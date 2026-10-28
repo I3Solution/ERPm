@@ -28,10 +28,25 @@
 | **Custom Select, Pointer & Full i18n** | 100% |  Hoàn thành | Custom Select Component, triệt tiêu caret nhấp nháy, phủ song ngữ 100% ([step-10.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-10-custom-select-cursor-and-complete-i18n.md)) |
 | **Dynamic Item Attributes (JSONB)** | 100% |  Hoàn thành | Thuộc tính động Schema-driven + PostgreSQL JSONB + GIN Index ([step-11.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-11-dynamic-item-attributes-jsonb.md)) |
 | **Git Remote & Gitignore Configuration** | 100% |  Hoàn thành | Cấu hình remote `origin` GitHub & Master `.gitignore` ([step-12.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-12-git-remote-and-gitignore-setup.md)) |
+| **Multi-Repo & Submodules Architecture** | 100% |  Hoàn thành | Tách BE/FE thành 2 repo riêng, phân rã 5 submodule FE lồng nhau ([step-13.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-13-multi-repo-and-submodule-enterprise-architecture.md)) |
 
 ---
 
-## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 12)
+## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 13)
+- [x] **Tách Backend & Frontend thành 2 Git Repo độc lập:**
+  - `ERPm-BE`: `https://github.com/I3Solution/ERPm-BE.git` (.NET 8 Clean Architecture, PostgreSQL).
+  - `ERPm-FE`: `https://github.com/I3Solution/ERPm-FE.git` (Angular 18 Standalone, Ionic 8 Hybrid).
+- [x] **Phân rã 5 Git Submodule cho Frontend:**
+  - `catalog`: `https://github.com/I3Solution/ERPm-FE-catalog.git`
+  - `dashboard`: `https://github.com/I3Solution/ERPm-FE-dashboard.git`
+  - `inventory`: `https://github.com/I3Solution/ERPm-FE-inventory.git`
+  - `partners`: `https://github.com/I3Solution/ERPm-FE-partners.git`
+  - `sales`: `https://github.com/I3Solution/ERPm-FE-sales.git`
+- [x] **Hệ thống Quản lý Kế hoạch & Trạng thái độc lập:**
+  - Mỗi repo chính (`ERPm-BE`, `ERPm-FE`) có `PROJECT_MASTER.md`, `AGENTS.md`, `.ai/` riêng.
+  - Mỗi submodule FE có `.ai/plan.md` (kế hoạch con từ task FE giao), `.ai/status.md`, `.ai/steps/` riêng.
+- [x] **Liên kết Submodules:** Cấu hình `.gitmodules` ở cả tầng Root và tầng Frontend.
+- [x] **Kiểm thử biên dịch:** `dotnet build` (0 Error) và `npm run build` (0 Error).
 - [x] **Cấu hình Git Remote Repository:**
   - Thiết lập remote `origin` trỏ tới `https://github.com/I3Solution/ERPm.git`.
   - Kiểm tra và xác nhận cả `fetch` và `push` đều kết nối thành công.

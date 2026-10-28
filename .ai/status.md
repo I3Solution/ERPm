@@ -28,11 +28,25 @@
 | **Custom Select, Pointer & Full i18n** | 100% |  Hoàn thành | Custom Select Component, triệt tiêu caret nhấp nháy, phủ song ngữ 100% ([step-10.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-10-custom-select-cursor-and-complete-i18n.md)) |
 | **Dynamic Item Attributes (JSONB)** | 100% |  Hoàn thành | Thuộc tính động Schema-driven + PostgreSQL JSONB + GIN Index ([step-11.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-11-dynamic-item-attributes-jsonb.md)) |
 | **Git Remote & Gitignore Configuration** | 100% |  Hoàn thành | Cấu hình remote `origin` GitHub & Master `.gitignore` ([step-12.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-12-git-remote-and-gitignore-setup.md)) |
-| **Multi-Repo & Submodules Architecture** | 100% |  Hoàn thành | Tách BE/FE thành 2 repo riêng, phân rã 5 submodule FE lồng nhau ([step-13.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-13-multi-repo-and-submodule-enterprise-architecture.md)) |
+| **Multi-Repo & Submodules Architecture** | 100% |  Hoàn thành | Tách BE/FE thành 2 repo riêng, phân rã submodule FE lồng nhau ([step-13.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-13-multi-repo-and-submodule-enterprise-architecture.md)) |
+| **Enterprise Module Acronyms & Gitmodules** | 100% |  Hoàn thành | Chuẩn hóa 10 module viết tắt (ACC, SD, PUR, WMS, CRM, HRM, MFG, SCM, PM, DASHBOARD) ([step-14.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-14-enterprise-erp-module-standardization.md)) |
 
 ---
 
-## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 13)
+## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 14)
+- [x] **Chuẩn hóa danh mục 10 Module ERP viết tắt chuẩn mực:**
+  - `ACC`, `SD`, `PUR`, `WMS`, `CRM`, `HRM`, `MFG`, `SCM`, `PM`, `DASHBOARD`.
+- [x] **Tái cấu trúc CSDL PostgreSQL theo module:**
+  - Chuẩn hóa các bảng bán hàng thành `tbl_SALE_Order`, `tbl_SALE_OrderItem`, `tbl_SALE_Invoice`, `tbl_SALE_InvoiceItem`.
+  - Giữ vững các bảng `tbl_PURCHASE_...`, `tbl_WMS_...`, `tbl_CRM_...`, `tbl_ACC_...`, `tbl_SYS_...`.
+- [x] **Cập nhật Backend Clean Architecture:**
+  - Gom các Controllers theo thư mục module: `Controllers/SD/`, `Controllers/PUR/`, `Controllers/WMS/`, `Controllers/CRM/`, `Controllers/SYS/`, `Controllers/DASHBOARD/`.
+  - Biên dịch kiểm tra: `dotnet build` đạt **0 Warning, 0 Error**.
+- [x] **Cập nhật Frontend Angular 18 Submodules & .gitmodules:**
+  - Tách bạch 10 Submodules tương ứng với remote `https://github.com/I3Solution/ERPm-FE-[MODULE].git`.
+  - Mỗi submodule đều sở hữu `.ai/plan.md` (kế hoạch con từ task FE giao), `.ai/status.md` và `.ai/steps/`.
+  - Biên dịch kiểm tra: `npm run build` đạt **0 Error**.
+- [x] **Cập nhật tài liệu hệ thống:** `PROJECT_MASTER.md`, `README.md`, `.gitmodules`.
 - [x] **Tách Backend & Frontend thành 2 Git Repo độc lập:**
   - `ERPm-BE`: `https://github.com/I3Solution/ERPm-BE.git` (.NET 8 Clean Architecture, PostgreSQL).
   - `ERPm-FE`: `https://github.com/I3Solution/ERPm-FE.git` (Angular 18 Standalone, Ionic 8 Hybrid).

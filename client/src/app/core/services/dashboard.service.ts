@@ -55,9 +55,10 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  public loadMetrics(): void {
+  public loadMetrics(branchId?: string | null): void {
     this.isLoading.set(true);
-    this.http.get<{ success: boolean; data: DashboardMetricsDto }>(this.apiUrl)
+    const url = branchId ? `${this.apiUrl}?branchId=${branchId}` : this.apiUrl;
+    this.http.get<{ success: boolean; data: DashboardMetricsDto }>(url)
       .pipe(catchError(() => of({ success: true, data: MOCK_METRICS })))
       .subscribe(res => {
         if (res && res.success && res.data) {

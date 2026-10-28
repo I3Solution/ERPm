@@ -1,6 +1,7 @@
 using ERPm.Domain.Common;
 using ERPm.Domain.Entities.Accounting;
 using ERPm.Domain.Entities.Catalog;
+using ERPm.Domain.Entities.System;
 using PartnerEntity = ERPm.Domain.Entities.Partner.Partner;
 
 namespace ERPm.Domain.Entities.Inventory;
@@ -9,6 +10,7 @@ public class StockReceipt : BaseAuditableEntity
 {
     public string Code { get; set; } = string.Empty;       // PNK0001
     public DateTime ReceiptDate { get; set; } = DateTime.UtcNow;
+    public Guid BranchId { get; set; }                     // Chi nhánh nhập kho
     public Guid WarehouseId { get; set; }
     public Guid? SupplierId { get; set; }                  // Nhà cung cấp
 
@@ -17,6 +19,7 @@ public class StockReceipt : BaseAuditableEntity
     public string? Notes { get; set; }
 
     // Navigation
+    public virtual Branch? Branch { get; set; }
     public virtual Warehouse? Warehouse { get; set; }
     public virtual PartnerEntity? Supplier { get; set; }
     public virtual ICollection<StockReceiptItem> Items { get; set; } = new List<StockReceiptItem>();

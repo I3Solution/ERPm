@@ -75,20 +75,53 @@ ERPm/
 3. **Immutability trong Kế toán & Kho:**
    - **Tuyệt đối không xóa cứng (Hard Delete)** các bản ghi hóa đơn, phiếu nhập/xuất kho đã ghi sổ (`Status = Posted`).
    - Mọi điều chỉnh đều phải thông qua **Phiếu hủy (Cancel)**, **Bút toán đảo (Storno/Reversal)**, hoặc **Phiếu điều chỉnh**.
+4. **Code Comments & Documentation Standards:**
+   - **Bắt buộc 100% bằng Tiếng Anh (English comments only):** Toàn bộ comment trong mã nguồn (C# backend, TypeScript/HTML/SCSS frontend, SQL migration scripts), bao gồm XML docstrings (`/// <summary>`), JSDoc, inline comments và header comments **phải được viết bằng Tiếng Anh** chuẩn mực kỹ thuật phần mềm quốc tế. Tuyệt đối không dùng tiếng Việt trong comment mã nguồn.
+
+### 2.3. Khung Generic Base CRUD Type-Safe (Dành cho Solo Developer)
+Nhằm giúp tối ưu tốc độ phát triển (giảm thời gian viết boilerplate CRUD) mà vẫn giữ **100% Type-Safe**, Swagger schema chuẩn chỉ, không dùng reflection runtime:
+1. **Khung chuẩn:**
+   - `IBaseCrudService<TEntity, TDto, TCreateDto, TUpdateDto, TKey>` trong `ERPm.Application/Common/Crud/`
+   - `BaseCrudService<TEntity, TDto, TCreateDto, TUpdateDto, TKey>` trong `ERPm.Infrastructure/Services/Common/`
+   - `BaseCrudController<TEntity, TDto, TCreateDto, TUpdateDto, TKey>` trong `ERPm.API/Controllers/Base/`
+2. **Nguyên tắc tạo CRUD mới cho Solo Dev:**
+   - Bảng danh mục thông thường (VD: `Category`, `UnitOfMeasure`, `Warehouse`, `CustomerGroup`...): Chỉ cần tạo Entity + DTOs + Controller kế thừa `BaseCrudController` (khoảng 10 dòng code). KHÔNG CẦN viết Service riêng hay can thiệp Dependency Injection nhờ Open Generics DI.
+   - Bảng có nghiệp vụ tùy biến: Kế thừa `BaseCrudService`, override các virtual hooks (`ApplyFilters`, `BeforeCreateAsync`, `AfterCreateAsync`, `BeforeUpdateAsync`).
+3. **Phân cấp Thư mục theo Module Đồng bộ với Tiền tố Bảng:**
+   - **SYS** (Hệ thống): `Entities/SYS/`, `DTOs/SYS/`, `Controllers/SYS/` -> `tbl_SYS_...`
+   - **WMS** (Kho & Sản phẩm): `Entities/WMS/`, `Controllers/WMS/` -> `tbl_WMS_...`
+   - **CRM** (Đối tác & Khách hàng): `Entities/CRM/`, `Controllers/CRM/` -> `tbl_CRM_...`
+   - **SALES** (Bán hàng): `Entities/SALES/`, `Controllers/SALES/` -> `tbl_SALES_...`
+   - **PURCHASE** (Mua hàng): `Entities/PURCHASE/`, `Controllers/PURCHASE/` -> `tbl_PURCHASE_...`
+   - **ACC** (Kế toán Sổ cái): `Entities/ACC/`, `Controllers/ACC/` -> `tbl_ACC_...`
 
 ---
 
 ## 3. THIẾT KẾ CƠ SỞ DỮ LIỆU & NGUYÊN LÝ KẾ TOÁN (POSTGRESQL)
 
-### 3.1. Quy chuẩn Database
-- **Bảng và Cột:** Đặt tên dạng `snake_case` hoặc mapping rõ ràng qua EF Core Fluent API.
-- **Tiền tệ & Số lượng:**
-  - Tiền tệ: `decimal(18, 4)` hoặc `numeric(18, 4)` (Tuyệt đối không dùng `float` / `double`).
-  - Số lượng: `decimal(18, 4)` (để hỗ trợ đơn vị tính lẻ như kg, lít, mét).
-- **Trạng thái Chứng từ (Voucher Status):**
-  - `0 - Draft`: Đang soạn thảo, chưa tác động kho/công nợ.
-  - `1 - Posted / Approved`: Đã ghi sổ, lập tức cập nhật Tồn kho và Công nợ + Sinh bút toán kế toán ngầm.
-  - `2 - Cancelled`: Đã hủy (có lưu lý do hủy và người hủy).
+### 3.1. Quy chuẩn Database & Kiến trúc Multi-Branch
+1. **Kiến trúc Tâm điểm Chi nhánh (Multi-Branch Architecture):**
+   - Hệ thống xoay quanh bảng trung tâm `"tbl_SYS_Branch"` (Chi nhánh công ty).
+   - Chi nhánh hỗ trợ phân cấp cha - con đa cấp (`parent_id REFERENCES "tbl_SYS_Branch"(id)`).
+   - Chi nhánh gốc (Tổng công ty / Head Office) bắt buộc có mã code là `'root'`.
+   - Tất cả kho bãi (`tbl_WMS_Warehouse`), hóa đơn bán hàng (`tbl_SALES_Invoice`), phiếu nhập kho (`tbl_WMS_StockReceipt`), phiếu xuất kho (`tbl_WMS_StockIssue`), và bút toán sổ cái (`tbl_ACC_JournalEntry`) đều bắt buộc mang `branch_id` xác định chi nhánh sở hữu / phát sinh chứng từ.
+2. **Quy ước Đặt tên Bảng theo Module (`tbl_{MODULE}_{ENTITY}`):**
+   - Tiền tố bắt buộc: `tbl_` đại diện cho table.
+   - Mã module viết HOA (VD: `SYS`, `WMS`, `CRM`, `SALES`, `ACC`).
+   - Tên thực thể dạng PascalCase (VD: `Item`, `Branch`, `Invoice`).
+   - *Bảng danh sách chuẩn:*
+     - **SYS:** `"tbl_SYS_Branch"`, `"tbl_SYS_Language"`, `"tbl_SYS_Dictionary"`.
+     - **WMS:** `"tbl_WMS_Item"`, `"tbl_WMS_Category"`, `"tbl_WMS_UnitOfMeasure"`, `"tbl_WMS_Warehouse"`, `"tbl_WMS_StockBalance"`, `"tbl_WMS_StockReceipt"`, `"tbl_WMS_StockReceiptItem"`, `"tbl_WMS_StockIssue"`, `"tbl_WMS_StockIssueItem"`.
+     - **CRM:** `"tbl_CRM_Partner"`.
+     - **SALES:** `"tbl_SALES_Invoice"`, `"tbl_SALES_InvoiceItem"`.
+     - **ACC:** `"tbl_ACC_Account"`, `"tbl_ACC_JournalEntry"`, `"tbl_ACC_JournalEntryLine"`.
+3. **Tiền tệ & Số lượng:**
+   - Tiền tệ: `decimal(18, 4)` hoặc `numeric(18, 4)` (Tuyệt đối không dùng `float` / `double`).
+   - Số lượng: `decimal(18, 4)` (để hỗ trợ đơn vị tính lẻ như kg, lít, mét).
+4. **Trạng thái Chứng từ (Voucher Status):**
+   - `0 - Draft`: Đang soạn thảo, chưa tác động kho/công nợ.
+   - `1 - Posted / Approved`: Đã ghi sổ, lập tức cập nhật Tồn kho và Công nợ + Sinh bút toán kế toán ngầm.
+   - `2 - Cancelled`: Đã hủy (có lưu lý do hủy và người hủy).
 
 ### 3.2. Nền tảng Bút toán Kép (Double-Entry Foundation)
 Mặc dù giai đoạn 1 giao diện người dùng chỉ hiển thị màn hình Bán hàng & Quản lý kho đơn giản, nhưng Database đã được cấy sẵn hạt nhân Kế toán:
@@ -208,5 +241,7 @@ Khi thực hiện bất kỳ nhiệm vụ nào trong dự án, AI Agent **phải
    - Đảm bảo Backend build thành công (`dotnet build`), không có warning lỗi tiềm ẩn.
    - Đảm bảo Frontend compile thành công, không dùng `any` bừa bãi.
 6. **GIẢI THÍCH RÕ RÀNG BẰNG TIẾNG VIỆT:**
-   - Mọi tài liệu, ghi chú và phản hồi cho người dùng viết bằng Tiếng Việt chuẩn mực, mạch lạc, chuyên nghiệp.
+   - Mọi tài liệu log bước thực hiện (`.ai/steps/`), tài liệu quản trị (`.ai/status.md`) và trao đổi, giải thích với người dùng trong hội thoại viết bằng Tiếng Việt chuẩn mực, mạch lạc, chuyên nghiệp.
+7. **CODE COMMENTS TRONG MÃ NGUỒN PHẢI DÙNG TIẾNG ANH (ENGLISH COMMENTS ONLY):**
+   - Mọi comment chú thích trong source code (C#, TypeScript, HTML templates, SCSS styles, SQL scripts) bắt buộc phải viết bằng Tiếng Anh. Tuyệt đối không comment tiếng Việt trong file mã nguồn.
 

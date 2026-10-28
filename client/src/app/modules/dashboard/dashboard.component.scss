@@ -1,0 +1,72 @@
+.dashboard-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.shortcut-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.85rem;
+  border-radius: var(--erpm-radius-md);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: var(--erpm-transition-fast);
+
+  .shortcut-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .shortcut-title {
+    font-weight: 700;
+    font-size: 0.825rem;
+    line-height: 1.3;
+  }
+  .shortcut-desc {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-top: 0.2rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--erpm-shadow-sm);
+  }
+
+  &.shortcut-indigo {
+    background-color: var(--erpm-primary-50);
+    color: var(--erpm-primary-800);
+    border-color: var(--erpm-primary-200);
+    &:hover { background-color: var(--erpm-primary-100); }
+  }
+  &.shortcut-emerald {
+    background-color: var(--erpm-success-bg);
+    color: var(--erpm-success-text);
+    border-color: var(--erpm-success-border);
+    &:hover { background-color: #d1fae5; }
+  }
+  &.shortcut-amber {
+    background-color: var(--erpm-warning-bg);
+    color: var(--erpm-warning-text);
+    border-color: var(--erpm-warning-border);
+    &:hover { background-color: #fef3c7; }
+  }
+  &.shortcut-purple {
+    background-color: #faf5ff;
+    color: #6b21a8;
+    border-color: #e9d5ff;
+    &:hover { background-color: #f3e8ff; }
+  }
+  &.shortcut-sky {
+    background-color: var(--erpm-info-bg);
+    color: var(--erpm-info-text);
+    border-color: var(--erpm-info-border);
+    &:hover { background-color: #e0f2fe; }
+  }
+  &.shortcut-rose {
+    background-color: var(--erpm-danger-bg);
+    color: var(--erpm-danger-text);
+    border-color: var(--erpm-danger-border);
+    &:hover { background-color: #ffe4e6; }
+  }
+}

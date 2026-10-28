@@ -69,7 +69,7 @@ const MOCK_PARTNERS: PartnerDto[] = [
 export class PartnerService {
   private readonly apiUrl = 'http://localhost:5000/api/v1/partners';
 
-  public partners = signal<PartnerDto[]>(MOCK_PARTNERS);
+  public partners = signal<PartnerDto[]>([]);
   public isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient) {}
@@ -77,12 +77,17 @@ export class PartnerService {
   public loadPartners(): void {
     this.isLoading.set(true);
     this.http.get<{ success: boolean; data: PartnerDto[] }>(this.apiUrl)
-      .pipe(catchError(() => of({ success: true, data: MOCK_PARTNERS })))
-      .subscribe(res => {
-        if (res && res.success && res.data) {
-          this.partners.set(res.data);
+      .subscribe({
+        next: (res) => {
+          if (res && res.success && res.data) {
+            this.partners.set(res.data);
+          }
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải danh sách đối tác:', err);
+          this.isLoading.set(false);
         }
-        this.isLoading.set(false);
       });
   }
 
@@ -92,23 +97,6 @@ export class PartnerService {
         map(res => res.data),
         tap(created => {
           this.partners.set([created, ...this.partners()]);
-        }),
-        catchError(() => {
-          const fallback: PartnerDto = {
-            id: crypto.randomUUID(),
-            code: request.code,
-            name: request.name,
-            partnerType: request.partnerType,
-            phone: request.phone,
-            email: request.email,
-            address: request.address,
-            taxCode: request.taxCode,
-            creditLimit: request.creditLimit,
-            debtBalance: 0,
-            isActive: true
-          };
-          this.partners.set([fallback, ...this.partners()]);
-          return of(fallback);
         })
       );
   }

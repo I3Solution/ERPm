@@ -1,0 +1,362 @@
+/* ==========================================================================
+   ERPM DESIGN SYSTEM - ENTERPRISE DATA TABLE SUITE
+   Ergonomic, high-density, responsive tables for Accounting & ERP
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TABLE CONTAINER & WRAPPER
+   -------------------------------------------------------------------------- */
+.erpm-table-container {
+  background: var(--erpm-bg-surface);
+  border: 1px solid var(--erpm-border);
+  border-radius: var(--erpm-radius-lg);
+  box-shadow: var(--erpm-shadow-sm);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: var(--erpm-transition-fast);
+
+  &:hover {
+    box-shadow: var(--erpm-shadow-md);
+  }
+}
+
+.erpm-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--erpm-bg-surface-subtle);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--erpm-border-strong);
+    border-radius: var(--erpm-radius-pill);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. TABLE TOOLBAR (Header controls above table)
+   -------------------------------------------------------------------------- */
+.erpm-table-toolbar {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--erpm-bg-surface);
+  border-bottom: 1px solid var(--erpm-border);
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 260px;
+  }
+
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .toolbar-count {
+    font-size: 0.8rem;
+    color: var(--erpm-text-muted);
+
+    strong {
+      color: var(--erpm-text-heading);
+      font-weight: 700;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. CORE TABLE STYLING
+   -------------------------------------------------------------------------- */
+.erpm-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.875rem;
+  text-align: left;
+
+  /* Sticky & High-Contrast Header */
+  thead {
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background-color: var(--erpm-bg-surface-subtle);
+      color: var(--erpm-text-muted);
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--erpm-border);
+      white-space: nowrap;
+      user-select: none;
+
+      &.sortable {
+        cursor: pointer;
+        transition: color 0.15s ease;
+
+        &:hover {
+          color: var(--erpm-primary-600);
+        }
+
+        &::after {
+          content: ' ↕';
+          font-size: 0.7rem;
+          opacity: 0.4;
+        }
+
+        &.sorted-asc::after {
+          content: ' ↑';
+          opacity: 1;
+          color: var(--erpm-primary-600);
+        }
+
+        &.sorted-desc::after {
+          content: ' ↓';
+          opacity: 1;
+          color: var(--erpm-primary-600);
+        }
+      }
+
+      &.text-right {
+        text-align: right;
+      }
+      &.text-center {
+        text-align: center;
+      }
+    }
+  }
+
+  /* Table Body */
+  tbody {
+    tr {
+      transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+      td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--erpm-border-subtle);
+        color: var(--erpm-text-body);
+        vertical-align: middle;
+        line-height: 1.4;
+      }
+
+      &:last-child td {
+        border-bottom: none;
+      }
+
+      /* Hover highlight with soft brand accent indicator */
+      &:hover {
+        background-color: #f8faff;
+        box-shadow: inset 3px 0 0 var(--erpm-primary-600);
+
+        .row-action-btn {
+          opacity: 1;
+        }
+      }
+
+      &.active-row {
+        background-color: var(--erpm-primary-50);
+        box-shadow: inset 3px 0 0 var(--erpm-primary-600);
+      }
+    }
+  }
+
+  /* Striped table variant */
+  &.erpm-table-striped {
+    tbody tr:nth-child(even) {
+      background-color: #fafbfc;
+      &:hover {
+        background-color: #f8faff;
+      }
+    }
+  }
+
+  /* Compact / High-Density variant for Accounting Sổ Cái */
+  &.erpm-table-compact {
+    thead th {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.7rem;
+    }
+    tbody td {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8125rem;
+    }
+  }
+
+  /* Totals / Summary Row in the table */
+  tfoot tr {
+    background-color: var(--erpm-bg-surface-subtle);
+    font-weight: 700;
+
+    td {
+      padding: 0.85rem 1rem;
+      border-top: 2px solid var(--erpm-border);
+      color: var(--erpm-text-heading);
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. CELL FORMATTERS & SPECIAL COLUMN HELPERS
+   -------------------------------------------------------------------------- */
+.col-code, .cell-code {
+  font-family: var(--font-family-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--erpm-primary-600);
+}
+
+.col-barcode, .cell-mono {
+  font-family: var(--font-family-mono);
+  font-size: 0.75rem;
+  color: var(--erpm-text-muted);
+}
+
+.col-currency, .cell-number {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+
+  &.text-success { color: var(--erpm-success-text); }
+  &.text-danger { color: var(--erpm-danger-core); }
+  &.text-primary { color: var(--erpm-primary-600); }
+}
+
+.cell-primary-title {
+  font-weight: 600;
+  color: var(--erpm-text-heading);
+}
+
+.cell-subtitle {
+  font-size: 0.75rem;
+  color: var(--erpm-text-muted);
+  margin-top: 0.15rem;
+}
+
+.cell-actions {
+  white-space: nowrap;
+  text-align: right;
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--erpm-radius-sm);
+    border: 1px solid var(--erpm-border);
+    background: #ffffff;
+    color: var(--erpm-text-muted);
+    cursor: pointer;
+    transition: var(--erpm-transition-fast);
+    margin-left: 0.35rem;
+
+    &:hover {
+      background: var(--erpm-primary-50);
+      color: var(--erpm-primary-700);
+      border-color: var(--erpm-primary-200);
+      transform: translateY(-1px);
+    }
+
+    &.btn-delete:hover {
+      background: var(--erpm-danger-bg);
+      color: var(--erpm-danger-core);
+      border-color: var(--erpm-danger-border);
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. TABLE FOOTER & PAGINATION BAR
+   -------------------------------------------------------------------------- */
+.erpm-table-footer {
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--erpm-border);
+  background: var(--erpm-bg-surface);
+  font-size: 0.8rem;
+  color: var(--erpm-text-muted);
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--erpm-radius-sm);
+      border: 1px solid var(--erpm-border);
+      background: #ffffff;
+      color: var(--erpm-text-body);
+      font-weight: 600;
+      font-size: 0.775rem;
+      cursor: pointer;
+      transition: var(--erpm-transition-fast);
+
+      &:hover:not(:disabled) {
+        background: var(--erpm-bg-surface-subtle);
+        border-color: var(--erpm-border-strong);
+      }
+
+      &.active {
+        background: var(--erpm-gradient-primary);
+        border-color: var(--erpm-primary-600);
+        color: #ffffff;
+        box-shadow: 0 2px 4px rgba(79, 70, 229, 0.25);
+      }
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. EMPTY TABLE STATE
+   -------------------------------------------------------------------------- */
+.erpm-table-empty {
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+
+  .empty-icon {
+    font-size: 2.75rem;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+  }
+
+  .empty-title {
+    font-family: var(--font-family-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--erpm-text-heading);
+    margin-bottom: 0.35rem;
+  }
+
+  .empty-desc {
+    font-size: 0.825rem;
+    color: var(--erpm-text-muted);
+    max-width: 380px;
+    margin: 0 auto 1.25rem;
+  }
+}

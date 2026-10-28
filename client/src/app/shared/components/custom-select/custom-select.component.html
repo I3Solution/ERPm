@@ -1,0 +1,118 @@
+<div
+  class="custom-select-wrapper"
+  [class.is-open]="isOpen()"
+  [class.is-disabled]="disabled"
+  [class.size-sm]="size === 'sm'"
+  [class.size-md]="size === 'md'"
+  [class.size-lg]="size === 'lg'"
+  [style.min-width]="minWidth"
+>
+  <!-- Trigger Box -->
+  <div
+    class="custom-select-trigger"
+    (click)="toggle($event)"
+    [attr.tabindex]="disabled ? -1 : 0"
+    role="button"
+  >
+    <!-- Left Icon (if selected item has icon) -->
+    <span *ngIf="selectedOption()?.icon" class="trigger-icon">
+      {{ selectedOption()?.icon }}
+    </span>
+
+    <!-- Label / Placeholder -->
+    <div class="trigger-label-container">
+      <span *ngIf="selectedOption(); else placeholderTpl" class="trigger-label">
+        {{ selectedOption()?.label }}
+      </span>
+      <ng-template #placeholderTpl>
+        <span class="trigger-placeholder">{{ placeholder }}</span>
+      </ng-template>
+
+      <span *ngIf="selectedOption()?.sublabel" class="trigger-sublabel">
+        {{ selectedOption()?.sublabel }}
+      </span>
+    </div>
+
+    <!-- Optional Badge -->
+    <span *ngIf="selectedOption()?.badge" class="trigger-badge">
+      {{ selectedOption()?.badge }}
+    </span>
+
+    <!-- Actions (Clear button & Chevron) -->
+    <div class="trigger-actions">
+      <button
+        *ngIf="allowClear && currentValue() !== null && currentValue() !== undefined && !disabled"
+        type="button"
+        class="clear-btn"
+        (click)="clear($event)"
+        title="Xóa lựa chọn"
+      >
+        ✕
+      </button>
+
+      <span class="chevron-arrow" [class.rotated]="isOpen()">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path
+            fill-rule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </span>
+    </div>
+  </div>
+
+  <!-- Dropdown Flyout Menu -->
+  <div *ngIf="isOpen()" class="custom-select-dropdown" (click)="$event.stopPropagation()">
+    <!-- Search Box (if searchable or options > 5) -->
+    <div *ngIf="searchable || options.length > 5" class="dropdown-search">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="searchKeyword"
+        placeholder="Tìm kiếm..."
+        class="dropdown-search-input"
+        autofocus
+      />
+      <button
+        *ngIf="searchKeyword()"
+        type="button"
+        class="clear-search-btn"
+        (click)="searchKeyword.set('')"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Scrollable Options List -->
+    <div class="options-scroll-list">
+      <div
+        *ngFor="let opt of filteredOptions()"
+        class="custom-select-option"
+        [class.active]="opt.value === currentValue()"
+        [class.disabled]="opt.disabled"
+        (click)="select(opt, $event)"
+      >
+        <span *ngIf="opt.icon" class="option-icon">{{ opt.icon }}</span>
+
+        <div class="option-text-group">
+          <div class="option-label">{{ opt.label }}</div>
+          <div *ngIf="opt.sublabel" class="option-sublabel">{{ opt.sublabel }}</div>
+        </div>
+
+        <span *ngIf="opt.badge" class="option-badge">{{ opt.badge }}</span>
+
+        <!-- Checkmark for selected option -->
+        <span *ngIf="opt.value === currentValue()" class="option-check">
+          ✓
+        </span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredOptions().length === 0" class="options-empty-state">
+        <span class="empty-icon">📂</span>
+        <span class="empty-text">Không có lựa chọn phù hợp</span>
+      </div>
+    </div>
+  </div>
+</div>

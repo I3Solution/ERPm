@@ -1,6 +1,7 @@
 using ERPm.Application.Common.Interfaces;
 using ERPm.Application.DTOs.Inventory;
 using ERPm.Application.Features.Inventory;
+using ERPm.Application.Features.System;
 using ERPm.Domain.Entities.Accounting;
 using ERPm.Domain.Entities.Inventory;
 using Microsoft.EntityFrameworkCore;
@@ -10,20 +11,34 @@ namespace ERPm.Infrastructure.Services;
 public class StockService : IStockService
 {
     private readonly IApplicationDbContext _context;
+    private readonly IBranchService _branchService;
 
-    public StockService(IApplicationDbContext context)
+    public StockService(IApplicationDbContext context, IBranchService branchService)
     {
         _context = context;
+        _branchService = branchService;
     }
 
-    public async Task<List<WarehouseDto>> GetWarehousesAsync(CancellationToken cancellationToken = default)
+    public async Task<List<WarehouseDto>> GetWarehousesAsync(Guid? branchId = null, CancellationToken cancellationToken = default)
     {
-        return await _context.Warehouses
+        var query = _context.Warehouses
+            .Include(w => w.Branch)
             .Where(w => w.IsActive)
+            .AsNoTracking();
+
+        if (branchId.HasValue && branchId.Value != Guid.Empty)
+        {
+            var targetBranchIds = await _branchService.GetBranchAndDescendantIdsAsync(branchId.Value, cancellationToken);
+            query = query.Where(w => targetBranchIds.Contains(w.BranchId));
+        }
+
+        return await query
             .OrderByDescending(w => w.IsDefault)
             .Select(w => new WarehouseDto
             {
                 Id = w.Id,
+                BranchId = w.BranchId,
+                BranchName = w.Branch != null ? w.Branch.Name : null,
                 Code = w.Code,
                 Name = w.Name,
                 Translations = w.Translations,
@@ -33,7 +48,7 @@ public class StockService : IStockService
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<StockBalanceDto>> GetStockBalancesAsync(Guid? warehouseId, CancellationToken cancellationToken = default)
+    public async Task<List<StockBalanceDto>> GetStockBalancesAsync(Guid? warehouseId, Guid? branchId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.StockBalances
             .Include(b => b.Warehouse)
@@ -44,6 +59,12 @@ public class StockService : IStockService
         if (warehouseId.HasValue)
         {
             query = query.Where(b => b.WarehouseId == warehouseId.Value);
+        }
+
+        if (branchId.HasValue && branchId.Value != Guid.Empty)
+        {
+            var targetBranchIds = await _branchService.GetBranchAndDescendantIdsAsync(branchId.Value, cancellationToken);
+            query = query.Where(b => b.Warehouse != null && targetBranchIds.Contains(b.Warehouse.BranchId));
         }
 
         return await query
@@ -71,10 +92,27 @@ public class StockService : IStockService
         var count = await _context.StockReceipts.CountAsync(cancellationToken);
         var code = $"PNK{count + 1:D5}";
 
+        // Xác định chi nhánh nhập kho
+        var branchId = request.BranchId;
+        if (!branchId.HasValue || branchId == Guid.Empty)
+        {
+            var wh = await _context.Warehouses.FirstOrDefaultAsync(w => w.Id == request.WarehouseId, cancellationToken);
+            if (wh != null && wh.BranchId != Guid.Empty)
+            {
+                branchId = wh.BranchId;
+            }
+            else
+            {
+                var rootBranch = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "root" || b.IsDefault, cancellationToken);
+                branchId = rootBranch?.Id ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
+            }
+        }
+
         var receipt = new StockReceipt
         {
             Code = code,
             ReceiptDate = DateTime.UtcNow,
+            BranchId = branchId.Value,
             WarehouseId = request.WarehouseId,
             SupplierId = request.SupplierId,
             Status = VoucherStatus.Posted,

@@ -1,0 +1,334 @@
+/* ==========================================================================
+   ERPM DESIGN SYSTEM - IONIC COMPONENT CUSTOM OVERRIDES
+   Transforms standard Ionic elements into a sleek, bespoke SaaS UI
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. ION-BUTTON: Modern tactile buttons, no harsh MD ripples
+   -------------------------------------------------------------------------- */
+ion-button {
+  --border-radius: var(--erpm-radius-sm);
+  font-family: var(--font-family-base);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: none; /* Discard uppercase MD style */
+  letter-spacing: -0.01em;
+  transition: var(--erpm-transition-fast);
+
+  &:hover {
+    filter: brightness(1.05);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.button-solid {
+    --box-shadow: var(--erpm-shadow-xs);
+
+    &.ion-color-primary {
+      --background: var(--erpm-gradient-primary);
+      --box-shadow: 0 2px 4px 0 rgba(79, 70, 229, 0.25);
+
+      &:hover {
+        --box-shadow: 0 4px 10px 0 rgba(79, 70, 229, 0.35);
+      }
+    }
+
+    &.ion-color-success {
+      --background: var(--erpm-gradient-success);
+      --box-shadow: 0 2px 4px 0 rgba(16, 185, 129, 0.25);
+    }
+
+    &.ion-color-danger {
+      --background: var(--erpm-gradient-danger);
+      --box-shadow: 0 2px 4px 0 rgba(244, 63, 94, 0.25);
+    }
+  }
+
+  &.button-outline {
+    --border-width: 1px;
+    --border-color: var(--erpm-border-strong);
+    --color: var(--erpm-text-heading);
+
+    &:hover {
+      --background: var(--erpm-bg-surface-active);
+    }
+  }
+
+  &.button-clear {
+    --color: var(--erpm-primary-600);
+    &:hover {
+      --background: var(--erpm-primary-50);
+    }
+  }
+
+  /* Compact button variant */
+  &.btn-compact {
+    --padding-top: 0.35rem;
+    --padding-bottom: 0.35rem;
+    --padding-start: 0.75rem;
+    --padding-end: 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. ION-CARD: Clean border-led elevation with soft ambient shadows
+   -------------------------------------------------------------------------- */
+ion-card {
+  --background: var(--erpm-bg-surface);
+  --color: var(--erpm-text-body);
+  border-radius: var(--erpm-radius-lg);
+  border: 1px solid var(--erpm-border);
+  box-shadow: var(--erpm-shadow-sm);
+  margin: 0;
+  transition: var(--erpm-transition-fast);
+
+  &.card-interactive {
+    cursor: pointer;
+    &:hover {
+      box-shadow: var(--erpm-shadow-md);
+      border-color: var(--erpm-primary-200);
+      transform: translateY(-2px);
+    }
+  }
+
+  ion-card-header {
+    padding: 1.25rem 1.25rem 0.5rem;
+
+    ion-card-title {
+      font-family: var(--font-family-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--erpm-text-heading);
+      letter-spacing: -0.02em;
+    }
+
+    ion-card-subtitle {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--erpm-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  ion-card-content {
+    padding: 1rem 1.25rem 1.25rem;
+    color: var(--erpm-text-body);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. ION-SEARCHBAR: Minimalist SaaS search bar
+   -------------------------------------------------------------------------- */
+ion-searchbar {
+  --background: var(--erpm-bg-surface);
+  --border-radius: var(--erpm-radius-sm);
+  --box-shadow: none;
+  --placeholder-color: var(--erpm-text-subtle);
+  --icon-color: var(--erpm-text-muted);
+  --clear-button-color: var(--erpm-text-muted);
+  padding: 0;
+  border: 1px solid var(--erpm-border);
+  border-radius: var(--erpm-radius-sm);
+  transition: var(--erpm-transition-fast);
+
+  &.searchbar-has-focus {
+    border-color: var(--erpm-border-focus);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  }
+
+  .searchbar-input-container {
+    height: 42px;
+  }
+
+  input {
+    font-size: 0.875rem !important;
+    font-weight: 400;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. ION-ITEM & ION-LIST: Clean card-like rows with refined separators
+   -------------------------------------------------------------------------- */
+ion-list {
+  background: transparent;
+  padding: 0;
+
+  &.erpm-item-list {
+    background: var(--erpm-bg-surface);
+    border: 1px solid var(--erpm-border);
+    border-radius: var(--erpm-radius-md);
+    overflow: hidden;
+  }
+}
+
+ion-item {
+  --background: var(--erpm-bg-surface);
+  --color: var(--erpm-text-body);
+  --border-color: var(--erpm-border-subtle);
+  --highlight-color-focused: var(--erpm-primary-600);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --inner-padding-end: 0;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease;
+
+  &.item-interactive:hover {
+    --background: var(--erpm-bg-surface-subtle);
+  }
+
+  ion-label {
+    h2, h3 {
+      font-weight: 600;
+      color: var(--erpm-text-heading);
+    }
+    p {
+      color: var(--erpm-text-muted);
+      font-size: 0.775rem;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. ION-BADGE & ION-CHIP: Modern pastel SaaS badges with dots
+   -------------------------------------------------------------------------- */
+ion-badge {
+  font-family: var(--font-family-base);
+  font-size: 0.725rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--erpm-radius-pill);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  &.color-primary {
+    background: var(--erpm-primary-50);
+    color: var(--erpm-primary-700);
+    border: 1px solid var(--erpm-primary-200);
+  }
+
+  &.color-success {
+    background: var(--erpm-success-bg);
+    color: var(--erpm-success-text);
+    border: 1px solid var(--erpm-success-border);
+  }
+
+  &.color-warning {
+    background: var(--erpm-warning-bg);
+    color: var(--erpm-warning-text);
+    border: 1px solid var(--erpm-warning-border);
+  }
+
+  &.color-danger {
+    background: var(--erpm-danger-bg);
+    color: var(--erpm-danger-text);
+    border: 1px solid var(--erpm-danger-border);
+  }
+
+  &.color-medium {
+    background: var(--erpm-neutral-bg);
+    color: var(--erpm-neutral-text);
+    border: 1px solid var(--erpm-neutral-border);
+  }
+}
+
+ion-chip {
+  --background: var(--erpm-bg-surface-subtle);
+  --color: var(--erpm-text-body);
+  border: 1px solid var(--erpm-border);
+  border-radius: var(--erpm-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+  height: 28px;
+  padding: 0 0.65rem;
+
+  &.chip-outline {
+    background: transparent;
+  }
+
+  &.chip-active {
+    --background: var(--erpm-primary-50);
+    --color: var(--erpm-primary-700);
+    border-color: var(--erpm-primary-300);
+    font-weight: 600;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. ION-SEGMENT: Sliding pill segment controller (Linear / macOS style)
+   -------------------------------------------------------------------------- */
+ion-segment {
+  background: var(--erpm-bg-surface-active);
+  border: 1px solid var(--erpm-border);
+  border-radius: var(--erpm-radius-sm);
+  padding: 3px;
+  min-height: 38px;
+
+  ion-segment-button {
+    --background: transparent;
+    --background-checked: #ffffff;
+    --color: var(--erpm-text-muted);
+    --color-checked: var(--erpm-text-heading);
+    --indicator-color: transparent;
+    border-radius: calc(var(--erpm-radius-sm) - 2px);
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-height: 32px;
+    margin: 0;
+    transition: var(--erpm-transition-fast);
+
+    &.segment-button-checked {
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. ION-TOOLBAR & ION-HEADER: Frosted Glassmorphism
+   -------------------------------------------------------------------------- */
+ion-header {
+  box-shadow: none;
+
+  ion-toolbar {
+    --background: var(--erpm-glass-bg);
+    --border-color: var(--erpm-border);
+    --border-width: 0 0 1px 0;
+    --color: var(--erpm-text-heading);
+    backdrop-filter: var(--erpm-glass-blur);
+    -webkit-backdrop-filter: var(--erpm-glass-blur);
+
+    ion-title {
+      font-family: var(--font-family-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   8. ION-MODAL: Clean Sheet and Floating Window Modals
+   -------------------------------------------------------------------------- */
+ion-modal {
+  --border-radius: var(--erpm-radius-xl);
+  --box-shadow: var(--erpm-shadow-xl);
+  --backdrop-opacity: 0.6;
+}
+
+/* --------------------------------------------------------------------------
+   9. ION-TOAST: Modern Floating Snack Notification
+   -------------------------------------------------------------------------- */
+ion-toast {
+  --background: #0f172a;
+  --color: #ffffff;
+  --border-radius: var(--erpm-radius-md);
+  --box-shadow: var(--erpm-shadow-lg);
+  --button-color: var(--erpm-primary-300);
+  font-size: 0.85rem;
+  font-weight: 500;
+}

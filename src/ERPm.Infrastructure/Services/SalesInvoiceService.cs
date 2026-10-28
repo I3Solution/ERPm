@@ -1,6 +1,7 @@
 using ERPm.Application.Common.Interfaces;
 using ERPm.Application.DTOs.Sales;
 using ERPm.Application.Features.Sales;
+using ERPm.Application.Features.System;
 using ERPm.Domain.Entities.Accounting;
 using ERPm.Domain.Entities.Inventory;
 using ERPm.Domain.Entities.Sales;
@@ -11,17 +12,29 @@ namespace ERPm.Infrastructure.Services;
 public class SalesInvoiceService : ISalesInvoiceService
 {
     private readonly IApplicationDbContext _context;
+    private readonly IBranchService _branchService;
 
-    public SalesInvoiceService(IApplicationDbContext context)
+    public SalesInvoiceService(IApplicationDbContext context, IBranchService branchService)
     {
         _context = context;
+        _branchService = branchService;
     }
 
-    public async Task<List<SalesInvoiceDto>> GetInvoicesAsync(CancellationToken cancellationToken = default)
+    public async Task<List<SalesInvoiceDto>> GetInvoicesAsync(Guid? branchId = null, CancellationToken cancellationToken = default)
     {
-        return await _context.SalesInvoices
+        var query = _context.SalesInvoices
+            .Include(i => i.Branch)
             .Include(i => i.Items)
                 .ThenInclude(it => it.Item)
+            .AsNoTracking();
+
+        if (branchId.HasValue && branchId.Value != Guid.Empty)
+        {
+            var targetBranchIds = await _branchService.GetBranchAndDescendantIdsAsync(branchId.Value, cancellationToken);
+            query = query.Where(i => targetBranchIds.Contains(i.BranchId));
+        }
+
+        return await query
             .OrderByDescending(i => i.InvoiceDate)
             .Take(50)
             .Select(i => new SalesInvoiceDto
@@ -29,6 +42,9 @@ public class SalesInvoiceService : ISalesInvoiceService
                 Id = i.Id,
                 InvoiceNumber = i.InvoiceNumber,
                 InvoiceDate = i.InvoiceDate,
+                BranchId = i.BranchId,
+                BranchCode = i.Branch != null ? i.Branch.Code : null,
+                BranchName = i.Branch != null ? i.Branch.Name : null,
                 CustomerName = i.CustomerName,
                 PaymentMethodName = i.PaymentMethod == PaymentMethod.Cash ? "Tiền mặt" :
                                     i.PaymentMethod == PaymentMethod.BankTransfer ? "Chuyển khoản" : "Ghi nợ",
@@ -57,10 +73,27 @@ public class SalesInvoiceService : ISalesInvoiceService
         var issueCode = $"PXK{count + 1:D5}";
         var journalCode = $"PKT{count + 1:D5}";
 
+        // Xác định chi nhánh phát sinh đơn hàng
+        var branchId = request.BranchId;
+        if (!branchId.HasValue || branchId == Guid.Empty)
+        {
+            var wh = await _context.Warehouses.FirstOrDefaultAsync(w => w.Id == request.WarehouseId, cancellationToken);
+            if (wh != null && wh.BranchId != Guid.Empty)
+            {
+                branchId = wh.BranchId;
+            }
+            else
+            {
+                var rootBranch = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "root" || b.IsDefault, cancellationToken);
+                branchId = rootBranch?.Id ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
+            }
+        }
+
         var invoice = new SalesInvoice
         {
             InvoiceNumber = invoiceNumber,
             InvoiceDate = DateTime.UtcNow,
+            BranchId = branchId.Value,
             CustomerId = request.CustomerId,
             CustomerName = string.IsNullOrWhiteSpace(request.CustomerName) ? "Khách lẻ" : request.CustomerName,
             WarehouseId = request.WarehouseId,
@@ -78,6 +111,7 @@ public class SalesInvoiceService : ISalesInvoiceService
         {
             Code = issueCode,
             IssueDate = DateTime.UtcNow,
+            BranchId = branchId.Value,
             WarehouseId = request.WarehouseId,
             CustomerId = request.CustomerId,
             Reason = $"Xuất bán theo hóa đơn {invoiceNumber}",
@@ -147,6 +181,7 @@ public class SalesInvoiceService : ISalesInvoiceService
                 VoucherType = "SALES_INVOICE",
                 DocDate = DateTime.UtcNow,
                 PostingDate = DateTime.UtcNow,
+                BranchId = branchId.Value,
                 Description = $"Hạch toán doanh thu & giá vốn hóa đơn {invoiceNumber}",
                 Status = VoucherStatus.Posted
             };
@@ -216,6 +251,6 @@ public class SalesInvoiceService : ISalesInvoiceService
         await _context.SalesInvoices.AddAsync(invoice, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return (await GetInvoicesAsync(cancellationToken)).First(i => i.Id == invoice.Id);
+        return (await GetInvoicesAsync(null, cancellationToken)).First(i => i.Id == invoice.Id);
     }
 }

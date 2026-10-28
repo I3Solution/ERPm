@@ -4,5 +4,5 @@ namespace ERPm.Application.Features.Dashboard;
 
 public interface IDashboardService
 {
-    Task<DashboardMetricsDto> GetMetricsAsync(CancellationToken cancellationToken = default);
+    Task<DashboardMetricsDto> GetMetricsAsync(Guid? branchId = null, CancellationToken cancellationToken = default);
 }

@@ -1,0 +1,303 @@
+<div class="pos-layout">
+  <!-- Left Column: Product Selection Catalog -->
+  <section class="pos-catalog-section">
+    <!-- Search and Fast Filter Bar -->
+    <div class="pos-search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          [(ngModel)]="searchKeyword"
+          (input)="onSearchInput()"
+          [placeholder]="'sales.search_items' | translate"
+          class="pos-search-input"
+        />
+        <button *ngIf="searchKeyword" (click)="searchKeyword = ''; onSearchInput()" class="clear-search-btn">✕</button>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid">
+      <div
+        *ngFor="let item of filteredItems()"
+        (click)="addToCart(item)"
+        class="product-card"
+      >
+        <div class="product-card-body">
+          <span class="product-sku">{{ item.code }}</span>
+          <h3 class="product-name">{{ item.name }}</h3>
+          <div class="product-card-footer">
+            <span class="product-price">{{ item.salePrice | number:'1.0-0' }} đ</span>
+            <span class="product-uom">{{ item.baseUomName || 'Cái' }}</span>
+          </div>
+        </div>
+        <button class="add-btn" [title]="'sales.pay_btn' | translate">+</button>
+      </div>
+
+      <div *ngIf="filteredItems().length === 0" class="empty-state">
+        <span class="text-3xl">🔍</span>
+        <p class="mt-2 text-sm text-slate-500">{{ 'sales.no_products_found' | translate }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Right Column: Cart & Checkout Panel -->
+  <aside class="pos-cart-panel">
+    <!-- Customer & Order Header -->
+    <div class="cart-header">
+      <div class="customer-select-box" style="flex: 1; min-width: 200px;">
+        <label class="text-xs font-semibold text-slate-600 block mb-1">
+          👤 {{ 'sales.customer' | translate }}
+        </label>
+        <app-custom-select
+          [options]="customerOptions()"
+          [(ngModel)]="selectedCustomerId"
+          [size]="'sm'"
+          [searchable]="true"
+          [minWidth]="'100%'"
+        ></app-custom-select>
+      </div>
+      <button (click)="clearCart()" [disabled]="cart().length === 0" class="clear-cart-btn" [title]="'sales.clear_cart' | translate">
+        🗑️
+      </button>
+    </div>
+
+    <!-- Cart Items Scrollable List -->
+    <div class="cart-items-list">
+      <div *ngIf="cart().length === 0" class="empty-cart-state">
+        <span class="text-4xl">🛒</span>
+        <p class="text-sm font-medium text-slate-500 mt-2">{{ 'sales.cart_empty' | translate }}</p>
+        <p class="text-xs text-slate-400">{{ 'sales.cart_empty_hint' | translate }}</p>
+      </div>
+
+      <div *ngFor="let line of cart(); let idx = index" class="cart-line-item">
+        <div class="line-info">
+          <span class="line-name">{{ line.item.name }}</span>
+          <span class="line-price">{{ line.unitPrice | number:'1.0-0' }} đ / {{ line.item.baseUomName || 'Cái' }}</span>
+        </div>
+        <div class="line-controls">
+          <div class="qty-stepper">
+            <button type="button" (click)="updateQuantity(idx, -1)" class="step-btn">-</button>
+            <input
+              type="number"
+              [ngModel]="line.quantity"
+              (ngModelChange)="setQuantity(idx, $event)"
+              min="1"
+              class="step-input"
+            />
+            <button type="button" (click)="updateQuantity(idx, 1)" class="step-btn">+</button>
+          </div>
+          <span class="line-total">{{ (line.quantity * line.unitPrice) | number:'1.0-0' }} đ</span>
+          <button (click)="removeLine(idx)" class="remove-line-btn">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Financial Totals & Checkout Button -->
+    <div class="cart-footer">
+      <div class="summary-row">
+        <span class="text-xs text-slate-500">{{ 'sales.subtotal' | translate }}</span>
+        <span class="font-semibold text-slate-800">{{ subTotal() | number:'1.0-0' }} đ</span>
+      </div>
+
+      <div class="summary-row discount-row">
+        <span class="text-xs text-slate-500">{{ 'sales.discount' | translate }}</span>
+        <input
+          type="number"
+          [(ngModel)]="discountAmount"
+          min="0"
+          class="discount-input"
+          placeholder="0"
+        />
+      </div>
+
+      <div class="summary-row grand-total-row">
+        <span class="text-base font-bold text-slate-900">{{ 'sales.total' | translate }}</span>
+        <span class="text-xl font-extrabold text-indigo-600">{{ grandTotal() | number:'1.0-0' }} đ</span>
+      </div>
+
+      <button
+        type="button"
+        (click)="openPaymentModal()"
+        [disabled]="cart().length === 0"
+        class="checkout-pay-btn"
+      >
+        <span>💳 {{ 'sales.pay_btn' | translate }}</span>
+        <span>{{ grandTotal() | number:'1.0-0' }} đ</span>
+      </button>
+    </div>
+  </aside>
+</div>
+
+<!-- MODAL 1: Payment Checkout Confirmation -->
+<div *ngIf="showPaymentModal" class="modal-backdrop" (click)="showPaymentModal = false">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="text-lg font-bold text-slate-900">{{ 'sales.checkout_title' | translate }}</h2>
+      <button (click)="showPaymentModal = false" class="modal-close-btn">✕</button>
+    </div>
+
+    <div class="modal-body space-y-4">
+      <!-- Total to Pay Highlight -->
+      <div class="pay-amount-box">
+        <span class="text-xs text-slate-500 uppercase tracking-wider font-semibold">{{ 'sales.total' | translate }}</span>
+        <h1 class="text-3xl font-extrabold text-indigo-600 mt-1">{{ grandTotal() | number:'1.0-0' }} đ</h1>
+      </div>
+
+      <!-- Payment Method Choice -->
+      <div>
+        <label class="text-xs font-semibold text-slate-600 block mb-1">
+          {{ 'sales.payment_method' | translate }}
+        </label>
+        <div class="payment-methods-grid">
+          <button
+            type="button"
+            (click)="paymentMethod = PaymentMethod.Cash; onSelectMethod()"
+            [class.active]="paymentMethod === PaymentMethod.Cash"
+            class="method-btn"
+          >
+            💵 {{ 'sales.cash' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="paymentMethod = PaymentMethod.BankTransfer; onSelectMethod()"
+            [class.active]="paymentMethod === PaymentMethod.BankTransfer"
+            class="method-btn"
+          >
+            🏦 {{ 'sales.bank_transfer' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="paymentMethod = PaymentMethod.Credit; onSelectMethod()"
+            [class.active]="paymentMethod === PaymentMethod.Credit"
+            class="method-btn"
+          >
+            📝 {{ 'sales.credit' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Cash Received & Change Due -->
+      <div *ngIf="paymentMethod === PaymentMethod.Cash" class="space-y-3">
+        <div>
+          <label class="text-xs font-semibold text-slate-600 block mb-1">
+            {{ 'sales.amount_paid' | translate }}
+          </label>
+          <input
+            type="number"
+            [(ngModel)]="amountPaid"
+            class="pos-input text-lg font-bold text-slate-900"
+          />
+        </div>
+
+        <!-- Quick Cash Denominations -->
+        <div class="quick-cash-row">
+          <button type="button" (click)="setQuickCash(grandTotal())" class="quick-cash-btn">Đủ tiền</button>
+          <button type="button" (click)="setQuickCash(100000)" class="quick-cash-btn">100k</button>
+          <button type="button" (click)="setQuickCash(200000)" class="quick-cash-btn">200k</button>
+          <button type="button" (click)="setQuickCash(500000)" class="quick-cash-btn">500k</button>
+        </div>
+
+        <div class="change-box">
+          <span class="text-xs text-slate-600 font-medium">{{ 'sales.change_due' | translate }}:</span>
+          <span class="text-base font-bold" [class.text-emerald-600]="changeDue >= 0" [class.text-rose-600]="changeDue < 0">
+            {{ changeDue | number:'1.0-0' }} đ
+          </span>
+        </div>
+      </div>
+
+      <!-- Order Notes -->
+      <div>
+        <label class="text-xs font-semibold text-slate-600 block mb-1">{{ 'inventory.receipt_notes' | translate }}</label>
+        <input type="text" [(ngModel)]="orderNotes" placeholder="VD: Giao nhanh buổi chiều..." class="pos-input text-sm" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button (click)="showPaymentModal = false" class="btn-secondary">{{ 'common.cancel' | translate }}</button>
+      <button (click)="confirmCheckout()" [disabled]="isSubmitting" class="btn-primary">
+        {{ isSubmitting ? ('common.saving' | translate) : ('sales.confirm_payment' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: Receipt & Print Modal -->
+<div *ngIf="completedInvoice" class="modal-backdrop">
+  <div class="modal-card receipt-card" (click)="$event.stopPropagation()">
+    <!-- Receipt Content Section -->
+    <div class="receipt-paper" id="printable-receipt">
+      <div class="receipt-header">
+        <h2 class="text-xl font-bold tracking-tight text-slate-900">ERPm STORE</h2>
+        <p class="text-xs text-slate-500">Số 1 Phố Huế, Hoàn Kiếm, Hà Nội</p>
+        <p class="text-xs text-slate-500">Hotline: 0901.234.567</p>
+        <div class="receipt-divider"></div>
+        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">HÓA ĐƠN BÁN HÀNG</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Số: {{ completedInvoice.invoiceNumber }}</p>
+        <p class="text-xs text-slate-400">{{ completedInvoice.invoiceDate | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p class="text-xs text-slate-600 mt-1">Khách: <strong>{{ completedInvoice.customerName }}</strong></p>
+      </div>
+
+      <div class="receipt-divider"></div>
+
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th class="text-left">Món</th>
+            <th class="text-center">SL</th>
+            <th class="text-right">Đơn giá</th>
+            <th class="text-right">T.Tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of completedInvoice.items">
+            <td class="text-left font-medium">{{ item.itemName }}</td>
+            <td class="text-center">{{ item.quantity }}</td>
+            <td class="text-right">{{ item.unitPrice | number:'1.0-0' }}</td>
+            <td class="text-right font-semibold">{{ item.amount | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="receipt-divider"></div>
+
+      <div class="receipt-totals space-y-1 text-xs">
+        <div class="flex justify-between">
+          <span>Tạm tính:</span>
+          <span>{{ completedInvoice.subTotal | number:'1.0-0' }} đ</span>
+        </div>
+        <div *ngIf="completedInvoice.discountAmount > 0" class="flex justify-between text-amber-600">
+          <span>Chiết khấu:</span>
+          <span>-{{ completedInvoice.discountAmount | number:'1.0-0' }} đ</span>
+        </div>
+        <div class="flex justify-between font-bold text-sm text-slate-900 pt-1 border-t border-slate-200">
+          <span>TỔNG TIỀN:</span>
+          <span>{{ completedInvoice.totalAmount | number:'1.0-0' }} đ</span>
+        </div>
+        <div class="flex justify-between text-slate-600 pt-1">
+          <span>Hình thức:</span>
+          <span>{{ completedInvoice.paymentMethodName }}</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Đã thanh toán:</span>
+          <span>{{ completedInvoice.paidAmount | number:'1.0-0' }} đ</span>
+        </div>
+        <div *ngIf="completedInvoice.remainingDebt > 0" class="flex justify-between text-rose-600 font-bold">
+          <span>Còn nợ:</span>
+          <span>{{ completedInvoice.remainingDebt | number:'1.0-0' }} đ</span>
+        </div>
+      </div>
+
+      <div class="receipt-divider"></div>
+      <div class="text-center text-xs text-slate-500 py-2">
+        <p>Cảm ơn quý khách và hẹn gặp lại!</p>
+        <p class="text-[10px] text-slate-400 mt-1">Hệ thống ERPm - Ghi sổ Kế toán tự động</p>
+      </div>
+    </div>
+
+    <div class="modal-footer print-actions">
+      <button (click)="closeReceiptModal()" class="btn-secondary">{{ 'sales.close' | translate }}</button>
+      <button (click)="printReceipt()" class="btn-primary">🖨️ {{ 'sales.print' | translate }}</button>
+    </div>
+  </div>
+</div>

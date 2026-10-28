@@ -30,6 +30,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Kế toán & Kho:** Không hard-delete chứng từ giao dịch tài chính đã ghi sổ (`Posted`). Thiết kế bảng sẵn sàng cho Double-Entry Ledger.
    - **Frontend (Angular + Ionic):** Standalone components, Signals, thiết kế Responsive Adaptive (hỗ trợ cả Mobile màn hình nhỏ và Desktop bảng dữ liệu lớn).
    - **Đa ngôn ngữ (i18n):** Mọi thông báo lỗi, nhãn giao diện và master data (Item, Category) phải tuân thủ chuẩn đa ngôn ngữ Anh - Việt qua từ điển `app_dictionaries` và JSONB translations.
+   - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
 
 ---
 

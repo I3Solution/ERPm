@@ -1,6 +1,7 @@
 using ERPm.Domain.Common;
 using ERPm.Domain.Entities.Accounting;
 using ERPm.Domain.Entities.Catalog;
+using ERPm.Domain.Entities.System;
 using PartnerEntity = ERPm.Domain.Entities.Partner.Partner;
 
 namespace ERPm.Domain.Entities.Inventory;
@@ -9,6 +10,7 @@ public class StockIssue : BaseAuditableEntity
 {
     public string Code { get; set; } = string.Empty;       // PXK0001
     public DateTime IssueDate { get; set; } = DateTime.UtcNow;
+    public Guid BranchId { get; set; }                     // Chi nhánh xuất kho
     public Guid WarehouseId { get; set; }
     public Guid? CustomerId { get; set; }
 
@@ -18,6 +20,7 @@ public class StockIssue : BaseAuditableEntity
     public string? Notes { get; set; }
 
     // Navigation
+    public virtual Branch? Branch { get; set; }
     public virtual Warehouse? Warehouse { get; set; }
     public virtual PartnerEntity? Customer { get; set; }
     public virtual ICollection<StockIssueItem> Items { get; set; } = new List<StockIssueItem>();

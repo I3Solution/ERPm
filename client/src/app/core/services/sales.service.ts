@@ -16,6 +16,7 @@ export interface SalesInvoiceItemRequest {
 }
 
 export interface CreateSalesInvoiceRequest {
+  branchId?: string;
   customerId?: string;
   customerName?: string;
   warehouseId: string;
@@ -39,6 +40,9 @@ export interface SalesInvoiceDto {
   id: string;
   invoiceNumber: string;
   invoiceDate: string;
+  branchId?: string;
+  branchCode?: string;
+  branchName?: string;
   customerName: string;
   paymentMethodName: string;
   subTotal: number;
@@ -80,20 +84,26 @@ const MOCK_INVOICES: SalesInvoiceDto[] = [
 export class SalesService {
   private readonly apiUrl = 'http://localhost:5000/api/v1/sales';
 
-  public invoices = signal<SalesInvoiceDto[]>(MOCK_INVOICES);
+  public invoices = signal<SalesInvoiceDto[]>([]);
   public isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient) {}
 
-  public loadInvoices(): void {
+  public loadInvoices(branchId?: string | null): void {
     this.isLoading.set(true);
-    this.http.get<{ success: boolean; data: SalesInvoiceDto[] }>(`${this.apiUrl}/invoices`)
-      .pipe(catchError(() => of({ success: true, data: MOCK_INVOICES })))
-      .subscribe(res => {
-        if (res && res.success && res.data) {
-          this.invoices.set(res.data);
+    const url = branchId ? `${this.apiUrl}/invoices?branchId=${branchId}` : `${this.apiUrl}/invoices`;
+    this.http.get<{ success: boolean; data: SalesInvoiceDto[] }>(url)
+      .subscribe({
+        next: (res) => {
+          if (res && res.success && res.data) {
+            this.invoices.set(res.data);
+          }
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải hóa đơn:', err);
+          this.isLoading.set(false);
         }
-        this.isLoading.set(false);
       });
   }
 
@@ -103,44 +113,6 @@ export class SalesService {
         map(res => res.data),
         tap(created => {
           this.invoices.set([created, ...this.invoices()]);
-        }),
-        catchError(() => {
-          // Local fallback creation
-          const subTotal = request.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-          const discount = request.discountAmount || 0;
-          const totalAmount = Math.max(0, subTotal - discount);
-          const paidAmount = request.paidAmount !== undefined ? request.paidAmount : totalAmount;
-          const remainingDebt = Math.max(0, totalAmount - paidAmount);
-
-          const methodMap: Record<number, string> = {
-            1: 'Tiền mặt',
-            2: 'Chuyển khoản NH',
-            3: 'Ghi nợ'
-          };
-
-          const invoice: SalesInvoiceDto = {
-            id: crypto.randomUUID(),
-            invoiceNumber: `HD-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`,
-            invoiceDate: new Date().toISOString(),
-            customerName: request.customerName || 'Khách lẻ',
-            paymentMethodName: methodMap[request.paymentMethod] || 'Tiền mặt',
-            subTotal,
-            discountAmount: discount,
-            totalAmount,
-            paidAmount,
-            remainingDebt,
-            items: request.items.map(i => ({
-              itemId: i.itemId,
-              itemCode: 'SKU',
-              itemName: 'Sản phẩm',
-              quantity: i.quantity,
-              unitPrice: i.unitPrice,
-              amount: i.quantity * i.unitPrice
-            }))
-          };
-
-          this.invoices.set([invoice, ...this.invoices()]);
-          return of(invoice);
         })
       );
   }

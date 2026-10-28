@@ -4,8 +4,10 @@
     <!-- Brand Logo -->
     <div class="sidebar-header">
       <div class="brand-logo">
-        <span class="logo-icon">🏢</span>
-        <div>
+        <div class="logo-icon-box">
+          <span>🏢</span>
+        </div>
+        <div class="logo-title-group">
           <span class="logo-text">ERPm</span>
           <span class="logo-badge">Pro</span>
         </div>
@@ -52,8 +54,8 @@
     <!-- Sidebar Footer -->
     <div class="sidebar-footer">
       <div class="system-status-indicator">
-        <span class="status-dot online"></span>
-        <span class="text-xs text-slate-500">API: .NET 8 Connected</span>
+        <span class="status-dot-pulse"></span>
+        <span class="font-medium text-slate-600">.NET 8 & PostgreSQL</span>
       </div>
     </div>
   </aside>
@@ -64,13 +66,15 @@
     <header class="top-header">
       <!-- Mobile Brand Indicator -->
       <div class="mobile-only flex items-center gap-2">
-        <span class="text-xl">🏢</span>
-        <span class="font-bold text-slate-900 tracking-tight">ERPm</span>
+        <div class="logo-icon-box" style="width: 32px; height: 32px; font-size: 1rem;">
+          <span>🏢</span>
+        </div>
+        <span class="font-bold text-slate-900 tracking-tight text-lg">ERPm</span>
       </div>
 
-      <!-- Desktop Breadcrumb / Title -->
-      <div class="desktop-only text-sm font-semibold text-slate-600">
-        {{ 'common.app_name' | translate }}
+      <!-- Interactive Branch Tree Select Box -->
+      <div class="flex items-center gap-3">
+        <app-branch-tree-select></app-branch-tree-select>
       </div>
 
       <!-- Header Actions: Language Switcher & Profile -->

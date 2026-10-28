@@ -1,0 +1,185 @@
+<div class="dashboard-container">
+  <!-- Page Header -->
+  <div class="erpm-page-header">
+    <div class="header-info">
+      <h1 class="erpm-page-title">
+        {{ 'menu.dashboard' | translate }}
+      </h1>
+      <p class="erpm-page-subtitle">
+        {{ 'dashboard.subtitle' | translate }}
+      </p>
+    </div>
+
+    <div class="erpm-header-actions">
+      <button
+        type="button"
+        (click)="dashboardService.loadMetrics()"
+        class="erpm-btn erpm-btn-secondary erpm-btn-sm"
+      >
+        <span>🔄</span>
+        <span>{{ 'dashboard.refresh' | translate }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Stat Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- Card 1: Today's Sales -->
+    <div class="erpm-stat-card">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'dashboard.today_sales' | translate }}</span>
+          <h3 class="stat-value text-indigo-600 mt-1">
+            {{ dashboardService.metrics().todaySales | number:'1.0-0' }} đ
+          </h3>
+        </div>
+        <div class="stat-icon-wrap">
+          💰
+        </div>
+      </div>
+      <div class="stat-footer">
+        <span class="erpm-badge erpm-badge-success" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">
+          <span class="dot"></span>
+          {{ dashboardService.metrics().todayInvoiceCount }} {{ 'dashboard.invoices_today' | translate }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Card 2: Total Items -->
+    <div class="erpm-stat-card accent-emerald">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'dashboard.total_items' | translate }}</span>
+          <h3 class="stat-value text-emerald-600 mt-1">
+            {{ dashboardService.metrics().totalItems }} SKU
+          </h3>
+        </div>
+        <div class="stat-icon-wrap icon-emerald">
+          📦
+        </div>
+      </div>
+      <div class="stat-footer text-xs text-slate-500">
+        {{ 'dashboard.inventory_value_prefix' | translate }} <strong class="text-slate-700 ml-1 font-semibold">{{ dashboardService.metrics().totalInventoryValue | number:'1.0-0' }} đ</strong>
+      </div>
+    </div>
+
+    <!-- Card 3: Low Stock Alert -->
+    <div class="erpm-stat-card accent-amber">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'dashboard.low_stock' | translate }}</span>
+          <h3 class="stat-value text-amber-600 mt-1">
+            {{ dashboardService.metrics().lowStockCount }} {{ 'catalog.items_unit' | translate }}
+          </h3>
+        </div>
+        <div class="stat-icon-wrap icon-amber">
+          ⚠️
+        </div>
+      </div>
+      <div class="stat-footer">
+        <span class="erpm-badge erpm-badge-warning" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">
+          <span class="dot"></span>
+          {{ 'dashboard.need_create_receipt' | translate }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Card 4: Accounting Journal -->
+    <div class="erpm-stat-card accent-sky">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'dashboard.accounting_journal' | translate }}</span>
+          <h3 class="stat-value text-sky-600 mt-1">
+            {{ dashboardService.metrics().totalJournalEntries }} {{ 'dashboard.entries_unit' | translate }}
+          </h3>
+        </div>
+        <div class="stat-icon-wrap icon-sky">
+          📑
+        </div>
+      </div>
+      <div class="stat-footer text-xs text-slate-500">
+        {{ 'dashboard.customer_debt_prefix' | translate }} <strong class="text-rose-600 ml-1 font-semibold">{{ dashboardService.metrics().totalCustomerDebt | number:'1.0-0' }} đ</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Shortcuts & Recent Activity -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left: Quick Action Cards -->
+    <div class="erpm-card lg:col-span-2">
+      <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <span>⚡</span>
+        <span>{{ 'dashboard.quick_actions' | translate }}</span>
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <a routerLink="/catalog" class="shortcut-card shortcut-indigo">
+          <span class="shortcut-icon">🏷️</span>
+          <span class="shortcut-title">{{ 'dashboard.action_catalog' | translate }}</span>
+          <span class="shortcut-desc">{{ 'dashboard.action_catalog_desc' | translate }}</span>
+        </a>
+        <a routerLink="/sales" class="shortcut-card shortcut-emerald">
+          <span class="shortcut-icon">🛒</span>
+          <span class="shortcut-title">{{ 'dashboard.action_pos' | translate }}</span>
+          <span class="shortcut-desc">{{ 'dashboard.action_pos_desc' | translate }}</span>
+        </a>
+        <a routerLink="/inventory" class="shortcut-card shortcut-amber">
+          <span class="shortcut-icon">📥</span>
+          <span class="shortcut-title">{{ 'dashboard.action_stock_in' | translate }}</span>
+          <span class="shortcut-desc">{{ 'dashboard.action_stock_in_desc' | translate }}</span>
+        </a>
+        <a routerLink="/partners" class="shortcut-card shortcut-purple">
+          <span class="shortcut-icon">👥</span>
+          <span class="shortcut-title">{{ 'dashboard.action_partners' | translate }}</span>
+          <span class="shortcut-desc">{{ 'dashboard.action_partners_desc' | translate }}</span>
+        </a>
+        <a routerLink="/inventory" class="shortcut-card shortcut-sky">
+          <span class="shortcut-icon">📊</span>
+          <span class="shortcut-title">{{ 'dashboard.action_stock_report' | translate }}</span>
+          <span class="shortcut-desc">{{ 'dashboard.action_stock_report_desc' | translate }}</span>
+        </a>
+        <a routerLink="/sales" class="shortcut-card shortcut-rose">
+          <span class="shortcut-icon">📖</span>
+          <span class="shortcut-title">{{ 'dashboard.action_sales_history' | translate }}</span>
+          <span class="shortcut-desc">{{ 'dashboard.action_sales_history_desc' | translate }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right: System Architecture Status -->
+    <div class="erpm-card">
+      <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <span>🏗️</span>
+        <span>{{ 'dashboard.architecture_title' | translate }}</span>
+      </h2>
+      <ul class="text-xs space-y-3.5 text-slate-600">
+        <li class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <span class="font-medium text-slate-700">Backend API</span>
+          <span class="erpm-badge erpm-badge-success">.NET 8 Clean Arch</span>
+        </li>
+        <li class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <span class="font-medium text-slate-700">Cơ sở Dữ liệu</span>
+          <span class="erpm-badge erpm-badge-success">PostgreSQL 16</span>
+        </li>
+        <li class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <span class="font-medium text-slate-700">Frontend Framework</span>
+          <span class="erpm-badge erpm-badge-success">Angular 18 Standalone</span>
+        </li>
+        <li class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <span class="font-medium text-slate-700">Mobile Hybrid</span>
+          <span class="erpm-badge erpm-badge-success">Ionic 8 + Capacitor</span>
+        </li>
+        <li class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+          <span class="font-medium text-slate-700">Đa ngôn ngữ (i18n)</span>
+          <span class="erpm-badge erpm-badge-info">Tiếng Việt & English</span>
+        </li>
+        <li class="flex items-center justify-between">
+          <span class="font-medium text-slate-700">{{ 'dashboard.connection_status' | translate }}</span>
+          <span class="erpm-badge erpm-badge-success">
+            <span class="dot"></span>
+            {{ 'dashboard.status_stable' | translate }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

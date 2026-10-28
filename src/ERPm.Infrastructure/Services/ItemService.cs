@@ -73,7 +73,8 @@ public class ItemService : IItemService
                 MaxStockAlert = i.MaxStockAlert,
                 ImageUrl = i.ImageUrl,
                 Description = i.Description,
-                IsActive = i.IsActive
+                IsActive = i.IsActive,
+                Attributes = i.Attributes
             })
             .ToListAsync(cancellationToken);
 
@@ -114,7 +115,8 @@ public class ItemService : IItemService
             MaxStockAlert = item.MaxStockAlert,
             ImageUrl = item.ImageUrl,
             Description = item.Description,
-            IsActive = item.IsActive
+            IsActive = item.IsActive,
+            Attributes = item.Attributes
         };
     }
 
@@ -135,7 +137,8 @@ public class ItemService : IItemService
             MaxStockAlert = request.MaxStockAlert,
             ImageUrl = request.ImageUrl,
             Description = request.Description,
-            IsActive = true
+            IsActive = true,
+            Attributes = request.Attributes ?? new()
         };
 
         await _context.Items.AddAsync(item, cancellationToken);
@@ -166,6 +169,10 @@ public class ItemService : IItemService
         item.ImageUrl = request.ImageUrl;
         item.Description = request.Description;
         item.IsActive = request.IsActive;
+        if (request.Attributes != null)
+        {
+            item.Attributes = request.Attributes;
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
         return await GetItemByIdAsync(item.Id, cancellationToken);

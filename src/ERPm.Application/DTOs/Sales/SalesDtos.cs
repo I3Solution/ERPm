@@ -4,6 +4,7 @@ namespace ERPm.Application.DTOs.Sales;
 
 public class CreateSalesInvoiceRequest
 {
+    public Guid? BranchId { get; set; }                    // Chi nhánh phát sinh đơn hàng
     public Guid? CustomerId { get; set; }
     public string CustomerName { get; set; } = "Khách lẻ";
     public Guid WarehouseId { get; set; }
@@ -27,6 +28,9 @@ public class SalesInvoiceDto
     public Guid Id { get; set; }
     public string InvoiceNumber { get; set; } = string.Empty;
     public DateTime InvoiceDate { get; set; }
+    public Guid BranchId { get; set; }
+    public string? BranchCode { get; set; }
+    public string? BranchName { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public string PaymentMethodName { get; set; } = string.Empty;
     public decimal SubTotal { get; set; }

@@ -1,0 +1,162 @@
+/* ==========================================================================
+   ERPM DESIGN SYSTEM - CORE VARIABLES & DESIGN TOKENS
+   Modern Fintech / SaaS Enterprise Aesthetic
+   ========================================================================== */
+
+:root {
+  /* Typography Tokens */
+  --font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-display: 'Plus Jakarta Sans', var(--font-family-base);
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --ion-font-family: var(--font-family-base);
+
+  /* Primary Brand Palette: Electric Indigo & Royal Violet */
+  --erpm-primary-50: #eef2ff;
+  --erpm-primary-100: #e0e7ff;
+  --erpm-primary-200: #c7d2fe;
+  --erpm-primary-300: #a5b4fc;
+  --erpm-primary-400: #818cf8;
+  --erpm-primary-500: #6366f1;
+  --erpm-primary-600: #4f46e5; /* Primary Core */
+  --erpm-primary-700: #4338ca;
+  --erpm-primary-800: #3730a3;
+  --erpm-primary-900: #312e81;
+  --erpm-primary-rgb: 79, 70, 229;
+
+  /* Brand Gradients */
+  --erpm-gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --erpm-gradient-primary-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  --erpm-gradient-accent: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+  --erpm-gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --erpm-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --erpm-gradient-danger: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  --erpm-gradient-surface: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --erpm-gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+
+  /* Status Colors */
+  --erpm-success-bg: #ecfdf5;
+  --erpm-success-border: #a7f3d0;
+  --erpm-success-text: #065f46;
+  --erpm-success-core: #10b981;
+
+  --erpm-warning-bg: #fffbeb;
+  --erpm-warning-border: #fde68a;
+  --erpm-warning-text: #92400e;
+  --erpm-warning-core: #f59e0b;
+
+  --erpm-danger-bg: #fff1f2;
+  --erpm-danger-border: #fecdd3;
+  --erpm-danger-text: #9f1239;
+  --erpm-danger-core: #f43f5e;
+
+  --erpm-info-bg: #f0f9ff;
+  --erpm-info-border: #bae6fd;
+  --erpm-info-text: #0369a1;
+  --erpm-info-core: #0ea5e9;
+
+  --erpm-neutral-bg: #f8fafc;
+  --erpm-neutral-border: #e2e8f0;
+  --erpm-neutral-text: #475569;
+  --erpm-neutral-core: #64748b;
+
+  /* Surfaces & Backgrounds */
+  --erpm-bg-canvas: #f8fafc;
+  --erpm-bg-surface: #ffffff;
+  --erpm-bg-surface-elevated: #ffffff;
+  --erpm-bg-surface-subtle: #f8fafc;
+  --erpm-bg-surface-active: #f1f5f9;
+
+  /* Borders & Dividers */
+  --erpm-border-subtle: #f1f5f9;
+  --erpm-border: #e2e8f0;
+  --erpm-border-strong: #cbd5e1;
+  --erpm-border-focus: #4f46e5;
+
+  /* Text Colors */
+  --erpm-text-heading: #0f172a;
+  --erpm-text-body: #1e293b;
+  --erpm-text-muted: #64748b;
+  --erpm-text-subtle: #94a3b8;
+  --erpm-text-inverse: #ffffff;
+
+  /* Spacing & Radius */
+  --erpm-radius-xs: 4px;
+  --erpm-radius-sm: 8px;
+  --erpm-radius-md: 12px;
+  --erpm-radius-lg: 16px;
+  --erpm-radius-xl: 22px;
+  --erpm-radius-pill: 9999px;
+
+  /* Soft Multi-Layer Shadows */
+  --erpm-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --erpm-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --erpm-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --erpm-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --erpm-shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --erpm-shadow-glow: 0 0 20px -2px rgba(79, 70, 229, 0.25);
+  --erpm-shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+
+  /* Glassmorphism */
+  --erpm-glass-bg: rgba(255, 255, 255, 0.85);
+  --erpm-glass-border: 1px solid rgba(226, 232, 240, 0.7);
+  --erpm-glass-blur: blur(12px);
+
+  /* Animation & Transitions */
+  --erpm-transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --erpm-transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --erpm-transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ========================================================================
+     IONIC THEME VARIABLE OVERRIDES
+     Harmonizes Ionic's component engine with ERPm's visual identity
+     ======================================================================== */
+  --ion-color-primary: #4f46e5;
+  --ion-color-primary-rgb: 79, 70, 229;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #4338ca;
+  --ion-color-primary-tint: #6366f1;
+
+  --ion-color-secondary: #0ea5e9;
+  --ion-color-secondary-rgb: 14, 165, 233;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #0284c7;
+  --ion-color-secondary-tint: #38bdf8;
+
+  --ion-color-success: #10b981;
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #059669;
+  --ion-color-success-tint: #34d399;
+
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #ffffff;
+  --ion-color-warning-contrast-rgb: 255, 255, 255;
+  --ion-color-warning-shade: #d97706;
+  --ion-color-warning-tint: #fbbf24;
+
+  --ion-color-danger: #f43f5e;
+  --ion-color-danger-rgb: 244, 63, 94;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #e11d48;
+  --ion-color-danger-tint: #fb7185;
+
+  --ion-color-dark: #0f172a;
+  --ion-color-dark-rgb: 15, 23, 42;
+  --ion-color-medium: #64748b;
+  --ion-color-medium-rgb: 100, 116, 139;
+  --ion-color-light: #f8fafc;
+  --ion-color-light-rgb: 248, 250, 252;
+
+  --ion-background-color: var(--erpm-bg-canvas);
+  --ion-text-color: var(--erpm-text-body);
+  --ion-border-color: var(--erpm-border);
+  --ion-item-background: var(--erpm-bg-surface);
+  --ion-card-background: var(--erpm-bg-surface);
+  --ion-toolbar-background: var(--erpm-bg-surface);
+  --ion-tab-bar-background: var(--erpm-bg-surface);
+}

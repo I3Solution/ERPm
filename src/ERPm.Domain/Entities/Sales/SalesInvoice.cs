@@ -2,6 +2,7 @@ using ERPm.Domain.Common;
 using ERPm.Domain.Entities.Accounting;
 using ERPm.Domain.Entities.Catalog;
 using ERPm.Domain.Entities.Inventory;
+using ERPm.Domain.Entities.System;
 using PartnerEntity = ERPm.Domain.Entities.Partner.Partner;
 
 namespace ERPm.Domain.Entities.Sales;
@@ -18,6 +19,7 @@ public class SalesInvoice : BaseAuditableEntity
     public string InvoiceNumber { get; set; } = string.Empty; // HD0001
     public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
 
+    public Guid BranchId { get; set; }                     // Chi nhánh lập hóa đơn
     public Guid? CustomerId { get; set; }
     public string CustomerName { get; set; } = "Khách lẻ";
     public Guid WarehouseId { get; set; }
@@ -39,6 +41,7 @@ public class SalesInvoice : BaseAuditableEntity
     public string? Notes { get; set; }
 
     // Navigation
+    public virtual Branch? Branch { get; set; }
     public virtual PartnerEntity? Customer { get; set; }
     public virtual Warehouse? Warehouse { get; set; }
     public virtual JournalEntry? JournalEntry { get; set; }

@@ -4,10 +4,19 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from './shared/pipes/translate.pipe';
 import { LocalizationService } from './core/services/localization.service';
 
+import { BranchTreeSelectComponent } from './shared/components/branch-tree-select/branch-tree-select.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    TranslatePipe,
+    BranchTreeSelectComponent
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

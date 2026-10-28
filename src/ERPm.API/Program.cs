@@ -68,10 +68,10 @@ using (var scope = app.Services.CreateScope())
         // Only attempt DB operation if database can connect
         if (context.Database.CanConnect())
         {
-            logger.LogInformation("Database connected. Applying migrations and seed data...");
+            logger.LogInformation("Database connected. Applying migrations...");
             await context.Database.MigrateAsync();
-            await DataSeeder.SeedAsync(context);
-            logger.LogInformation("Database migration and seeding completed successfully.");
+            // await DataSeeder.SeedAsync(context); // Tạm thời không seed data theo yêu cầu
+            logger.LogInformation("Database migration check completed successfully.");
         }
         else
         {

@@ -1,0 +1,279 @@
+<div class="inventory-container">
+  <!-- Page Header -->
+  <div class="erpm-page-header">
+    <div class="header-info">
+      <h1 class="erpm-page-title">{{ 'inventory.title' | translate }}</h1>
+      <p class="erpm-page-subtitle">{{ 'inventory.subtitle' | translate }}</p>
+    </div>
+
+    <div class="erpm-header-actions">
+      <button (click)="openReceiptModal()" class="erpm-btn erpm-btn-primary">
+        <span>📥</span>
+        <span>{{ 'inventory.stock_in_btn' | translate }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Metrics Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="erpm-stat-card">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'inventory.total_items_in_stock' | translate }}</span>
+          <h3 class="stat-value mt-1">{{ stockService.balances().length }} SKU</h3>
+        </div>
+        <div class="stat-icon-wrap">
+          📦
+        </div>
+      </div>
+      <div class="stat-footer text-xs text-slate-500">
+        {{ 'inventory.managed_across_branches' | translate }}
+      </div>
+    </div>
+
+    <div class="erpm-stat-card accent-emerald">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'inventory.total_stock_value' | translate }}</span>
+          <h3 class="stat-value text-emerald-600 mt-1">{{ totalStockValue() | number:'1.0-0' }} đ</h3>
+        </div>
+        <div class="stat-icon-wrap icon-emerald">
+          💰
+        </div>
+      </div>
+      <div class="stat-footer text-xs text-slate-500">
+        {{ 'inventory.avg_cost_note' | translate }}
+      </div>
+    </div>
+
+    <div class="erpm-stat-card" [class.accent-amber]="lowStockCount() > 0">
+      <div class="stat-card-header">
+        <div>
+          <span class="stat-label">{{ 'inventory.low_stock_alert' | translate }}</span>
+          <h3 class="stat-value mt-1" [class.text-amber-600]="lowStockCount() > 0">
+            {{ lowStockCount() }} {{ 'catalog.items_unit' | translate }}
+          </h3>
+        </div>
+        <div class="stat-icon-wrap" [class.icon-amber]="lowStockCount() > 0">
+          ⚠️
+        </div>
+      </div>
+      <div class="stat-footer">
+        <span *ngIf="lowStockCount() > 0" class="erpm-badge erpm-badge-warning">
+          <span class="dot"></span>
+          {{ 'inventory.need_restock' | translate }}
+        </span>
+        <span *ngIf="lowStockCount() === 0" class="erpm-badge erpm-badge-success">
+          <span class="dot"></span>
+          {{ 'inventory.stock_safe' | translate }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modern ERP Table Container -->
+  <div class="erpm-table-container">
+    <!-- Table Toolbar -->
+    <div class="erpm-table-toolbar">
+      <div class="toolbar-left">
+        <div class="erpm-search-box" style="max-width: 360px;">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            [(ngModel)]="searchKeyword"
+            [placeholder]="'inventory.search_placeholder' | translate"
+            class="erpm-search-input"
+          />
+          <button *ngIf="searchKeyword" (click)="searchKeyword = ''" class="clear-btn">✕</button>
+        </div>
+
+        <div style="min-width: 240px;">
+          <app-custom-select
+            [options]="warehouseOptions()"
+            [(ngModel)]="selectedWarehouseId"
+            (change)="onWarehouseChange()"
+            [size]="'sm'"
+            [minWidth]="'240px'"
+            [searchable]="true"
+          ></app-custom-select>
+        </div>
+      </div>
+
+      <div class="toolbar-right">
+        <span class="toolbar-count">
+          {{ 'table.showing' | translate }}: <strong>{{ filteredBalances().length }}</strong> {{ 'inventory.records_count' | translate }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Scrollable Table -->
+    <div class="erpm-table-scroll">
+      <table class="erpm-table">
+        <thead>
+          <tr>
+            <th>{{ 'table.item_code' | translate }}</th>
+            <th>{{ 'table.item_name' | translate }}</th>
+            <th>{{ 'table.barcode' | translate }}</th>
+            <th>{{ 'table.uom' | translate }}</th>
+            <th>{{ 'table.warehouse' | translate }}</th>
+            <th class="text-right">{{ 'inventory.qty_on_hand' | translate }}</th>
+            <th class="text-right">{{ 'inventory.avg_cost' | translate }}</th>
+            <th class="text-right">{{ 'inventory.total_value' | translate }}</th>
+            <th class="text-center">{{ 'common.status' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredBalances()">
+            <td>
+              <span class="col-code">{{ item.itemCode }}</span>
+            </td>
+            <td>
+              <span class="cell-primary-title">{{ item.itemName }}</span>
+            </td>
+            <td>
+              <span class="col-barcode">{{ item.barcode || '—' }}</span>
+            </td>
+            <td>
+              <span class="erpm-badge erpm-badge-neutral">{{ item.uomName || 'Cái' }}</span>
+            </td>
+            <td class="font-medium text-slate-700">
+              {{ item.warehouseName }}
+            </td>
+            <td class="col-currency font-bold" [class.text-amber-600]="item.isLowStock">
+              {{ item.quantityOnHand | number:'1.0-2' }}
+            </td>
+            <td class="col-currency" style="color: var(--erpm-text-muted);">
+              {{ item.averageCostPrice | number:'1.0-0' }} đ
+            </td>
+            <td class="col-currency text-primary">
+              {{ item.totalValue | number:'1.0-0' }} đ
+            </td>
+            <td class="text-center">
+              <span *ngIf="item.isLowStock" class="erpm-badge erpm-badge-warning">
+                <span class="dot"></span>
+                ⚠️ {{ 'table.low_stock' | translate }}
+              </span>
+              <span *ngIf="!item.isLowStock" class="erpm-badge erpm-badge-success">
+                <span class="dot"></span>
+                ✓ {{ 'table.stable' | translate }}
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredBalances().length === 0">
+            <td colspan="9">
+              <div class="erpm-table-empty">
+                <span class="empty-icon">📦</span>
+                <h4 class="empty-title">{{ 'inventory.no_stock_data' | translate }}</h4>
+                <p class="empty-desc">{{ 'inventory.no_stock_desc' | translate }}</p>
+                <button (click)="openReceiptModal()" class="erpm-btn erpm-btn-primary erpm-btn-sm">
+                  {{ 'inventory.stock_in_btn' | translate }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table Footer -->
+    <div *ngIf="filteredBalances().length > 0" class="erpm-table-footer">
+      <span>{{ 'table.total_items' | translate }}: <strong>{{ filteredBalances().length }}</strong></span>
+      <div class="pagination-controls">
+        <button class="page-btn active">1</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Quick Stock Receipt (Nhập kho hàng) -->
+<div *ngIf="showReceiptModal" class="erpm-modal-backdrop" (click)="showReceiptModal = false">
+  <div class="erpm-modal" (click)="$event.stopPropagation()">
+    <div class="erpm-modal-header">
+      <h2 class="modal-title">{{ 'inventory.receipt_title' | translate }}</h2>
+      <button (click)="showReceiptModal = false" class="modal-close-btn" [title]="'common.cancel' | translate">✕</button>
+    </div>
+
+    <div class="erpm-modal-body">
+      <!-- Warehouse Selection -->
+      <div class="erpm-form-group">
+        <label class="erpm-label">{{ 'inventory.receipt_warehouse' | translate }} *</label>
+        <app-custom-select
+          [options]="receiptWarehouseOptions()"
+          [(ngModel)]="receiptWarehouseId"
+          [size]="'md'"
+          [minWidth]="'100%'"
+        ></app-custom-select>
+      </div>
+
+      <!-- Supplier Selection -->
+      <div class="erpm-form-group">
+        <label class="erpm-label">{{ 'inventory.supplier' | translate }}</label>
+        <app-custom-select
+          [options]="receiptSupplierOptions()"
+          [(ngModel)]="receiptSupplierId"
+          [size]="'md'"
+          [minWidth]="'100%'"
+          [searchable]="true"
+        ></app-custom-select>
+      </div>
+
+      <!-- Item to Stock In -->
+      <div class="erpm-form-group">
+        <label class="erpm-label">{{ 'inventory.item_stock_in' | translate }} *</label>
+        <app-custom-select
+          [options]="receiptItemOptions()"
+          [(ngModel)]="receiptItemId"
+          (change)="onReceiptItemSelect()"
+          [size]="'md'"
+          [minWidth]="'100%'"
+          [searchable]="true"
+        ></app-custom-select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="erpm-form-group">
+          <label class="erpm-label">{{ 'inventory.quantity' | translate }} *</label>
+          <input
+            type="number"
+            [(ngModel)]="receiptQuantity"
+            min="1"
+            class="erpm-input font-bold"
+          />
+        </div>
+        <div class="erpm-form-group">
+          <label class="erpm-label">{{ 'inventory.unit_cost' | translate }} (đ) *</label>
+          <input
+            type="number"
+            [(ngModel)]="receiptUnitCost"
+            min="0"
+            class="erpm-input font-bold"
+          />
+        </div>
+      </div>
+
+      <div class="erpm-form-group">
+        <label class="erpm-label">{{ 'inventory.receipt_notes' | translate }}</label>
+        <input
+          type="text"
+          [(ngModel)]="receiptNotes"
+          [placeholder]="'inventory.receipt_notes_placeholder' | translate"
+          class="erpm-input"
+        />
+      </div>
+    </div>
+
+    <div class="erpm-modal-footer">
+      <button (click)="showReceiptModal = false" class="erpm-btn erpm-btn-secondary">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        (click)="submitStockReceipt()"
+        [disabled]="!receiptItemId || receiptQuantity <= 0 || isSubmitting"
+        class="erpm-btn erpm-btn-primary"
+      >
+        {{ isSubmitting ? ('common.saving' | translate) : ('inventory.save_receipt' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>

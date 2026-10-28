@@ -1,0 +1,384 @@
+.branch-select-container {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   1. TRIGGER SELECT BOX
+   -------------------------------------------------------------------------- */
+.branch-select-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0.85rem 0.4rem 0.5rem;
+  background-color: var(--erpm-bg-surface);
+  border: 1px solid var(--erpm-border);
+  border-radius: var(--erpm-radius-pill);
+  box-shadow: var(--erpm-shadow-xs);
+  cursor: pointer !important;
+  user-select: none !important;
+  caret-color: transparent !important;
+  text-align: left;
+  transition: var(--erpm-transition-fast);
+  max-width: 340px;
+
+  * {
+    cursor: pointer !important;
+    user-select: none !important;
+    caret-color: transparent !important;
+  }
+
+  &:hover {
+    border-color: var(--erpm-primary-300);
+    box-shadow: var(--erpm-shadow-sm);
+    background-color: var(--erpm-bg-surface-subtle);
+  }
+
+  &.is-open {
+    border-color: var(--erpm-primary-600);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+  }
+
+  .trigger-icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    background: var(--erpm-primary-50);
+    color: var(--erpm-primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .trigger-label-group {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    line-height: 1.25;
+
+    .trigger-branch-name {
+      font-size: 0.825rem;
+      font-weight: 700;
+      color: var(--erpm-text-heading);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .trigger-sub-info {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--erpm-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      .trigger-code {
+        font-weight: 600;
+        color: var(--erpm-primary-600);
+      }
+    }
+  }
+
+  .trigger-arrow {
+    margin-left: 0.35rem;
+    color: var(--erpm-text-muted);
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+
+    .arrow-icon {
+      display: inline-block;
+      transition: transform 0.2s ease;
+
+      &.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. DROPDOWN FLYOUT PANEL
+   -------------------------------------------------------------------------- */
+.branch-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 400px;
+  max-width: 90vw;
+  background-color: var(--erpm-bg-surface);
+  border: 1px solid var(--erpm-border);
+  border-radius: var(--erpm-radius-lg);
+  box-shadow: var(--erpm-shadow-xl);
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media (max-width: 640px) {
+    width: 320px;
+    left: auto;
+    right: 0;
+  }
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-search-wrap {
+  padding: 0.75rem 0.85rem;
+  background-color: var(--erpm-bg-surface-subtle);
+  border-bottom: 1px solid var(--erpm-border-subtle);
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .search-icon {
+    position: absolute;
+    left: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--erpm-text-muted);
+    pointer-events: none;
+  }
+
+  .dropdown-search-input {
+    width: 100%;
+    padding: 0.45rem 1.75rem 0.45rem 2rem;
+    font-size: 0.8rem;
+    border-radius: var(--erpm-radius-sm);
+    border: 1px solid var(--erpm-border);
+    background-color: #ffffff;
+    color: var(--erpm-text-heading);
+    caret-color: var(--erpm-text-heading, #0f172a) !important;
+    cursor: text !important;
+    user-select: text !important;
+    outline: none;
+    transition: var(--erpm-transition-fast);
+
+    &:focus {
+      border-color: var(--erpm-primary-600);
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
+    }
+  }
+
+  .clear-search-btn {
+    position: absolute;
+    right: 1.35rem;
+    background: none;
+    border: none;
+    font-size: 0.75rem;
+    color: var(--erpm-text-muted);
+    cursor: pointer;
+    padding: 0.2rem;
+  }
+}
+
+.tree-scroll-container {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--erpm-border-strong);
+    border-radius: var(--erpm-radius-pill);
+  }
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--erpm-border-subtle);
+  margin: 0.35rem 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. RECURSIVE TREE NODES & ROWS
+   -------------------------------------------------------------------------- */
+.tree-node-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-node-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-right: 0.85rem;
+  cursor: pointer !important;
+  user-select: none !important;
+  caret-color: transparent !important;
+  border-radius: 6px;
+  margin: 1px 0.35rem;
+  transition: var(--erpm-transition-fast);
+
+  * {
+    cursor: pointer !important;
+    user-select: none !important;
+    caret-color: transparent !important;
+  }
+
+  &:hover {
+    background-color: var(--erpm-bg-surface-subtle);
+
+    .tree-toggle-btn {
+      color: var(--erpm-text-heading);
+    }
+  }
+
+  &.active {
+    background-color: var(--erpm-primary-50);
+
+    .node-name {
+      color: var(--erpm-primary-700);
+      font-weight: 700;
+    }
+    .node-code {
+      color: var(--erpm-primary-600);
+    }
+  }
+
+  &.root-scope-item {
+    margin: 0.25rem 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px dashed var(--erpm-primary-200);
+    border-radius: var(--erpm-radius-sm);
+    background-color: #fafbfc;
+
+    &:hover {
+      background-color: var(--erpm-primary-50);
+      border-color: var(--erpm-primary-400);
+    }
+  }
+
+  .tree-toggle-btn {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--erpm-text-muted);
+    border-radius: 4px;
+    transition: var(--erpm-transition-fast);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .chevron-glyph {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &.expanded .chevron-glyph {
+      transform: rotate(90deg);
+      color: var(--erpm-primary-600);
+    }
+  }
+
+  .tree-leaf-spacer {
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .node-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .node-content {
+    flex: 1;
+    min-width: 0;
+
+    .node-name {
+      font-size: 0.8rem;
+      color: var(--erpm-text-heading);
+    }
+
+    .node-code {
+      font-size: 0.68rem;
+      background: var(--erpm-bg-surface-active);
+      color: var(--erpm-text-muted);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+    }
+
+    .node-address {
+      font-size: 0.68rem;
+      color: var(--erpm-text-subtle);
+      margin-top: 0.1rem;
+    }
+
+    .node-desc {
+      display: block;
+      margin-top: 0.15rem;
+    }
+  }
+
+  .children-count-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--erpm-text-muted);
+    background-color: var(--erpm-bg-surface-active);
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--erpm-radius-pill);
+    white-space: nowrap;
+  }
+
+  .node-check {
+    font-weight: 800;
+    color: var(--erpm-primary-600);
+    font-size: 0.85rem;
+    margin-left: 0.35rem;
+  }
+}
+
+.tree-children-container {
+  position: relative;
+
+  /* Delicate vertical guideline */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 21px;
+    top: 0;
+    bottom: 6px;
+    width: 1px;
+    background: var(--erpm-border);
+  }
+}
+
+.tree-empty-state {
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.dropdown-footer {
+  padding: 0.65rem 0.85rem;
+  background-color: var(--erpm-bg-surface-subtle);
+  border-top: 1px solid var(--erpm-border-subtle);
+  line-height: 1.35;
+}

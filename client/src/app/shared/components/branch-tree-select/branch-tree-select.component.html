@@ -1,0 +1,150 @@
+<div class="branch-select-container">
+  <!-- Trigger Control (Select Box) -->
+  <button
+    type="button"
+    class="branch-select-trigger"
+    [class.is-open]="isOpen()"
+    (click)="toggleDropdown($event)"
+    [title]="'branch.select_branch' | translate"
+  >
+    <div class="trigger-icon-box">
+      <span>{{ branchService.currentBranch()?.id === allBranchesOption.id ? '🌐' : '🏢' }}</span>
+    </div>
+
+    <div class="trigger-label-group">
+      <div class="trigger-branch-name">
+        {{ branchService.currentBranch()?.name || ('branch.select_branch' | translate) }}
+      </div>
+      <div class="trigger-sub-info">
+        <span class="trigger-code font-mono">{{ branchService.currentBranch()?.code || '---' }}</span>
+        <span *ngIf="branchService.currentBranch()?.parentName" class="trigger-parent">
+          • {{ 'branch.direct_parent' | translate }}: {{ branchService.currentBranch()?.parentName }}
+        </span>
+      </div>
+    </div>
+
+    <div class="trigger-arrow">
+      <span class="arrow-icon" [class.rotated]="isOpen()">▼</span>
+    </div>
+  </button>
+
+  <!-- Dropdown Flyout Panel -->
+  <div *ngIf="isOpen()" class="branch-dropdown-panel" (click)="$event.stopPropagation()">
+    <!-- Search Bar in Dropdown -->
+    <div class="dropdown-search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="searchKeyword"
+        [placeholder]="'branch.search_placeholder' | translate"
+        class="dropdown-search-input"
+        autofocus
+      />
+      <button *ngIf="searchKeyword()" (click)="searchKeyword.set('')" class="clear-search-btn">✕</button>
+    </div>
+
+    <!-- Tree Items List -->
+    <div class="tree-scroll-container">
+      <!-- Option 1: Toàn hệ thống (All Branches) -->
+      <div
+        class="tree-node-row root-scope-item"
+        [class.active]="isSelected(allBranchesOption)"
+        (click)="selectAllBranches($event)"
+      >
+        <span class="tree-leaf-spacer"></span>
+        <span class="node-icon">🌐</span>
+        <div class="node-content">
+          <span class="node-name font-bold">{{ 'branch.all_system' | translate }}</span>
+          <span class="node-desc text-xs text-slate-500">{{ 'branch.all_system_desc' | translate }}</span>
+        </div>
+        <span *ngIf="isSelected(allBranchesOption)" class="node-check">✓</span>
+      </div>
+
+      <div class="dropdown-divider"></div>
+
+      <!-- Recursive Tree Root -->
+      <ng-container
+        *ngTemplateOutlet="treeNode; context: { nodes: displayedTree(), depth: 0 }"
+      ></ng-container>
+
+      <!-- Empty Search Result -->
+      <div *ngIf="displayedTree().length === 0" class="tree-empty-state">
+        <span class="text-2xl">🔍</span>
+        <p class="mt-1 text-xs text-slate-500 font-medium">Không tìm thấy chi nhánh khớp với "{{ searchKeyword() }}"</p>
+      </div>
+    </div>
+
+    <!-- Dropdown Hint Footer -->
+    <div class="dropdown-footer">
+      <span class="text-xs text-slate-500">
+        💡 <em>{{ 'branch.filter_hint' | translate }}</em>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     RECURSIVE NG-TEMPLATE FOR INFINITE BRANCH TREE
+     ========================================================================= -->
+<ng-template #treeNode let-nodes="nodes" let-depth="depth">
+  <div *ngFor="let node of nodes" class="tree-node-wrapper">
+    <!-- Single Branch Item Row -->
+    <div
+      class="tree-node-row"
+      [style.padding-left.px]="12 + depth * 20"
+      [class.active]="isSelected(node)"
+      [class.has-children]="node.children && node.children.length > 0"
+      [class.is-depth-0]="depth === 0"
+      (click)="selectBranch(node, $event)"
+    >
+      <!-- Expand / Collapse Chevron Button (for parents) -->
+      <button
+        *ngIf="node.children && node.children.length > 0; else leafSpacer"
+        type="button"
+        class="tree-toggle-btn"
+        [class.expanded]="isExpanded(node.id)"
+        (click)="toggleExpand(node.id, $event)"
+        title="Đóng / mở các chi nhánh con"
+      >
+        <span class="chevron-glyph">›</span>
+      </button>
+
+      <!-- Spacer for leaf items so icons align neatly -->
+      <ng-template #leafSpacer>
+        <span class="tree-leaf-spacer"></span>
+      </ng-template>
+
+      <!-- Branch Level Icon -->
+      <span class="node-icon">{{ getNodeIcon(node, depth) }}</span>
+
+      <!-- Branch Label Group -->
+      <div class="node-content">
+        <div class="flex items-center gap-1.5">
+          <span class="node-name" [class.font-bold]="depth <= 1">{{ node.name }}</span>
+          <span class="node-code font-mono">{{ node.code }}</span>
+        </div>
+        <div *ngIf="node.address" class="node-address text-xs text-slate-400 truncate">
+          {{ node.address }}
+        </div>
+      </div>
+
+      <!-- Children Count Badge (for parents) -->
+      <span *ngIf="node.children && node.children.length > 0" class="children-count-badge" title="Số lượng chi nhánh cấp dưới">
+        {{ node.children.length }} {{ 'branch.sub_level' | translate }}
+      </span>
+
+      <!-- Selected Indicator Checkmark -->
+      <span *ngIf="isSelected(node)" class="node-check">✓</span>
+    </div>
+
+    <!-- Recursive Call to Child Nodes (Infinite Hierarchy) -->
+    <div
+      *ngIf="node.children && node.children.length > 0 && isExpanded(node.id)"
+      class="tree-children-container"
+    >
+      <ng-container
+        *ngTemplateOutlet="treeNode; context: { nodes: node.children, depth: depth + 1 }"
+      ></ng-container>
+    </div>
+  </div>
+</ng-template>

@@ -3,6 +3,8 @@ namespace ERPm.Application.DTOs.Inventory;
 public class WarehouseDto
 {
     public Guid Id { get; set; }
+    public Guid BranchId { get; set; }
+    public string? BranchName { get; set; }
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public Dictionary<string, string> Translations { get; set; } = new();
@@ -27,6 +29,7 @@ public class StockBalanceDto
 
 public class CreateStockReceiptRequest
 {
+    public Guid? BranchId { get; set; }
     public Guid WarehouseId { get; set; }
     public Guid? SupplierId { get; set; }
     public string? Notes { get; set; }

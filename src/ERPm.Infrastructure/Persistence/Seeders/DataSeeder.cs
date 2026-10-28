@@ -3,6 +3,7 @@ using ERPm.Domain.Entities.Catalog;
 using ERPm.Domain.Entities.Inventory;
 using ERPm.Domain.Entities.Localization;
 using ERPm.Domain.Entities.Partner;
+using ERPm.Domain.Entities.System;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERPm.Infrastructure.Persistence.Seeders;
@@ -11,6 +12,52 @@ public static class DataSeeder
 {
     public static async Task SeedAsync(ApplicationDbContext context)
     {
+        // 0. Seed Multi-level Hierarchical Branch Tree (Tổng Công Ty & Chi nhánh con/cháu)
+        var rootId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+        var rootBranch = await context.Branches.FirstOrDefaultAsync(b => b.Code == "root" || b.Id == rootId);
+        if (rootBranch == null)
+        {
+            rootBranch = new Branch
+            {
+                Id = rootId,
+                Code = "root",
+                Name = "Tổng Công Ty (Tập đoàn)",
+                ParentId = null,
+                Address = "Tòa nhà Keangnam, Hà Nội",
+                IsDefault = true,
+                IsActive = true
+            };
+            await context.Branches.AddAsync(rootBranch);
+            await context.SaveChangesAsync();
+        }
+
+        var kmbId = Guid.Parse("00000000-0000-0000-0000-000000000010");
+        if (!await context.Branches.AnyAsync(b => b.Id == kmbId))
+        {
+            var branchesToSeed = new List<Branch>
+            {
+                // Khối Miền Bắc & con cháu
+                new() { Id = kmbId, Code = "KMB", Name = "Khối Miền Bắc", ParentId = rootId, IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000011"), Code = "CN-HN", Name = "Chi nhánh Hà Nội (HQ)", ParentId = kmbId, Address = "Số 1 Phố Huế, Hoàn Kiếm", IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000012"), Code = "CH-HK", Name = "Cửa hàng Hoàn Kiếm", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000011"), Address = "Tràng Tiền, Hà Nội", IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000013"), Code = "CH-CG", Name = "Cửa hàng Cầu Giấy", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000011"), Address = "Xuân Thủy, Cầu Giấy", IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000014"), Code = "CN-HP", Name = "Chi nhánh Hải Phòng", ParentId = kmbId, Address = "Lê Hồng Phong, Hải Phòng", IsActive = true },
+
+                // Khối Miền Nam & con cháu
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000020"), Code = "KMN", Name = "Khối Miền Nam", ParentId = rootId, IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000021"), Code = "CN-HCM", Name = "Chi nhánh TP. Hồ Chí Minh", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"), Address = "Nguyễn Huệ, Quận 1, TP.HCM", IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000022"), Code = "CH-Q1", Name = "Cửa hàng Quận 1", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000021"), Address = "Lê Lợi, Quận 1", IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000023"), Code = "CH-TD", Name = "Cửa hàng Thủ Đức", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000021"), Address = "Võ Văn Ngân, Thủ Đức", IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000024"), Code = "CN-CT", Name = "Chi nhánh Cần Thơ", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"), Address = "Ninh Kiều, Cần Thơ", IsActive = true },
+
+                // Khối Miền Trung
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000030"), Code = "KMT", Name = "Khối Miền Trung", ParentId = rootId, IsActive = true },
+                new() { Id = Guid.Parse("00000000-0000-0000-0000-000000000031"), Code = "CN-DN", Name = "Chi nhánh Đà Nẵng", ParentId = Guid.Parse("00000000-0000-0000-0000-000000000030"), Address = "Bạch Đằng, Đà Nẵng", IsActive = true }
+            };
+            await context.Branches.AddRangeAsync(branchesToSeed);
+            await context.SaveChangesAsync();
+        }
+
         // 1. Seed Languages
         if (!await context.AppLanguages.AnyAsync())
         {
@@ -76,6 +123,8 @@ public static class DataSeeder
         {
             defaultWarehouse = new Warehouse
             {
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                BranchId = rootBranch.Id,
                 Code = "KHO01",
                 Name = "Kho Tổng Trung Tâm",
                 Translations = new() { ["vi"] = "Kho Tổng Trung Tâm", ["en"] = "Main Central Warehouse" },
@@ -111,6 +160,55 @@ public static class DataSeeder
             await context.SaveChangesAsync();
         }
 
+        // 5.5. Seed Dynamic Item Attributes (Schema-Driven Metadata)
+        if (!await context.ItemAttributes.AnyAsync())
+        {
+            var attributes = new List<ItemAttribute>
+            {
+                new()
+                {
+                    Code = "color",
+                    Name = "Màu sắc",
+                    DataType = AttributeDataType.Select,
+                    Options = new() { "Xanh Dương", "Đỏ", "Đen", "Trắng", "Vàng" },
+                    IsRequired = false,
+                    IsFilterable = true,
+                    SortOrder = 1
+                },
+                new()
+                {
+                    Code = "size",
+                    Name = "Kích cỡ / Quy cách",
+                    DataType = AttributeDataType.Select,
+                    Options = new() { "0.5mm", "0.7mm", "A4", "A3", "S", "M", "L", "XL" },
+                    IsRequired = false,
+                    IsFilterable = true,
+                    SortOrder = 2
+                },
+                new()
+                {
+                    Code = "origin",
+                    Name = "Xuất xứ",
+                    DataType = AttributeDataType.Text,
+                    IsRequired = false,
+                    IsFilterable = true,
+                    SortOrder = 3
+                },
+                new()
+                {
+                    Code = "warranty_months",
+                    Name = "Thời hạn bảo hành",
+                    DataType = AttributeDataType.Number,
+                    Unit = "tháng",
+                    IsRequired = false,
+                    IsFilterable = true,
+                    SortOrder = 4
+                }
+            };
+            await context.ItemAttributes.AddRangeAsync(attributes);
+            await context.SaveChangesAsync();
+        }
+
         // 6. Seed Items & Stock Balances
         if (!await context.Items.AnyAsync())
         {
@@ -126,7 +224,14 @@ public static class DataSeeder
                 CostPrice = 3200m,
                 MinStockAlert = 20m,
                 MaxStockAlert = 500m,
-                IsActive = true
+                IsActive = true,
+                Attributes = new()
+                {
+                    ["color"] = "Xanh Dương",
+                    ["size"] = "0.5mm",
+                    ["origin"] = "Việt Nam",
+                    ["warranty_months"] = 12
+                }
             };
 
             var item2 = new Item
@@ -141,7 +246,12 @@ public static class DataSeeder
                 CostPrice = 62000m,
                 MinStockAlert = 10m,
                 MaxStockAlert = 200m,
-                IsActive = true
+                IsActive = true,
+                Attributes = new()
+                {
+                    ["size"] = "A4",
+                    ["origin"] = "Thái Lan"
+                }
             };
 
             var item3 = new Item
@@ -156,7 +266,8 @@ public static class DataSeeder
                 CostPrice = 0m,
                 MinStockAlert = 0m,
                 MaxStockAlert = 0m,
-                IsActive = true
+                IsActive = true,
+                Attributes = new()
             };
 
             await context.Items.AddRangeAsync([item1, item2, item3]);

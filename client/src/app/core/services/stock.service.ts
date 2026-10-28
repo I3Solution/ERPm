@@ -4,6 +4,8 @@ import { Observable, catchError, of, map, tap } from 'rxjs';
 
 export interface WarehouseDto {
   id: string;
+  branchId?: string;
+  branchName?: string;
   code: string;
   name: string;
   translations?: Record<string, string>;
@@ -32,6 +34,7 @@ export interface StockReceiptItemRequest {
 }
 
 export interface CreateStockReceiptRequest {
+  branchId?: string;
   warehouseId: string;
   supplierId?: string;
   notes?: string;
@@ -84,40 +87,44 @@ export class StockService {
   private readonly apiUrl = 'http://localhost:5000/api/v1/stock';
 
   // Signals
-  public warehouses = signal<WarehouseDto[]>(MOCK_WAREHOUSES);
-  public balances = signal<StockBalanceDto[]>(MOCK_BALANCES);
+  public warehouses = signal<WarehouseDto[]>([]);
+  public balances = signal<StockBalanceDto[]>([]);
   public isLoading = signal<boolean>(false);
 
   constructor(private http: HttpClient) {}
 
-  public loadWarehouses(): void {
-    this.http.get<{ success: boolean; data: WarehouseDto[] }>(`${this.apiUrl}/warehouses`)
-      .pipe(catchError(() => of({ success: true, data: MOCK_WAREHOUSES })))
-      .subscribe(res => {
-        if (res && res.success && res.data) {
-          this.warehouses.set(res.data);
-        }
+  public loadWarehouses(branchId?: string | null): void {
+    const url = branchId ? `${this.apiUrl}/warehouses?branchId=${branchId}` : `${this.apiUrl}/warehouses`;
+    this.http.get<{ success: boolean; data: WarehouseDto[] }>(url)
+      .subscribe({
+        next: (res) => {
+          if (res && res.success && res.data) {
+            this.warehouses.set(res.data);
+          }
+        },
+        error: (err) => console.error('Lỗi khi tải danh sách kho:', err)
       });
   }
 
-  public loadBalances(warehouseId?: string): void {
+  public loadBalances(warehouseId?: string | null, branchId?: string | null): void {
     this.isLoading.set(true);
-    const url = warehouseId ? `${this.apiUrl}/balances?warehouseId=${warehouseId}` : `${this.apiUrl}/balances`;
+    const params: string[] = [];
+    if (warehouseId) params.push(`warehouseId=${warehouseId}`);
+    if (branchId) params.push(`branchId=${branchId}`);
+    const queryString = params.length > 0 ? `?${params.join('&')}` : '';
 
-    this.http.get<{ success: boolean; data: StockBalanceDto[] }>(url)
-      .pipe(
-        catchError(() => {
-          const list = warehouseId
-            ? MOCK_BALANCES.filter(b => b.warehouseId === warehouseId)
-            : MOCK_BALANCES;
-          return of({ success: true, data: list });
-        })
-      )
-      .subscribe(res => {
-        if (res && res.success && res.data) {
-          this.balances.set(res.data);
+    this.http.get<{ success: boolean; data: StockBalanceDto[] }>(`${this.apiUrl}/balances${queryString}`)
+      .subscribe({
+        next: (res) => {
+          if (res && res.success && res.data) {
+            this.balances.set(res.data);
+          }
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Lỗi khi tải tồn kho:', err);
+          this.isLoading.set(false);
         }
-        this.isLoading.set(false);
       });
   }
 
@@ -125,21 +132,7 @@ export class StockService {
     return this.http.post<{ success: boolean; data: boolean }>(`${this.apiUrl}/receipts`, request)
       .pipe(
         map(res => res.data),
-        tap(() => this.loadBalances(request.warehouseId)),
-        catchError(() => {
-          // Local fallback simulation
-          for (const item of request.items) {
-            const found = this.balances().find(b => b.itemId === item.itemId);
-            if (found) {
-              found.quantityOnHand += Number(item.quantity);
-              found.averageCostPrice = Number(item.unitPrice);
-              found.totalValue = found.quantityOnHand * found.averageCostPrice;
-              found.isLowStock = found.quantityOnHand <= 10;
-            }
-          }
-          this.balances.set([...this.balances()]);
-          return of(true);
-        })
+        tap(() => this.loadBalances(request.warehouseId))
       );
   }
 }

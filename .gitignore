@@ -1,6 +1,6 @@
 ## ====================================================================
 ## ERPm - Master .gitignore
-## .NET 8 (Clean Architecture) + Angular 18 (Ionic Hybrid) + PostgreSQL
+## .NET 10 (Clean Architecture) + Angular 17.3 (Ionic Hybrid) + PostgreSQL
 ## ====================================================================
 
 # ---------------------------------------------------------------------

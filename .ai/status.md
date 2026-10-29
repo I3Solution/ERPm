@@ -1,4 +1,71 @@
+# ERPm — Trạng thái hiện hành, Step 19 (2026-10-29)
+
+Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
+
+## Completed
+
+- [x] Đồng bộ migration/snapshot/schema tham chiếu; nâng cấp schema UUID 9 bảng sang model hiện hành, giữ bản gốc legacy và ExternalId.
+- [x] Tài khoản ERPm nội bộ, Admin/Operator/Viewer, scope chi nhánh ở server, khóa đăng nhập, thu hồi tài khoản/token và audit.
+- [x] Posting nguyên tử; khóa cập nhật kho/công nợ, sequence mã chứng từ và idempotency; kiểm tra dữ liệu, kho–chi nhánh, tồn và hạn mức nợ.
+- [x] Giá vốn bình quân với carrying value chính xác; thanh toán một phần/tiền thừa; bút toán cân bằng bắt buộc và hủy hóa đơn bằng bút toán đảo.
+- [x] Sửa Signals/reactive form, dictionary bundle, routes, phân trang, tìm SKU/barcode/bản dịch; bỏ số liệu demo, tách state item theo màn hình.
+- [x] Kiểm tra: backend solution build 0 warning/0 error; **44 kiểm tra PostgreSQL/API đạt**. FE production build đạt, type-check spec đạt; **7 kiểm thử Chrome đạt**.
+- [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
+
+## In-Progress
+
+- Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
+- FE Angular 17.3/Ionic 8 đang được giữ nguyên phiên bản; initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
+
+## Next Steps
+
+1. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
+2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
+3. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
+
+Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-internal-accounts.md), [đối chiếu F01–F22](reviews/2026-10-29-priority-resolution.md). SDK .NET 10 đã có ở thư mục người dùng nhưng chưa trên PATH; nhận định thiếu SDK trong Step 18 đã được đính chính.
+
+
+---
+
+## Tài liệu trước Step 19 — lưu để truy vết
+
 # 📊 DỰ ÁN ERPM - BẢNG TRẠNG THÁI HIỆN TẠI (CURRENT STATUS)
+
+> **Đánh giá hiện hành: 2026-10-29 — Step 18.**
+>
+> **Giai đoạn:** Giai đoạn 1 đã có source MVP, đang cần ổn định và nghiệm thu lại; Giai đoạn 2 mới có một phần khung.
+>
+> **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
+
+## Completed — Đã hoàn thành rà soát
+
+- [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
+- [x] Ghi [báo cáo rà soát 2026-10-29](reviews/2026-10-29-source-review.md) với 22 phát hiện và vị trí source; lưu [Step 18](steps/step-18-source-review-and-development-assessment.md).
+- [x] Xác minh production FE build exit 0, có 2 warning; phát hiện phần test chưa compile được (TS2339).
+- [x] Tái hiện cục bộ lỗi Signals ở POS/CRM/branch tree và effect POS/Inventory; đối chiếu contract localization và routes.
+- [x] Xác định model EF 23 bảng hiện hành không khớp migration/snapshot 9 bảng cũ.
+
+## In-Progress — Tình trạng thực tế
+
+- Giai đoạn 1: **cần ổn định lại**, chưa nghiệm thu kho–công nợ–kế toán hoặc vận hành đa người dùng.
+- Chưa bắt đầu sửa các phát hiện trong lượt review này; không chỉnh sửa source ứng dụng hoặc database.
+- Build BE/integration PostgreSQL chưa được xác minh: máy hiện chỉ có SDK .NET 8.0.400, các project nhắm net10.0.
+- FE thực tế dùng Angular 17.3 (runtime đang cài 17.3.12) + Ionic 8; chưa có cấu hình Capacitor/native/offline trong checkout.
+
+## Next Steps — Ưu tiên sau rà soát
+
+1. Chuẩn bị môi trường .NET 10; xác minh restore/build BE, đồng bộ migration và bootstrap/upgrade DB thử nghiệm không mất dữ liệu.
+2. Sửa computed/effect và tổng tiền FE; sửa routes, i18n contract, phân trang; bỏ số demo khỏi dashboard nghiệp vụ.
+3. Bổ sung xác thực/phân quyền, validation, kiểm tra kho–chi nhánh, cấp số chứng từ/idempotency và concurrency tồn kho/công nợ.
+4. Thống nhất giá vốn, thanh toán một phần/tiền thừa, posting bắt buộc và vòng đời chứng từ; kiểm thử đối chiếu kho–sổ–công nợ.
+5. Nghiệm thu lại Giai đoạn 1 theo test có bằng chứng, cập nhật roadmap/status BE/FE, rồi tiếp tục PUR/Sổ quỹ.
+
+---
+
+## Lịch sử trước Step 18 — Giữ để truy vết
+
+Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đây là ghi nhận cũ, có điểm không còn khớp source. Dùng đánh giá hiện hành phía trên và báo cáo Step 18 để xác định công việc tiếp theo.
 
 > **Cập nhật lần cuối:** 2026-10-22  
 > **Giai đoạn hiện tại:** Giai đoạn 1 (Nền tảng Kiến trúc Nhanh & Multi-Branch Deep Dive) -> Chuẩn bị bước vào Giai đoạn 2 (Mua hàng & Sổ quỹ)  

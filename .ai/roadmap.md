@@ -1,3 +1,19 @@
+# Mốc hiện hành — Step 19, 2026-10-29
+
+| Giai đoạn | Trạng thái có bằng chứng |
+| --- | --- |
+| 1: MVP bán hàng, kho, đối tác, dashboard | Đã ổn định source, 44 kiểm tra PostgreSQL/API và build đạt; chờ nghiệm thu thủ công |
+| 2: Mua hàng và sổ quỹ | Có API đơn Draft/Confirmed và nhập mua hạch toán 156/331; chưa có luồng PO–nhận hàng–hóa đơn/thu chi đầy đủ |
+| 3: Kế toán tài chính | Có ledger nền tảng; chưa có bộ sổ/báo cáo đầy đủ |
+| 4: Native/offline, phân hệ mở rộng | Chưa triển khai |
+
+Ưu tiên tiếp theo: nghiệm thu MVP/E2E/CI → PUR và thu chi → sổ cái → native/offline. Checklist thiết kế cũ bên dưới thể hiện kế hoạch/lịch sử, không thay thế kết quả nghiệm thu hiện hành.
+
+
+---
+
+## Tài liệu trước Step 19 — lưu để truy vết
+
 # 🗺️ LỘ TRÌNH PHÁT TRIỂN DỰ ÁN ERPM (MASTER ROADMAP)
 
 Dự án được chia thành các giai đoạn (Phases) theo phương pháp **Lean & Incremental**, bắt đầu từ phiên bản Mini hữu dụng ngay lập tức, tiến dần tới Hệ thống Kế toán - ERP hoàn chỉnh.
@@ -8,7 +24,7 @@ Dự án được chia thành các giai đoạn (Phases) theo phương pháp **L
 *Mục tiêu: Đưa vào sử dụng thực tế ngay cho cửa hàng / doanh nghiệp vừa & nhỏ để bán hàng, quản lý kho hàng hóa, quản lý khách hàng và xem báo cáo dòng tiền.*
 
 ### 📦 Sprint 1.1: Khởi tạo Kiến trúc Lõi & Master Data (ITEM & Partners)
-- [ ] Thiết lập Solution .NET 8 Clean Architecture (`Domain`, `Application`, `Infrastructure`, `API`).
+- [ ] Thiết lập Solution .NET 10 Clean Architecture (`Domain`, `Application`, `Infrastructure`, `API`).
 - [ ] Cấu hình PostgreSQL với EF Core 8 (Code-First Migrations, Npgsql).
 - [ ] Xây dựng Base Entities: `BaseAuditableEntity`, `ISoftDelete`, `ITenant`.
 - [ ] **Phân hệ ITEM (Sản phẩm & Dịch vụ):**

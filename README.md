@@ -1,5 +1,7 @@
 # 🏛️ ERPM - ENTERPRISE MULTI-REPOSITORY ARCHITECTURE
 
+**Baseline Step 19:** .NET 10 / Angular 17.3, tài khoản nội bộ và các sửa ưu tiên đã có kiểm thử. Xem [hướng dẫn chạy local](docs/LOCAL_DEVELOPMENT.md), [đối chiếu F01–F22](.ai/reviews/2026-10-29-priority-resolution.md) và [.ai/status.md](.ai/status.md). Các module trong bảng dưới là phạm vi sản phẩm, không đồng nghĩa đã triển khai đầy đủ.
+
 > **Tổ chức:** [I3Solution](https://github.com/I3Solution)  
 > **Parent Umbrella Repository:** `https://github.com/I3Solution/ERPm.git`
 
@@ -8,12 +10,12 @@ Hệ thống **ERPm** (Quản trị Bán hàng, Tồn kho & Kế toán mở rộ
 ```text
 ERPm (Parent Umbrella Orchestrator: https://github.com/I3Solution/ERPm.git)
 │
-├── 📂 ERPm-BE (Backend .NET 8 Clean Architecture)
+├── 📂 ERPm-BE (Backend .NET 10 Clean Architecture)
 │   └── Remote: https://github.com/I3Solution/ERPm-BE.git
 │       ├── Controllers: ACC/, SD/, PUR/, WMS/, CRM/, SYS/, DASHBOARD/
 │       └── Database DDL: tbl_SYS_..., tbl_CRM_..., tbl_WMS_..., tbl_SALE_..., tbl_PURCHASE_..., tbl_ACC_...
 │
-└── 📂 ERPm-FE (Frontend Angular 18 + Ionic 8 Hybrid)
+└── 📂 ERPm-FE (Frontend Angular 17.3 + Ionic 8 Hybrid)
     ├── Remote: https://github.com/I3Solution/ERPm-FE.git
     │
     └── 📦 10 Feature Module Git Submodules:

@@ -131,6 +131,6 @@ dotnet run --project src/ERPm.API --launch-profile http --no-build -- --migrate 
   - Không đăng nhập → **401**.
 
 ## Hướng tiếp theo
-1. Đọc nhân viên và QTCT có lọc theo `DataScope` (dịch `WorkTimeline.VisibleBefore` sang SQL `EXISTS` như Tian-v1), kèm cờ được sửa/xóa theo từng dòng. Sau đó mở quyền đọc cho Operator.
+1. Đọc nhân viên và QTCT có lọc theo `DataScope` (dịch `WorkTimeline.VisibleBefore` sang một câu SQL `EXISTS`), kèm cờ được sửa/xóa theo từng dòng. Sau đó mở quyền đọc cho Operator.
 2. FE (`ERPm-FE-HRM`): danh mục pháp nhân, cơ cấu tổ chức, ca; hồ sơ nhân viên và QTCT, dùng `<app-form-control>`. Thêm key i18n vào `system.json` (FE) và `system_dictionary.json` (BE), vì CI so sánh 2 file này.
 3. Chấm công: quẹt thẻ, nghỉ phép, kỳ công khóa theo pháp nhân, bảng công dùng `TimesheetCalculator`.

@@ -1,6 +1,6 @@
 # 🤖 AGENTS.MD: HƯỚNG DẪN DÀNH CHO AI AGENT TRONG DỰ ÁN ERPM
 
-Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Phần mềm Quản trị Bán hàng, Tồn kho & Kế toán mở rộng (C# .NET 8, PostgreSQL, Angular + Ionic Hybrid).
+Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Phần mềm Quản trị Bán hàng, Tồn kho & Kế toán mở rộng (C# .NET 10, PostgreSQL, Angular + Ionic Hybrid).
 
 ---
 
@@ -25,12 +25,23 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - Sau khi ghi log step, cập nhật lại trạng thái: Chuyển các việc đã làm sang **Completed**, cập nhật **In-Progress** và **Next Steps**.
 
 4. **Kỷ luật Kỹ thuật (Technical Discipline):**
-   - **Backend (.NET 8):** Tuân thủ Clean Architecture (`Domain` -> `Application` -> `Infrastructure` -> `API`). Không nhồi nhét business logic vào Controllers.
+   - **Backend (.NET 10):** Tuân thủ Clean Architecture (`Domain` -> `Application` -> `Infrastructure` -> `API`). Không nhồi nhét business logic vào Controllers.
    - **Database (PostgreSQL):** Tiền tệ & số lượng bắt buộc dùng `decimal(18, 4)`. Hỗ trợ Soft-delete và Auditing.
    - **Kế toán & Kho:** Không hard-delete chứng từ giao dịch tài chính đã ghi sổ (`Posted`). Thiết kế bảng sẵn sàng cho Double-Entry Ledger.
    - **Frontend (Angular + Ionic):** Standalone components, Signals, thiết kế Responsive Adaptive (hỗ trợ cả Mobile màn hình nhỏ và Desktop bảng dữ liệu lớn).
    - **Đa ngôn ngữ (i18n):** Mọi thông báo lỗi, nhãn giao diện và master data (Item, Category) phải tuân thủ chuẩn đa ngôn ngữ Anh - Việt qua từ điển `app_dictionaries` và JSONB translations.
    - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
+
+5. **Quy tắc Git Commit (Commit Message Convention):**
+   - Mọi lệnh `git commit` trên repo gốc, `ERPm-BE`, `ERPm-FE` và các Submodules bắt buộc tuân thủ cú pháp:
+     `[tag] nội dung commit` hoặc `[tag](MODULE) nội dung commit`
+   - **Bộ 6 Tag chuẩn:**
+     - `[add]`: Thêm mới tính năng, bảng, API, màn hình, thành phần.
+     - `[update]`: Cập nhật nghiệp vụ, nâng cấp cấu trúc, thay đổi yêu cầu hoặc tối ưu hiệu năng/UI.
+     - `[fix]`: Sửa lỗi (bug logic, lỗi giao diện, lỗi build/SQL).
+     - `[refactor]`: Tái cấu trúc mã nguồn (gom hàm, tách file) không làm thay đổi nghiệp vụ.
+     - `[db]`: Thay đổi riêng về SQL Schema, EF Migration, Index, Seed data.
+     - `[docs]`: Cập nhật tài liệu (`PROJECT_MASTER.md`, `AGENTS.md`, `.ai/`).
 
 ---
 

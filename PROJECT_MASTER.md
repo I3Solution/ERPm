@@ -188,6 +188,11 @@ client/
    - Trên Desktop: Hỗ trợ đầu đọc mã vạch USB (lắng nghe sự kiện phím nhanh `keyup` buffer).
 3. **State Management & Signals:**
    - Sử dụng Angular Signals (`computed()`, `signal()`, `effect()`) cho state quản lý giỏ hàng bán hàng, bộ lọc tìm kiếm và bảng dữ liệu.
+4. **Quy chuẩn Biểu mẫu Nhập liệu (`FormGroup` + `FormControlComponent` & `InputControlComponent`):**
+   - Toàn bộ các Form nhập liệu đi lưu dữ liệu (CRUD Modal, Phiếu nhập/xuất, Đơn hàng, Đối tác, Thanh toán) bắt buộc sử dụng **`FormGroup` (`ReactiveFormsModule`)** thay vì biến rời `[(ngModel)]`.
+   - Không vẽ thẻ `<input>`, `<textarea>`, `<select>` thủ công lặp lại trên từng màn hình; bắt buộc sử dụng bộ đôi component chuẩn hóa:
+     - [`InputControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`): Nhận `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`), `dataSource` (`SelectOption[]`), `prefix`/`suffix` và tự động xử lý ép kiểu, định dạng số/tiền tệ hoặc render `<app-custom-select>`.
+     - [`FormControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`): Bọc `<app-input-control>`, tự động nhận `formControlName`, hiển thị `label`, `unit`, dấu `*` (`required` tự nhận diện từ `Validators.required`) và thông báo lỗi validation chuẩn hóa.
 
 ---
 

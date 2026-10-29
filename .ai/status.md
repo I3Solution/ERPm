@@ -32,10 +32,15 @@
 | **Enterprise Module Acronyms & Gitmodules** | 100% |  Hoàn thành | Chuẩn hóa 10 module viết tắt (ACC, SD, PUR, WMS, CRM, HRM, MFG, SCM, PM, DASHBOARD) ([step-14.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-14-enterprise-erp-module-standardization.md)) |
 | **Dual-Key Architecture (`int Id` + `UUIDv7 ExternalId`)** | 100% |  Hoàn thành | PK/FK `int` tự tăng + `ExternalId` UUIDv7 Covering Index ([step-15.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-15-dual-key-int-id-and-uuidv7-external-id.md)) |
 | **Nâng cấp Backend lên .NET 10 LTS (`net10.0`)** | 100% |  Hoàn thành | EF Core 10.0.14, Npgsql 10.0.3, Native `Guid.CreateVersion7()` ([step-16.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-16-upgrade-dotnet-10-lts.md)) |
+| **Standardized Reactive Forms (`FormGroup` + `InputControl` / `FormControl`)** | 100% |  Hoàn thành | `<app-form-control>` & `<app-input-control>` đa kiểu dữ liệu ([step-17.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-17-standardized-form-group-and-input-control-components.md)) |
 
 ---
 
-## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 15 & 16)
+## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 15, 16 & 17)
+- [x] **Chuẩn hóa `FormGroup` & Bộ Component `InputControlComponent` / `FormControlComponent`:**
+  - Xây dựng [`InputControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`) xử lý tự động theo `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`) và `dataSource` (`SelectOption[]`).
+  - Xây dựng [`FormControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`) bọc `<app-input-control>`, tích hợp `ControlValueAccessor` + `NgControl`, tự động vẽ nhãn, đơn vị, dấu `*` bắt buộc và thông báo lỗi validation.
+  - Chuyển đổi toàn bộ các Form nhập liệu lưu dữ liệu (`InventoryComponent`, `ItemsComponent` kể cả Dynamic Attributes JSONB, `PartnersComponent`, `PosComponent`) từ `[(ngModel)]` sang `FormGroup` (`ReactiveFormsModule`).
 - [x] **Nâng cấp toàn bộ Backend (`ERPm-BE`) lên .NET 10 LTS (`net10.0`):**
   - Chuyển đổi 4 projects (`ERPm.Domain`, `ERPm.Application`, `ERPm.Infrastructure`, `ERPm.API`) lên `net10.0`.
   - Nâng cấp `Microsoft.EntityFrameworkCore` (`10.0.14`), `Npgsql.EntityFrameworkCore.PostgreSQL` (`10.0.3`), `EFCore.NamingConventions` (`10.0.1`), `Microsoft.AspNetCore.OpenApi` (`10.0.14`).

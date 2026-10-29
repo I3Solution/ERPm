@@ -3,7 +3,7 @@
 > **Ngày:** 2026-10-30 · **Người thực hiện:** Thiện (module HRM) · **Trạng thái:** Hoàn thành
 
 ## Mục tiêu
-Đây là bước đầu chuyển nghiệp vụ HRM (Thaco / HRM9, đã kiểm chứng ở bản demo Tian-v1) vào ERPm. Bước này chỉ chuyển **lõi nghiệp vụ thuần**:
+Đây là bước đầu chuyển nghiệp vụ HRM (theo HRM9, đã kiểm chứng ở bản tham khảo nội bộ) vào ERPm. Bước này chỉ chuyển **lõi nghiệp vụ thuần**:
 - không có DB, entity, API hay màn hình;
 - không đụng tới module khác;
 - được kiểm chứng tự động bằng bộ kiểm tra riêng.
@@ -34,12 +34,12 @@
   - Tính theo ngày: ghép quẹt thẻ theo khung ca, kể cả ca qua đêm. Ra trạng thái đi muộn, về sớm, thiếu quẹt, vắng, nghỉ phép có lương / không lương. Công làm tròn đến nửa ngày.
   - Tổng hợp thành bảng công.
 - **`ShiftSchedule.cs`** là record thuần (giờ vào/ra, nghỉ giữa ca, số phút đi muộn cho phép, ngày làm). Bộ tính công dùng record này nên không phụ thuộc entity danh mục ca, sẽ làm ở bước sau.
-- **Khác bản Tian-v1:**
+- **Khác bản tham khảo:**
   - Id đổi từ `Guid` sang `int`, theo Dual-Key của ERPm.
   - Toàn bộ comment bằng tiếng Anh.
 
 **Kiểm tra và tích hợp**
-- `tests/ERPm.Hrm.Verification/`: project console theo kiểu `Check()` giống `ERPm.Verification`. Chỉ tham chiếu `ERPm.Domain`, **không cần PostgreSQL**. Gồm 28 kiểm tra, chuyển toàn bộ test case của Tian-v1 và thêm 2 case mới:
+- `tests/ERPm.Hrm.Verification/`: project console theo kiểu `Check()` giống `ERPm.Verification`. Chỉ tham chiếu `ERPm.Domain`, **không cần PostgreSQL**. Gồm 28 kiểm tra, chuyển toàn bộ test case của bản tham khảo và thêm 2 case mới:
   - phạm vi cây phòng ban;
   - ngày không thuộc thời gian làm việc / ca chưa kết thúc.
 - `ERPm.sln`: thêm project vào solution folder `tests`.
@@ -72,4 +72,4 @@ dotnet run --project tests/ERPm.Verification --no-build      # ERPM_TEST_CONNECT
 - Entity và bảng `tbl_HRM_*` kế thừa `BaseAuditableEntity`, tạo bằng EF migration: hồ sơ (`Profile`), QTCT (`WorkHistory`), hợp đồng, danh mục, ca (`Shift`, ánh xạ sang `ShiftSchedule`).
 - Danh mục dùng `BaseCrudController` trong `Controllers/HRM/`, route `api/v1/hrm/...`.
 - FE: màn danh mục và hồ sơ trong submodule `ERPm-FE-HRM`, dùng `<app-form-control>`.
-- Sau đó: chuyển bộ công thức lương (Formula engine) của Tian-v1, cũng là lõi thuần, cùng bộ kiểm tra.
+- Sau đó: chuyển bộ công thức lương (Formula engine), cũng là lõi thuần, cùng bộ kiểm tra.

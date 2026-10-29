@@ -21,7 +21,7 @@ Xây dựng một hệ thống phần mềm **Quản trị Bán hàng - Tồn kh
 | **Backend API** | **C# / .NET 10 (LTS)** | Hiệu năng cao, Type-safe mạnh, Clean Architecture, dễ bảo trì enterprise. |
 | **Database** | **PostgreSQL 16+** | Hỗ trợ JSONB linh hoạt, ACID chuẩn xác cho tài chính, miễn phí, hỗ trợ mở rộng partitioning sau này. |
 | **ORM & Data Access** | **EF Core 10 + Dapper** | EF Core cho nghiệp vụ Command/Transaction; Dapper cho Query báo cáo & Dashboard tốc độ cao. |
-| **Frontend Framework** | **Angular 18+ (Standalone Components)** | Cấu trúc module rõ ràng, Dependency Injection, Signals phản ứng nhanh, Type-safe tuyệt đối. |
+| **Frontend Framework** | **Angular 20 (Standalone Components)** | Cấu trúc module rõ ràng, Dependency Injection, Signals phản ứng nhanh, Type-safe tuyệt đối. |
 | **Hybrid UI Framework** | **Ionic Framework 8 + Capacitor** | Bộ UI tối ưu đồng thời cho Mobile & Desktop Web, tích hợp Camera quét mã vạch native, Single Codebase build Android/iOS. |
 | **Kiến trúc Mã nguồn** | **Clean Architecture (Domain-Driven)** | Tách biệt hoàn toàn Domain Logic, Application Layer, Infrastructure và Presentation. |
 
@@ -191,8 +191,8 @@ client/
 4. **Quy chuẩn Biểu mẫu Nhập liệu (`FormGroup` + `FormControlComponent` & `InputControlComponent`):**
    - Toàn bộ các Form nhập liệu đi lưu dữ liệu (CRUD Modal, Phiếu nhập/xuất, Đơn hàng, Đối tác, Thanh toán) bắt buộc sử dụng **`FormGroup` (`ReactiveFormsModule`)** thay vì biến rời `[(ngModel)]`.
    - Không vẽ thẻ `<input>`, `<textarea>`, `<select>` thủ công lặp lại trên từng màn hình; bắt buộc sử dụng bộ đôi component chuẩn hóa:
-     - [`InputControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`): Nhận `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`), `dataSource` (`SelectOption[]`), `prefix`/`suffix` và tự động xử lý ép kiểu, định dạng số/tiền tệ hoặc render `<app-custom-select>`.
-     - [`FormControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`): Bọc `<app-input-control>`, tự động nhận `formControlName`, hiển thị `label`, `unit`, dấu `*` (`required` tự nhận diện từ `Validators.required`) và thông báo lỗi validation chuẩn hóa.
+     - [`InputControlComponent`](ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`): Nhận `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`), `dataSource` (`SelectOption[]`), `prefix`/`suffix` và tự động xử lý ép kiểu, định dạng số/tiền tệ hoặc render `<app-custom-select>`.
+     - [`FormControlComponent`](ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`): Bọc `<app-input-control>`, tự động nhận `formControlName`, hiển thị `label`, `unit`, dấu `*` (`required` tự nhận diện từ `Validators.required`) và thông báo lỗi validation chuẩn hóa.
 
 ---
 

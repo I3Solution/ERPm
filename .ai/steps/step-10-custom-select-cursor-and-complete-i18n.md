@@ -11,36 +11,36 @@
 ## 📂 1. DANH SÁCH FILE ĐÃ TẠO VÀ CHỈNH SỬA
 
 ### A. Component Mới:
-- [`client/src/app/shared/components/custom-select/custom-select.component.ts`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/custom-select/custom-select.component.ts): Component dropdown tùy chỉnh standalone, tích hợp `ControlValueAccessor` (tương thích `[(ngModel)]` và two-way binding), hỗ trợ tìm kiếm tức thời bên trong dropdown, clear button, checkmark `✓`, badge, icon và đóng mở khi click ra ngoài (`HostListener`).
-- [`client/src/app/shared/components/custom-select/custom-select.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/custom-select/custom-select.component.html): Template giao diện trigger box và flyout menu với hiệu ứng đổ bóng mờ, không sử dụng thẻ `<option>` OS.
-- [`client/src/app/shared/components/custom-select/custom-select.component.scss`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/custom-select/custom-select.component.scss): Phong cách thiết kế neo-fintech cao cấp, bo góc mượt mà, hover tinh tế, triệt tiêu text caret và đảm bảo `cursor: pointer`.
+- [`client/src/app/shared/components/custom-select/custom-select.component.ts`](../../ERPm-FE/src/app/shared/components/custom-select/custom-select.component.ts): Component dropdown tùy chỉnh standalone, tích hợp `ControlValueAccessor` (tương thích `[(ngModel)]` và two-way binding), hỗ trợ tìm kiếm tức thời bên trong dropdown, clear button, checkmark `✓`, badge, icon và đóng mở khi click ra ngoài (`HostListener`).
+- [`client/src/app/shared/components/custom-select/custom-select.component.html`](../../ERPm-FE/src/app/shared/components/custom-select/custom-select.component.html): Template giao diện trigger box và flyout menu với hiệu ứng đổ bóng mờ, không sử dụng thẻ `<option>` OS.
+- [`client/src/app/shared/components/custom-select/custom-select.component.scss`](../../ERPm-FE/src/app/shared/components/custom-select/custom-select.component.scss): Phong cách thiết kế neo-fintech cao cấp, bo góc mượt mà, hover tinh tế, triệt tiêu text caret và đảm bảo `cursor: pointer`.
 
 ### B. Global CSS & Theme Tokens:
-- [`client/src/styles.scss`](file:///d:/WORKING%20PLACE/ERPm/client/src/styles.scss):
+- [`client/src/styles.scss`](../../ERPm-FE/src/styles.scss):
   - Khắc phục lỗi con trỏ chuột nhấp nháy: `body *:not(input):not(textarea):not([contenteditable="true"]) { caret-color: transparent !important; }`.
   - Ép buộc `cursor: pointer !important;` và `user-select: none !important;` cho tất cả các phần tử tương tác và con cháu của chúng (`*`).
-- [`client/src/theme/components.scss`](file:///d:/WORKING%20PLACE/ERPm/client/src/theme/components.scss):
+- [`client/src/theme/components.scss`](../../ERPm-FE/src/theme/components.scss):
   - Nâng cấp `.erpm-select` fallback: `appearance: none; -webkit-appearance: none;`, custom SVG chevron arrow, `cursor: pointer !important;`.
 
 ### C. Màn hình & Phân hệ được nâng cấp:
-- [`client/src/app/modules/inventory/inventory.component.ts`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/inventory/inventory.component.ts) & [`inventory.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/inventory/inventory.component.html):
+- [`client/src/app/modules/inventory/inventory.component.ts`](../../ERPm-FE/src/app/modules/inventory/inventory.component.ts) & [`inventory.component.html`](../../ERPm-FE/src/app/modules/inventory/inventory.component.html):
   - Thay thế toàn bộ `<select>` native (bộ lọc kho hàng ở toolbar và 3 select trong modal nhập kho) bằng `<app-custom-select>`.
   - Phủ pipe `translate` cho tất cả table headers, search input placeholder, thống kê KPI, empty state, modal labels.
-- [`client/src/app/shared/components/branch-tree-select/branch-tree-select.component.ts`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/branch-tree-select/branch-tree-select.component.ts), [`branch-tree-select.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/branch-tree-select/branch-tree-select.component.html) & [`branch-tree-select.component.scss`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/branch-tree-select/branch-tree-select.component.scss):
+- [`client/src/app/shared/components/branch-tree-select/branch-tree-select.component.ts`](../../ERPm-FE/src/app/shared/components/branch-tree-select/branch-tree-select.component.ts), [`branch-tree-select.component.html`](../../ERPm-FE/src/app/shared/components/branch-tree-select/branch-tree-select.component.html) & [`branch-tree-select.component.scss`](../../ERPm-FE/src/app/shared/components/branch-tree-select/branch-tree-select.component.scss):
   - Bổ sung `TranslatePipe`.
   - Song ngữ hóa các nhãn chi nhánh, gợi ý phân cấp, tooltip và tìm kiếm.
   - Ép buộc pointer và chặn bôi đen/caret nhấp nháy khi click vào tên chi nhánh hay icon.
-- [`client/src/app/modules/catalog/items.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/catalog/items.component.html):
+- [`client/src/app/modules/catalog/items.component.html`](../../ERPm-FE/src/app/modules/catalog/items.component.html):
   - Song ngữ hóa toàn bộ tiêu đề bảng, tổng số lượng mặt hàng, giá bán lẻ, empty state, mobile card view.
-- [`client/src/app/modules/partners/partners.component.ts`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/partners/partners.component.ts) & [`partners.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/partners/partners.component.html):
+- [`client/src/app/modules/partners/partners.component.ts`](../../ERPm-FE/src/app/modules/partners/partners.component.ts) & [`partners.component.html`](../../ERPm-FE/src/app/modules/partners/partners.component.html):
   - Dùng `app-custom-select` cho loại đối tác (Khách hàng / Nhà cung cấp / Cả hai).
   - Phủ song ngữ cho metrics, toolbar, table headers, classification badges.
-- [`client/src/app/modules/dashboard/dashboard.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/dashboard/dashboard.component.html):
+- [`client/src/app/modules/dashboard/dashboard.component.html`](../../ERPm-FE/src/app/modules/dashboard/dashboard.component.html):
   - Dùng `translate` pipe cho 4 stat cards, 6 quick actions, và khối kiến trúc hệ thống.
-- [`client/src/app/modules/sales/pos.component.ts`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/sales/pos.component.ts) & [`pos.component.html`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/sales/pos.component.html):
+- [`client/src/app/modules/sales/pos.component.ts`](../../ERPm-FE/src/app/modules/sales/pos.component.ts) & [`pos.component.html`](../../ERPm-FE/src/app/modules/sales/pos.component.html):
   - Dùng `app-custom-select` có ô tìm kiếm cho danh sách khách hàng POS (Khách lẻ / Khách hàng).
   - Song ngữ hóa giỏ hàng rỗng, nút thanh toán, modal xác nhận đơn hàng và in hóa đơn.
-- [`client/src/app/core/services/localization.service.ts`](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/localization.service.ts):
+- [`client/src/app/core/services/localization.service.ts`](../../ERPm-FE/src/app/core/services/localization.service.ts):
   - Từ điển fallback đa ngôn ngữ đồ sộ với hơn 80+ keys cho cả tiếng Việt (`vi`) và tiếng Anh (`en`).
 
 ---

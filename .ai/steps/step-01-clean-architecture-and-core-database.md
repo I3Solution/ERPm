@@ -14,7 +14,7 @@
    - `ERPm.Infrastructure` (EF Core, Npgsql PostgreSQL, DataSeeder, Service Implementations)
    - `ERPm.API` (Controllers, Middleware, Swagger OpenAPI)
 2. Thiết lập môi trường PostgreSQL 16 với file cấu hình `docker-compose.yml`.
-3. Xây dựng toàn bộ các Entity cốt lõi tuân thủ chặt chẽ [PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/PROJECT_MASTER.md):
+3. Xây dựng toàn bộ các Entity cốt lõi tuân thủ chặt chẽ [PROJECT_MASTER.md](../../PROJECT_MASTER.md):
    - **Đa ngôn ngữ (i18n):** `AppLanguage`, `AppDictionary` và thuộc tính `Translations` kiểu PostgreSQL `JSONB`.
    - **Phân hệ ITEM (Hàng hóa):** `Item`, `Category`, `UnitOfMeasure` với kiểu số tiền & số lượng `decimal(18, 4)`.
    - **Phân hệ Khách hàng / Đối tác:** `Partner` (Khách hàng & NCC, hạn mức công nợ).

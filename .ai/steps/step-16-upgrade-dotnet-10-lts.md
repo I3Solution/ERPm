@@ -19,22 +19,22 @@
    - `Microsoft.AspNetCore.OpenApi`: `8.0.8` -> `10.0.14`
    - `Swashbuckle.AspNetCore`: `6.4.0` -> `10.3.1` (cập nhật namespace `Microsoft.OpenApi` trong `Program.cs`)
 3. **Tối ưu `Uuid7Generator` với Native .NET 10 API:**
-   - Trong [BaseEntity.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Domain/Common/BaseEntity.cs), chuyển `Uuid7Generator.NewUuid7()` sang gọi trực tiếp hàm chuẩn BCL của .NET 10: `Guid.CreateVersion7()` và `Guid.CreateVersion7(timestamp)`.
+   - Trong [BaseEntity.cs](../../ERPm-BE/src/ERPm.Domain/Common/BaseEntity.cs), chuyển `Uuid7Generator.NewUuid7()` sang gọi trực tiếp hàm chuẩn BCL của .NET 10: `Guid.CreateVersion7()` và `Guid.CreateVersion7(timestamp)`.
 
 ---
 
 ## 📂 2. DANH SÁCH FILE ĐÃ CHỈNH SỬA
 
-- [ERPm.Domain.csproj](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Domain/ERPm.Domain.csproj)
-- [ERPm.Application.csproj](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Application/ERPm.Application.csproj)
-- [ERPm.Infrastructure.csproj](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Infrastructure/ERPm.Infrastructure.csproj)
-- [ERPm.API.csproj](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.API/ERPm.API.csproj)
-- [Program.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.API/Program.cs)
-- [BaseEntity.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Domain/Common/BaseEntity.cs)
-- [AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/AGENTS.md) & [ERPm-BE/AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/AGENTS.md)
-- [PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/PROJECT_MASTER.md), [ERPm-BE/PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/PROJECT_MASTER.md), [ERPm-FE/PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/PROJECT_MASTER.md)
+- [ERPm.Domain.csproj](../../ERPm-BE/src/ERPm.Domain/ERPm.Domain.csproj)
+- [ERPm.Application.csproj](../../ERPm-BE/src/ERPm.Application/ERPm.Application.csproj)
+- [ERPm.Infrastructure.csproj](../../ERPm-BE/src/ERPm.Infrastructure/ERPm.Infrastructure.csproj)
+- [ERPm.API.csproj](../../ERPm-BE/src/ERPm.API/ERPm.API.csproj)
+- [Program.cs](../../ERPm-BE/src/ERPm.API/Program.cs)
+- [BaseEntity.cs](../../ERPm-BE/src/ERPm.Domain/Common/BaseEntity.cs)
+- [AGENTS.md](../../AGENTS.md) & [ERPm-BE/AGENTS.md](../../ERPm-BE/AGENTS.md)
+- [PROJECT_MASTER.md](../../PROJECT_MASTER.md), [ERPm-BE/PROJECT_MASTER.md](../../ERPm-BE/PROJECT_MASTER.md), [ERPm-FE/PROJECT_MASTER.md](../../ERPm-FE/PROJECT_MASTER.md)
 
 ---
 
 ## ✅ 3. KẾT QUẢ KIỂM TRA (VERIFICATION)
-- Cài đặt `.NET SDK 10.0.403` và chạy `dotnet build "d:\WORKING PLACE\ERPm\ERPm-BE\ERPm.sln"`: **0 Warning(s), 0 Error(s)**.
+- Cài đặt `.NET SDK 10.0.403` và chạy `dotnet build "ERPm-BE\ERPm.sln"`: **0 Warning(s), 0 Error(s)**.

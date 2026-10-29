@@ -15,7 +15,7 @@
   - `SCM`: `https://github.com/I3Solution/ERPm-FE-SCM.git`
   - `PM`: `https://github.com/I3Solution/ERPm-FE-PM.git`
   - `DASHBOARD`: `https://github.com/I3Solution/ERPm-FE-DASHBOARD.git`
-- Đăng ký đầy đủ 10 module vào [.gitmodules](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/.gitmodules) của Frontend.
+- Đăng ký đầy đủ 10 module vào [.gitmodules](../../ERPm-FE/.gitmodules) của Frontend.
 - Cập nhật toàn bộ tài liệu quy chuẩn (`PROJECT_MASTER.md`, `README.md`, `.ai/status.md`).
 
 ---

@@ -24,25 +24,25 @@
 ## 📂 2. DANH SÁCH FILE ĐÃ TẠO / CHỈNH SỬA
 
 ### 2.1. Backend Domain & Application (`ERPm-BE`)
-- [BaseEntity.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Domain/Common/BaseEntity.cs): Bổ sung `Uuid7Generator`, chuyển `BaseEntity : BaseEntity<int>`, thêm `Guid ExternalId = Uuid7Generator.NewUuid7()`.
+- [BaseEntity.cs](../../ERPm-BE/src/ERPm.Domain/Common/BaseEntity.cs): Bổ sung `Uuid7Generator`, chuyển `BaseEntity : BaseEntity<int>`, thêm `Guid ExternalId = Uuid7Generator.NewUuid7()`.
 - Toàn bộ Entities trong `ERPm.Domain/Entities/`: Chuyển các khóa ngoại sang `int` / `int?` và chuẩn hóa 100% English comments.
-- [IBaseCrudService.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Application/Common/Crud/IBaseCrudService.cs) & toàn bộ DTOs / Service Interfaces trong `ERPm.Application`: Chuyển sang `int` (`Id`) và không sử dụng `ExternalId` trên các luồng `GET`.
+- [IBaseCrudService.cs](../../ERPm-BE/src/ERPm.Application/Common/Crud/IBaseCrudService.cs) & toàn bộ DTOs / Service Interfaces trong `ERPm.Application`: Chuyển sang `int` (`Id`) và không sử dụng `ExternalId` trên các luồng `GET`.
 
 ### 2.2. Backend Infrastructure, API & Database (`ERPm-BE`)
-- [ApplicationDbContext.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Infrastructure/Persistence/ApplicationDbContext.cs): Thêm `ConfigureDualKeyAuditable` và `ConfigureDualKeyEntity` cấu hình `UseIdentityByDefaultColumn()` cho `Id` và Unique Covering Index `HasIndex(e => e.ExternalId).IsUnique().IncludeProperties(...)`.
-- [BaseCrudService.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.Infrastructure/Services/Common/BaseCrudService.cs), `BranchService.cs`, `DashboardService.cs`, `ItemService.cs`, `SalesInvoiceService.cs`, `StockService.cs`, `DataSeeder.cs`: Chuyển sang `int` `Id` cho toàn bộ truy vấn và seed data.
-- [BaseCrudController.cs](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/src/ERPm.API/Controllers/Base/BaseCrudController.cs) & các Controllers (`BranchesController`, `ItemsController`, `ItemAttributesController`, `SalesController`, `SalesOrdersController`, `PurchaseOrdersController`, `StockController`, `DashboardController`): Đổi route constraint từ `{id:guid}` sang `{id:int}`.
-- [erpm_schema.sql](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/database/erpm_schema.sql): Bổ sung hàm `uuid_generate_v7()`, chuyển toàn bộ PK/FK sang `INT`, thêm cột `external_id UUID` và Covering Index `INCLUDE (id, is_deleted) WITH (fillfactor = 95)`.
+- [ApplicationDbContext.cs](../../ERPm-BE/src/ERPm.Infrastructure/Persistence/ApplicationDbContext.cs): Thêm `ConfigureDualKeyAuditable` và `ConfigureDualKeyEntity` cấu hình `UseIdentityByDefaultColumn()` cho `Id` và Unique Covering Index `HasIndex(e => e.ExternalId).IsUnique().IncludeProperties(...)`.
+- [BaseCrudService.cs](../../ERPm-BE/src/ERPm.Infrastructure/Services/Common/BaseCrudService.cs), `BranchService.cs`, `DashboardService.cs`, `ItemService.cs`, `SalesInvoiceService.cs`, `StockService.cs`, `DataSeeder.cs`: Chuyển sang `int` `Id` cho toàn bộ truy vấn và seed data.
+- [BaseCrudController.cs](../../ERPm-BE/src/ERPm.API/Controllers/Base/BaseCrudController.cs) & các Controllers (`BranchesController`, `ItemsController`, `ItemAttributesController`, `SalesController`, `SalesOrdersController`, `PurchaseOrdersController`, `StockController`, `DashboardController`): Đổi route constraint từ `{id:guid}` sang `{id:int}`.
+- [erpm_schema.sql](../../ERPm-BE/database/erpm_schema.sql): Bổ sung hàm `uuid_generate_v7()`, chuyển toàn bộ PK/FK sang `INT`, thêm cột `external_id UUID` và Covering Index `INCLUDE (id, is_deleted) WITH (fillfactor = 95)`.
 
 ### 2.3. Frontend (`ERPm-FE`) & Tài liệu Quy chuẩn (Dual-Key + Git Commit Convention)
 - Các Services & Components trong `ERPm-FE/src/app/`: Đồng bộ kiểu `id` sang `number`.
-- [AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/AGENTS.md), [ERPm-BE/AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/AGENTS.md), [ERPm-FE/AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/AGENTS.md): Bổ sung Quy tắc 5 - **Quy tắc Git Commit (`[tag]` / `[tag](MODULE)`)** với 6 tag chuẩn (`[add]`, `[update]`, `[fix]`, `[refactor]`, `[db]`, `[docs]`).
-- [PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/PROJECT_MASTER.md), [ERPm-BE/PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/PROJECT_MASTER.md), [ERPm-FE/PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/PROJECT_MASTER.md): Cập nhật quy chuẩn Dual-Key Architecture và Quy tắc 8 - **Quy tắc Git Commit chuẩn**.
+- [AGENTS.md](../../AGENTS.md), [ERPm-BE/AGENTS.md](../../ERPm-BE/AGENTS.md), [ERPm-FE/AGENTS.md](../../ERPm-FE/AGENTS.md): Bổ sung Quy tắc 5 - **Quy tắc Git Commit (`[tag]` / `[tag](MODULE)`)** với 6 tag chuẩn (`[add]`, `[update]`, `[fix]`, `[refactor]`, `[db]`, `[docs]`).
+- [PROJECT_MASTER.md](../../PROJECT_MASTER.md), [ERPm-BE/PROJECT_MASTER.md](../../ERPm-BE/PROJECT_MASTER.md), [ERPm-FE/PROJECT_MASTER.md](../../ERPm-FE/PROJECT_MASTER.md): Cập nhật quy chuẩn Dual-Key Architecture và Quy tắc 8 - **Quy tắc Git Commit chuẩn**.
 
 ---
 
 ## ✅ 3. KẾT QUẢ KIỂM TRA (VERIFICATION)
-- `dotnet build "d:\WORKING PLACE\ERPm\ERPm-BE\ERPm.sln"`: **Build succeeded (0 Warning(s), 0 Error(s))**.
+- `dotnet build "ERPm-BE\ERPm.sln"`: **Build succeeded (0 Warning(s), 0 Error(s))**.
 - `npm run build` (`ERPm-FE`): **Build succeeded (0 Error(s))**.
 - Kiểm tra toàn bộ các hàm `GET` (`GetPaged`, `GetById`, `GetBranches`, `GetBranchTree`, `GetItems`, `GetWarehouses`, `GetStockBalances`, `GetInvoices`, `GetMetrics`): Tất cả đều làm việc thuần túy với `int Id`, không phụ thuộc vào `ExternalId`.
 

@@ -13,7 +13,7 @@ ERPm (Parent Umbrella Orchestrator: https://github.com/I3Solution/ERPm.git)
 │       ├── Controllers: ACC/, SD/, PUR/, WMS/, CRM/, SYS/, DASHBOARD/
 │       └── Database DDL: tbl_SYS_..., tbl_CRM_..., tbl_WMS_..., tbl_SALE_..., tbl_PURCHASE_..., tbl_ACC_...
 │
-└── 📂 ERPm-FE (Frontend Angular 18 + Ionic 8 Hybrid)
+└── 📂 ERPm-FE (Frontend Angular 20 + Ionic 8 Hybrid)
     ├── Remote: https://github.com/I3Solution/ERPm-FE.git
     │
     └── 📦 10 Feature Module Git Submodules:

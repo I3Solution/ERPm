@@ -15,7 +15,7 @@
    - `src/ERPm.Infrastructure`: EF Core DbContext, Npgsql PostgreSQL, Configurations, Seeders, Repositories.
    - `src/ERPm.API`: ASP.NET Core Web API, Controllers, Middleware, Swagger OpenAPI.
 2. Tạo cấu hình môi trường **PostgreSQL 16** với file `docker-compose.yml`.
-3. Xây dựng các Entity cốt lõi tuân thủ tuyệt đối [PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/PROJECT_MASTER.md):
+3. Xây dựng các Entity cốt lõi tuân thủ tuyệt đối [PROJECT_MASTER.md](../../PROJECT_MASTER.md):
    - **Audit & Base:** `BaseEntity`, `BaseAuditableEntity`, `ISoftDelete`, `ITenant`.
    - **Đa ngôn ngữ (i18n):** `AppLanguage`, `AppDictionary`, và `Translations` kiểu JSONB.
    - **Phân hệ ITEM:** `Item`, `Category`, `UnitOfMeasure` với `decimal(18, 4)`.

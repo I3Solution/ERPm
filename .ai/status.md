@@ -1,4 +1,4 @@
-# ERPm — Trạng thái hiện hành, Step 19 (2026-10-29)
+# ERPm — Trạng thái hiện hành, Step 20 (2026-10-30)
 
 Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
 
@@ -10,19 +10,21 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] Giá vốn bình quân với carrying value chính xác; thanh toán một phần/tiền thừa; bút toán cân bằng bắt buộc và hủy hóa đơn bằng bút toán đảo.
 - [x] Sửa Signals/reactive form, dictionary bundle, routes, phân trang, tìm SKU/barcode/bản dịch; bỏ số liệu demo, tách state item theo màn hình.
 - [x] Kiểm tra: backend solution build 0 warning/0 error; **44 kiểm tra PostgreSQL/API đạt**. FE production build đạt, type-check spec đạt; **7 kiểm thử Chrome đạt**.
+- [x] **HRM (Step 20):** lõi nghiệp vụ thuần QTCT / phạm vi dữ liệu / tính công trong `ERPm.Domain/Services/HumanResource`, **28 kiểm tra HRM đạt** (`tests/ERPm.Hrm.Verification`, không cần DB, đã thêm vào CI) — [Step 20](steps/step-20-hrm-domain-rules.md).
 - [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
 
 ## In-Progress
 
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
-- FE Angular 17.3/Ionic 8 đang được giữ nguyên phiên bản; initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
+- FE đã lên Angular 20.3 / Ionic 8.8 (Step 18, `step-18-angular-20-env-config-and-secrets.md`); initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
 
 ## Next Steps
 
 1. **Triển khai Step 20 — Tổ chức đa cấp, Chức danh & Phân quyền động kiểu AWS IAM JSON:** Theo tài liệu đặc tả [plan-step-20-iam-dynamic-role-and-organization.md](plans/plan-step-20-iam-dynamic-role-and-organization.md) (Tập đoàn → Công ty → Chi nhánh → Phòng ban → Chức danh → Nhân viên; phân quyền 2 tầng theo Chức danh + User Override bằng `PolicyDocument` JSONB và `DataScope`).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
-3. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
+3. HRM bước 2: chốt ánh xạ pháp nhân / cơ cấu tổ chức với `tbl_SYS_Branch`, rồi entity `tbl_HRM_*` (hồ sơ, QTCT, hợp đồng, ca) + danh mục BaseCrud + màn hình `ERPm-FE-HRM`.
+4. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
 
 Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-internal-accounts.md), [đối chiếu F01–F22](reviews/2026-10-29-priority-resolution.md). SDK .NET 10 đã có ở thư mục người dùng nhưng chưa trên PATH; nhận định thiếu SDK trong Step 18 đã được đính chính.
 

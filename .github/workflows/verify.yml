@@ -26,6 +26,7 @@ jobs:
       - name: Verify shared dictionaries
         run: cmp ERPm-FE/src/assets/i18n/system.json ERPm-BE/src/ERPm.Infrastructure/Persistence/Seeders/system_dictionary.json
       - run: dotnet build ERPm-BE/ERPm.sln
+      - run: dotnet run --project ERPm-BE/tests/ERPm.Hrm.Verification --no-build
       - run: dotnet run --project ERPm-BE/tests/ERPm.Verification --no-build
   frontend:
     runs-on: ubuntu-latest

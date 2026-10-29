@@ -1,4 +1,4 @@
-# ERPm — Trạng thái hiện hành, Step 20 (2026-10-30)
+# ERPm — Trạng thái hiện hành, Step 21 (2026-10-30)
 
 Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
 
@@ -11,6 +11,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] Sửa Signals/reactive form, dictionary bundle, routes, phân trang, tìm SKU/barcode/bản dịch; bỏ số liệu demo, tách state item theo màn hình.
 - [x] Kiểm tra: backend solution build 0 warning/0 error; **44 kiểm tra PostgreSQL/API đạt**. FE production build đạt, type-check spec đạt; **7 kiểm thử Chrome đạt**.
 - [x] **HRM (Step 20):** lõi nghiệp vụ thuần QTCT / phạm vi dữ liệu / tính công trong `ERPm.Domain/Services/HumanResource`, **28 kiểm tra HRM đạt** (`tests/ERPm.Hrm.Verification`, không cần DB, đã thêm vào CI) — [Step 20](steps/step-20-hrm-domain-rules.md).
+- [x] **HRM nền (Step 21, nhánh `thien/hrm-foundation`, chờ review):** `tbl_SYS_Company`, `tbl_SYS_OrgStructure`, `tbl_SYS_Branch.company_id`; `tbl_HRM_Employee`/`WorkHistory`/`Shift`/`DataPermission` + API `api/v1/sys/...`, `api/v1/hrm/...`; migration `AddHrmFoundation` chỉ thêm. **51 kiểm tra HRM + 44 kiểm tra Step 19 đạt** — [Step 21](steps/step-21-hrm-foundation-company-org-employee.md).
 - [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
 
 ## In-Progress
@@ -22,7 +23,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 1. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
-3. HRM bước 2: chốt ánh xạ pháp nhân / cơ cấu tổ chức với `tbl_SYS_Branch`, rồi entity `tbl_HRM_*` (hồ sơ, QTCT, hợp đồng, ca) + danh mục BaseCrud + màn hình `ERPm-FE-HRM`.
+3. HRM: review/merge Step 21 → đọc hồ sơ/QTCT lọc theo `DataScope` ở server → màn hình `ERPm-FE-HRM` (danh mục, hồ sơ, QTCT) → chấm công.
 4. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
 
 Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-internal-accounts.md), [đối chiếu F01–F22](reviews/2026-10-29-priority-resolution.md). SDK .NET 10 đã có ở thư mục người dùng nhưng chưa trên PATH; nhận định thiếu SDK trong Step 18 đã được đính chính.

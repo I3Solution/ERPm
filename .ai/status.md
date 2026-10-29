@@ -19,7 +19,8 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Next Steps
 
-1. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
+1. **Triển khai Step 20 — Tổ chức đa cấp, Chức danh & Phân quyền động kiểu AWS IAM JSON:** Theo tài liệu đặc tả [plan-step-20-iam-dynamic-role-and-organization.md](plans/plan-step-20-iam-dynamic-role-and-organization.md) (Tập đoàn → Công ty → Chi nhánh → Phòng ban → Chức danh → Nhân viên; phân quyền 2 tầng theo Chức danh + User Override bằng `PolicyDocument` JSONB và `DataScope`).
+2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
 3. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
 

@@ -47,21 +47,21 @@
 ## 2. DANH SÁCH FILE ĐÃ TẠO VÀ CHỈNH SỬA
 
 ### Frontend (`client/`)
-1. [client/src/app/core/services/stock.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/stock.service.ts): Service quản lý tồn kho, kho hàng và tạo phiếu nhập kho.
-2. [client/src/app/core/services/sales.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/sales.service.ts): Service quản lý hóa đơn bán hàng và POS checkout.
-3. [client/src/app/core/services/partner.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/partner.service.ts): Service quản lý khách hàng, nhà cung cấp và công nợ.
-4. [client/src/app/core/services/dashboard.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/dashboard.service.ts): Service lấy dữ liệu chỉ số KPI tổng quan.
-5. [client/src/app/core/services/localization.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/localization.service.ts): Mở rộng từ điển Anh - Việt cho toàn bộ phân hệ Bán hàng, Tồn kho, Đối tác.
-6. [client/src/app/pages/sales/pos.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/pages/sales/pos.component.ts): Giao diện Bán hàng & Thu ngân POS hoàn chỉnh.
-7. [client/src/app/pages/inventory/inventory.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/pages/inventory/inventory.component.ts): Giao diện Quản trị Tồn kho & Nhập kho.
-8. [client/src/app/pages/partners/partners.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/pages/partners/partners.component.ts): Giao diện Danh bạ Khách hàng & Đối tác.
-9. [client/src/app/pages/dashboard/dashboard.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/pages/dashboard/dashboard.component.ts): Cập nhật kết nối `DashboardService` và liên kết RouterLink.
-10. [client/src/app/app.routes.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/app.routes.ts): Định tuyến hoàn chỉnh cho 5 màn hình.
-11. [client/src/app/app.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/app.component.html): Kích hoạt các liên kết điều hướng trên Desktop và Mobile.
+1. [client/src/app/core/services/stock.service.ts](../../ERPm-FE/src/app/core/services/stock.service.ts): Service quản lý tồn kho, kho hàng và tạo phiếu nhập kho.
+2. [client/src/app/core/services/sales.service.ts](../../ERPm-FE/src/app/core/services/sales.service.ts): Service quản lý hóa đơn bán hàng và POS checkout.
+3. [client/src/app/core/services/partner.service.ts](../../ERPm-FE/src/app/core/services/partner.service.ts): Service quản lý khách hàng, nhà cung cấp và công nợ.
+4. [client/src/app/core/services/dashboard.service.ts](../../ERPm-FE/src/app/core/services/dashboard.service.ts): Service lấy dữ liệu chỉ số KPI tổng quan.
+5. [client/src/app/core/services/localization.service.ts](../../ERPm-FE/src/app/core/services/localization.service.ts): Mở rộng từ điển Anh - Việt cho toàn bộ phân hệ Bán hàng, Tồn kho, Đối tác.
+6. [client/src/app/pages/sales/pos.component.ts](../../ERPm-FE/src/app/pages/sales/pos.component.ts): Giao diện Bán hàng & Thu ngân POS hoàn chỉnh.
+7. [client/src/app/pages/inventory/inventory.component.ts](../../ERPm-FE/src/app/pages/inventory/inventory.component.ts): Giao diện Quản trị Tồn kho & Nhập kho.
+8. [client/src/app/pages/partners/partners.component.ts](../../ERPm-FE/src/app/pages/partners/partners.component.ts): Giao diện Danh bạ Khách hàng & Đối tác.
+9. [client/src/app/pages/dashboard/dashboard.component.ts](../../ERPm-FE/src/app/pages/dashboard/dashboard.component.ts): Cập nhật kết nối `DashboardService` và liên kết RouterLink.
+10. [client/src/app/app.routes.ts](../../ERPm-FE/src/app/app.routes.ts): Định tuyến hoàn chỉnh cho 5 màn hình.
+11. [client/src/app/app.component.html](../../ERPm-FE/src/app/app.component.html): Kích hoạt các liên kết điều hướng trên Desktop và Mobile.
 
 ### Database & Schema Artifacts
-12. [database/erpm_schema.sql](file:///d:/WORKING%20PLACE/ERPm/database/erpm_schema.sql): File kịch bản DDL + Seed data PostgreSQL độc lập 403 dòng hoàn chỉnh.
-13. [docker-compose.yml](file:///d:/WORKING%20PLACE/ERPm/docker-compose.yml): Cấu hình chạy nhanh PostgreSQL 16 Alpine và pgAdmin 4.
+12. [database/erpm_schema.sql](../../ERPm-BE/database/erpm_schema.sql): File kịch bản DDL + Seed data PostgreSQL độc lập 403 dòng hoàn chỉnh.
+13. [docker-compose.yml](../../ERPm-BE/docker-compose.yml): Cấu hình chạy nhanh PostgreSQL 16 Alpine và pgAdmin 4.
 
 ---
 

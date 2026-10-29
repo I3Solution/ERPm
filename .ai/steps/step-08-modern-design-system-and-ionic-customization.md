@@ -33,22 +33,22 @@
 
 | File | Hành động | Nội dung chính |
 | :--- | :---: | :--- |
-| [index.html](file:///d:/WORKING%20PLACE/ERPm/client/src/index.html) | Chỉnh sửa | Bổ sung Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono; thêm meta theme-color `#4f46e5` |
-| [theme/variables.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/theme/variables.scss) | **Tạo mới** | Master Design Tokens: Colors, Gradients, Shadows, Radius, Glassmorphism & Ionic theme bindings |
-| [theme/ionic-overrides.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/theme/ionic-overrides.scss) | **Tạo mới** | Tùy biến toàn bộ các component của Ionic (button, card, searchbar, item, badge, segment, modal, toast) |
-| [theme/tables.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/theme/tables.scss) | **Tạo mới** | Hệ thống Data Table ERP đỉnh cao: toolbar, scroll, sticky header, hover highlight, tabular-nums, empty state, pagination |
-| [theme/components.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/theme/components.scss) | **Tạo mới** | Bộ UI Components dùng chung: `.erpm-stat-card`, `.erpm-btn`, `.erpm-input`, `.erpm-badge`, `.erpm-modal`, status pulse dot |
-| [styles.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/styles.scss) | Chỉnh sửa | Master stylesheet import modular theme, tối ưu hóa CSS reset, loại bỏ các selector lỗi RTL của Ionic |
-| [app.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/app.component.html) | Chỉnh sửa | Logo Pro mới, Branch indicator "Chi nhánh Trung tâm", đèn trạng thái kết nối API & DB nhấp nháy xanh |
-| [app.component.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/app/app.component.scss) | Chỉnh sửa | Nâng cấp styling sidebar, frosted glass header, language switcher pill, responsive mobile bottom bar |
-| [items.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/catalog/items.component.html) | Chỉnh sửa | Tích hợp `.erpm-table`, `.erpm-table-toolbar`, empty state và modal nhập liệu hiện đại |
-| [items.component.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/catalog/items.component.scss) | Chỉnh sửa | Loại bỏ CSS lặp lại, kế thừa 100% từ hệ thống ERPm Design System |
-| [dashboard.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/dashboard/dashboard.component.html) | Chỉnh sửa | Áp dụng `.erpm-stat-card` với các dải màu gradient, shortcut cards thao tác nhanh |
-| [dashboard.component.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/dashboard/dashboard.component.scss) | Chỉnh sửa | Styling các nút shortcut rực rỡ và responsive |
-| [inventory.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/inventory/inventory.component.html) | Chỉnh sửa | Áp dụng `.erpm-table` cho danh sách tồn kho, bộ lọc kho, modal nhập kho mới |
-| [inventory.component.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/inventory/inventory.component.scss) | Chỉnh sửa | Kế thừa từ global styles, tinh gọn code |
-| [partners.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/partners/partners.component.html) | Chỉnh sửa | Áp dụng `.erpm-table` cho sổ khách hàng/NCC, type pill segments, modal thêm đối tác |
-| [partners.component.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/partners/partners.component.scss) | Chỉnh sửa | Tinh gọn styling, bổ sung `.partner-type-pills` |
+| [index.html](../../ERPm-FE/src/index.html) | Chỉnh sửa | Bổ sung Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono; thêm meta theme-color `#4f46e5` |
+| [theme/variables.scss](../../ERPm-FE/src/theme/variables.scss) | **Tạo mới** | Master Design Tokens: Colors, Gradients, Shadows, Radius, Glassmorphism & Ionic theme bindings |
+| [theme/ionic-overrides.scss](../../ERPm-FE/src/theme/ionic-overrides.scss) | **Tạo mới** | Tùy biến toàn bộ các component của Ionic (button, card, searchbar, item, badge, segment, modal, toast) |
+| [theme/tables.scss](../../ERPm-FE/src/theme/tables.scss) | **Tạo mới** | Hệ thống Data Table ERP đỉnh cao: toolbar, scroll, sticky header, hover highlight, tabular-nums, empty state, pagination |
+| [theme/components.scss](../../ERPm-FE/src/theme/components.scss) | **Tạo mới** | Bộ UI Components dùng chung: `.erpm-stat-card`, `.erpm-btn`, `.erpm-input`, `.erpm-badge`, `.erpm-modal`, status pulse dot |
+| [styles.scss](../../ERPm-FE/src/styles.scss) | Chỉnh sửa | Master stylesheet import modular theme, tối ưu hóa CSS reset, loại bỏ các selector lỗi RTL của Ionic |
+| [app.component.html](../../ERPm-FE/src/app/app.component.html) | Chỉnh sửa | Logo Pro mới, Branch indicator "Chi nhánh Trung tâm", đèn trạng thái kết nối API & DB nhấp nháy xanh |
+| [app.component.scss](../../ERPm-FE/src/app/app.component.scss) | Chỉnh sửa | Nâng cấp styling sidebar, frosted glass header, language switcher pill, responsive mobile bottom bar |
+| [items.component.html](../../ERPm-FE/src/app/modules/catalog/items.component.html) | Chỉnh sửa | Tích hợp `.erpm-table`, `.erpm-table-toolbar`, empty state và modal nhập liệu hiện đại |
+| [items.component.scss](../../ERPm-FE/src/app/modules/catalog/items.component.scss) | Chỉnh sửa | Loại bỏ CSS lặp lại, kế thừa 100% từ hệ thống ERPm Design System |
+| [dashboard.component.html](../../ERPm-FE/src/app/modules/dashboard/dashboard.component.html) | Chỉnh sửa | Áp dụng `.erpm-stat-card` với các dải màu gradient, shortcut cards thao tác nhanh |
+| [dashboard.component.scss](../../ERPm-FE/src/app/modules/dashboard/dashboard.component.scss) | Chỉnh sửa | Styling các nút shortcut rực rỡ và responsive |
+| [inventory.component.html](../../ERPm-FE/src/app/modules/inventory/inventory.component.html) | Chỉnh sửa | Áp dụng `.erpm-table` cho danh sách tồn kho, bộ lọc kho, modal nhập kho mới |
+| [inventory.component.scss](../../ERPm-FE/src/app/modules/inventory/inventory.component.scss) | Chỉnh sửa | Kế thừa từ global styles, tinh gọn code |
+| [partners.component.html](../../ERPm-FE/src/app/modules/partners/partners.component.html) | Chỉnh sửa | Áp dụng `.erpm-table` cho sổ khách hàng/NCC, type pill segments, modal thêm đối tác |
+| [partners.component.scss](../../ERPm-FE/src/app/modules/partners/partners.component.scss) | Chỉnh sửa | Tinh gọn styling, bổ sung `.partner-type-pills` |
 
 ---
 

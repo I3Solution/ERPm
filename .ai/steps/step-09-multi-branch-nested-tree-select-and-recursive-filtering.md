@@ -31,28 +31,28 @@
 
 | File | Hành động | Nội dung chính |
 | :--- | :---: | :--- |
-| [IBranchService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Application/Features/System/IBranchService.cs) | Chỉnh sửa | Bổ sung phương thức `GetBranchAndDescendantIdsAsync` |
-| [BranchService.cs (Backend)](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Services/BranchService.cs) | Chỉnh sửa | Triển khai BFS duyệt cây phân cấp đệ quy vô hạn |
-| [BranchesController.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.API/Controllers/BranchesController.cs) | Chỉnh sửa | Bổ sung endpoint `GET /api/v1/branches/{id}/descendants` |
-| [DataSeeder.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Persistence/Seeders/DataSeeder.cs) | Chỉnh sửa | Nạp cây dữ liệu mẫu 4 cấp (Tổng CT -> Khối miền -> Chi nhánh -> Cửa hàng) |
-| [ISalesInvoiceService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Application/Features/Sales/ISalesInvoiceService.cs) | Chỉnh sửa | Bổ sung tham số `branchId` cho `GetInvoicesAsync` |
-| [SalesInvoiceService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Services/SalesInvoiceService.cs) | Chỉnh sửa | Tiêm `IBranchService` và lọc hóa đơn theo chi nhánh và con cháu |
-| [SalesController.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.API/Controllers/SalesController.cs) | Chỉnh sửa | Tiếp nhận query param `?branchId=` |
-| [IDashboardService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Application/Features/Dashboard/IDashboardService.cs) | Chỉnh sửa | Bổ sung tham số `branchId` cho `GetMetricsAsync` |
-| [DashboardService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Services/DashboardService.cs) | Chỉnh sửa | Lọc doanh thu, số dư kho, bút toán theo chi nhánh và con cháu |
-| [DashboardController.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.API/Controllers/DashboardController.cs) | Chỉnh sửa | Tiếp nhận query param `?branchId=` |
-| [IStockService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Application/Features/Inventory/IStockService.cs) | Chỉnh sửa | Bổ sung tham số `branchId` cho `GetWarehousesAsync` & `GetStockBalancesAsync` |
-| [StockService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Services/StockService.cs) | Chỉnh sửa | Lọc kho và tồn kho theo chi nhánh và con cháu |
-| [StockController.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.API/Controllers/StockController.cs) | Chỉnh sửa | Tiếp nhận query param `?branchId=` |
-| [branch.service.ts (Frontend)](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/branch.service.ts) | Chỉnh sửa | Quản lý Signal `currentBranch`, `branchTree`, mock tree 4 tầng, `localStorage` và `getActiveBranchIdForQuery` |
-| [branch-tree-select.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/branch-tree-select/branch-tree-select.component.ts) | **Tạo mới** | Logic component Tree Select: expand/collapse, search, host click listener |
-| [branch-tree-select.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/branch-tree-select/branch-tree-select.component.html) | **Tạo mới** | Template đệ quy vô hạn với `ngTemplateOutlet`, icon đóng/mở nhánh con |
-| [branch-tree-select.component.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/app/shared/components/branch-tree-select/branch-tree-select.component.scss) | **Tạo mới** | Styling cao cấp: flyout panel, guideline đứt đoạn cây phân cấp, chevron xoay |
-| [app.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/app.component.ts) | Chỉnh sửa | Khai báo import `BranchTreeSelectComponent` |
-| [app.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/app.component.html) | Chỉnh sửa | Gắn component `app-branch-tree-select` vào thanh header trên cùng |
-| [dashboard.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/dashboard/dashboard.component.ts) | Chỉnh sửa | Sử dụng Angular `effect` tự động nạp metrics theo chi nhánh đang chọn |
-| [pos.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/sales/pos.component.ts) | Chỉnh sửa | Tự động nạp hóa đơn theo chi nhánh và gán `branchId` khi lập hóa đơn mới |
-| [inventory.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/inventory/inventory.component.ts) | Chỉnh sửa | Tự động nạp danh sách kho & tồn kho theo chi nhánh đang chọn |
+| [IBranchService.cs](../../ERPm-BE/src/ERPm.Application/Features/System/IBranchService.cs) | Chỉnh sửa | Bổ sung phương thức `GetBranchAndDescendantIdsAsync` |
+| [BranchService.cs (Backend)](../../ERPm-BE/src/ERPm.Infrastructure/Services/BranchService.cs) | Chỉnh sửa | Triển khai BFS duyệt cây phân cấp đệ quy vô hạn |
+| [BranchesController.cs](../../ERPm-BE/src/ERPm.API/Controllers/BranchesController.cs) | Chỉnh sửa | Bổ sung endpoint `GET /api/v1/branches/{id}/descendants` |
+| [DataSeeder.cs](../../ERPm-BE/src/ERPm.Infrastructure/Persistence/Seeders/DataSeeder.cs) | Chỉnh sửa | Nạp cây dữ liệu mẫu 4 cấp (Tổng CT -> Khối miền -> Chi nhánh -> Cửa hàng) |
+| [ISalesInvoiceService.cs](../../ERPm-BE/src/ERPm.Application/Features/Sales/ISalesInvoiceService.cs) | Chỉnh sửa | Bổ sung tham số `branchId` cho `GetInvoicesAsync` |
+| [SalesInvoiceService.cs](../../ERPm-BE/src/ERPm.Infrastructure/Services/SalesInvoiceService.cs) | Chỉnh sửa | Tiêm `IBranchService` và lọc hóa đơn theo chi nhánh và con cháu |
+| [SalesController.cs](../../ERPm-BE/src/ERPm.API/Controllers/SalesController.cs) | Chỉnh sửa | Tiếp nhận query param `?branchId=` |
+| [IDashboardService.cs](../../ERPm-BE/src/ERPm.Application/Features/Dashboard/IDashboardService.cs) | Chỉnh sửa | Bổ sung tham số `branchId` cho `GetMetricsAsync` |
+| [DashboardService.cs](../../ERPm-BE/src/ERPm.Infrastructure/Services/DashboardService.cs) | Chỉnh sửa | Lọc doanh thu, số dư kho, bút toán theo chi nhánh và con cháu |
+| [DashboardController.cs](../../ERPm-BE/src/ERPm.API/Controllers/DashboardController.cs) | Chỉnh sửa | Tiếp nhận query param `?branchId=` |
+| [IStockService.cs](../../ERPm-BE/src/ERPm.Application/Features/Inventory/IStockService.cs) | Chỉnh sửa | Bổ sung tham số `branchId` cho `GetWarehousesAsync` & `GetStockBalancesAsync` |
+| [StockService.cs](../../ERPm-BE/src/ERPm.Infrastructure/Services/StockService.cs) | Chỉnh sửa | Lọc kho và tồn kho theo chi nhánh và con cháu |
+| [StockController.cs](../../ERPm-BE/src/ERPm.API/Controllers/StockController.cs) | Chỉnh sửa | Tiếp nhận query param `?branchId=` |
+| [branch.service.ts (Frontend)](../../ERPm-FE/src/app/core/services/branch.service.ts) | Chỉnh sửa | Quản lý Signal `currentBranch`, `branchTree`, mock tree 4 tầng, `localStorage` và `getActiveBranchIdForQuery` |
+| [branch-tree-select.component.ts](../../ERPm-FE/src/app/shared/components/branch-tree-select/branch-tree-select.component.ts) | **Tạo mới** | Logic component Tree Select: expand/collapse, search, host click listener |
+| [branch-tree-select.component.html](../../ERPm-FE/src/app/shared/components/branch-tree-select/branch-tree-select.component.html) | **Tạo mới** | Template đệ quy vô hạn với `ngTemplateOutlet`, icon đóng/mở nhánh con |
+| [branch-tree-select.component.scss](../../ERPm-FE/src/app/shared/components/branch-tree-select/branch-tree-select.component.scss) | **Tạo mới** | Styling cao cấp: flyout panel, guideline đứt đoạn cây phân cấp, chevron xoay |
+| [app.component.ts](../../ERPm-FE/src/app/app.component.ts) | Chỉnh sửa | Khai báo import `BranchTreeSelectComponent` |
+| [app.component.html](../../ERPm-FE/src/app/app.component.html) | Chỉnh sửa | Gắn component `app-branch-tree-select` vào thanh header trên cùng |
+| [dashboard.component.ts](../../ERPm-FE/src/app/modules/dashboard/dashboard.component.ts) | Chỉnh sửa | Sử dụng Angular `effect` tự động nạp metrics theo chi nhánh đang chọn |
+| [pos.component.ts](../../ERPm-FE/src/app/modules/sales/pos.component.ts) | Chỉnh sửa | Tự động nạp hóa đơn theo chi nhánh và gán `branchId` khi lập hóa đơn mới |
+| [inventory.component.ts](../../ERPm-FE/src/app/modules/inventory/inventory.component.ts) | Chỉnh sửa | Tự động nạp danh sách kho & tồn kho theo chi nhánh đang chọn |
 
 ---
 

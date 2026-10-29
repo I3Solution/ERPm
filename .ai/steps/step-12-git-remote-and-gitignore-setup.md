@@ -12,7 +12,7 @@
 ---
 
 ## 📂 2. CÁC TỆP ĐÃ TẠO & CHỈNH SỬA
-1. **[.gitignore](file:///d:/WORKING%20PLACE/ERPm/.gitignore):**
+1. **[.gitignore](../../.gitignore):**
    - Viết mới bộ quy tắc lọc toàn diện, loại trừ triệt để các file rác, build artifacts và cache của cả C# .NET và Node.js/Angular.
 2. **Git Remote Configuration:**
    - Đã gán remote `origin` với URL: `https://github.com/I3Solution/ERPm.git`.

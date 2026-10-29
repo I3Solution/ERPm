@@ -67,7 +67,42 @@ Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-inter
 
 Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đây là ghi nhận cũ, có điểm không còn khớp source. Dùng đánh giá hiện hành phía trên và báo cáo Step 18 để xác định công việc tiếp theo.
 
-> **Cập nhật lần cuối:** 2026-10-22  
+> **Đánh giá hiện hành: 2026-10-29 — Step 18.**
+>
+> **Giai đoạn:** Giai đoạn 1 đã có source MVP, đang cần ổn định và nghiệm thu lại; Giai đoạn 2 mới có một phần khung.
+>
+> **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
+
+## Completed — Đã hoàn thành rà soát
+
+- [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
+- [x] Ghi [báo cáo rà soát 2026-10-29](reviews/2026-10-29-source-review.md) với 22 phát hiện và vị trí source; lưu [Step 18](steps/step-18-source-review-and-development-assessment.md).
+- [x] Xác minh production FE build exit 0, có 2 warning; phát hiện phần test chưa compile được (TS2339).
+- [x] Tái hiện cục bộ lỗi Signals ở POS/CRM/branch tree và effect POS/Inventory; đối chiếu contract localization và routes.
+- [x] Xác định model EF 23 bảng hiện hành không khớp migration/snapshot 9 bảng cũ.
+
+## In-Progress — Tình trạng thực tế
+
+- Giai đoạn 1: **cần ổn định lại**, chưa nghiệm thu kho–công nợ–kế toán hoặc vận hành đa người dùng.
+- Chưa bắt đầu sửa các phát hiện trong lượt review này; không chỉnh sửa source ứng dụng hoặc database.
+- Build BE/integration PostgreSQL chưa được xác minh: máy hiện chỉ có SDK .NET 8.0.400, các project nhắm net10.0.
+- FE thực tế dùng Angular 17.3 (runtime đang cài 17.3.12) + Ionic 8; chưa có cấu hình Capacitor/native/offline trong checkout.
+
+## Next Steps — Ưu tiên sau rà soát
+
+1. Chuẩn bị môi trường .NET 10; xác minh restore/build BE, đồng bộ migration và bootstrap/upgrade DB thử nghiệm không mất dữ liệu.
+2. Sửa computed/effect và tổng tiền FE; sửa routes, i18n contract, phân trang; bỏ số demo khỏi dashboard nghiệp vụ.
+3. Bổ sung xác thực/phân quyền, validation, kiểm tra kho–chi nhánh, cấp số chứng từ/idempotency và concurrency tồn kho/công nợ.
+4. Thống nhất giá vốn, thanh toán một phần/tiền thừa, posting bắt buộc và vòng đời chứng từ; kiểm thử đối chiếu kho–sổ–công nợ.
+5. Nghiệm thu lại Giai đoạn 1 theo test có bằng chứng, cập nhật roadmap/status BE/FE, rồi tiếp tục PUR/Sổ quỹ.
+
+---
+
+## Lịch sử trước Step 18 — Giữ để truy vết
+
+Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đây là ghi nhận cũ, có điểm không còn khớp source. Dùng đánh giá hiện hành phía trên và báo cáo Step 18 để xác định công việc tiếp theo.
+
+> **Cập nhật lần cuối:** 2026-10-29  
 > **Giai đoạn hiện tại:** Giai đoạn 1 (Nền tảng Kiến trúc Nhanh & Multi-Branch Deep Dive) -> Chuẩn bị bước vào Giai đoạn 2 (Mua hàng & Sổ quỹ)  
 > **Trạng thái:** Backend .NET 8 Clean Architecture hoàn thiện + Multi-Branch Tree Select vô hạn tầng + Lọc dữ liệu cha con tự động cho toàn bộ hệ thống.
 
@@ -78,35 +113,42 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
 | Hạng mục / Phân hệ | Tiến độ | Trạng thái | Ghi chú |
 | :--- | :---: | :---: | :--- |
 | **Quy chuẩn & Kế hoạch Master** | 100% |  Hoàn thành | Đã tạo `PROJECT_MASTER.md`, `AGENTS.md`, `.ai/` |
-| **Backend Clean Architecture (.NET 10)** | 100% |  Hoàn thành | Đã tách 4 tầng (`net10.0`), build 0 errors ([step-16.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-16-upgrade-dotnet-10-lts.md)) |
-| **PostgreSQL & Schema Script** | 100% |  Hoàn thành | Đã có [erpm_schema.sql](file:///d:/WORKING%20PLACE/ERPm/database/erpm_schema.sql) 540+ dòng |
-| **Phân hệ ITEM & Danh mục** | 100% |  Hoàn thành | Backend CRUD + Frontend Adaptive UI hoàn chỉnh ([step-02.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-02-frontend-angular-ionic-setup.md)) |
+| **Backend Clean Architecture (.NET 10)** | 100% |  Hoàn thành | Đã tách 4 tầng (`net10.0`), build 0 errors ([step-16.md](steps/step-16-upgrade-dotnet-10-lts.md)) |
+| **PostgreSQL & Schema Script** | 100% |  Hoàn thành | Đã có [erpm_schema.sql](../ERPm-BE/database/erpm_schema.sql) 540+ dòng |
+| **Phân hệ ITEM & Danh mục** | 100% |  Hoàn thành | Backend CRUD + Frontend Adaptive UI hoàn chỉnh ([step-02.md](steps/step-02-frontend-angular-ionic-setup.md)) |
 | **Phân hệ Đa ngôn ngữ (i18n)** | 100% |  Hoàn thành | Backend Bundle API + Frontend TranslatePipe & Signal (VI/EN) |
-| **Frontend Angular + Ionic Hybrid** | 100% |  Hoàn thành | Hoàn thiện tất cả 5 màn hình, build 0 errors ([step-03.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-03-full-mvp-sales-inventory-pos.md)) |
+| **Frontend Angular + Ionic Hybrid** | 100% |  Hoàn thành | Hoàn thiện tất cả 5 màn hình, build 0 errors ([step-03.md](steps/step-03-full-mvp-sales-inventory-pos.md)) |
 | **Phân hệ Bán hàng & POS Touch** | 100% |  Hoàn thành | Giao diện thu ngân POS, giỏ hàng, thanh toán, in hóa đơn nhiệt |
 | **Phân hệ Tồn kho (Inventory)** | 100% |  Hoàn thành | Xem tồn tức thời, cảnh báo hết hàng, lập phiếu nhập kho nhanh |
 | **Phân hệ Khách hàng (Partner)** | 100% |  Hoàn thành | Danh bạ KH/NCC, phân loại, hạn mức nợ và theo dõi công nợ |
 | **Hạt nhân Kế toán (Double-Entry)** | 100% |  Hoàn thành | Tự động sinh bút toán Nợ/Có (111/131/511/632/156) khi bán hàng |
-| **Tâm điểm Chi nhánh (Multi-Branch)** | 100% |  Hoàn thành | Cây phân cấp, branch_id cho toàn bộ chứng từ & kho bãi ([step-05.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-05-multi-branch-architecture-and-table-prefix-redesign.md)) |
-| **Framework Base CRUD cho Solo Dev** | 100% |  Hoàn thành | Generic Base CRUD Type-safe + Module Folder ([step-06.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-06-solo-dev-rapid-crud-architecture-and-module-modularization.md)) |
-| **Frontend Modularization & 3 Files Triad** | 100% |  Hoàn thành | Tách thư mục modules, tách độc lập .ts, .html, .scss ([step-07.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-07-frontend-modularization-and-component-triad-separation.md)) |
-| **Design System & Ionic Customization** | 100% |  Hoàn thành | Tokens, Tables, Ionic Overrides & Reusable UI ([step-08.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-08-modern-design-system-and-ionic-customization.md)) |
-| **Multi-Branch Tree-Select & Querying** | 100% |  Hoàn thành | Tree Select menu đệ quy vô hạn + BFS lọc cha con con cháu ([step-09.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-09-multi-branch-nested-tree-select-and-recursive-filtering.md)) |
-| **Custom Select, Pointer & Full i18n** | 100% |  Hoàn thành | Custom Select Component, triệt tiêu caret nhấp nháy, phủ song ngữ 100% ([step-10.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-10-custom-select-cursor-and-complete-i18n.md)) |
-| **Dynamic Item Attributes (JSONB)** | 100% |  Hoàn thành | Thuộc tính động Schema-driven + PostgreSQL JSONB + GIN Index ([step-11.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-11-dynamic-item-attributes-jsonb.md)) |
-| **Git Remote & Gitignore Configuration** | 100% |  Hoàn thành | Cấu hình remote `origin` GitHub & Master `.gitignore` ([step-12.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-12-git-remote-and-gitignore-setup.md)) |
-| **Multi-Repo & Submodules Architecture** | 100% |  Hoàn thành | Tách BE/FE thành 2 repo riêng, phân rã submodule FE lồng nhau ([step-13.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-13-multi-repo-and-submodule-enterprise-architecture.md)) |
-| **Enterprise Module Acronyms & Gitmodules** | 100% |  Hoàn thành | Chuẩn hóa 10 module viết tắt (ACC, SD, PUR, WMS, CRM, HRM, MFG, SCM, PM, DASHBOARD) ([step-14.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-14-enterprise-erp-module-standardization.md)) |
-| **Dual-Key Architecture (`int Id` + `UUIDv7 ExternalId`)** | 100% |  Hoàn thành | PK/FK `int` tự tăng + `ExternalId` UUIDv7 Covering Index ([step-15.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-15-dual-key-int-id-and-uuidv7-external-id.md)) |
-| **Nâng cấp Backend lên .NET 10 LTS (`net10.0`)** | 100% |  Hoàn thành | EF Core 10.0.14, Npgsql 10.0.3, Native `Guid.CreateVersion7()` ([step-16.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-16-upgrade-dotnet-10-lts.md)) |
-| **Standardized Reactive Forms (`FormGroup` + `InputControl` / `FormControl`)** | 100% |  Hoàn thành | `<app-form-control>` & `<app-input-control>` đa kiểu dữ liệu ([step-17.md](file:///d:/WORKING%20PLACE/ERPm/.ai/steps/step-17-standardized-form-group-and-input-control-components.md)) |
+| **Tâm điểm Chi nhánh (Multi-Branch)** | 100% |  Hoàn thành | Cây phân cấp, branch_id cho toàn bộ chứng từ & kho bãi ([step-05.md](steps/step-05-multi-branch-architecture-and-table-prefix-redesign.md)) |
+| **Framework Base CRUD cho Solo Dev** | 100% |  Hoàn thành | Generic Base CRUD Type-safe + Module Folder ([step-06.md](steps/step-06-solo-dev-rapid-crud-architecture-and-module-modularization.md)) |
+| **Frontend Modularization & 3 Files Triad** | 100% |  Hoàn thành | Tách thư mục modules, tách độc lập .ts, .html, .scss ([step-07.md](steps/step-07-frontend-modularization-and-component-triad-separation.md)) |
+| **Design System & Ionic Customization** | 100% |  Hoàn thành | Tokens, Tables, Ionic Overrides & Reusable UI ([step-08.md](steps/step-08-modern-design-system-and-ionic-customization.md)) |
+| **Multi-Branch Tree-Select & Querying** | 100% |  Hoàn thành | Tree Select menu đệ quy vô hạn + BFS lọc cha con con cháu ([step-09.md](steps/step-09-multi-branch-nested-tree-select-and-recursive-filtering.md)) |
+| **Custom Select, Pointer & Full i18n** | 100% |  Hoàn thành | Custom Select Component, triệt tiêu caret nhấp nháy, phủ song ngữ 100% ([step-10.md](steps/step-10-custom-select-cursor-and-complete-i18n.md)) |
+| **Dynamic Item Attributes (JSONB)** | 100% |  Hoàn thành | Thuộc tính động Schema-driven + PostgreSQL JSONB + GIN Index ([step-11.md](steps/step-11-dynamic-item-attributes-jsonb.md)) |
+| **Git Remote & Gitignore Configuration** | 100% |  Hoàn thành | Cấu hình remote `origin` GitHub & Master `.gitignore` ([step-12.md](steps/step-12-git-remote-and-gitignore-setup.md)) |
+| **Multi-Repo & Submodules Architecture** | 100% |  Hoàn thành | Tách BE/FE thành 2 repo riêng, phân rã submodule FE lồng nhau ([step-13.md](steps/step-13-multi-repo-and-submodule-enterprise-architecture.md)) |
+| **Enterprise Module Acronyms & Gitmodules** | 100% |  Hoàn thành | Chuẩn hóa 10 module viết tắt (ACC, SD, PUR, WMS, CRM, HRM, MFG, SCM, PM, DASHBOARD) ([step-14.md](steps/step-14-enterprise-erp-module-standardization.md)) |
+| **Dual-Key Architecture (`int Id` + `UUIDv7 ExternalId`)** | 100% |  Hoàn thành | PK/FK `int` tự tăng + `ExternalId` UUIDv7 Covering Index ([step-15.md](steps/step-15-dual-key-int-id-and-uuidv7-external-id.md)) |
+| **Nâng cấp Backend lên .NET 10 LTS (`net10.0`)** | 100% |  Hoàn thành | EF Core 10.0.14, Npgsql 10.0.3, Native `Guid.CreateVersion7()` ([step-16.md](steps/step-16-upgrade-dotnet-10-lts.md)) |
+| **Standardized Reactive Forms (`FormGroup` + `InputControl` / `FormControl`)** | 100% |  Hoàn thành | `<app-form-control>` & `<app-input-control>` đa kiểu dữ liệu ([step-17.md](steps/step-17-standardized-form-group-and-input-control-components.md)) |
+| **Angular 20 + Cấu hình môi trường & Bảo mật cấu hình** | 100% |  Hoàn thành | Angular 20.3 + Ionic 8.8, `environment.apiBaseUrl`, bỏ mật khẩu DB khỏi `appsettings.json`, link tài liệu tương đối ([step-18.md](steps/step-18-angular-20-env-config-and-secrets.md)) |
 
 ---
 
-## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 15, 16 & 17)
+## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 15, 16, 17 & 18)
+- [x] **Nâng cấp Frontend (`ERPm-FE`) lên Angular 20 (step-18):**
+  - `@angular/*` `17.3` -> `20.3`, `@angular/cli` `20.3`, TypeScript `5.8`, `zone.js` `0.15`, `@ionic/angular` `8.3` -> `8.8` (bản Ionic 8 hỗ trợ Angular 20).
+  - `styles.scss`: đổi `@import` sang `@use` (Sass `@import` đã deprecated), build 0 warning Sass.
+- [x] **Cấu hình môi trường Frontend:** Thêm `src/environments/environment.ts` + `environment.development.ts` (`apiBaseUrl`), thay toàn bộ 7 service hard-code `http://localhost:5000`.
+- [x] **Bảo mật cấu hình Backend:** Bỏ mật khẩu DB khỏi `appsettings.json`; mật khẩu cấp qua `dotnet user-secrets` (dev) hoặc biến môi trường `ConnectionStrings__DefaultConnection` (server).
+- [x] **Tài liệu:** Đổi link tuyệt đối `file:///d:/WORKING%20PLACE/ERPm/...` sang đường dẫn tương đối (mở được trên mọi máy); cập nhật phiên bản Angular 20.
 - [x] **Chuẩn hóa `FormGroup` & Bộ Component `InputControlComponent` / `FormControlComponent`:**
-  - Xây dựng [`InputControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`) xử lý tự động theo `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`) và `dataSource` (`SelectOption[]`).
-  - Xây dựng [`FormControlComponent`](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`) bọc `<app-input-control>`, tích hợp `ControlValueAccessor` + `NgControl`, tự động vẽ nhãn, đơn vị, dấu `*` bắt buộc và thông báo lỗi validation.
+  - Xây dựng [`InputControlComponent`](../ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`) xử lý tự động theo `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`) và `dataSource` (`SelectOption[]`).
+  - Xây dựng [`FormControlComponent`](../ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`) bọc `<app-input-control>`, tích hợp `ControlValueAccessor` + `NgControl`, tự động vẽ nhãn, đơn vị, dấu `*` bắt buộc và thông báo lỗi validation.
   - Chuyển đổi toàn bộ các Form nhập liệu lưu dữ liệu (`InventoryComponent`, `ItemsComponent` kể cả Dynamic Attributes JSONB, `PartnersComponent`, `PosComponent`) từ `[(ngModel)]` sang `FormGroup` (`ReactiveFormsModule`).
 - [x] **Nâng cấp toàn bộ Backend (`ERPm-BE`) lên .NET 10 LTS (`net10.0`):**
   - Chuyển đổi 4 projects (`ERPm.Domain`, `ERPm.Application`, `ERPm.Infrastructure`, `ERPm.API`) lên `net10.0`.
@@ -114,7 +156,7 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
   - Cập nhật `Uuid7Generator.NewUuid7()` sử dụng trực tiếp hàm gốc `Guid.CreateVersion7()` của .NET 10.
 - [x] **Chuẩn hóa Quy tắc Git Commit (`[tag]` / `[tag](MODULE)`):**
   - Thiết lập quy chuẩn commit message thống nhất trên cả 3 repo (`ERPm` Root, `ERPm-BE`, `ERPm-FE`) với 6 tag chuẩn: `[add]`, `[update]`, `[fix]`, `[refactor]`, `[db]`, `[docs]`.
-  - Cập nhật đồng bộ vào [AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/AGENTS.md), [ERPm-BE/AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-BE/AGENTS.md), [ERPm-FE/AGENTS.md](file:///d:/WORKING%20PLACE/ERPm/ERPm-FE/AGENTS.md) và cả 3 file `PROJECT_MASTER.md`.
+  - Cập nhật đồng bộ vào [AGENTS.md](../AGENTS.md), [ERPm-BE/AGENTS.md](../ERPm-BE/AGENTS.md), [ERPm-FE/AGENTS.md](../ERPm-FE/AGENTS.md) và cả 3 file `PROJECT_MASTER.md`.
 - [x] **Thiết kế & triển khai kiến trúc Dual-Key (`int Id` + `Guid ExternalId` UUIDv7):**
   - Chuyển khóa chính `Id` và toàn bộ khóa ngoại (`FK`) của các bảng sang `int` tự tăng (`GENERATED BY DEFAULT AS IDENTITY`) để tối ưu tốc độ `JOIN` nội bộ.
   - Bổ sung bộ sinh `Uuid7Generator.NewUuid7()` chuẩn RFC 9562 (48-bit Unix Timestamp ms Big-Endian) trong `BaseEntity.cs` và hàm `uuid_generate_v7()` trong `erpm_schema.sql`.
@@ -187,6 +229,8 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
 ---
 
 ## 🚀 3. HƯỚNG DẪN KHỞI CHẠY & KIỂM THỬ
-1. **Cơ sở dữ liệu:** File độc lập [database/erpm_schema.sql](file:///d:/WORKING%20PLACE/ERPm/database/erpm_schema.sql).
-2. **Backend .NET 8 Web API:** Chạy `dotnet run --project src/ERPm.API` (Swagger UI: `http://localhost:5000/swagger`).
-3. **Frontend Angular + Ionic:** Chạy `ng serve` trong thư mục `client/` (`http://localhost:4200`).
+1. **Cơ sở dữ liệu:** File độc lập [database/erpm_schema.sql](../ERPm-BE/database/erpm_schema.sql).
+2. **Backend .NET 10 Web API:** Lần đầu đặt chuỗi kết nối (không commit mật khẩu):
+   `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=erpm_db;Username=postgres;Password=<mật-khẩu>" --project ERPm-BE/src/ERPm.API`
+   rồi chạy `dotnet run --project ERPm-BE/src/ERPm.API` (Swagger UI: `http://localhost:5000/swagger`).
+3. **Frontend Angular 20 + Ionic:** Chạy `npm install` rồi `ng serve` trong thư mục `ERPm-FE/` (`http://localhost:4200`). Đổi địa chỉ API tại `ERPm-FE/src/environments/environment*.ts`.

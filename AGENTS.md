@@ -7,13 +7,13 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
 ## 📌 QUY TẮC HOẠT ĐỘNG BẮT BUỘC
 
 1. **Đọc tài liệu cốt lõi trước khi thực hiện nhiệm vụ:**
-   - [PROJECT_MASTER.md](file:///d:/WORKING%20PLACE/ERPm/PROJECT_MASTER.md): Tài liệu kiến trúc chuẩn, quy ước code và mô hình dữ liệu.
-   - [.ai/roadmap.md](file:///d:/WORKING%20PLACE/ERPm/.ai/roadmap.md): Lộ trình phát triển qua các Sprint.
-   - [.ai/status.md](file:///d:/WORKING%20PLACE/ERPm/.ai/status.md): Trạng thái hiện tại của dự án và các việc cần làm tiếp theo.
+   - [PROJECT_MASTER.md](PROJECT_MASTER.md): Tài liệu kiến trúc chuẩn, quy ước code và mô hình dữ liệu.
+   - [.ai/roadmap.md](.ai/roadmap.md): Lộ trình phát triển qua các Sprint.
+   - [.ai/status.md](.ai/status.md): Trạng thái hiện tại của dự án và các việc cần làm tiếp theo.
 
 2. **Quy chuẩn lưu vết từng Step vào thư mục `.ai/steps/`:**
    - Mỗi khi bạn hoàn thành một tính năng, cấu hình hoặc sửa đổi kiến trúc lớn, bạn **PHẢI** tạo hoặc cập nhật file log theo định dạng:
-     `d:/WORKING PLACE/ERPm/.ai/steps/step-[số thứ tự]-[tên-ngắn-gọn].md`
+     `.ai/steps/step-[số thứ tự]-[tên-ngắn-gọn].md`
    - File log cần nêu rõ:
      - Mục tiêu của step.
      - Danh sách file đã tạo / chỉnh sửa.

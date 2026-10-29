@@ -14,18 +14,18 @@
 
 ## 📁 Danh sách File Đã Chỉnh Sửa / Tạo Mới
 
-1. [ERPm.Infrastructure.csproj](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/ERPm.Infrastructure.csproj):
+1. [ERPm.Infrastructure.csproj](../../ERPm-BE/src/ERPm.Infrastructure/ERPm.Infrastructure.csproj):
    - Cài đặt package `EFCore.NamingConventions` (version 8.0.3).
-2. [DependencyInjection.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/DependencyInjection.cs):
+2. [DependencyInjection.cs](../../ERPm-BE/src/ERPm.Infrastructure/DependencyInjection.cs):
    - Thêm `.UseSnakeCaseNamingConvention()` vào DbContext options để tự động map toàn bộ entity sang chuẩn `snake_case` của PostgreSQL.
-3. [Program.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.API/Program.cs):
+3. [Program.cs](../../ERPm-BE/src/ERPm.API/Program.cs):
    - Tạm comment out `await DataSeeder.SeedAsync(context);` theo yêu cầu.
-4. [item.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/item.service.ts):
+4. [item.service.ts](../../ERPm-FE/src/app/core/services/item.service.ts):
    - Loại bỏ cơ chế fallback mock swallow lỗi; kết nối trực tiếp với backend API; khởi tạo signal `items` từ mảng rỗng và lan truyền error thật về component.
-5. [items.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/pages/catalog/items.component.ts):
+5. [items.component.ts](../../ERPm-FE/src/app/pages/catalog/items.component.ts):
    - Gán `baseUomId` hợp lệ trỏ tới ĐVT "Cái" trong DB.
    - Bổ sung callback `error` trong `submitCreate()` để thông báo lỗi cho người dùng nếu API thất bại thay vì âm thầm đóng modal.
-6. [partner.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/partner.service.ts), [stock.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/stock.service.ts), [sales.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/sales.service.ts):
+6. [partner.service.ts](../../ERPm-FE/src/app/core/services/partner.service.ts), [stock.service.ts](../../ERPm-FE/src/app/core/services/stock.service.ts), [sales.service.ts](../../ERPm-FE/src/app/core/services/sales.service.ts):
    - Đồng bộ kết nối API trực tiếp, loại bỏ cơ chế swallow lỗi để các phân hệ đối tác, kho và bán hàng tương tác chuẩn xác với DB.
 
 ---

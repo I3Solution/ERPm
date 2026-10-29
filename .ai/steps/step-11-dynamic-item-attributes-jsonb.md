@@ -41,33 +41,33 @@
 
 ### A. Backend (.NET 8 Clean Architecture):
 1. **Domain Entities:**
-   - [ItemAttribute.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Domain/Entities/Catalog/ItemAttribute.cs) *(MỚI)*: Định nghĩa metadata thuộc tính (`Code`, `Name`, `DataType`, `Options`, `Unit`, `IsRequired`, `IsFilterable`, `SortOrder`, `CategoryId`).
-   - [Item.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Domain/Entities/Catalog/Item.cs): Bổ sung `public Dictionary<string, object> Attributes { get; set; } = new();`.
+   - [ItemAttribute.cs](../../ERPm-BE/src/ERPm.Domain/Entities/Catalog/ItemAttribute.cs) *(MỚI)*: Định nghĩa metadata thuộc tính (`Code`, `Name`, `DataType`, `Options`, `Unit`, `IsRequired`, `IsFilterable`, `SortOrder`, `CategoryId`).
+   - [Item.cs](../../ERPm-BE/src/ERPm.Domain/Entities/Catalog/Item.cs): Bổ sung `public Dictionary<string, object> Attributes { get; set; } = new();`.
 
 2. **Application Layer:**
-   - [IApplicationDbContext.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Application/Common/Interfaces/IApplicationDbContext.cs): Bổ sung `DbSet<ItemAttribute> ItemAttributes { get; }`.
-   - [CatalogDtos.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Application/DTOs/Catalog/CatalogDtos.cs): Bổ sung `Attributes` vào `ItemDto`, `CreateItemRequest`, `UpdateItemRequest`; tạo `ItemAttributeDto`, `CreateItemAttributeRequest`, `UpdateItemAttributeRequest`.
+   - [IApplicationDbContext.cs](../../ERPm-BE/src/ERPm.Application/Common/Interfaces/IApplicationDbContext.cs): Bổ sung `DbSet<ItemAttribute> ItemAttributes { get; }`.
+   - [CatalogDtos.cs](../../ERPm-BE/src/ERPm.Application/DTOs/Catalog/CatalogDtos.cs): Bổ sung `Attributes` vào `ItemDto`, `CreateItemRequest`, `UpdateItemRequest`; tạo `ItemAttributeDto`, `CreateItemAttributeRequest`, `UpdateItemAttributeRequest`.
 
 3. **Infrastructure Layer:**
-   - [ApplicationDbContext.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Persistence/ApplicationDbContext.cs): Cấu hình EF Core Npgsql mapping `Item.Attributes` kiểu `jsonb` với `ValueComparer<Dictionary<string, object>>` và `ItemAttribute.Options` kiểu `jsonb`.
-   - [ItemService.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Services/ItemService.cs): Mapping `Attributes` hai chiều trong `GetItemsAsync`, `GetItemByIdAsync`, `CreateItemAsync`, `UpdateItemAsync`.
-   - [DataSeeder.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.Infrastructure/Persistence/Seeders/DataSeeder.cs): Bổ sung seed thuộc tính mở rộng (`color`, `size`, `origin`, `warranty_months`) và gán mẫu cho các mặt hàng ban đầu.
+   - [ApplicationDbContext.cs](../../ERPm-BE/src/ERPm.Infrastructure/Persistence/ApplicationDbContext.cs): Cấu hình EF Core Npgsql mapping `Item.Attributes` kiểu `jsonb` với `ValueComparer<Dictionary<string, object>>` và `ItemAttribute.Options` kiểu `jsonb`.
+   - [ItemService.cs](../../ERPm-BE/src/ERPm.Infrastructure/Services/ItemService.cs): Mapping `Attributes` hai chiều trong `GetItemsAsync`, `GetItemByIdAsync`, `CreateItemAsync`, `UpdateItemAsync`.
+   - [DataSeeder.cs](../../ERPm-BE/src/ERPm.Infrastructure/Persistence/Seeders/DataSeeder.cs): Bổ sung seed thuộc tính mở rộng (`color`, `size`, `origin`, `warranty_months`) và gán mẫu cho các mặt hàng ban đầu.
 
 4. **API Controllers:**
-   - [ItemAttributesController.cs](file:///d:/WORKING%20PLACE/ERPm/src/ERPm.API/Controllers/WMS/ItemAttributesController.cs) *(MỚI)*: API RESTful CRUD cho cấu hình thuộc tính động (`/api/v1/wms/item-attributes/by-category/{categoryId?}`).
+   - [ItemAttributesController.cs](../../ERPm-BE/src/ERPm.API/Controllers/WMS/ItemAttributesController.cs) *(MỚI)*: API RESTful CRUD cho cấu hình thuộc tính động (`/api/v1/wms/item-attributes/by-category/{categoryId?}`).
 
 5. **Database Script:**
-   - [erpm_schema.sql](file:///d:/WORKING%20PLACE/ERPm/database/erpm_schema.sql): Bổ sung cột `attributes jsonb DEFAULT '{}'::jsonb`, GIN index `idx_tbl_wms_item_attributes_gin`, và bảng `tbl_WMS_ItemAttribute`.
+   - [erpm_schema.sql](../../ERPm-BE/database/erpm_schema.sql): Bổ sung cột `attributes jsonb DEFAULT '{}'::jsonb`, GIN index `idx_tbl_wms_item_attributes_gin`, và bảng `tbl_WMS_ItemAttribute`.
 
 ### B. Frontend (Angular 18 Standalone + Ionic):
 1. **Services & Localization:**
-   - [item.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/item.service.ts): Bổ sung enum `AttributeDataType`, interface `ItemAttributeDto`, signal `attributes`, và hàm `loadAttributes(categoryId?)`.
-   - [localization.service.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/core/services/localization.service.ts): Bổ sung translation keys cho `catalog.attributes`, `catalog.attributes_desc`, `catalog.attributes_custom` (VI & EN).
+   - [item.service.ts](../../ERPm-FE/src/app/core/services/item.service.ts): Bổ sung enum `AttributeDataType`, interface `ItemAttributeDto`, signal `attributes`, và hàm `loadAttributes(categoryId?)`.
+   - [localization.service.ts](../../ERPm-FE/src/app/core/services/localization.service.ts): Bổ sung translation keys cho `catalog.attributes`, `catalog.attributes_desc`, `catalog.attributes_custom` (VI & EN).
 
 2. **Components & Styles:**
-   - [components.scss](file:///d:/WORKING%20PLACE/ERPm/client/src/theme/components.scss): Thêm class `.erpm-badge-outline` phục vụ hiển thị tags/chips thuộc tính mở rộng.
-   - [items.component.ts](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/catalog/items.component.ts): Quản lý state `customAttributes`, convert options cho custom select, lấy entries hiển thị badges, và gán attributes khi tạo mới.
-   - [items.component.html](file:///d:/WORKING%20PLACE/ERPm/client/src/app/modules/catalog/items.component.html):
+   - [components.scss](../../ERPm-FE/src/theme/components.scss): Thêm class `.erpm-badge-outline` phục vụ hiển thị tags/chips thuộc tính mở rộng.
+   - [items.component.ts](../../ERPm-FE/src/app/modules/catalog/items.component.ts): Quản lý state `customAttributes`, convert options cho custom select, lấy entries hiển thị badges, và gán attributes khi tạo mới.
+   - [items.component.html](../../ERPm-FE/src/app/modules/catalog/items.component.html):
      - Hiển thị badges thuộc tính trên bảng dữ liệu Desktop dưới tên sản phẩm.
      - Hiển thị badges thuộc tính trên danh sách thẻ Mobile.
      - Khối "Thuộc tính mở rộng (PostgreSQL JSONB)" động trong modal tạo mới sản phẩm với các loại điều khiển: Dropdown Select, Number, Text, Date, Checkbox.

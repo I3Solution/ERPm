@@ -240,41 +240,41 @@ ERPm-BE/src/
 Để đảm bảo vừa có ngay tính năng sử dụng được ngay (Incremental Delivery), vừa giữ vững nền móng mở rộng lâu dài, kế hoạch được chia thành 5 giai đoạn rõ ràng:
 
 ### 🌟 GIAI ĐOẠN 21.1: HẠ TẦNG LÕI CSDL & ENGINE TRUNG TÂM (CORE FOUNDATION)
-- [ ] **21.1.1 (DB):** Tạo Migration 5 bảng CSDL: `tbl_SYS_NotificationTemplate`, `tbl_SYS_Notification`, `tbl_SYS_NotificationRecipient`, `tbl_SYS_UserNotificationPreference`, `tbl_SYS_NotificationOutbox`. Thiết lập Dual-Key UUIDv7 và Composite Indexes.
-- [ ] **21.1.2 (Domain):** Xây dựng Entities, Enums, và Hợp đồng `INotificationEvent`.
-- [ ] **21.1.3 (Engine):** Xây dựng `INotificationEngine`, `INotificationRouter` (tích hợp định tuyến theo Chức danh, Phòng ban, Chi nhánh và Role IAM từ Step 20), và `TemplateRenderer`.
-- [ ] **21.1.4 (Seed):** Nạp danh mục Mẫu thông báo chuẩn (`NotificationTemplateSeeder`) với bản dịch tiếng Anh & tiếng Việt.
+- [x] **21.1.1 (DB):** Tạo Migration 5 bảng CSDL: `tbl_SYS_NotificationTemplate`, `tbl_SYS_Notification`, `tbl_SYS_NotificationRecipient`, `tbl_SYS_UserNotificationPreference`, `tbl_SYS_NotificationOutbox`. Thiết lập Dual-Key UUIDv7 và Composite Indexes.
+- [x] **21.1.2 (Domain):** Xây dựng Entities, Enums, và Hợp đồng `INotificationEvent`.
+- [x] **21.1.3 (Engine):** Xây dựng `INotificationEngine`, `INotificationRouter` (tích hợp định tuyến theo Chức danh, Phòng ban, Chi nhánh và Role IAM từ Step 20), và `TemplateRenderer`.
+- [x] **21.1.4 (Seed):** Nạp danh mục Mẫu thông báo chuẩn (`NotificationTemplateSeeder`) với bản dịch tiếng Anh & tiếng Việt.
 
 ### 🌟 GIAI ĐOẠN 21.2: REAL-TIME IN-APP & REST API (BACKEND)
-- [ ] **21.2.1 (SignalR):** Xây dựng `NotificationHub` (`/hubs/notifications`) với phân nhóm theo `User_{id}`, `Branch_{id}`, `Company_{id}`.
-- [ ] **21.2.2 (Channel):** Hiện thực hóa `InAppChannelProvider` đẩy trực tiếp qua SignalR HubContext.
-- [ ] **21.2.3 (API):** Xây dựng `NotificationsController` (`/api/v1/sys/notifications`):
+- [x] **21.2.1 (SignalR):** Xây dựng `NotificationHub` (`/hubs/notifications`) với phân nhóm theo `User_{id}`, `Branch_{id}`, `Company_{id}`.
+- [x] **21.2.2 (Channel):** Hiện thực hóa `InAppChannelProvider` đẩy trực tiếp qua SignalR HubContext.
+- [x] **21.2.3 (API):** Xây dựng `NotificationsController` (`/api/v1/sys/notifications`):
   - `GET /` (danh sách phân trang có filter).
   - `GET /unread-count`.
   - `PUT /{id}/read` & `PUT /read-all`.
   - `GET /preferences` & `PUT /preferences` (quản lý cấu hình nhận tin).
   - `POST /broadcast` (gửi thông báo toàn hệ thống, kiểm tra quyền `sys:notification:broadcast`).
-- [ ] **21.2.4 (IAM):** Đăng ký quyền `sys:notification:*` vào `PermissionCatalog.cs`.
+- [x] **21.2.4 (IAM):** Đăng ký quyền `sys:notification:*` vào `PermissionCatalog.cs`.
 
 ### 🌟 GIAI ĐOẠN 21.3: GIAO DIỆN CHUÔNG & TRUNG TÂM THÔNG BÁO (FRONTEND)
-- [ ] **21.3.1 (SignalR Client):** Cài đặt `@microsoft/signalr`, xây dựng `NotificationSignalRService` và `NotificationStateService` với Angular Signals.
-- [ ] **21.3.2 (Header Bell):** Xây dựng `<app-notification-bell>` tích hợp vào Header [app.component.html](file:///j:/I3Solution/ERPm/ERPm-FE/src/app/app.component.html).
-- [ ] **21.3.3 (Popover):** Xây dựng Dropdown `<app-notification-popover>` với animation, icon phân hệ, thời gian tương đối và nút thao tác nhanh.
-- [ ] **21.3.4 (Toast):** Xây dựng `<app-toast-container>` hiển thị thông báo popup nổi 4s.
-- [ ] **21.3.5 (i18n):** Cập nhật `system_dictionary.json` toàn bộ nhãn tiếng Việt & tiếng Anh.
+- [x] **21.3.1 (SignalR Client):** Cài đặt `@microsoft/signalr`, xây dựng `NotificationSignalRService` và `NotificationStateService` với Angular Signals.
+- [x] **21.3.2 (Header Bell):** Xây dựng `<app-notification-bell>` tích hợp vào Header [app.component.html](file:///j:/I3Solution/ERPm/ERPm-FE/src/app/app.component.html).
+- [x] **21.3.3 (Popover):** Xây dựng Dropdown `<app-notification-popover>` với animation, icon phân hệ, thời gian tương đối và nút thao tác nhanh.
+- [x] **21.3.4 (Toast):** Xây dựng `<app-toast-container>` hiển thị thông báo popup nổi 4s.
+- [x] **21.3.5 (i18n):** Cập nhật `system_dictionary.json` toàn bộ nhãn tiếng Việt & tiếng Anh.
 
 ### 🌟 GIAI ĐOẠN 21.4: TÍCH HỢP TỰ ĐỘNG VÀO CÁC PHÂN HỆ NGHIỆP VỤ (EVENT TRIGGERS)
-- [ ] **21.4.1 (Kho WMS):** Kích hoạt `WMS_LOW_STOCK` khi xuất kho làm tồn rơi xuống dưới mức tối thiểu $\rightarrow$ Bắn tới Thủ kho và Quản lý chi nhánh (`BRANCH_TREE`).
-- [ ] **21.4.2 (Bán hàng SD):**
+- [x] **21.4.1 (Kho WMS):** Kích hoạt `WMS_LOW_STOCK` khi xuất kho làm tồn rơi xuống dưới mức tối thiểu $\rightarrow$ Bắn tới Thủ kho và Quản lý chi nhánh (`BRANCH_TREE`).
+- [x] **21.4.2 (Bán hàng SD):**
   - Kích hoạt `SD_ORDER_NEW` khi có đơn đặt hàng mới.
   - Kích hoạt `SD_INVOICE_CANCELLED` khi hủy hóa đơn (sinh bút toán đảo) $\rightarrow$ Bắn cảnh báo `DANGER` tới Kế toán trưởng & Ban giám đốc.
-- [ ] **21.4.3 (Nhân sự & IAM):** Kích hoạt `SYS_ROLE_CHANGED` khi tài khoản được gán Role mới hoặc điều chuyển quá trình công tác.
+- [x] **21.4.3 (Nhân sự & IAM):** Kích hoạt `SYS_ROLE_CHANGED` khi tài khoản được gán Role mới hoặc điều chuyển quá trình công tác.
 
 ### 🌟 GIAI ĐOẠN 21.5: SẴN SÀNG ĐA KÊNH NGOẠI VI & SCALE-OUT (OUTBOX & SCALE)
-- [ ] **21.5.1 (Outbox Worker):** Xây dựng `NotificationOutboxWorker` (BackgroundService) quét bảng `tbl_SYS_NotificationOutbox` xử lý retry tự động khi gửi Email / Push.
-- [ ] **21.5.2 (Email Channel):** Tích hợp `EmailChannelProvider` gửi qua SMTP / Email Service khi user bật nhận Email.
-- [ ] **21.5.3 (Mobile Ready):** Cấu hình sẵn payload tương thích Firebase Cloud Messaging (FCM) chuẩn bị cho App Mobile ở Giai đoạn 4.
-- [ ] **21.5.4 (Verification):** Bộ kiểm thử tự động `NotificationEngineChecks` trong `ERPm.Verification` (kiểm tra lưu DB, đếm chưa đọc, phân quyền người nhận, outbox worker).
+- [x] **21.5.1 (Outbox Worker):** Xây dựng `NotificationOutboxWorker` (BackgroundService) quét bảng `tbl_SYS_NotificationOutbox` xử lý retry tự động khi gửi Email / Push.
+- [x] **21.5.2 (Email Channel):** Tích hợp `EmailChannelProvider` gửi qua SMTP / Email Service khi user bật nhận Email.
+- [x] **21.5.3 (Mobile Ready):** Cấu hình sẵn payload tương thích Firebase Cloud Messaging (FCM) chuẩn bị cho App Mobile ở Giai đoạn 4.
+- [x] **21.5.4 (Verification):** Bộ kiểm thử tự động `NotificationEngineChecks` trong `ERPm.Verification` (kiểm tra lưu DB, đếm chưa đọc, phân quyền người nhận, outbox worker).
 
 ---
 

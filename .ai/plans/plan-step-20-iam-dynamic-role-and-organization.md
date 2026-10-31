@@ -244,6 +244,140 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 
 ---
 
+## 🔄 5b. THAY ĐỔI YÊU CẦU
+
+### CR-20-01 (2026-10-31): Gán role theo phòng ban, gán nhân sự khi tạo user
+- **Người yêu cầu:** Thiện (tổng hợp yêu cầu nhóm, chờ Phúc chốt) · **Ngày:** 2026-10-31
+- **Yêu cầu mới (4 nhóm):**
+  1. **ROLE:** gán role theo **phòng ban** và theo **user**.
+  2. **BRANCH:** tạo tập đoàn / công ty / chi nhánh, tạo **bộ phận, phòng ban**.
+  3. **USER:** tạo user và **gán nhân sự** ngay lúc tạo.
+  4. **HRM:** tạo nhân sự.
+- **Đối chiếu với bản đã làm (BE trên master):**
+
+  | Nhóm | Đã có | Thiếu |
+  | :--- | :--- | :--- |
+  | ROLE theo user | `PUT /api/v1/sys/roles/users/{id}` | Màn FE |
+  | ROLE theo phòng ban | Chỉ gán được cho chức danh (`JobPositionRole`) | Bảng `DepartmentRole`, engine, API (20.6.1–20.6.3) |
+  | BRANCH | `/api/v1/branches` (`orgUnitType`, `taxCode`, `/tree`), `/api/v1/hrm/departments` (có `ParentId`) | Màn FE |
+  | USER gán nhân sự | Chỉ gán từ phía nhân viên (`Employee.UserId`) | `employeeId` trong request user (20.6.4) |
+  | HRM tạo nhân sự | `/api/v1/hrm/employees`, `/hrm/work-histories` | Màn FE |
+
+- **Lý do:** quản trị thường cấp quyền theo phòng ban (cả phòng có chung quyền). Chỉ gán theo chức danh thì phải tạo chức danh riêng cho mỗi phòng.
+- **Thiết kế "bộ phận" / "phòng ban" (đã so sánh, chọn phương án C):**
+
+  | Phương án | Mô tả | Ưu | Nhược |
+  | :--- | :--- | :--- | :--- |
+  | A. Tách bảng | `tbl_HRM_Department` + bảng riêng `tbl_HRM_Section` (bộ phận), sau này thêm Tổ / Nhóm | Rõ từng cấp | Cố định số cấp; nhân viên, chức danh, chứng từ phải có nhiều FK; engine phạm vi phải duyệt nhiều cây; mỗi cấp một bộ CRUD |
+  | B. Một cây, không có cấp | Bảng hiện tại, chỉ dùng `ParentId` | Đơn giản, không đổi gì | Không phân biệt được Phòng với Bộ phận; không chặn được cây sai (Phòng nằm dưới Bộ phận); báo cáo theo cấp khó |
+  | **C. Một cây + danh mục cấp (chọn)** | Giữ `tbl_HRM_Department` (`ParentId`), thêm danh mục `tbl_HRM_DepartmentLevel`; `Department.LevelId` | Số cấp do từng công ty tự khai báo (Khối / Phòng / Bộ phận / Tổ…), đa ngôn ngữ; mọi FK vẫn là một `DepartmentId`; engine `OrgTree` và `DEPARTMENT_TREE` hiện tại dùng lại nguyên | Thêm 1 bảng danh mục, thêm 1 quy tắc kiểm tra khi lưu |
+
+  - `tbl_HRM_DepartmentLevel`: `Code`, `Name`, `Translations` (JSONB), `SortOrder` (cấp càng sâu thì số càng lớn), `CompanyId` (null = dùng chung cả tập đoàn), `IsActive`. Seed mặc định: `DIVISION` Khối (10), `DEPARTMENT` Phòng (20), `SECTION` Bộ phận (30), `TEAM` Tổ (40).
+  - Quy tắc khi lưu phòng ban:
+    - `SortOrder` của cấp con phải **lớn hơn** của cấp cha (`error.hrm.department_level_order`);
+    - con phải cùng `CompanyId` với cha;
+    - không được tạo vòng lặp (đã có).
+  - Thêm `Path` (`/1/5/12/`) và `Depth` tính tự động khi lưu hoặc khi đổi cha (cập nhật cả nhánh con). Hai cột này để báo cáo và lọc "phòng X và các cấp dưới" chạy thẳng trong SQL (`path LIKE '/1/5/%'`), không phải đệ quy. Index `path` dùng `text_pattern_ops`.
+  - Dữ liệu cũ: phòng ban đã có thì gán `LevelId` = `DEPARTMENT`, và tính `Path` trong migration.
+- **Quy tắc quyền hiệu lực (sau CR):** hợp các nguồn sau, `Deny` tường minh vẫn thắng:
+  1. role gán thẳng cho user;
+  2. role của chức danh;
+  3. role của phòng ban hiện tại (theo QTCT / `Employee.DepartmentId`);
+  4. role của phòng ban cha có `ApplyToChildren = true`.
+- **Phạm vi:** chỉ thêm. Không đổi `JobPositionRole`/`UserRole` và không đổi API cũ. Thêm 1 migration.
+
+### Phase 20.6: Triển khai CR-20-01
+
+> **Ưu tiên:** dựng lõi 4 nhóm ROLE / BRANCH / USER / HRM trước để anh em dùng ngay. Các trường hợp mở rộng (M1–M3) xem mục "Mở rộng sau".
+> Mỗi task ghi: người làm, phụ thuộc, việc phải làm, cách nghiệm thu. Xong thì tick `- [x]` và ghi commit.
+
+**Backend (không bị chặn, làm được ngay)**
+
+- [ ] **Task 20.6.0 [db] Danh mục cấp phòng ban + `Path`.** Người làm: _(giao)_ · Phụ thuộc: không
+  - Entity `Entities/HumanResource/DepartmentLevel.cs` (`tbl_HRM_DepartmentLevel`) và thêm `LevelId` (FK restrict), `Path`, `Depth` vào `Department`.
+  - Thêm sẵn các cột móc cho mở rộng, chỉ thêm cột, chưa có logic:
+    - `StandardLevelCode` (nullable) trong danh mục cấp, dùng cho M1;
+    - `EffectiveFrom` / `EffectiveTo` (nullable) trong `Department`, dùng cho M2.
+  - Migration `AddDepartmentLevel`: seed 4 cấp mặc định; phòng ban cũ được `LevelId = DEPARTMENT` và tính `Path`/`Depth` bằng SQL đệ quy.
+  - CRUD `/api/v1/hrm/department-levels` (quyền `hrm:department:view/edit`). Không xóa được cấp đang dùng (`error.validation.reference`).
+  - `DepartmentService`:
+    - kiểm tra thứ tự cấp và cùng công ty;
+    - tính `Path`/`Depth`, khi đổi cha thì cập nhật `Path` của cả nhánh con trong cùng transaction;
+    - gọi `Invalidate()` của IAM khi đổi cha.
+  - `GET /api/v1/hrm/departments?levelCode=SECTION` và `?underId={id}` (lọc theo `Path`).
+  - **Nghiệm thu:** tạo được Khối → Phòng → Bộ phận → Tổ; tạo Phòng dưới Bộ phận bị chặn; chuyển một Phòng sang Khối khác thì `Path` của các Bộ phận con đổi theo.
+- [ ] **Task 20.6.1 [db] Bảng `tbl_SYS_DepartmentRole`.** Người làm: _(giao)_ · Phụ thuộc: không
+  - Entity `Entities/System/DepartmentRole.cs`: `DepartmentId`, `RoleId`, `ApplyToChildren` (bool, mặc định `false`). Dùng dual-key và auditable như `JobPositionRole`.
+  - Unique `(department_id, role_id)`; FK tới `tbl_HRM_Department` và `tbl_SYS_Role` (restrict).
+  - Migration `AddDepartmentRole` (chỉ thêm), chạy lại `tools/ERPm.Schema` → `database/current_model.sql`.
+  - Seed mẫu: 1 role gán cho một phòng ban trong `OrganizationSampleSeeder`.
+  - **Nghiệm thu:** `dotnet ef database update` trên DB sạch thành công; `current_model.sql` có bảng mới.
+- [ ] **Task 20.6.2 IAM engine nhận role của phòng ban.** Người làm: _(giao)_ · Phụ thuộc: 20.6.1
+  - Gom việc lấy role của chức danh và phòng ban vào một hàm nhận **danh sách vị trí** `(DepartmentId, JobPositionId)`; hiện truyền 1 vị trí chính, làm móc cho kiêm nhiệm M3.
+  - `IamService`: khi tính quyền hiệu lực, thêm role của `Employee.DepartmentId` và của các phòng ban cha có `ApplyToChildren`.
+  - Gọi `Invalidate()` khi:
+    - gán hoặc gỡ role của phòng ban;
+    - đổi `DepartmentId` của nhân viên (tạo hoặc sửa QTCT);
+    - đổi `ParentId` của phòng ban.
+  - **Nghiệm thu:** test ở 20.6.5; `/api/v1/auth/me` trả `permissions[]` có quyền lấy từ phòng ban.
+- [ ] **Task 20.6.3 API gán role cho phòng ban.** Người làm: _(giao)_ · Phụ thuộc: 20.6.1
+  - Endpoint:
+    - `GET /api/v1/sys/roles/departments/{departmentId}`: quyền `sys:role:view`;
+    - `PUT /api/v1/sys/roles/departments/{departmentId}`: quyền `sys:role:edit`, body `[{ roleId, applyToChildren }]`.
+  - Áp guard leo thang quyền (`error.iam.escalation`) và giới hạn công ty (`error.iam.company_scope`): phòng ban và role phải cùng công ty với người gán, trừ super admin.
+  - Logic nằm trong `RoleService`, controller chỉ gọi service.
+  - **Nghiệm thu:** gán được role cho phòng ban cùng công ty; gán sang công ty khác bị 403.
+- [ ] **Task 20.6.4 Gán nhân sự khi tạo / sửa user.** Người làm: _(giao)_ · Phụ thuộc: không
+  - Thêm `employeeId?` vào `UserRequest` và `UserAccessRequest`. `AccountDto` trả thêm `employeeId`, `employeeCode`, `employeeName`.
+  - Kiểm tra:
+    - nhân viên tồn tại và cùng công ty với người tạo;
+    - nhân viên chưa có tài khoản, nếu có rồi thì trả `error.hrm.user_linked`;
+    - gửi `employeeId = null` khi sửa thì gỡ liên kết.
+  - Ghi vào `Employee.UserId` (giữ một nguồn liên kết duy nhất, không thêm cột ở `AppUser`).
+  - `GET /api/v1/hrm/employees?withoutAccount=true` để FE lọc nhân viên chưa có tài khoản.
+  - **Đã chốt (Thiện, 2026-10-31): bắt buộc gán nhân sự** khi admin cấp công ty tạo user; chỉ super admin được tạo user không gắn nhân sự (tài khoản hệ thống). Lý do — lỗi đang có: `GET /auth/users` lọc theo nhân viên của công ty. Vì vậy admin công ty tạo user mà chưa gán nhân sự thì sẽ không thấy user vừa tạo. Thiếu `employeeId` thì trả `error.validation.required`.
+  - **Nghiệm thu:** tạo user kèm nhân sự thì `/auth/me` trả đúng `employeeId`, `companyId`, `departmentId`.
+- [ ] **Task 20.6.5 Test và từ điển.** Người làm: _(giao)_ · Phụ thuộc: 20.6.0–20.6.4
+  - Thêm khoảng 9 check vào `tests/ERPm.Verification`:
+    - cấp con phải sâu hơn cấp cha (chặn Phòng dưới Bộ phận);
+    - đổi cha thì `Path` của cả nhánh con cập nhật theo;
+    - admin công ty tạo user thiếu `employeeId` bị chặn;
+    - role của phòng ban được cấp cho nhân viên;
+    - `ApplyToChildren` đi xuống phòng ban con, còn khi `false` thì không;
+    - điều chuyển phòng ban thì mất quyền cũ;
+    - `Deny` ở role user thắng `Allow` của phòng ban;
+    - gán role cho phòng ban của công ty khác bị 403;
+    - tạo user với nhân viên đã có tài khoản bị chặn.
+  - Thêm nhãn và mã lỗi mới vào `app_dictionaries` (VI/EN).
+  - **Nghiệm thu:** `dotnet build` 0 cảnh báo 0 lỗi; `ERPm.Verification` đạt hết (93 + check mới); `ERPm.Hrm.Verification` 28.
+
+**Frontend (bị chặn bởi [bug con trỏ submodule SD/CRM](../tasks/bug-20261031-fe-submodule-pointers-unpushed.md))**
+
+- [ ] **Task 20.6.6 Bổ sung vào màn 20.4.2.** Người làm: _(giao)_ · Phụ thuộc: 20.4.1, 20.6.3, 20.6.4
+  - Màn cây tổ chức: chọn node phòng ban thì có tab **Role** (danh sách role, ô "áp dụng cho phòng ban con").
+  - Màn user: ô chọn **Nhân sự** (lọc `withoutAccount=true`), hiện mã và tên nhân viên trên lưới.
+  - Màn nhân viên: nút **Cấp tài khoản**, mở form user với nhân sự đã chọn sẵn.
+  - Dùng `FormGroup` + `<app-form-control>`/`<app-input-control>`; ẩn nút theo `can('sys:role:edit')`, `can('sys:user:create')`.
+  - **Nghiệm thu:** `npm run build` 0 lỗi; thao tác được trên `http://localhost:4200` với tài khoản admin công ty mẫu.
+
+**Gợi ý chia việc:** 20.6.0–20.6.5 một người BE làm liền mạch (khoảng 1,5–2 ngày). 20.4.x và 20.6.6 cho người FE sau khi gỡ bug submodule.
+
+### Mở rộng sau (ghi nhận 2026-10-31, KHÔNG làm trong CR-20-01)
+
+> CR-20-01 chỉ dựng **lõi** của 4 nhóm ROLE / BRANCH / USER / HRM để anh em làm tiếp các module khác. Những mục dưới đây đã có điểm móc sẵn (cột hoặc quy tắc), sau này mở rộng thì **chỉ thêm, không sửa** phần lõi.
+
+| # | Trường hợp | Ví dụ | Hướng làm | Điểm móc dựng sẵn ở 20.6.0 |
+| :--- | :--- | :--- | :--- | :--- |
+| M1 | Báo cáo gộp tập đoàn khi mỗi công ty đặt tên cấp khác nhau | "Nhóm" của công ty B tương ứng "Tổ" của công ty A | Ánh xạ cấp riêng về cấp chuẩn của tập đoàn; báo cáo gộp theo cấp chuẩn | Cột `StandardLevelCode` (nullable) trong `tbl_HRM_DepartmentLevel` |
+| M2 | **Tái cơ cấu theo thời gian** (gộp / tách / đổi cha) | 01/2027 nhập Phòng A vào Khối X | Đã có QTCT thì không sửa `ParentId` tại chỗ: tạo node mới, đóng node cũ (`EffectiveTo`), điều chuyển nhân viên qua QTCT. Thêm `tbl_HRM_DepartmentHistory` (bản cũ + ngày hiệu lực), API `/hrm/departments/tree?asOf=`. QTCT lưu thêm `DepartmentPath` tại thời điểm hiệu lực để báo cáo kỳ cũ không đổi | Cột `EffectiveFrom`, `EffectiveTo` (nullable) trong `tbl_HRM_Department`; `Path` đã có |
+| M3 | **Kiêm nhiệm** | Một người vừa ở Phòng KT vừa ở Ban kiểm soát | Bảng `tbl_HRM_ConcurrentAssignment` (nhân viên, phòng ban, chức danh, từ ngày, đến ngày). IAM cộng thêm role và phạm vi của vị trí kiêm nhiệm còn hiệu lực | Ở 20.6.2, viết hàm lấy role theo **danh sách vị trí** (`IEnumerable<(DepartmentId, JobPositionId)>`, hiện chỉ có vị trí chính), nên M3 chỉ cần thêm nguồn |
+
+- Đã xử lý sẵn trong lõi, không cần mở rộng:
+  - mỗi công ty có bộ cấp riêng (`CompanyId` trong danh mục cấp);
+  - độ sâu tùy ý;
+  - bỏ qua cấp giữa (chỉ cần cấp con sâu hơn cấp cha);
+  - mỗi chi nhánh một cây (`BranchId`).
+
 ## ⏳ 6. VIỆC CÒN LẠI (cập nhật 2026-10-31)
 
 | Task | Trạng thái | Ghi chú |
@@ -254,6 +388,9 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 | 20.4.4 Từ điển VI/EN | Một phần | BE đã thêm `error.iam.*`, `error.hrm.user_linked`; còn nhãn giao diện các màn mới. |
 | 20.5.2 Build & log | Một phần | `dotnet build` 0/0, 75 + 28 check đạt; còn `npm run build` sau khi làm FE. |
 | Gán `DepartmentId` cho chứng từ | Chưa làm | Cột đã có (nullable) và đã dùng trong query filter, nhưng DTO/UI tạo chứng từ chưa nhận giá trị. |
+| CR-20-01: 20.6.0–20.6.5 (BE cấp phòng ban + Path, role theo phòng ban, bắt buộc gán nhân sự khi tạo user) | Chưa làm | Không bị chặn. Chờ Phúc chốt CR-20-01. |
+| CR-20-01: 20.6.6 (FE tab Role phòng ban, chọn nhân sự cho user) | Chưa làm | Bị chặn cùng 20.4. |
+| Mở rộng M1–M3 (cấp chuẩn tập đoàn, tái cơ cấu theo thời gian, kiêm nhiệm) | Để sau | Xem mục "Mở rộng sau" trong 5b; cột móc làm sẵn ở 20.6.0. |
 | Cache quyền đa instance | Để sau | Cache IAM đang in-process; khi chạy nhiều API instance cần chuyển version sang Redis/DB. |
 
-**Chặn:** 20.4 chờ Phúc đẩy FE SD (`52500c5`) và CRM (`9f4a4c6`).
+**Chặn:** 20.4 và 20.6.6 chờ gỡ [bug con trỏ submodule SD/CRM](../tasks/bug-20261031-fe-submodule-pointers-unpushed.md) (FE master trỏ SD `52500c5`, CRM `9f4a4c6` chưa có trên GitHub).

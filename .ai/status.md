@@ -13,6 +13,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **HRM (Step 20):** lõi nghiệp vụ thuần QTCT / phạm vi dữ liệu / tính công trong `ERPm.Domain/Services/HumanResource`, **28 kiểm tra HRM đạt** (`tests/ERPm.Hrm.Verification`, không cần DB, đã thêm vào CI) — [Step 20](steps/step-20-hrm-domain-rules.md).
 - [x] **IAM & tổ chức (Step 20 BE, nhánh `thien/step-20-iam`):** cây Tập đoàn/Công ty/Chi nhánh, phòng ban, chức danh, nhân viên + QTCT, role động JSONB, `[RequirePermission]` thay khóa cứng Admin, guard leo thang; **75 kiểm tra PostgreSQL/API đạt** — [Step 20 IAM](steps/step-20-iam-dynamic-role-and-organization.md).
 - [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
+- [x] **Sửa lỗi FE module / build (2026-10-31):** Khôi phục `node_modules` bị thiếu/hỏng (`semver/functions/cmp`, `listr2`, `acorn`), sửa type mismatch trong `SD/pos.component.ts` và `sales.service.ts` (`requestId`, `selectedCustomerId`, `warehouseId`). FE build và `npm start` (`ng serve`) chạy bình thường 100% — [Task Bug](tasks/bug-20261031-fe-semver-missing-modules-and-pos-types.md).
 
 ## In-Progress
 

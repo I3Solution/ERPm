@@ -93,6 +93,8 @@ ERPm/
 4. **Code Comments & Documentation Standards:**
    - **Bắt buộc 100% bằng Tiếng Anh (English comments only):** Toàn bộ comment trong mã nguồn (C# backend, TypeScript/HTML/SCSS frontend, SQL migration scripts), bao gồm XML docstrings (`/// <summary>`), JSDoc, inline comments và header comments **phải được viết bằng Tiếng Anh** chuẩn mực kỹ thuật phần mềm quốc tế. Tuyệt đối không dùng tiếng Việt trong comment mã nguồn.
 
+5. **Quy tắc tham khảo từ HRM9 (12 quy tắc, khi viết hoặc review service/query/import/lưu dữ liệu):** xem [`.ai/tasks/spike-20261031-hrm9-csharp-rules.md`](.ai/tasks/spike-20261031-hrm9-csharp-rules.md). Điểm chính: không truy vấn DB trong vòng lặp, query chỉ đọc dùng `AsNoTracking`, một cửa duy nhất cho truy vấn có phạm vi dữ liệu, mỗi loại lỗi âm thầm cần một check trong `tests/ERPm.Verification`.
+
 ### 2.3. Khung Generic Base CRUD Type-Safe (Dành cho Solo Developer)
 Nhằm giúp tối ưu tốc độ phát triển (giảm thời gian viết boilerplate CRUD) mà vẫn giữ **100% Type-Safe**, Swagger schema chuẩn chỉ, không dùng reflection runtime:
 1. **Khung chuẩn:**

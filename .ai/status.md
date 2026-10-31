@@ -19,6 +19,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **Step 20.4.1 FE (`AuthService.can()` + `permissionGuard`) đã merge master (2026-10-31):** quyền hiệu lực lấy từ `/auth/me`, 4 nút nghiệp vụ CRM/WMS/SD gắn `can()`; Karma 28/28, kiểm tra tay đạt.
 - [x] **CI GitHub Actions (root `ERPm`) đã chạy được (2026-10-31):** thêm secret `SUBMODULES_TOKEN`, vá từ điển VI/EN lệch BE/FE, bổ sung quy tắc `git config push.recurseSubmodules check` vào `AGENTS.md` (root + `ERPm-FE`) sau 3 lần CI đỏ do quên push commit submodule con.
 - [x] **Step 20.4.2 + 20.6.6 FE (màn tổ chức / chức danh + gán role / nhân viên + cấp tài khoản / user) đã merge master (2026-10-31):** đủ 4 nhóm nghiệp vụ ROLE (theo phòng ban và chức danh)/BRANCH (tạo + sửa + xóa)/USER (tạo, bắt buộc gán nhân sự)/HRM (tạo nhân viên); Karma 53/53, `ERPm.Verification` **120/120**, kiểm tay 39/39 — [plan Phase 20.4](plans/plan-step-20-iam-dynamic-role-and-organization.md).
+- [x] **Spike quy tắc C# từ HRM9 (2026-10-31):** 12 quy tắc nên áp dụng, danh sách không nên copy, 8 đề xuất chờ nhóm quyết định. Xem [`spike-20261031-hrm9-csharp-rules.md`](tasks/spike-20261031-hrm9-csharp-rules.md); chỉ tài liệu, chưa đổi code.
 
 ## In-Progress
 

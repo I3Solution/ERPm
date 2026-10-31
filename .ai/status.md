@@ -1,4 +1,4 @@
-# ERPm — Trạng thái hiện hành, Step 20 (2026-10-30)
+# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
 
 Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
 
@@ -11,7 +11,9 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] Sửa Signals/reactive form, dictionary bundle, routes, phân trang, tìm SKU/barcode/bản dịch; bỏ số liệu demo, tách state item theo màn hình.
 - [x] Kiểm tra: backend solution build 0 warning/0 error; **44 kiểm tra PostgreSQL/API đạt**. FE production build đạt, type-check spec đạt; **7 kiểm thử Chrome đạt**.
 - [x] **HRM (Step 20):** lõi nghiệp vụ thuần QTCT / phạm vi dữ liệu / tính công trong `ERPm.Domain/Services/HumanResource`, **28 kiểm tra HRM đạt** (`tests/ERPm.Hrm.Verification`, không cần DB, đã thêm vào CI) — [Step 20](steps/step-20-hrm-domain-rules.md).
+- [x] **IAM & tổ chức (Step 20 BE, nhánh `thien/step-20-iam`):** cây Tập đoàn/Công ty/Chi nhánh, phòng ban, chức danh, nhân viên + QTCT, role động JSONB, `[RequirePermission]` thay khóa cứng Admin, guard leo thang; **75 kiểm tra PostgreSQL/API đạt** — [Step 20 IAM](steps/step-20-iam-dynamic-role-and-organization.md).
 - [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
+- [x] **Sửa lỗi FE module / build (2026-10-31):** Khôi phục `node_modules` bị thiếu/hỏng (`semver/functions/cmp`, `listr2`, `acorn`), sửa type mismatch trong `SD/pos.component.ts` và `sales.service.ts` (`requestId`, `selectedCustomerId`, `warehouseId`). FE build và `npm start` (`ng serve`) chạy bình thường 100% — [Task Bug](tasks/bug-20261031-fe-semver-missing-modules-and-pos-types.md).
 
 ## In-Progress
 
@@ -20,10 +22,10 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Next Steps
 
-1. **Triển khai Step 20 — Tổ chức đa cấp, Chức danh & Phân quyền động kiểu AWS IAM JSON:** Theo tài liệu đặc tả [plan-step-20-iam-dynamic-role-and-organization.md](plans/plan-step-20-iam-dynamic-role-and-organization.md) (Tập đoàn → Công ty → Chi nhánh → Phòng ban → Chức danh → Nhân viên; phân quyền 2 tầng theo Chức danh + User Override bằng `PolicyDocument` JSONB và `DataScope`).
+1. **Step 20.4 FE — Phân quyền động:** `AuthService.can()`/`permissionGuard` từ `/auth/me`, màn cây tổ chức, chức danh + gán role, nhân viên, Role designer (ma trận + JSON). Chờ Phúc đẩy FE SD/CRM; sau đó merge `thien/step-20-iam`. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
-3. HRM bước 2: chốt ánh xạ pháp nhân / cơ cấu tổ chức với `tbl_SYS_Branch`, rồi entity `tbl_HRM_*` (hồ sơ, QTCT, hợp đồng, ca) + danh mục BaseCrud + màn hình `ERPm-FE-HRM`.
+3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.
 4. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
 
 Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-internal-accounts.md), [đối chiếu F01–F22](reviews/2026-10-29-priority-resolution.md). SDK .NET 10 đã có ở thư mục người dùng nhưng chưa trên PATH; nhận định thiếu SDK trong Step 18 đã được đính chính.

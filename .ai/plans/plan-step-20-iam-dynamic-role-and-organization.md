@@ -4,7 +4,7 @@
 > **Mã kế hoạch:** PLAN-STEP-20  
 > **Phân hệ liên quan:** `SYS` (Hệ thống & IAM), `HRM` (Tổ chức, Phòng ban, Chức danh, Nhân sự), cùng toàn bộ 10 Submodules nghiệp vụ  
 > **Đối tượng đọc:** Đội ngũ Developers (Backend .NET 10 & Frontend Angular + Ionic)  
-> **Trạng thái:** Đã lên kế hoạch chi tiết (Ready for Implementation)
+> **Trạng thái:** BE xong (20.1, 20.2, 20.3, 20.5.1 — nhánh `thien/step-20-iam`, xem [step log](../steps/step-20-iam-dynamic-role-and-organization.md)); FE 20.4 chưa làm
 
 ---
 
@@ -198,28 +198,28 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 ## 🛠️ 5. PHÂN RÃ CÔNG VIỆC TRIỂN KHAI (WORK BREAKDOWN CHO TEAM)
 
 ### Phase 20.1: Database Schema, Entities & Seed Data (Backend)
-- [ ] **Task 20.1.1:** Cập nhật `Branch.cs` bổ sung `OrgUnitType`, `CompanyId`, `TaxCode`.
-- [ ] **Task 20.1.2:** Tạo các Entity mới trong `ERPm.Domain`:
+- [x] **Task 20.1.1:** Cập nhật `Branch.cs` bổ sung `OrgUnitType`, `CompanyId`, `TaxCode`.
+- [x] **Task 20.1.2:** Tạo các Entity mới trong `ERPm.Domain`:
   - `Entities/HRM/Department.cs` (`tbl_HRM_Department`)
   - `Entities/HRM/JobPosition.cs` (`tbl_HRM_JobPosition`)
   - `Entities/HRM/Employee.cs` (`tbl_HRM_Employee`)
   - `Entities/System/IamRole.cs` (`tbl_SYS_Role`) + Value Object `IamPolicyDocument`
   - `Entities/System/JobPositionRole.cs` (`tbl_SYS_JobPositionRole`)
   - `Entities/System/UserRole.cs` (`tbl_SYS_UserRole`)
-- [ ] **Task 20.1.3:** Bổ sung `DepartmentId` (nullable) vào các chứng từ (`SalesOrder`, `SalesInvoice`, `PurchaseOrder`, `StockReceipt`, `StockIssue`).
-- [ ] **Task 20.1.4:** Cấu hình Fluent API trong `ApplicationDbContext.cs`, tạo EF Core Migration và cập nhật `EssentialDataSeeder.cs` với cây mẫu (Tập đoàn -> Công ty -> Chi nhánh -> Phòng ban -> Chức danh -> Role mẫu).
+- [x] **Task 20.1.3:** Bổ sung `DepartmentId` (nullable) vào các chứng từ (`SalesOrder`, `SalesInvoice`, `PurchaseOrder`, `StockReceipt`, `StockIssue`).
+- [x] **Task 20.1.4:** Cấu hình Fluent API trong `ApplicationDbContext.cs`, tạo EF Core Migration và cập nhật `EssentialDataSeeder.cs` với cây mẫu (Tập đoàn -> Công ty -> Chi nhánh -> Phòng ban -> Chức danh -> Role mẫu).
 
 ### Phase 20.2: IAM Policy Engine & Security Middleware (Backend)
-- [ ] **Task 20.2.1:** Xây dựng `PermissionCatalog` định nghĩa toàn bộ mã `module:resource:action` của hệ thống.
-- [ ] **Task 20.2.2:** Xây dựng `IamPolicyEvaluator` hỗ trợ so khớp Wildcard (`*`, `sd:*`, `*:view`), kiểm tra `Deny` trước `Allow`, và tính toán `EffectiveDataScope` (`AllowedBranchIds`, `AllowedDepartmentIds`, `OnlyOwnRecords`).
-- [ ] **Task 20.2.3:** Nâng cấp `ICurrentUser`, `CurrentUser` và `AccountValidationMiddleware`:
+- [x] **Task 20.2.1:** Xây dựng `PermissionCatalog` định nghĩa toàn bộ mã `module:resource:action` của hệ thống.
+- [x] **Task 20.2.2:** Xây dựng `IamPolicyEvaluator` hỗ trợ so khớp Wildcard (`*`, `sd:*`, `*:view`), kiểm tra `Deny` trước `Allow`, và tính toán `EffectiveDataScope` (`AllowedBranchIds`, `AllowedDepartmentIds`, `OnlyOwnRecords`).
+- [x] **Task 20.2.3:** Nâng cấp `ICurrentUser`, `CurrentUser` và `AccountValidationMiddleware`:
   - Tính toán và cache quyền hiệu lực theo `UserId + SecurityStamp`.
   - Đồng bộ với Global Query Filters của `ApplicationDbContext`.
-- [ ] **Task 20.2.4:** Tạo `[RequirePermission("...")]` Attribute và cập nhật `BaseCrudController` cùng các Controller nghiệp vụ để kiểm tra đúng quyền từng phân hệ thay vì khóa cứng `Policy = "Admin"`.
+- [x] **Task 20.2.4:** Tạo `[RequirePermission("...")]` Attribute và cập nhật `BaseCrudController` cùng các Controller nghiệp vụ để kiểm tra đúng quyền từng phân hệ thay vì khóa cứng `Policy = "Admin"`.
 
 ### Phase 20.3: API Quản trị Tổ chức, Chức danh & Role Động (Backend)
-- [ ] **Task 20.3.1:** Xây dựng CRUD API cho `DepartmentsController`, `JobPositionsController`, `EmployeesController`.
-- [ ] **Task 20.3.2:** Xây dựng `RolesController` (`/api/v1/sys/roles`) và `/api/v1/sys/permissions/catalog`:
+- [x] **Task 20.3.1:** Xây dựng CRUD API cho `DepartmentsController`, `JobPositionsController`, `EmployeesController`.
+- [x] **Task 20.3.2:** Xây dựng `RolesController` (`/api/v1/sys/roles`) và `/api/v1/sys/permissions/catalog`:
   - Cho phép Công ty tự tạo/sửa Role động của công ty mình.
   - Gán Role vào Chức danh (`JobPosition`) và gán Role/Inline Policy vào `User`.
   - Áp dụng **Privilege Escalation Guard**: Người tạo Role không được cấp những Action hoặc Branch nằm ngoài quyền hạn của chính người đó.
@@ -236,9 +236,24 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 - [ ] **Task 20.4.4:** Cập nhật từ điển song ngữ VI/EN (`system_dictionary.json`) cho toàn bộ nhãn giao diện và thông báo lỗi phân quyền.
 
 ### Phase 20.5: Kiểm thử Tự động (Verification) & Nghiệm thu
-- [ ] **Task 20.5.1:** Bổ sung bộ test tích hợp PostgreSQL vào `tests/ERPm.Verification`:
+- [x] **Task 20.5.1:** Bổ sung bộ test tích hợp PostgreSQL vào `tests/ERPm.Verification`:
   - Test kế thừa quyền tự động từ `JobPosition` xuống `Employee/User`.
   - Test `BRANCH_TREE` (chỉ xem được dữ liệu từ chi nhánh của mình trở xuống) và `CUSTOM_BRANCHES` (`CanViewBranchData`).
   - Test `Explicit Deny` ghi đè `Allow` và chống leo thang đặc quyền giữa các Công ty trong Tập đoàn.
 - [ ] **Task 20.5.2:** Chạy `dotnet build` (0 warning, 0 error), `npm run build` (0 error), ghi log `.ai/steps/step-20-iam-dynamic-role-and-organization.md` và cập nhật `.ai/status.md`.
 
+---
+
+## ⏳ 6. VIỆC CÒN LẠI (cập nhật 2026-10-31)
+
+| Task | Trạng thái | Ghi chú |
+| :--- | :--- | :--- |
+| 20.4.1 `AuthService.can()` + `permissionGuard` | Chưa làm | BE đã có: `/api/v1/auth/me` trả `permissions[]`, `readScope`, `companyId`, `primaryBranchId`, `departmentId`, `jobPositionId`. FE thay kiểm tra `role === 'Admin'` bằng `can(action)`. |
+| 20.4.2 Màn cây tổ chức, chức danh + gán role, nhân viên + cấp tài khoản | Chưa làm | API: `/api/v1/branches` (thêm `orgUnitType`, `taxCode`), `/api/v1/hrm/{departments,job-positions,employees,work-histories}`, `/api/v1/sys/roles/job-positions/{id}`, `/api/v1/auth/users` (role `None` cho tài khoản chỉ dùng role động). |
+| 20.4.3 Role designer (ma trận + JSON editor) | Chưa làm | API: `/api/v1/sys/roles`, `/api/v1/sys/permissions/catalog`, `/api/v1/sys/roles/users/{id}`. Lỗi 403 `error.iam.escalation` / `error.iam.company_scope` cần hiển thị rõ. |
+| 20.4.4 Từ điển VI/EN | Một phần | BE đã thêm `error.iam.*`, `error.hrm.user_linked`; còn nhãn giao diện các màn mới. |
+| 20.5.2 Build & log | Một phần | `dotnet build` 0/0, 75 + 28 check đạt; còn `npm run build` sau khi làm FE. |
+| Gán `DepartmentId` cho chứng từ | Chưa làm | Cột đã có (nullable) và đã dùng trong query filter, nhưng DTO/UI tạo chứng từ chưa nhận giá trị. |
+| Cache quyền đa instance | Để sau | Cache IAM đang in-process; khi chạy nhiều API instance cần chuyển version sang Redis/DB. |
+
+**Chặn:** 20.4 chờ Phúc đẩy FE SD (`52500c5`) và CRM (`9f4a4c6`).

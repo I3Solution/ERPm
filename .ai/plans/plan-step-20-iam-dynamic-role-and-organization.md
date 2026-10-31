@@ -223,6 +223,16 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - Cho phép Công ty tự tạo/sửa Role động của công ty mình.
   - Gán Role vào Chức danh (`JobPosition`) và gán Role/Inline Policy vào `User`.
   - Áp dụng **Privilege Escalation Guard**: Người tạo Role không được cấp những Action hoặc Branch nằm ngoài quyền hạn của chính người đó.
+- [ ] **Task 20.3.3 (bổ sung 2026-10-31):** Sửa / ngừng dùng node cây tổ chức (`/api/v1/branches`). Hiện mới có GET và POST.
+  - `PUT /api/v1/branches/{id}` (`sys:branch:edit`):
+    - sửa `Code`, `Name`, `TaxCode`, `Address`, `Phone`, `Email`, `IsActive`;
+    - đổi `ParentId` được, nhưng có kiểm tra:
+      - không tạo vòng;
+      - Công ty chỉ nằm dưới Tập đoàn, Chi nhánh chỉ nằm dưới Công ty hoặc Chi nhánh;
+      - đổi cha thì tính lại `CompanyId` của cả nhánh con.
+  - **Không đổi `OrgUnitType`** sau khi tạo.
+  - `DELETE /api/v1/branches/{id}` (`sys:branch:delete`): chỉ xóa mềm, và chỉ khi node không còn node con, phòng ban, nhân viên, kho hay chứng từ nào tham chiếu (`error.validation.reference`). Còn dữ liệu thì dùng `IsActive = false`.
+  - Logic nằm trong `BranchService`; đổi cha thì gọi `Invalidate()` của IAM. Thêm 4 check vào `ERPm.Verification`.
 
 ### Phase 20.4: Giao diện Quản trị Tổ chức & Thiết kế Role Động (Frontend)
 - [ ] **Task 20.4.1:** Nâng cấp `AuthService` (`ERPm-FE/src/app/core/services/auth.service.ts`) nhận danh sách quyền hiệu lực và scope từ `/api/v1/auth/me`; cung cấp hàm `can(action)` và `permissionGuard`.
@@ -230,6 +240,20 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - Quản lý Cây Tổ chức (Tập đoàn – Công ty – Chi nhánh – Phòng ban).
   - Quản lý Danh mục Chức danh (`JobPosition`) & Gán Role mặc định cho Chức danh.
   - Quản lý Hồ sơ Nhân viên (`Employee`) & Cấp tài khoản đăng nhập.
+  - **Đã chốt (BA, 2026-10-31):**
+    1. **Một cây chung** Tập đoàn › Công ty › Chi nhánh › Phòng ban.
+       - Phòng ban gốc (không có `ParentId`) treo dưới chi nhánh theo `BranchId`; phòng ban con treo theo `ParentId`.
+       - Mỗi node có biểu tượng riêng theo loại; với phòng ban thì hiện tên cấp (Khối / Phòng / Bộ phận…).
+       - Panel chi tiết bên phải. Tab **Role** chỉ hiện khi chọn phòng ban.
+       - Cây tải theo công ty đang chọn. Không tải cả tập đoàn một lần, trừ super admin.
+    2. Sửa, ngừng, đổi cha của tập đoàn / công ty / chi nhánh: làm **Task 20.3.3** (BE) trước, rồi mới gắn vào cây. Chưa có 20.3.3 thì cây chỉ cho tạo mới các node này.
+    3. Vị trí code:
+       - cây tổ chức, chức danh, nhân viên đặt trong submodule `ERPm-FE-HRM`, dựng `src` theo cấu trúc các module khác, đọc `.ai/plan.md` có sẵn trong repo đó trước;
+       - màn user đặt trong `ERPm-FE/src/app/modules/SYS` (thư mục thường).
+    4. Phạm vi:
+       - cấp phòng ban: chỉ có ô chọn cấp khi tạo / sửa phòng ban (lọc theo công ty). Màn danh mục cấp riêng để sau;
+       - màn QTCT tách thành **Task 20.4.5** (để sau).
+- [ ] **Task 20.4.5 (bổ sung 2026-10-31):** Màn QTCT (`/hrm/work-histories`) trong hồ sơ nhân viên: timeline, thêm điều chuyển / nghỉ việc; và màn danh mục cấp phòng ban (`/hrm/department-levels`).
 - [ ] **Task 20.4.3:** Xây dựng màn hình **Thiết kế Role Động (Dynamic Role & IAM Policy Builder)** hỗ trợ 2 chế độ đồng bộ 2 chiều:
   - **Tab 1 - Ma trận trực quan (Visual Matrix):** Tick chọn quyền `Xem / Thêm / Sửa / Xóa / Duyệt / Hủy` theo từng trang và chọn `DataScope` (`Từ chi nhánh hiện tại trở xuống`, `Chọn chi nhánh cụ thể`, `Phòng ban`, `Toàn công ty`...).
   - **Tab 2 - Trình soạn thảo JSON (AWS IAM JSON Editor):** Chỉnh sửa trực tiếp cấu trúc JSON `Statements` dành cho Admin nâng cao.

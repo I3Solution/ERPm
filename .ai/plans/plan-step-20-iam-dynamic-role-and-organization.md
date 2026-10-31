@@ -223,7 +223,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - Cho phép Công ty tự tạo/sửa Role động của công ty mình.
   - Gán Role vào Chức danh (`JobPosition`) và gán Role/Inline Policy vào `User`.
   - Áp dụng **Privilege Escalation Guard**: Người tạo Role không được cấp những Action hoặc Branch nằm ngoài quyền hạn của chính người đó.
-- [ ] **Task 20.3.3 (bổ sung 2026-10-31):** Sửa / ngừng dùng node cây tổ chức (`/api/v1/branches`). Hiện mới có GET và POST.
+- [x] **Task 20.3.3 (bổ sung 2026-10-31, merge 2026-10-31):** Sửa / ngừng dùng node cây tổ chức (`/api/v1/branches`). Hiện mới có GET và POST.
   - `PUT /api/v1/branches/{id}` (`sys:branch:edit`):
     - sửa `Code`, `Name`, `TaxCode`, `Address`, `Phone`, `Email`, `IsActive`;
     - đổi `ParentId` được, nhưng có kiểm tra:

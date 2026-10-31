@@ -15,16 +15,20 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **Notification Engine (Step 21, nhánh loipham/Notification):** Nền tảng thông báo đa kênh toàn hệ thống (In-App SignalR, Outbox, Email, Smart IAM/Org router, Quiet Hours, Dynamic bilingual templates); tự động kích hoạt sự kiện WMS (tồn tối thiểu), SD (đơn mới, hủy hóa đơn), IAM (thay đổi vai trò); UI Angular 20 Standalone (Chuông, Popover, Toast, Notification Center, Preferences); **93/93 kiểm tra PostgreSQL/API đạt** — [Step 21](steps/step-21-enterprise-notification-engine.md).
 - [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
 - [x] **Sửa lỗi FE module / build (2026-10-31):** Khôi phục `node_modules` bị thiếu/hỏng (`semver/functions/cmp`, `listr2`, `acorn`), sửa type mismatch trong `SD/pos.component.ts` và `sales.service.ts` (`requestId`, `selectedCustomerId`, `warehouseId`). FE build và `npm start` (`ng serve`) chạy bình thường 100% — [Task Bug](tasks/bug-20261031-fe-semver-missing-modules-and-pos-types.md).
+- [x] **CR-20-01 BE (20.6.0–20.6.5) + Task 20.3.3 (sửa/ngừng node cây tổ chức) đã merge master (2026-10-31):** cấp phòng ban + `Path`, role theo phòng ban, bắt buộc gán nhân sự khi tạo user, `PUT`/`DELETE /api/v1/branches`; **118 kiểm tra PostgreSQL/API đạt**, HRM 28 — [plan Phase 20.6](plans/plan-step-20-iam-dynamic-role-and-organization.md).
+- [x] **Step 20.4.1 FE (`AuthService.can()` + `permissionGuard`) đã merge master (2026-10-31):** quyền hiệu lực lấy từ `/auth/me`, 4 nút nghiệp vụ CRM/WMS/SD gắn `can()`; Karma 28/28, kiểm tra tay đạt.
+- [x] **CI GitHub Actions (root `ERPm`) đã chạy được (2026-10-31):** thêm secret `SUBMODULES_TOKEN`, vá từ điển VI/EN lệch BE/FE, bổ sung quy tắc `git config push.recurseSubmodules check` vào `AGENTS.md` (root + `ERPm-FE`) sau 3 lần CI đỏ do quên push commit submodule con.
 
 ## In-Progress
 
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
-- **CR-20-01 BE (20.6.0–20.6.5) chờ review** trên nhánh `thien/step20-s206` (BE `fcd1723`): cấp phòng ban + `Path`, role theo phòng ban, bắt buộc gán nhân sự khi tạo user; **108 kiểm tra đạt** — [plan Phase 20.6](plans/plan-step-20-iam-dynamic-role-and-organization.md).
+- **Step 20.4.2 + 20.6.6 FE (màn tổ chức / chức danh / nhân viên / user) đang làm:** xong (a) service, (b) màn cây tổ chức (đã merge master); còn (c) chức danh + gán role, (d) nhân viên + cấp tài khoản, (e) user — [plan Phase 20.4](plans/plan-step-20-iam-dynamic-role-and-organization.md).
+- CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.
 - FE đã lên Angular 20.3 / Ionic 8.8 (Step 18, `step-18-angular-20-env-config-and-secrets.md`); initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
 
 ## Next Steps
 
-1. **Step 20.4 FE — Phân quyền động:** `AuthService.can()`/`permissionGuard` từ `/auth/me`, màn cây tổ chức, chức danh + gán role, nhân viên, Role designer (ma trận + JSON). Đã gỡ chặn: [bug con trỏ submodule SD/CRM](tasks/bug-20261031-fe-submodule-pointers-unpushed.md) Done (clone sạch `-b master` + `npm run build` đạt). Thay đổi yêu cầu CR-20-01 (role theo phòng ban, gán nhân sự khi tạo user) → Phase 20.6 trong plan. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
+1. **Step 20.4 FE — Phân quyền động:** 20.4.1 xong, 20.4.2+20.6.6 đang làm tiếp (c)(d)(e), rồi 20.4.3 Role designer, 20.4.4 từ điển, 20.4.5 QTCT + danh mục cấp. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
 3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.

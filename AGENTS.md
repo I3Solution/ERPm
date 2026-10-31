@@ -42,6 +42,13 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - `[refactor]`: Tái cấu trúc mã nguồn (gom hàm, tách file) không làm thay đổi nghiệp vụ.
      - `[db]`: Thay đổi riêng về SQL Schema, EF Migration, Index, Seed data.
      - `[docs]`: Cập nhật tài liệu (`PROJECT_MASTER.md`, `AGENTS.md`, `.ai/`).
+   - **Bắt buộc với repo có Submodule (`ERPm-FE` và các `ERPm-FE-<MODULE>`, cả repo gốc `ERPm`):** trước khi push, chạy một lần
+     ```
+     git config push.recurseSubmodules check
+     ```
+     Lệnh này chặn ngay nếu con trỏ submodule trỏ tới một commit mà submodule đó chưa push lên remote của chính nó — đây là lỗi hay gặp nhất khi làm việc nhiều repo (commit con nằm trên máy nhưng quên `git push` trong repo con trước khi push repo cha). Đã từng xảy ra 3 lần trong step 20 (SD/CRM lúc merge, CRM, WMS lúc gán quyền IAM), khiến CI báo `upload-pack: not our ref` / `repository not found` và PR không chạy được kiểm tra tự động.
+     - Thứ tự push đúng: **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
+     - Nghi CI đỏ ngay ở bước tải code (checkout): so trực tiếp con trỏ mà repo cha đang trỏ với các nhánh trên remote của submodule, ví dụ `git ls-remote <remote-submodule> | grep <hash>`; thiếu thì vào đúng submodule đó `git push`.
 
 6. **Quy tắc ghi chép theo loại Task:**
    - Mỗi việc thuộc đúng một loại dưới đây và được ghi ở đúng nơi tương ứng. Viết bằng Tiếng Việt.

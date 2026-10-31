@@ -64,6 +64,51 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Khi xong:** chuyển trạng thái sang `Done`, ghi kết quả kiểm tra và commit liên quan, rồi thêm một dòng vào **Completed** của `.ai/status.md`.
    - Việc nhỏ (sửa chính tả, đổi một nhãn) không cần file task; commit message đúng tag là đủ.
 
+7. **Quy tắc tạo card Trello:**
+   - **Nguồn chuẩn:** đặc tả nằm trong repo (plan của step hoặc file `.ai/tasks/`). Trello chỉ để theo dõi tiến độ. Mỗi card có link tới đúng mục trong plan / file task, không chép lại toàn bộ đặc tả. Không ghi tên khách hàng vào card hay label.
+   - **Cột:**
+
+     | Cột | Ý nghĩa | `Trạng thái` trong repo |
+     | :--- | :--- | :--- |
+     | Backlog | Đã ghi nhận, chưa lên kế hoạch | — |
+     | Todo | Sẵn sàng làm, đủ đặc tả | `Todo` |
+     | Doing | Đang làm (mỗi người tối đa 2 card) | `Doing` |
+     | Blocked | Bị chặn; ghi rõ đang chờ card / người nào | `Blocked` |
+     | Review | Đã push nhánh, chờ review / merge | `Doing` |
+     | Done | Đã merge master và đạt nghiệm thu | `Done` |
+
+   - **Tên card:** `[tag](MODULE) <MÃ> <tiêu đề ngắn>`
+     - `tag` giống commit;
+     - `MÃ` là `S20.6.1` cho task thuộc step, hoặc `BUG-YYYYMMDD` / `DB-…` / `SPIKE-…` / `REF-…` / `CHG-…` cho task lẻ.
+     - Ví dụ: `[db](IAM) S20.6.1 Bảng tbl_SYS_DepartmentRole`.
+   - **Label:**
+     - Loại: `Step` · `change` · `bug` · `refactor` · `db` · `spike` · `review`
+     - Tầng: `BE` · `FE` · `DB` · `Docs`
+     - Module: `IAM` · `HRM` · `SYS` · `SD` · `ACC`…
+     - Ưu tiên: `P1 Lõi` · `P2` · `P3 Mở rộng`
+   - **Mô tả card:**
+     ```
+     Liên quan: <link plan/task trên GitHub> – mục <Task XX>
+     Phụ thuộc: <mã card> | Không
+     Nhánh: <ten>/<step>-<ngan>
+     Việc phải làm: <copy từ plan/task>
+     Nghiệm thu: <copy từ plan/task>
+     Commit: BE xxxxxxx · FE xxxxxxx · root xxxxxxx (điền khi xong)
+     ```
+   - **Checklist bắt buộc mỗi card:**
+     - Clean Architecture; comment trong code bằng tiếng Anh.
+     - Có nhãn và lỗi VI/EN.
+     - Build và test:
+       - BE: `dotnet build` 0 warning / 0 error, `ERPm.Verification` đạt hết;
+       - FE: `npm run build` 0 error.
+     - Commit đúng tag.
+     - Đã tick `- [x]` trong plan (hoặc file task chuyển `Done`) và ghi commit.
+     - Đã cập nhật `.ai/status.md`.
+   - **Chuyển cột:**
+     - Còn phụ thuộc chưa xong thì để **Blocked**.
+     - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
+     - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
+
 ---
 
 ## 📂 THƯ MỤC AI CẦN BIẾT

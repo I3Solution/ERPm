@@ -293,7 +293,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 
 **Backend (không bị chặn, làm được ngay)**
 
-- [ ] **Task 20.6.0 [db] Danh mục cấp phòng ban + `Path`.** Người làm: _(giao)_ · Phụ thuộc: không
+- [x] **Task 20.6.0 [db] Danh mục cấp phòng ban + `Path`.** Người làm: Thiện · BE `fcd1723` (nhánh `thien/step20-s206`, chờ review) · Phụ thuộc: không
   - Entity `Entities/HumanResource/DepartmentLevel.cs` (`tbl_HRM_DepartmentLevel`) và thêm `LevelId` (FK restrict), `Path`, `Depth` vào `Department`.
   - Thêm sẵn các cột móc cho mở rộng, chỉ thêm cột, chưa có logic:
     - `StandardLevelCode` (nullable) trong danh mục cấp, dùng cho M1;
@@ -306,13 +306,13 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
     - gọi `Invalidate()` của IAM khi đổi cha.
   - `GET /api/v1/hrm/departments?levelCode=SECTION` và `?underId={id}` (lọc theo `Path`).
   - **Nghiệm thu:** tạo được Khối → Phòng → Bộ phận → Tổ; tạo Phòng dưới Bộ phận bị chặn; chuyển một Phòng sang Khối khác thì `Path` của các Bộ phận con đổi theo.
-- [ ] **Task 20.6.1 [db] Bảng `tbl_SYS_DepartmentRole`.** Người làm: _(giao)_ · Phụ thuộc: không
+- [x] **Task 20.6.1 [db] Bảng `tbl_SYS_DepartmentRole`.** Người làm: Thiện · BE `fcd1723` (nhánh `thien/step20-s206`, chờ review) · Phụ thuộc: không
   - Entity `Entities/System/DepartmentRole.cs`: `DepartmentId`, `RoleId`, `ApplyToChildren` (bool, mặc định `false`). Dùng dual-key và auditable như `JobPositionRole`.
   - Unique `(department_id, role_id)`; FK tới `tbl_HRM_Department` và `tbl_SYS_Role` (restrict).
   - Migration `AddDepartmentRole` (chỉ thêm), chạy lại `tools/ERPm.Schema` → `database/current_model.sql`.
   - Seed mẫu: 1 role gán cho một phòng ban trong `OrganizationSampleSeeder`.
   - **Nghiệm thu:** `dotnet ef database update` trên DB sạch thành công; `current_model.sql` có bảng mới.
-- [ ] **Task 20.6.2 IAM engine nhận role của phòng ban.** Người làm: _(giao)_ · Phụ thuộc: 20.6.1
+- [x] **Task 20.6.2 IAM engine nhận role của phòng ban.** Người làm: Thiện · BE `fcd1723` (nhánh `thien/step20-s206`, chờ review) · Phụ thuộc: 20.6.1
   - Gom việc lấy role của chức danh và phòng ban vào một hàm nhận **danh sách vị trí** `(DepartmentId, JobPositionId)`; hiện truyền 1 vị trí chính, làm móc cho kiêm nhiệm M3.
   - `IamService`: khi tính quyền hiệu lực, thêm role của `Employee.DepartmentId` và của các phòng ban cha có `ApplyToChildren`.
   - Gọi `Invalidate()` khi:
@@ -320,14 +320,14 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
     - đổi `DepartmentId` của nhân viên (tạo hoặc sửa QTCT);
     - đổi `ParentId` của phòng ban.
   - **Nghiệm thu:** test ở 20.6.5; `/api/v1/auth/me` trả `permissions[]` có quyền lấy từ phòng ban.
-- [ ] **Task 20.6.3 API gán role cho phòng ban.** Người làm: _(giao)_ · Phụ thuộc: 20.6.1
+- [x] **Task 20.6.3 API gán role cho phòng ban.** Người làm: Thiện · BE `fcd1723` (nhánh `thien/step20-s206`, chờ review) · Phụ thuộc: 20.6.1
   - Endpoint:
     - `GET /api/v1/sys/roles/departments/{departmentId}`: quyền `sys:role:view`;
     - `PUT /api/v1/sys/roles/departments/{departmentId}`: quyền `sys:role:edit`, body `[{ roleId, applyToChildren }]`.
   - Áp guard leo thang quyền (`error.iam.escalation`) và giới hạn công ty (`error.iam.company_scope`): phòng ban và role phải cùng công ty với người gán, trừ super admin.
   - Logic nằm trong `RoleService`, controller chỉ gọi service.
   - **Nghiệm thu:** gán được role cho phòng ban cùng công ty; gán sang công ty khác bị 403.
-- [ ] **Task 20.6.4 Gán nhân sự khi tạo / sửa user.** Người làm: _(giao)_ · Phụ thuộc: không
+- [x] **Task 20.6.4 Gán nhân sự khi tạo / sửa user.** Người làm: Thiện · BE `fcd1723` (nhánh `thien/step20-s206`, chờ review) · Phụ thuộc: không
   - Thêm `employeeId?` vào `UserRequest` và `UserAccessRequest`. `AccountDto` trả thêm `employeeId`, `employeeCode`, `employeeName`.
   - Kiểm tra:
     - nhân viên tồn tại và cùng công ty với người tạo;
@@ -337,7 +337,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - `GET /api/v1/hrm/employees?withoutAccount=true` để FE lọc nhân viên chưa có tài khoản.
   - **Đã chốt (Thiện, 2026-10-31): bắt buộc gán nhân sự** khi admin cấp công ty tạo user; chỉ super admin được tạo user không gắn nhân sự (tài khoản hệ thống). Lý do — lỗi đang có: `GET /auth/users` lọc theo nhân viên của công ty. Vì vậy admin công ty tạo user mà chưa gán nhân sự thì sẽ không thấy user vừa tạo. Thiếu `employeeId` thì trả `error.validation.required`.
   - **Nghiệm thu:** tạo user kèm nhân sự thì `/auth/me` trả đúng `employeeId`, `companyId`, `departmentId`.
-- [ ] **Task 20.6.5 Test và từ điển.** Người làm: _(giao)_ · Phụ thuộc: 20.6.0–20.6.4
+- [x] **Task 20.6.5 Test và từ điển.** Người làm: Thiện · BE `fcd1723` (nhánh `thien/step20-s206`, chờ review) · Phụ thuộc: 20.6.0–20.6.4
   - Thêm khoảng 9 check vào `tests/ERPm.Verification`:
     - cấp con phải sâu hơn cấp cha (chặn Phòng dưới Bộ phận);
     - đổi cha thì `Path` của cả nhánh con cập nhật theo;
@@ -388,9 +388,9 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 | 20.4.4 Từ điển VI/EN | Một phần | BE đã thêm `error.iam.*`, `error.hrm.user_linked`; còn nhãn giao diện các màn mới. |
 | 20.5.2 Build & log | Một phần | `dotnet build` 0/0, 75 + 28 check đạt; còn `npm run build` sau khi làm FE. |
 | Gán `DepartmentId` cho chứng từ | Chưa làm | Cột đã có (nullable) và đã dùng trong query filter, nhưng DTO/UI tạo chứng từ chưa nhận giá trị. |
-| CR-20-01: 20.6.0–20.6.5 (BE cấp phòng ban + Path, role theo phòng ban, bắt buộc gán nhân sự khi tạo user) | Chưa làm | Không bị chặn. Chờ Phúc chốt CR-20-01. |
+| CR-20-01: 20.6.0–20.6.5 (BE cấp phòng ban + Path, role theo phòng ban, bắt buộc gán nhân sự khi tạo user) | Chờ review | BE `fcd1723` trên nhánh `thien/step20-s206`; `ERPm.Verification` 108 check, HRM 28. Migration `AddDepartmentLevel`, `AddDepartmentRole`. Cấp phòng ban dùng quyền `hrm:department:*` (create/edit/delete) thay vì chỉ view/edit. |
 | CR-20-01: 20.6.6 (FE tab Role phòng ban, chọn nhân sự cho user) | Chưa làm | Bị chặn cùng 20.4. |
 | Mở rộng M1–M3 (cấp chuẩn tập đoàn, tái cơ cấu theo thời gian, kiêm nhiệm) | Để sau | Xem mục "Mở rộng sau" trong 5b; cột móc làm sẵn ở 20.6.0. |
 | Cache quyền đa instance | Để sau | Cache IAM đang in-process; khi chạy nhiều API instance cần chuyển version sang Redis/DB. |
 
-**Chặn:** 20.4 và 20.6.6 chờ gỡ [bug con trỏ submodule SD/CRM](../tasks/bug-20261031-fe-submodule-pointers-unpushed.md) (FE master trỏ SD `52500c5`, CRM `9f4a4c6` chưa có trên GitHub).
+**Đã gỡ chặn (2026-10-31):** [bug con trỏ submodule SD/CRM](../tasks/bug-20261031-fe-submodule-pointers-unpushed.md) đã xong (Phúc push SD `52500c5`, CRM `9f4a4c6`). 20.4 và 20.6.6 làm được.

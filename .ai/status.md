@@ -18,17 +18,18 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **CR-20-01 BE (20.6.0–20.6.5) + Task 20.3.3 (sửa/ngừng node cây tổ chức) đã merge master (2026-10-31):** cấp phòng ban + `Path`, role theo phòng ban, bắt buộc gán nhân sự khi tạo user, `PUT`/`DELETE /api/v1/branches`; **118 kiểm tra PostgreSQL/API đạt**, HRM 28 — [plan Phase 20.6](plans/plan-step-20-iam-dynamic-role-and-organization.md).
 - [x] **Step 20.4.1 FE (`AuthService.can()` + `permissionGuard`) đã merge master (2026-10-31):** quyền hiệu lực lấy từ `/auth/me`, 4 nút nghiệp vụ CRM/WMS/SD gắn `can()`; Karma 28/28, kiểm tra tay đạt.
 - [x] **CI GitHub Actions (root `ERPm`) đã chạy được (2026-10-31):** thêm secret `SUBMODULES_TOKEN`, vá từ điển VI/EN lệch BE/FE, bổ sung quy tắc `git config push.recurseSubmodules check` vào `AGENTS.md` (root + `ERPm-FE`) sau 3 lần CI đỏ do quên push commit submodule con.
+- [x] **Step 20.4.2 + 20.6.6 FE (màn tổ chức / chức danh + gán role / nhân viên + cấp tài khoản / user) đã merge master (2026-10-31):** đủ 4 nhóm nghiệp vụ ROLE (theo phòng ban và chức danh)/BRANCH (tạo + sửa + xóa)/USER (tạo, bắt buộc gán nhân sự)/HRM (tạo nhân viên); Karma 53/53, `ERPm.Verification` **120/120**, kiểm tay 39/39 — [plan Phase 20.4](plans/plan-step-20-iam-dynamic-role-and-organization.md).
 
 ## In-Progress
 
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
-- **Step 20.4.2 + 20.6.6 FE (màn tổ chức / chức danh / nhân viên / user) đang làm:** xong (a) service, (b) màn cây tổ chức (đã merge master); còn (c) chức danh + gán role, (d) nhân viên + cấp tài khoản, (e) user — [plan Phase 20.4](plans/plan-step-20-iam-dynamic-role-and-organization.md).
+- Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).
 - CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.
 - FE đã lên Angular 20.3 / Ionic 8.8 (Step 18, `step-18-angular-20-env-config-and-secrets.md`); initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
 
 ## Next Steps
 
-1. **Step 20.4 FE — Phân quyền động:** 20.4.1 xong, 20.4.2+20.6.6 đang làm tiếp (c)(d)(e), rồi 20.4.3 Role designer, 20.4.4 từ điển, 20.4.5 QTCT + danh mục cấp. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
+1. **Step 20.4 FE — Phân quyền động:** 20.4.1, 20.4.2, 20.6.6 xong. Còn 20.4.3 Role designer (ma trận + JSON, gán role theo user), 20.4.4 từ điển, 20.4.5 QTCT + danh mục cấp; ngoài ra `DepartmentId` cho chứng từ, mục "Quản trị" trên menu mobile. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
 3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.

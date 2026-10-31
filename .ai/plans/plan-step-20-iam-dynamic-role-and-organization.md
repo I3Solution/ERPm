@@ -402,19 +402,31 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - bỏ qua cấp giữa (chỉ cần cấp con sâu hơn cấp cha);
   - mỗi chi nhánh một cây (`BranchId`).
 
-## ⏳ 6. VIỆC CÒN LẠI (cập nhật 2026-10-31)
+## ⏳ 6. VIỆC CÒN LẠI (cập nhật 2026-10-31 cuối ngày)
 
-| Task | Trạng thái | Ghi chú |
-| :--- | :--- | :--- |
-| 20.4.1 `AuthService.can()` + `permissionGuard` | Chưa làm | BE đã có: `/api/v1/auth/me` trả `permissions[]`, `readScope`, `companyId`, `primaryBranchId`, `departmentId`, `jobPositionId`. FE thay kiểm tra `role === 'Admin'` bằng `can(action)`. |
-| 20.4.2 Màn cây tổ chức, chức danh + gán role, nhân viên + cấp tài khoản | Chưa làm | API: `/api/v1/branches` (thêm `orgUnitType`, `taxCode`), `/api/v1/hrm/{departments,job-positions,employees,work-histories}`, `/api/v1/sys/roles/job-positions/{id}`, `/api/v1/auth/users` (role `None` cho tài khoản chỉ dùng role động). |
-| 20.4.3 Role designer (ma trận + JSON editor) | Chưa làm | API: `/api/v1/sys/roles`, `/api/v1/sys/permissions/catalog`, `/api/v1/sys/roles/users/{id}`. Lỗi 403 `error.iam.escalation` / `error.iam.company_scope` cần hiển thị rõ. |
-| 20.4.4 Từ điển VI/EN | Một phần | BE đã thêm `error.iam.*`, `error.hrm.user_linked`; còn nhãn giao diện các màn mới. |
-| 20.5.2 Build & log | Một phần | `dotnet build` 0/0, 75 + 28 check đạt; còn `npm run build` sau khi làm FE. |
-| Gán `DepartmentId` cho chứng từ | Chưa làm | Cột đã có (nullable) và đã dùng trong query filter, nhưng DTO/UI tạo chứng từ chưa nhận giá trị. |
-| CR-20-01: 20.6.0–20.6.5 (BE cấp phòng ban + Path, role theo phòng ban, bắt buộc gán nhân sự khi tạo user) | Chờ review | BE `fcd1723` trên nhánh `thien/step20-s206`; `ERPm.Verification` 108 check, HRM 28. Migration `AddDepartmentLevel`, `AddDepartmentRole`. Cấp phòng ban dùng quyền `hrm:department:*` (create/edit/delete) thay vì chỉ view/edit. |
-| CR-20-01: 20.6.6 (FE tab Role phòng ban, chọn nhân sự cho user) | Chưa làm | Bị chặn cùng 20.4. |
-| Mở rộng M1–M3 (cấp chuẩn tập đoàn, tái cơ cấu theo thời gian, kiêm nhiệm) | Để sau | Xem mục "Mở rộng sau" trong 5b; cột móc làm sẵn ở 20.6.0. |
-| Cache quyền đa instance | Để sau | Cache IAM đang in-process; khi chạy nhiều API instance cần chuyển version sang Redis/DB. |
+**Đã xong, trên master:** 20.1–20.3, 20.5.1, CR-20-01 (20.6.0–20.6.5), 20.3.3, 20.4.1, 20.4.2, 20.6.6. Cả 4 nhóm nghiệp vụ ROLE (theo phòng ban, chức danh)/BRANCH (tạo, sửa, xóa)/USER (tạo, bắt buộc gán nhân sự)/HRM (tạo nhân viên) đã có màn hình. Build 0/0, `ERPm.Verification` 120, HRM 28, Karma 53, kiểm tay 39+12+12.
 
-**Đã gỡ chặn (2026-10-31):** [bug con trỏ submodule SD/CRM](../tasks/bug-20261031-fe-submodule-pointers-unpushed.md) đã xong (Phúc push SD `52500c5`, CRM `9f4a4c6`). 20.4 và 20.6.6 làm được.
+**Thứ tự ưu tiên làm tiếp (chốt cuối ngày 2026-10-31, bắt đầu từ đây ngày mai):**
+
+| # | Task | Mức | Ghi chú / quyết định nghiệp vụ |
+| :--- | :--- | :--- | :--- |
+| 1 | **[bug] B2** `GET /hrm/department-levels` lộ cấp riêng của công ty khác cho admin công ty | P1, làm trước — rò rỉ dữ liệu, sửa nhanh (~30 phút), cùng kiểu lỗi đã vá cho chức danh ở BE#4 | Lọc theo `CompanyId` null (dùng chung) hoặc trùng công ty người gọi |
+| 2 | **20.4.3** Role designer (ma trận quyền + JSON editor) | P1 | **Đã chốt (BA):** gán role phụ cho user (nhiều role, `PUT /sys/roles/users/{id}`) và inline policy (JSON, nâng cao) làm **trong màn Role designer**, không làm trong hộp thoại tạo/sửa tài khoản (giữ hộp thoại đó đơn giản: chỉ tạo user + chọn nhân sự). Hiển thị rõ lỗi 403 `error.iam.escalation` / `error.iam.company_scope` bằng câu thân thiện, không chỉ in mã lỗi. |
+| 3 | **20.4.5** Màn QTCT (`/hrm/work-histories`) + danh mục cấp phòng ban (`/hrm/department-levels`) | P1 | Hiện sửa nhân viên khóa các trường tổ chức (công ty/chi nhánh/phòng ban/chức danh) vì phải đổi qua QTCT — nghĩa là **chưa có cách điều chuyển nhân viên bằng giao diện** cho tới khi task này xong. Ưu tiên cao vì chặn một thao tác nghiệp vụ thật. |
+| 4 | **20.4.4** Từ điển VI/EN | P2, làm chung PR với #2, #3 | Rà khóa còn thiếu của Role designer và QTCT; nhắc quy tắc sửa cả 2 file cùng PR. |
+| 5 | **[FE] B1** Mục "Quản trị" trên thanh menu dưới (mobile) | P2 | **Đã chốt (BA):** dùng tab **"Thêm"** ở cuối thanh menu dưới (mẫu Ionic phổ biến), mở trang danh sách các màn quản trị — không thêm tab riêng cho từng màn (sẽ quá nhiều tab). |
+| 6 | **[QA] B6** Đưa 39+12+12 kịch bản kiểm tay thành E2E chính thức, chạy trong CI | P2 | **Đã chốt (BA): dùng Playwright**, không dùng Cypress — chạy headless tốt hơn trên `ubuntu-latest`, hỗ trợ đa trình duyệt, API hiện đại, tích hợp GitHub Actions sẵn có dễ hơn. Cần DB tạm giống cách `ERPm.Verification` đang làm. |
+| 7 | **S20-DEP** Gán `DepartmentId` cho chứng từ (đơn bán, hóa đơn, đơn mua, phiếu nhập/xuất) | P2 | Cột và bộ lọc đã có, chỉ thiếu DTO/UI. |
+| 8 | **[bug] B3** Danh sách nhân viên chỉ lọc theo từ khóa và "chưa có tài khoản" | P3 | Công ty lớn cần lọc thêm theo chi nhánh/phòng ban/chức danh ở server. |
+| 9 | **[FE] B5** Cây tổ chức tải tối đa 1000 phòng ban một lần, không phân trang | P3 | Đủ cho giai đoạn đầu; cần ngưỡng cảnh báo hoặc tải theo nhánh khi công ty lớn. |
+| 10 | **[tool] B7** Script nạp dữ liệu demo (`notes/erpm-test-web/seed-testweb.py`, local) | P3 | Cân nhắc đưa vào `tools/` của BE để dùng chung. |
+| 11 | **M1–M3** Cấp chuẩn tập đoàn, tái cơ cấu theo thời gian, kiêm nhiệm | P3 / để sau | Xem mục "Mở rộng sau" trong 5b; cột móc đã làm sẵn ở 20.6.0. |
+
+**Đã xử lý, không cần task:**
+- B4 (kiểm kịch bản đổi cha chi nhánh trên UI) — gộp vào B6 (E2E), không tách task riêng.
+- B8 (bài học push submodule detached HEAD) — đã thêm vào `AGENTS.md` mục 5 (push `HEAD:refs/heads/<nhánh>` rồi so `git ls-remote`).
+- Cache quyền đa instance — để sau, chưa cần vì mới chạy 1 instance API.
+
+**Không phải việc của team (ghi để không quên):**
+- Thêm secret `SUBMODULES_TOKEN` cho repo `ERPm-FE` — Phúc (card Trello CI-TOKEN).
+- Xóa 2 nhánh tạm `thien/step20-fe-auth-crm`/`-wms` (quyền xóa remote bị chặn ở các phiên AI) — Thiện.

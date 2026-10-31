@@ -49,6 +49,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      Lệnh này chặn ngay nếu con trỏ submodule trỏ tới một commit mà submodule đó chưa push lên remote của chính nó — đây là lỗi hay gặp nhất khi làm việc nhiều repo (commit con nằm trên máy nhưng quên `git push` trong repo con trước khi push repo cha). Đã từng xảy ra 3 lần trong step 20 (SD/CRM lúc merge, CRM, WMS lúc gán quyền IAM), khiến CI báo `upload-pack: not our ref` / `repository not found` và PR không chạy được kiểm tra tự động.
      - Thứ tự push đúng: **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
      - Nghi CI đỏ ngay ở bước tải code (checkout): so trực tiếp con trỏ mà repo cha đang trỏ với các nhánh trên remote của submodule, ví dụ `git ls-remote <remote-submodule> | grep <hash>`; thiếu thì vào đúng submodule đó `git push`.
+     - Submodule đang ở trạng thái "detached HEAD" (sau `git submodule update`, sau khi kiểm tay...): `git push origin <nhánh>` **không đẩy gì** và không báo lỗi rõ nếu có cờ `-q`. Đẩy đúng bằng `git push origin HEAD:refs/heads/<nhánh>`, rồi so `git rev-parse HEAD` với `git ls-remote origin refs/heads/<nhánh>` để chắc chắn remote đã nhận đúng commit, trước khi mở PR ở repo cha.
 
 6. **Quy tắc ghi chép theo loại Task:**
    - Mỗi việc thuộc đúng một loại dưới đây và được ghi ở đúng nơi tương ứng. Viết bằng Tiếng Việt.

@@ -235,7 +235,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - Logic nằm trong `BranchService`; đổi cha thì gọi `Invalidate()` của IAM. Thêm 4 check vào `ERPm.Verification`.
 
 ### Phase 20.4: Giao diện Quản trị Tổ chức & Thiết kế Role Động (Frontend)
-- [ ] **Task 20.4.1:** Nâng cấp `AuthService` (`ERPm-FE/src/app/core/services/auth.service.ts`) nhận danh sách quyền hiệu lực và scope từ `/api/v1/auth/me`; cung cấp hàm `can(action)` và `permissionGuard`.
+- [x] **Task 20.4.1:** Nâng cấp `AuthService` (`ERPm-FE/src/app/core/services/auth.service.ts`) nhận danh sách quyền hiệu lực và scope từ `/api/v1/auth/me`; cung cấp hàm `can(action)` và `permissionGuard`. _(Thiện · FE `5a225bd`, nhánh `thien/step20-fe-auth`, chờ review; log: `steps/step-20-fe-auth-permissions.md`)_
 - [ ] **Task 20.4.2:** Xây dựng các màn hình quản trị trong module `HRM` / `SYS` (tuân thủ `FormGroup` + `<app-form-control>` / `<app-input-control>`):
   - Quản lý Cây Tổ chức (Tập đoàn – Công ty – Chi nhánh – Phòng ban).
   - Quản lý Danh mục Chức danh (`JobPosition`) & Gán Role mặc định cho Chức danh.

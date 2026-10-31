@@ -236,7 +236,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 
 ### Phase 20.4: Giao diện Quản trị Tổ chức & Thiết kế Role Động (Frontend)
 - [x] **Task 20.4.1:** Nâng cấp `AuthService` (`ERPm-FE/src/app/core/services/auth.service.ts`) nhận danh sách quyền hiệu lực và scope từ `/api/v1/auth/me`; cung cấp hàm `can(action)` và `permissionGuard`. _(Thiện · FE `5a225bd`, nhánh `thien/step20-fe-auth`, chờ review; log: `steps/step-20-fe-auth-permissions.md`)_
-- [ ] **Task 20.4.2:** Xây dựng các màn hình quản trị trong module `HRM` / `SYS` (tuân thủ `FormGroup` + `<app-form-control>` / `<app-input-control>`):
+- [x] **Task 20.4.2:** Xây dựng các màn hình quản trị trong module `HRM` / `SYS` (tuân thủ `FormGroup` + `<app-form-control>` / `<app-input-control>`): _(Thiện · (a)(b) đã merge; (c)(d)(e) FE `eb856e0`, HRM `e1d9c87`, BE `fdd2e68` nhánh `thien/step20-fe-positions`, chờ review; log: `steps/step-20-fe-org-screens.md`)_
   - Quản lý Cây Tổ chức (Tập đoàn – Công ty – Chi nhánh – Phòng ban).
   - Quản lý Danh mục Chức danh (`JobPosition`) & Gán Role mặc định cho Chức danh.
   - Quản lý Hồ sơ Nhân viên (`Employee`) & Cấp tài khoản đăng nhập.
@@ -377,7 +377,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 
 **Frontend (bị chặn bởi [bug con trỏ submodule SD/CRM](../tasks/bug-20261031-fe-submodule-pointers-unpushed.md))**
 
-- [ ] **Task 20.6.6 Bổ sung vào màn 20.4.2.** Người làm: _(giao)_ · Phụ thuộc: 20.4.1, 20.6.3, 20.6.4
+- [x] **Task 20.6.6 Bổ sung vào màn 20.4.2.** Người làm: Thiện (phiên thực thi) · FE `eb856e0`, HRM `e1d9c87`, chờ review · Phụ thuộc: 20.4.1, 20.6.3, 20.6.4
   - Màn cây tổ chức: chọn node phòng ban thì có tab **Role** (danh sách role, ô "áp dụng cho phòng ban con").
   - Màn user: ô chọn **Nhân sự** (lọc `withoutAccount=true`), hiện mã và tên nhân viên trên lưới.
   - Màn nhân viên: nút **Cấp tài khoản**, mở form user với nhân sự đã chọn sẵn.

@@ -19,11 +19,12 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 ## In-Progress
 
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
+- **CR-20-01 BE (20.6.0–20.6.5) chờ review** trên nhánh `thien/step20-s206` (BE `fcd1723`): cấp phòng ban + `Path`, role theo phòng ban, bắt buộc gán nhân sự khi tạo user; **108 kiểm tra đạt** — [plan Phase 20.6](plans/plan-step-20-iam-dynamic-role-and-organization.md).
 - FE đã lên Angular 20.3 / Ionic 8.8 (Step 18, `step-18-angular-20-env-config-and-secrets.md`); initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
 
 ## Next Steps
 
-1. **Step 20.4 FE — Phân quyền động:** `AuthService.can()`/`permissionGuard` từ `/auth/me`, màn cây tổ chức, chức danh + gán role, nhân viên, Role designer (ma trận + JSON). Bị chặn bởi [bug con trỏ submodule SD/CRM](tasks/bug-20261031-fe-submodule-pointers-unpushed.md). Thay đổi yêu cầu CR-20-01 (role theo phòng ban, gán nhân sự khi tạo user) → Phase 20.6 trong plan. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
+1. **Step 20.4 FE — Phân quyền động:** `AuthService.can()`/`permissionGuard` từ `/auth/me`, màn cây tổ chức, chức danh + gán role, nhân viên, Role designer (ma trận + JSON). Đã gỡ chặn: [bug con trỏ submodule SD/CRM](tasks/bug-20261031-fe-submodule-pointers-unpushed.md) Done (clone sạch `-b master` + `npm run build` đạt). Thay đổi yêu cầu CR-20-01 (role theo phòng ban, gán nhân sự khi tạo user) → Phase 20.6 trong plan. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
 3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.

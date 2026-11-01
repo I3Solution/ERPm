@@ -89,112 +89,429 @@
 
 ---
 
-## 📡 3. BẢNG API CONTRACTS (CONTRACT-FIRST SPECIFICATIONS)
+## 📡 3. BẢNG API CONTRACTS CHUẨN HÓA (CONTRACT-FIRST SPECIFICATIONS)
 
-> **Ghi chú cho Lợi (FE):** Dùng trực tiếp Request/Response DTO dưới đây để tạo TypeScript Interfaces và Mock Services.  
-> **Ghi chú cho Thiện (BE):** Triển khai Controller, DTO và Validation theo đúng định dạng cam kết dưới đây.
+> **CHỐT KIẾN TRÚC & HỢP ĐỒNG (ARCHITECT SIGN-OFF):**  
+> Bản hợp đồng dưới đây là **Cam kết bất biến (Immutable Contract)** giữa Backend và Frontend cho toàn bộ Step 22.  
+> - **Lợi (FE):** Dùng trực tiếp các TypeScript Interface và DTO mẫu dưới đây để tạo `sd.models.ts` và `sd-mock.service.ts`. Dựng xong 100% UI mà không cần chờ Backend.  
+> - **Thiện (BE):** Triển khai Controller, DTO, FluentValidation và Service logic trả về cấu trúc JSON đúng 100% như cam kết.
 
-### 3.1. Phân hệ Bảng giá (Price Lists)
-| Endpoint | Method | Quyền (Permission) | Mô tả |
-| :--- | :--- | :--- | :--- |
-| `/api/v1/sales/price-lists` | `GET` | `sd:pricelist:view` | Danh sách bảng giá (lọc chi nhánh, hiệu lực) |
-| `/api/v1/sales/price-lists/{id}` | `GET` | `sd:pricelist:view` | Chi tiết bảng giá kèm danh sách mặt hàng |
-| `/api/v1/sales/price-lists` | `POST` | `sd:pricelist:create` | Tạo bảng giá mới |
-| `/api/v1/sales/price-lists/{id}` | `PUT` | `sd:pricelist:edit` | Cập nhật bảng giá |
-| `/api/v1/sales/price-lists/{id}/items` | `POST` | `sd:pricelist:edit` | Cập nhật hàng loạt danh mục giá sản phẩm |
+---
 
-**Request DTO Mẫu (`CreatePriceListRequest`):**
-```json
-{
-  "code": "PL-WHOLESALE-2026",
-  "name": "Bảng giá bán buôn Đại lý Cấp 1",
-  "currency": "VND",
-  "effectiveFrom": "2026-01-01T00:00:00Z",
-  "effectiveTo": "2026-12-31T23:59:59Z",
-  "branchId": null,
-  "isActive": true,
-  "items": [
-    {
-      "itemId": 105,
-      "unitPrice": 185000.0000,
-      "minQuantity": 10.0000,
-      "discountPercent": 5.0000
-    }
-  ]
+### 3.0. Quy chuẩn chung (Global Contract Standards)
+
+1. **ApiResponse Wrapper:**
+```typescript
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  errorCode?: string;
 }
 ```
 
-### 3.2. Phân hệ Báo giá (Sales Quotations)
+2. **Phân trang chuẩn (Pagination):**
+```typescript
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  pageIndex: number;
+  pageSize: number;
+  totalPages: number;
+}
+```
+
+3. **Kiểu dữ liệu & Quy ước:**
+   - Số tiền và số lượng: Bắt buộc `decimal(18, 4)` (TypeScript biểu diễn bằng `number`).
+   - Thời gian: Bắt buộc định dạng ISO 8601 UTC `YYYY-MM-DDTHH:mm:ssZ`.
+   - Khóa ID: `id` (int nội bộ dùng cho quan hệ FK/database), `externalId` (UUIDv7 string dùng cho tích hợp ngoài).
+
+---
+
+### 3.1. Phân hệ Bảng giá & Tính giá (Price Lists & Pricing Engine)
+
+#### 3.1.1. Bảng Endpoints
 | Endpoint | Method | Quyền | Mô tả |
 | :--- | :--- | :--- | :--- |
-| `/api/v1/sales/quotations` | `GET` | `sd:quotation:view` | Danh sách báo giá (hỗ trợ DataScope) |
+| `/api/v1/sales/price-lists` | `GET` | `sd:pricelist:view` | Lấy danh sách bảng giá phân trang |
+| `/api/v1/sales/price-lists/{id}` | `GET` | `sd:pricelist:view` | Lấy chi tiết bảng giá kèm danh mục mặt hàng |
+| `/api/v1/sales/price-lists` | `POST` | `sd:pricelist:create` | Tạo bảng giá mới |
+| `/api/v1/sales/price-lists/{id}` | `PUT` | `sd:pricelist:edit` | Cập nhật thông tin bảng giá |
+| `/api/v1/sales/price-lists/{id}` | `DELETE` | `sd:pricelist:delete` | Xóa bảng giá (chỉ khi chưa phát sinh đơn bán) |
+| `/api/v1/sales/price-lists/calculate-price` | `POST` | `sd:order:view` | **Tính giá tự động** tối ưu theo Khách hàng + Số lượng |
+
+#### 3.1.2. TypeScript Interfaces & DTO Mẫu
+```typescript
+export interface PriceListItemDto {
+  id?: number;
+  itemId: number;
+  itemCode: string;
+  itemName: string;
+  unitName?: string;
+  unitPrice: number;            // decimal(18, 4)
+  minQuantity: number;          // decimal(18, 4) - bậc thang số lượng
+  discountPercent: number;      // decimal(18, 4)
+}
+
+export interface PriceListDetailDto {
+  id: number;
+  externalId: string;
+  code: string;
+  name: string;
+  currency: string;
+  effectiveFrom: string;        // ISO UTC
+  effectiveTo?: string;         // ISO UTC
+  branchId?: number;
+  branchName?: string;
+  isActive: boolean;
+  notes?: string;
+  items: PriceListItemDto[];
+}
+
+export interface CreatePriceListRequest {
+  code: string;
+  name: string;
+  currency: string;
+  effectiveFrom: string;
+  effectiveTo?: string;
+  branchId?: number;
+  isActive: boolean;
+  notes?: string;
+  items: {
+    itemId: number;
+    unitPrice: number;
+    minQuantity: number;
+    discountPercent: number;
+  }[];
+}
+
+// API Tính giá tự động
+export interface CalculatePriceRequest {
+  customerId?: number;
+  branchId: number;
+  items: {
+    itemId: number;
+    quantity: number;
+  }[];
+}
+
+export interface CalculatePriceResponse {
+  items: {
+    itemId: number;
+    appliedPriceListId?: number;
+    appliedPriceListName?: string;
+    originalPrice: number;
+    unitPrice: number;          // Giá sau bảng giá/bậc thang
+    discountPercent: number;
+    discountAmount: number;
+    lineTotal: number;
+  }[];
+}
+```
+
+---
+
+### 3.2. Phân hệ Báo giá Khách hàng (Sales Quotations)
+
+#### 3.2.1. Bảng Endpoints
+| Endpoint | Method | Quyền | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `/api/v1/sales/quotations` | `GET` | `sd:quotation:view` | Danh sách báo giá (lọc trạng thái, nhân viên, ngày) |
 | `/api/v1/sales/quotations/{id}` | `GET` | `sd:quotation:view` | Chi tiết báo giá |
 | `/api/v1/sales/quotations` | `POST` | `sd:quotation:create` | Lập báo giá mới |
-| `/api/v1/sales/quotations/{id}/send-email` | `POST` | `sd:quotation:edit` | Gửi email báo giá cho khách (tích hợp Step 21) |
-| `/api/v1/sales/quotations/{id}/convert-to-order` | `POST` | `sd:order:create` | Chuyển báo giá thành Đơn bán hàng |
+| `/api/v1/sales/quotations/{id}` | `PUT` | `sd:quotation:edit` | Sửa báo giá (chỉ khi Draft hoặc Sent) |
+| `/api/v1/sales/quotations/{id}/send-email` | `POST` | `sd:quotation:edit` | Gửi email báo giá (tích hợp Step 21 Outbox) |
+| `/api/v1/sales/quotations/{id}/convert-to-order` | `POST` | `sd:order:create` | **1-Click** chuyển đổi Báo giá thành Đơn bán hàng |
 
-**Response DTO Mẫu (`SalesQuotationDto`):**
-```json
-{
-  "id": 12,
-  "externalId": "018f3a5b-9c2d-7841-a123-456789abcdef",
-  "quotationNumber": "BG-2026-0012",
-  "quotationDate": "2026-11-01T08:00:00Z",
-  "validUntil": "2026-11-15T23:59:59Z",
-  "customerId": 88,
-  "customerName": "Công ty TNHH Hoàng Long",
-  "salespersonId": 14,
-  "salespersonName": "Nguyễn Văn Kinh Doanh",
-  "branchId": 2,
-  "departmentId": 5,
-  "status": "Sent",
-  "subTotal": 50000000.0000,
-  "discountAmount": 2500000.0000,
-  "taxAmount": 4750000.0000,
-  "totalAmount": 52250000.0000,
-  "items": [
-    {
-      "id": 1,
-      "itemId": 105,
-      "itemCode": "ITM00105",
-      "itemName": "Màn hình Dell UltraSharp 27 inch",
-      "unitName": "Cái",
-      "quantity": 5.0000,
-      "unitPrice": 10000000.0000,
-      "discountAmount": 500000.0000,
-      "lineTotal": 49500000.0000
-    }
-  ]
+#### 3.2.2. TypeScript Interfaces & DTO Mẫu
+```typescript
+export type QuotationStatus = 'Draft' | 'Sent' | 'Accepted' | 'Rejected' | 'Converted' | 'Expired';
+
+export interface SalesQuotationItemDto {
+  id?: number;
+  itemId: number;
+  itemCode: string;
+  itemName: string;
+  unitName?: string;
+  quantity: number;
+  unitPrice: number;
+  discountAmount: number;
+  lineTotal: number;
+  notes?: string;
+}
+
+export interface SalesQuotationDetailDto {
+  id: number;
+  externalId: string;
+  quotationNumber: string;      // BG-YYYYMM-XXXX
+  quotationDate: string;
+  validUntil: string;
+  customerId: number;
+  customerName: string;
+  customerPhone?: string;
+  customerEmail?: string;
+  salespersonId?: number;
+  salespersonName?: string;
+  branchId: number;
+  branchName: string;
+  departmentId?: number;
+  status: QuotationStatus;
+  subTotal: number;
+  discountAmount: number;
+  taxAmount: number;
+  totalAmount: number;
+  termsAndConditions?: string;  // Điều khoản thương mại
+  convertedSalesOrderId?: number;
+  items: SalesQuotationItemDto[];
+}
+
+export interface CreateSalesQuotationRequest {
+  quotationDate: string;
+  validUntil: string;
+  customerId: number;
+  branchId: number;
+  departmentId?: number;
+  salespersonId?: number;
+  priceListId?: number;
+  termsAndConditions?: string;
+  items: {
+    itemId: number;
+    quantity: number;
+    unitPrice: number;
+    discountAmount: number;
+    notes?: string;
+  }[];
 }
 ```
 
-### 3.3. Phân hệ Đơn bán hàng (Sales Orders)
+---
+
+### 3.3. Phân hệ Đơn đặt hàng B2B (Sales Orders)
+
+#### 3.3.1. Bảng Endpoints
 | Endpoint | Method | Quyền | Mô tả |
 | :--- | :--- | :--- | :--- |
-| `/api/v1/sales/orders` | `GET` | `sd:order:view` | Danh sách đơn hàng (Filter status, branch, date, staff) |
+| `/api/v1/sales/orders` | `GET` | `sd:order:view` | Danh sách đơn hàng (hỗ trợ DataScope SELF/DEPT/BRANCH) |
 | `/api/v1/sales/orders/{id}` | `GET` | `sd:order:view` | Chi tiết đơn hàng |
-| `/api/v1/sales/orders` | `POST` | `sd:order:create` | Tạo đơn hàng mới |
+| `/api/v1/sales/orders` | `POST` | `sd:order:create` | Tạo đơn bán hàng mới |
 | `/api/v1/sales/orders/{id}` | `PUT` | `sd:order:edit` | Sửa đơn hàng (khi ở trạng thái Draft) |
-| `/api/v1/sales/orders/{id}/confirm` | `POST` | `sd:order:confirm` | Xác nhận đơn hàng & giữ chỗ kho |
-| `/api/v1/sales/orders/{id}/approve-credit` | `POST` | `sd:order:approve_credit` | Duyệt vượt hạn mức nợ (Trưởng phòng/Kế toán) |
-| `/api/v1/sales/orders/{id}/cancel` | `POST` | `sd:order:cancel` | Hủy đơn hàng & nhả tồn kho giữ chỗ |
-| `/api/v1/sales/orders/{id}/create-invoice` | `POST` | `sd:invoice:create` | Xuất hóa đơn / phiếu giao hàng từ đơn bán |
+| `/api/v1/sales/orders/{id}/confirm` | `POST` | `sd:order:confirm` | **Xác nhận đơn**: Kích hoạt Giữ chỗ kho + Kiểm tra nợ |
+| `/api/v1/sales/orders/{id}/approve-credit` | `POST` | `sd:order:approve_credit` | **Duyệt vượt hạn mức nợ** (Trưởng phòng/Kế toán) |
+| `/api/v1/sales/orders/{id}/cancel` | `POST` | `sd:order:cancel` | Hủy đơn và **nhả tồn kho giữ chỗ** |
+| `/api/v1/sales/orders/{id}/create-invoice` | `POST` | `sd:invoice:create` | Sinh Hóa đơn xuất kho từ Đơn bán |
 
-**Mã lỗi nghiệp vụ (Error Codes) bắt buộc:**
-- `error.sd.quotation_expired`: Báo giá đã hết hạn hiệu lực.
-- `error.sd.quotation_already_converted`: Báo giá này đã được chuyển thành đơn bán hàng trước đó.
-- `error.sd.credit_limit_exceeded`: Khách hàng vượt quá hạn mức công nợ cho phép.
-- `error.sd.insufficient_available_stock`: Không đủ tồn kho khả dụng để giữ chỗ.
-- `error.sd.order_invalid_status_for_action`: Trạng thái đơn không hợp lệ để thực hiện thao tác.
-- `error.sd.cannot_cancel_invoiced_order`: Không thể hủy đơn hàng đã xuất hóa đơn giao hàng.
+#### 3.3.2. TypeScript Interfaces & DTO Mẫu
+```typescript
+export type SalesOrderStatus = 'Draft' | 'PendingApproval' | 'Confirmed' | 'Processing' | 'Completed' | 'Cancelled';
+export type CreditCheckStatus = 'Passed' | 'Warning' | 'PendingApproval' | 'Overridden';
+export type ReservationStatus = 'None' | 'Reserved' | 'Released';
+
+export interface SalesOrderItemDto {
+  id?: number;
+  itemId: number;
+  itemCode: string;
+  itemName: string;
+  unitName?: string;
+  quantity: number;
+  unitPrice: number;
+  discountAmount: number;
+  lineTotal: number;
+  invoicedQuantity: number;     // Số lượng đã xuất hóa đơn
+}
+
+export interface SalesOrderDetailDto {
+  id: number;
+  externalId: string;
+  orderNumber: string;          // SO-YYYYMM-XXXX
+  orderDate: string;
+  expectedDeliveryDate?: string;
+  quotationId?: number;
+  quotationNumber?: string;
+  customerId: number;
+  customerName: string;
+  deliveryAddress?: string;
+  salespersonId?: number;
+  salespersonName?: string;
+  branchId: number;
+  branchName: string;
+  departmentId?: number;
+  status: SalesOrderStatus;
+  creditCheckStatus: CreditCheckStatus;
+  reservationStatus: ReservationStatus;
+  subTotal: number;
+  discountAmount: number;
+  taxAmount: number;
+  totalAmount: number;
+  paidAmount: number;
+  notes?: string;
+  items: SalesOrderItemDto[];
+}
+
+export interface CreateSalesOrderRequest {
+  orderDate: string;
+  expectedDeliveryDate?: string;
+  quotationId?: number;
+  customerId: number;
+  deliveryAddress?: string;
+  branchId: number;
+  departmentId?: number;
+  salespersonId?: number;
+  notes?: string;
+  items: {
+    itemId: number;
+    quantity: number;
+    unitPrice: number;
+    discountAmount: number;
+  }[];
+}
+
+export interface ApproveCreditRequest {
+  reason: string;
+}
+
+export interface CancelOrderRequest {
+  reason: string;
+}
+
+export interface CreateInvoiceFromOrderRequest {
+  warehouseId: number;
+  paymentMethod: number;        // 1=Cash, 2=BankTransfer, 3=Debt
+  tenderedAmount: number;
+  notes?: string;
+}
+```
+
+---
+
+### 3.4. Phân hệ Trả hàng bán (Sales Returns & Credit Memos)
+
+#### 3.4.1. Bảng Endpoints
+| Endpoint | Method | Quyền | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `/api/v1/sales/returns` | `GET` | `sd:return:view` | Danh sách phiếu trả hàng |
+| `/api/v1/sales/returns/{id}` | `GET` | `sd:return:view` | Chi tiết phiếu trả hàng |
+| `/api/v1/sales/returns` | `POST` | `sd:return:create` | Lập phiếu trả hàng: Tự động nhập kho + Bút toán đảo |
+
+#### 3.4.2. TypeScript Interfaces & DTO Mẫu
+```typescript
+export interface SalesReturnItemDto {
+  id?: number;
+  invoiceItemId?: number;
+  itemId: number;
+  itemCode: string;
+  itemName: string;
+  unitName?: string;
+  returnQuantity: number;
+  unitPrice: number;
+  refundAmount: number;
+  reason?: string;
+}
+
+export interface SalesReturnDetailDto {
+  id: number;
+  externalId: string;
+  returnNumber: string;         // SR-YYYYMM-XXXX
+  returnDate: string;
+  invoiceId?: number;
+  invoiceNumber?: string;
+  customerId: number;
+  customerName: string;
+  branchId: number;
+  warehouseId: number;
+  totalRefundAmount: number;
+  refundMethod: number;         // 1=Cash, 2=BankTransfer, 3=ReduceDebt
+  status: string;               // Posted
+  stockReceiptId?: number;      // Phiếu nhập kho hoàn hàng
+  journalEntryId?: number;      // Bút toán đảo nợ 521/131/156/632
+  notes?: string;
+  items: SalesReturnItemDto[];
+}
+
+export interface CreateSalesReturnRequest {
+  invoiceId?: number;
+  customerId: number;
+  branchId: number;
+  warehouseId: number;
+  refundMethod: number;
+  reason: string;
+  items: {
+    invoiceItemId?: number;
+    itemId: number;
+    quantity: number;
+    unitPrice: number;
+    reason?: string;
+  }[];
+}
+```
+
+---
+
+### 3.5. Phân hệ Báo cáo & KPI Bán hàng (Sales Analytics)
+
+#### 3.5.1. Bảng Endpoints
+| Endpoint | Method | Quyền | Mô tả |
+| :--- | :--- | :--- | :--- |
+| `/api/v1/sales/analytics/summary` | `GET` | `sd:report:view` | Tổng quan doanh số, lợi nhuận gộp, số đơn |
+| `/api/v1/sales/analytics/salesperson-kpi` | `GET` | `sd:report:view` | Hiệu suất kinh doanh theo từng nhân sự |
+| `/api/v1/sales/analytics/funnel` | `GET` | `sd:report:view` | Phễu bán hàng (Báo giá -> Đơn bán -> Hóa đơn) |
+
+#### 3.5.2. TypeScript Interfaces & DTO Mẫu
+```typescript
+export interface SalesSummaryDto {
+  totalRevenue: number;         // Tổng doanh số
+  totalCost: number;            // Tổng giá vốn
+  grossProfit: number;          // Lợi nhuận gộp
+  grossMarginPercent: number;   // Tỷ suất LN gộp (%)
+  totalOrders: number;          // Số lượng đơn hàng
+  completedOrders: number;
+  cancelledOrders: number;
+}
+
+export interface SalespersonKpiDto {
+  salespersonId: number;
+  salespersonName: string;
+  departmentName?: string;
+  totalOrders: number;
+  totalRevenue: number;
+  targetRevenue?: number;
+  completionRatePercent?: number;
+}
+
+export interface SalesFunnelDto {
+  quotationCount: number;
+  quotationTotalAmount: number;
+  orderCount: number;
+  orderTotalAmount: number;
+  invoiceCount: number;
+  invoiceTotalAmount: number;
+  conversionRatePercent: number; // Tỷ lệ chuyển đổi BG -> SO
+}
+```
+
+---
+
+### 3.6. Danh mục Mã lỗi chuẩn (Error Codes Specification)
+
+| Mã lỗi (Error Code) | Thông điệp Tiếng Việt (Default VI) | Thông điệp Tiếng Anh (Default EN) |
+| :--- | :--- | :--- |
+| `error.sd.quotation_expired` | Báo giá đã quá hạn hiệu lực, không thể chuyển thành đơn bán. | Quotation has expired and cannot be converted. |
+| `error.sd.quotation_already_converted` | Báo giá này đã được chuyển thành đơn bán hàng trước đó. | This quotation has already been converted to an order. |
+| `error.sd.credit_limit_exceeded` | Khách hàng vượt quá hạn mức công nợ cho phép. Cần phê duyệt. | Customer credit limit exceeded. Approval required. |
+| `error.sd.insufficient_available_stock` | Tồn kho khả dụng không đủ để giữ chỗ cho đơn hàng. | Insufficient available stock for reservation. |
+| `error.sd.order_invalid_status_for_action` | Trạng thái đơn hàng không hợp lệ với thao tác yêu cầu. | Invalid order status for the requested action. |
+| `error.sd.cannot_cancel_invoiced_order` | Không thể hủy đơn hàng đã xuất hóa đơn giao hàng. | Cannot cancel an order that has already been invoiced. |
+| `error.sd.return_quantity_exceeds_invoiced` | Số lượng trả lại vượt quá số lượng đã mua trên hóa đơn. | Return quantity exceeds invoiced quantity. |
+| `error.sd.pricelist_duplicate_code` | Mã bảng giá đã tồn tại trong hệ thống. | Price list code already exists. |
+
+---
 
 ---
 
 ## 👥 4. PHÂN CÔNG NHIỆM VỤ RACI & CONTRACT-FIRST
 
 ### 4.1. Phúc (Tech Lead / Architect):
-- [ ] Chốt toàn bộ kiến trúc, API Contract và tài liệu Step 22.
-- [ ] Khởi tạo danh sách Card Trello cho Phase 22.1 -> 22.5, phân công rõ ràng cho Thiện và Lợi.
+- [x] **Task S22.0.1 Chốt toàn bộ kiến trúc, API Contract và tài liệu Step 22.** (Hoàn thành 2026-11-01).
+- [x] **Khởi tạo danh sách 11 Card Trello cho Phase 22.1 -> 22.5, phân công rõ ràng cho Thiện và Lợi kèm Checklist.** (Hoàn thành 2026-11-01).
 - [ ] Review PR của Thiện (BE) và Lợi (FE).
 - [ ] Chịu trách nhiệm merge vào nhánh `master` sau khi toàn bộ verify pass.
 
@@ -254,3 +571,4 @@ Tuần 3: Phase 22.4 (Trả hàng bán) & Phase 22.5 (Báo cáo & Tích hợp ho
 3. **IAM & Bảo mật:**
    - Phân quyền chặt chẽ với các permission mới (`sd:pricelist:*`, `sd:quotation:*`, `sd:order:*`, `sd:order:approve_credit`, `sd:return:*`).
    - Tôn trọng triệt để `DataScope` của nhân viên bán hàng (chỉ thấy đơn của mình nếu gán scope `SELF`).
+

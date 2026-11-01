@@ -118,11 +118,25 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
      - **Bắt buộc (Lợi, 2026-11-01): mỗi lần chuyển cột (trạng thái) của card phải comment kèm SHA commit liên quan** (BE/FE/root, commit nào có thì ghi commit đó — không có commit thật thì ghi lý do, ví dụ "chờ review"). Không chuyển cột mà không có comment SHA, để ai xem card cũng tra được đúng mã nguồn ứng với trạng thái đó.
 
-8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Contract-First Development:**
+8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Chế độ Tự kiểm tra Tự merge PR (Autonomous Merge):**
    - **Phân vai trách nhiệm (RACI):**
-     - **Phúc (Tech Lead / Architect / Reviewer):** Lập Kế hoạch Step tổng (`.ai/plans/plan-step-XX.md`), chốt **API Contract** trước khi bắt đầu code, tạo và gán card Trello cho Thiện và Lợi, review Pull Request (PR) và là người duy nhất merge vào nhánh `master`.
-     - **Thiện (Developer):** Thực thi các task Backend (hoặc Module phụ trách) bám sát đúng API Contract, viết unit/verification tests đạt 100%.
-     - **Lợi (Developer):** Thực thi các task Frontend (hoặc Module phụ trách), sử dụng Mock Data bám sát API Contract để dựng UI/Form/Signals hoàn chỉnh độc lập mà không cần chờ BE.
+     - **Phúc (Tech Lead / Architect):** Lập Kế hoạch Step tổng (.ai/plans/plan-step-XX.md), chốt **API Contract** trước khi bắt đầu code, tạo và phân công card Trello cho các thành viên, rà soát kiến trúc định kỳ (Periodic Architectural Review) và hỗ trợ giải quyết các bài toán kỹ thuật/xung đột phức tạp khi thành viên yêu cầu.
+     - **Thiện (Developer):** Thực thi các task Backend (hoặc Module phụ trách) bám sát đúng API Contract, tự kiểm tra đạt 100% verification tests, tự merge PR của mình vào master và báo cáo commit cho Phúc.
+     - **Lợi (Developer):** Thực thi các task Frontend (hoặc Module phụ trách), sử dụng Mock Data bám sát API Contract để dựng UI/Form/Signals hoàn chỉnh độc lập, tự kiểm tra build & giao diện, tự merge PR của mình vào master và báo cáo commit cho Phúc.
+   - **Chế độ Tự kiểm tra & Tự merge PR (Self-Verification & Autonomous Merge Policy - Áp dụng chính thức từ 2026-11-01):**
+     - **Toàn quyền tự chủ (Autonomous Merge):** Các thành viên (Thiện, Lợi, Phúc) được toàn quyền **tự xem lại kết quả, tự kiểm tra nghiệm thu và tự merge PR của chính mình vào nhánh master** trên cả repo con (ERPm-BE, ERPm-FE, các submodule) và repo cha (ERPm), **không cần chờ Phúc review từng PR** nhằm tối đa hóa tốc độ phát triển độc lập.
+     - **Kỷ luật Tự kiểm tra bắt buộc trước khi Merge (Self-Verification Mandatory Checklist):**
+       1. **BE:** `dotnet build` đạt 0 warning / 0 error; `ERPm.Verification` (và test domain như `ERPm.Hrm.Verification`) đạt 100%.
+       2. **FE:** `npm run build` đạt 0 error; Karma unit tests đạt 100% (nếu có).
+       3. **UI / Nghiệp vụ:** Tự chạy thử trên trình duyệt local, thao tác các tính năng vừa code, đảm bảo không vỡ layout responsive (Desktop & Mobile) và không có lỗi console.
+       4. **Submodule pointer:** Tuân thủ tuyệt đối quy tắc `git config push.recurseSubmodules check` — **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
+       5. **Code comments:** 100% comment trong source code bằng Tiếng Anh.
+       6. **Đa ngôn ngữ (i18n):** Đồng bộ đầy đủ từ điển VI/EN ở cả `system_dictionary.json` và `system.json`.
+     - **Kỷ luật Truy vết & Báo cáo sau khi Merge (Post-Merge Accountability):**
+       1. **Trello:** Chuyển card sang cột **Done**, bắt buộc comment kèm SHA commit liên quan (BE / FE / root).
+       2. **Plan Step:** Tick `- [x]` trong plan của Step (`.ai/plans/plan-step-XX.md`) kèm mã SHA commit.
+       3. **Status:** Cập nhật 1 dòng vào mục `Completed` trong `.ai/status.md`.
+       4. **Thông báo Lead:** Báo Phúc commit/PR cuối vừa merge để Phúc nắm tiến độ tổng thể dự án.
    - **Nguyên tắc "Contract-First" để làm việc độc lập:**
      - Mọi tính năng kết nối FE-BE **bắt buộc phải có bảng API Contract** trong file plan của Step trước khi bắt đầu code (gồm Endpoint URL, Method, Request DTO mẫu, Response DTO mẫu và mã Error codes).
      - **FE (Lợi):** Dựa vào Contract để tạo ngay TypeScript Interface, viết Mock Service trả về Observable/Signal data mẫu. Dựng xong toàn bộ UI, form validation, adaptive responsive độc lập.
@@ -134,7 +148,6 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Quy tắc Đặt tên Nhánh & Submodules:**
      - Đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loi/s20-fe-roles`).
      - Tuân thủ nghiêm ngặt quy tắc push Submodule con trước khi push repo cha (`git config push.recurseSubmodules check`).
-   - **Ghi chú (Thiện ↔ Phúc đã trao đổi riêng, 2026-11-01):** với các step/module do Thiện phụ trách (hiện là IAM/HRM, step 20), Thiện tự xem lại kết quả (UI, test) rồi tự merge PR của chính mình vào `master`, không chờ Phúc review từng PR — đổi lại Thiện luôn báo Phúc commit/PR cuối sau khi merge để Phúc nắm được. Đây là ngoại lệ đã thống nhất cho phần việc của Thiện, không áp dụng cho PR của người khác; mọi PR khác vẫn theo đúng mục 8 (Phúc review và merge).
 ---
 
 ## 📂 THƯ MỤC AI CẦN BIẾT

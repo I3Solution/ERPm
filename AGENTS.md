@@ -117,7 +117,9 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
      - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
      - **Bắt buộc (Lợi, 2026-11-01): mỗi lần chuyển cột (trạng thái) của card phải comment kèm SHA commit liên quan** (BE/FE/root, commit nào có thì ghi commit đó — không có commit thật thì ghi lý do, ví dụ "chờ review"). Không chuyển cột mà không có comment SHA, để ai xem card cũng tra được đúng mã nguồn ứng với trạng thái đó.
-     - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ. Đính trực tiếp vào card Trello (kéo-thả hoặc dán ảnh vào ô bình luận). AI không có công cụ tự đính kèm ảnh lên Trello hay vẽ chú thích lên ảnh — khi AI phát hiện/raise bug có giao diện, ghi rõ trong card "cần người đính kèm ảnh chụp, xem mô tả bước X" để người nhận việc hoặc Thiện tự đính ảnh vào.
+     - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ.
+       - AI không có công cụ tự chụp màn hình app đang chạy (không có trình duyệt/computer-use trong phiên), nhưng **tự vẽ chú thích được** lên ảnh người dùng gửi sẵn (Python/PIL: khoanh vùng, mũi tên, nhãn chữ).
+       - **Đính kèm (chốt 2026-11-01, tránh tốn token):** mặc định AI chỉ đưa **đường dẫn file ảnh đã chú thích** (đường dẫn đầy đủ trong scratchpad) để Thiện/người nhận việc tự kéo-thả vào Trello — **không** xuất bản Artifact cho việc này (tốn token). Chỉ xuất bản Artifact khi được yêu cầu riêng.
 
 8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Chế độ Tự kiểm tra Tự merge PR (Autonomous Merge):**
    - **Phân vai trách nhiệm (RACI):**

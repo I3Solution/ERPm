@@ -31,6 +31,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Frontend (Angular + Ionic):** Standalone components, Signals, thiết kế Responsive Adaptive (hỗ trợ cả Mobile màn hình nhỏ và Desktop bảng dữ liệu lớn). Toàn bộ Form nhập liệu lưu dữ liệu bắt buộc dùng `FormGroup` (`ReactiveFormsModule`) kết hợp bộ component chuẩn hóa `<app-form-control>` (`FormControlComponent`) và `<app-input-control>` (`InputControlComponent`) nhận `type`, `dataSource`.
    - **Đa ngôn ngữ (i18n):** Mọi thông báo lỗi, nhãn giao diện và master data (Item, Category) phải tuân thủ chuẩn đa ngôn ngữ Anh - Việt qua từ điển `app_dictionaries` và JSONB translations.
    - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
+   - **Thông báo Doanh nghiệp (Enterprise Notifications):** Mọi tính năng nghiệp vụ có phát sinh sự kiện quan trọng (tạo mới, gửi duyệt, phê duyệt, từ chối, hủy chứng từ, cảnh báo ngưỡng an toàn, quá hạn công nợ/hợp đồng, phân quyền tài khoản) bắt buộc phải tích hợp phát sinh thông báo qua Notification Engine theo đúng hướng dẫn tại [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md).
 
 5. **Quy tắc Git Commit (Commit Message Convention):**
    - Mọi lệnh `git commit` trên repo gốc, `ERPm-BE`, `ERPm-FE` và các Submodules bắt buộc tuân thủ cú pháp:
@@ -106,6 +107,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Checklist bắt buộc mỗi card:**
      - Clean Architecture; comment trong code bằng tiếng Anh.
      - Có nhãn và lỗi VI/EN.
+     - Đã đánh giá và tích hợp Notification cho các sự kiện nghiệp vụ liên quan theo chuẩn [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md) (nếu tính năng có phát sinh sự kiện).
      - Build và test:
        - BE: `dotnet build` 0 warning / 0 error, `ERPm.Verification` đạt hết;
        - FE: `npm run build` 0 error.

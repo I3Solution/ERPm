@@ -274,4 +274,5 @@ Khi thực hiện bất kỳ nhiệm vụ nào trong dự án, AI Agent **phải
      - `[refactor]`: Tái cấu trúc code không làm thay đổi hành vi nghiệp vụ.
      - `[db]`: Thay đổi riêng về SQL Schema, EF Migration, Index, Seed data.
      - `[docs]`: Cập nhật tài liệu (`PROJECT_MASTER.md`, `AGENTS.md`, `.ai/`).
-
+9. **TÍCH HỢP HỆ THỐNG THÔNG BÁO (NOTIFICATION INTEGRATION):**
+   - Mọi tính năng nghiệp vụ khi phát sinh sự kiện quan trọng (tạo mới, gửi duyệt, phê duyệt, từ chối, hủy chứng từ, cảnh báo ngưỡng an toàn, quá hạn, phân quyền) bắt buộc phải tích hợp Notification Engine theo quy chuẩn tại [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md).

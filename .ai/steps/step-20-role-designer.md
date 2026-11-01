@@ -1,6 +1,6 @@
 # Step 20 – S20.4.3 Role designer (ma trận quyền + JSON)
 
-Trạng thái: **chờ tester** (chưa merge). Nhánh `thien/step20-role-designer` ở root, ERPm-BE và ERPm-FE.
+Trạng thái: **Done** (tester PASS lần 2, 2026-11-02; đã merge). BE `bf15bf0`, HRM `2de228c`, FE `c56c982`.
 
 ## Mục tiêu
 Màn `/roles` cho người quản trị thiết kế vai trò IAM: tách "làm gì" và "thấy dữ liệu của ai", sao chép vai trò, soạn JSON nâng cao, gán vai trò phụ + inline policy cho tài khoản, xem trước quyền hiệu lực có nguồn gốc. Theo thẻ Trello S20.4.3 và bài học HRM9 (`notes/hrm9-ho-so/phan-quyen-hrm9.md`).
@@ -21,7 +21,7 @@ Màn `/roles` cho người quản trị thiết kế vai trò IAM: tách "làm g
 ## Lệnh và kết quả kiểm tra
 - BE: `dotnet build ERPm.sln` 0 warning / 0 error; `dotnet run --project tests/ERPm.Verification` đạt 130/130.
 - FE: `ng build` 0 lỗi (cảnh báo budget bundle có sẵn từ trước); Karma 86/86.
-- **Chưa test**: thao tác trên trình duyệt (chưa có phiên chạy web); giao cho tester `erpm-fd`/`erpm-a9`.
+- Tester `erpm-60`: lần 1 FAIL (L1-L4), lần 2 PASS; kiểm tay đủ ma trận, JSON, sao chép, tab Tài khoản, 409, 403, dark, mobile 390px.
 
 ## Việc còn lại
 | Việc | Trạng thái | Ghi chú |

@@ -4,6 +4,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Completed
 
+- [x] **Quy chuẩn Tracking Trello & Comment Commit SHA (2026-11-01):** Ban hành Quy tắc bắt buộc 10 (Rule 10) trong PROJECT_MASTER.md và chuẩn hóa mục 7, mục 8 trong AGENTS.md: Bất kỳ thao tác chuyển trạng thái (cột) nào trên Trello bắt buộc phải comment kèm Hash Commit (SHA) tương ứng và kết quả kiểm thử vào Activity Feed của Card để bảo đảm khả năng truy vết mã nguồn (audit trail) xuyên suốt dự án.
 - [x] Đồng bộ migration/snapshot/schema tham chiếu; nâng cấp schema UUID 9 bảng sang model hiện hành, giữ bản gốc legacy và ExternalId.
 - [x] Tài khoản ERPm nội bộ, Admin/Operator/Viewer, scope chi nhánh ở server, khóa đăng nhập, thu hồi tài khoản/token và audit.
 - [x] Posting nguyên tử; khóa cập nhật kho/công nợ, sequence mã chứng từ và idempotency; kiểm tra dữ liệu, kho–chi nhánh, tồn và hạn mức nợ.

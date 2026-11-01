@@ -114,11 +114,21 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - Commit đúng tag.
      - Đã tick `- [x]` trong plan (hoặc file task chuyển `Done`) và ghi commit.
      - Đã cập nhật `.ai/status.md`.
-   - **Chuyển cột:**
+   - **Chuyển cột & Kỷ luật Ghi nhận Hoạt động (Trello Activity Tracking):**
      - Còn phụ thuộc chưa xong thì để **Blocked**.
      - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
      - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
-     - **Bắt buộc (Lợi, 2026-11-01): mỗi lần chuyển cột (trạng thái) của card phải comment kèm SHA commit liên quan** (BE/FE/root, commit nào có thì ghi commit đó — không có commit thật thì ghi lý do, ví dụ "chờ review"). Không chuyển cột mà không có comment SHA, để ai xem card cũng tra được đúng mã nguồn ứng với trạng thái đó.
+     - **QUY TẮC BẮT BUỘC TOÀN DỰ ÁN: COMMENT HASH COMMIT KHI CHUYỂN CỘT (TRELLO AUDIT TRAIL):**
+       - **BẮT BUỘC 100%:** Bất kỳ thao tác kéo/chuyển cột nào trên Trello (`Todo` ➔ `Doing`, `Doing` ➔ `Review`, `Review` ➔ `Done`, `Blocked`), người thực hiện (hoặc AI Agent) **PHẢI COMMENT NGAY LẬP TỨC** hash commit liên quan vào card để ghi nhận activity và phục vụ truy vết (tracking) sau này.
+       - **Tuyệt đối không chuyển cột mà không có comment SHA commit:**
+         - **Sang Doing:** Comment nhánh cá nhân bắt đầu làm + SHA commit mốc xuất phát (nếu có).
+         - **Sang Review:** Bắt buộc comment SHA commit PR / commit đã push trên nhánh cá nhân (BE / FE / submodule) + bằng chứng build pass.
+         - **Sang Done:** Bắt buộc comment danh sách đầy đủ các SHA commit đã merge vào `master` (gồm cả BE, FE và repo root) + tóm tắt kết quả verification test.
+         - **Sang Blocked:** Comment rõ nguyên nhân bị chặn, mã task/PR hoặc người đang phụ thuộc.
+       - **Cú pháp Comment Chuẩn hóa (Bắt buộc dùng):**
+         `[Chuyển <Cột Mới>] Commit <Tầng> liên quan: <hash_commit>. <Tóm tắt kết quả / tiến độ nghiệm thu>.`
+         *Ví dụ thực tế:*
+         `[Chuyển Done] Commit BE liên quan: 30d9fa5. SignalR WebSocket hub (/hubs/notifications) và REST API endpoints (/api/v1/sys/notifications) đạt 100% nghiệm thu.`
      - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ.
        - AI không có công cụ tự chụp màn hình app đang chạy (không có trình duyệt/computer-use trong phiên), nhưng **tự vẽ chú thích được** lên ảnh người dùng gửi sẵn (Python/PIL: khoanh vùng, mũi tên, nhãn chữ).
        - **Đính kèm (chốt 2026-11-01, tránh tốn token):** mặc định AI chỉ đưa **đường dẫn file ảnh đã chú thích** (đường dẫn đầy đủ trong scratchpad) để Thiện/người nhận việc tự kéo-thả vào Trello — **không** xuất bản Artifact cho việc này (tốn token). Chỉ xuất bản Artifact khi được yêu cầu riêng.

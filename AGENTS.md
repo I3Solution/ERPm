@@ -117,6 +117,23 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
      - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
 
+8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Contract-First Development:**
+   - **Phân vai trách nhiệm (RACI):**
+     - **Phúc (Tech Lead / Architect / Reviewer):** Lập Kế hoạch Step tổng (`.ai/plans/plan-step-XX.md`), chốt **API Contract** trước khi bắt đầu code, tạo và gán card Trello cho Thiện và Lợi, review Pull Request (PR) và là người duy nhất merge vào nhánh `master`.
+     - **Thiện (Developer):** Thực thi các task Backend (hoặc Module phụ trách) bám sát đúng API Contract, viết unit/verification tests đạt 100%.
+     - **Lợi (Developer):** Thực thi các task Frontend (hoặc Module phụ trách), sử dụng Mock Data bám sát API Contract để dựng UI/Form/Signals hoàn chỉnh độc lập mà không cần chờ BE.
+   - **Nguyên tắc "Contract-First" để làm việc độc lập:**
+     - Mọi tính năng kết nối FE-BE **bắt buộc phải có bảng API Contract** trong file plan của Step trước khi bắt đầu code (gồm Endpoint URL, Method, Request DTO mẫu, Response DTO mẫu và mã Error codes).
+     - **FE (Lợi):** Dựa vào Contract để tạo ngay TypeScript Interface, viết Mock Service trả về Observable/Signal data mẫu. Dựng xong toàn bộ UI, form validation, adaptive responsive độc lập.
+     - **BE (Thiện):** Dựa vào Contract để tạo Entity, Migration, Service và Controller trả về đúng cấu trúc JSON đã cam kết.
+     - **Khi tích hợp:** FE chỉ cần chuyển cờ gọi từ Mock Service sang HttpClient gọi API thật.
+   - **Hai mô hình phân chia task linh hoạt:**
+     - *Mô hình theo tầng (Layer-based):* Áp dụng cho tính năng lõi/hạ tầng sâu. Thiện làm toàn bộ Backend trên repo `ERPm-BE`; Lợi làm toàn bộ Frontend trên repo `ERPm-FE` (không bao giờ chạm chung file code).
+     - *Mô hình theo phân hệ dọc (Vertical Slice):* Áp dụng cho tính năng nghiệp vụ độc lập. Thiện làm trọn gói Module A (BE + FE của module đó); Lợi làm trọn gói Module B (BE + FE của module đó).
+   - **Quy tắc Đặt tên Nhánh & Submodules:**
+     - Đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loi/s20-fe-roles`).
+     - Tuân thủ nghiêm ngặt quy tắc push Submodule con trước khi push repo cha (`git config push.recurseSubmodules check`).
+
 ---
 
 ## 📂 THƯ MỤC AI CẦN BIẾT

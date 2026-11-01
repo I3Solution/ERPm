@@ -20,6 +20,8 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **CI GitHub Actions (root `ERPm`) đã chạy được (2026-10-31):** thêm secret `SUBMODULES_TOKEN`, vá từ điển VI/EN lệch BE/FE, bổ sung quy tắc `git config push.recurseSubmodules check` vào `AGENTS.md` (root + `ERPm-FE`) sau 3 lần CI đỏ do quên push commit submodule con.
 - [x] **Step 20.4.2 + 20.6.6 FE (màn tổ chức / chức danh + gán role / nhân viên + cấp tài khoản / user) đã merge master (2026-10-31):** đủ 4 nhóm nghiệp vụ ROLE (theo phòng ban và chức danh)/BRANCH (tạo + sửa + xóa)/USER (tạo, bắt buộc gán nhân sự)/HRM (tạo nhân viên); Karma 53/53, `ERPm.Verification` **120/120**, kiểm tay 39/39 — [plan Phase 20.4](plans/plan-step-20-iam-dynamic-role-and-organization.md).
 - [x] **Spike quy tắc C# từ HRM9 (2026-10-31):** 12 quy tắc nên áp dụng, danh sách không nên copy, 8 đề xuất chờ nhóm quyết định. Xem [`spike-20261031-hrm9-csharp-rules.md`](tasks/spike-20261031-hrm9-csharp-rules.md); chỉ tài liệu, chưa đổi code.
+- [x] **Màn Nhân viên: breadcrumb đơn vị + lọc theo cây tổ chức đã merge master (2026-11-01):** component dùng chung `app-branch-breadcrumbs` (rê chuột hiện các cấp từ gốc), bộ lọc `branchId` (gồm node con), từ điển `emp.all_branches`; Verification 123, Karma 72. Xem [`step-20-fe-employee-branch-view.md`](steps/step-20-fe-employee-branch-view.md).
+- [x] **BUG-20261101 đã merge master (2026-11-01):** danh sách / tra cứu cấp phòng ban lọc theo phạm vi công ty, giống chức danh. Xem [`bug-20261101-department-levels-scope.md`](tasks/bug-20261101-department-levels-scope.md).
 
 ## In-Progress
 

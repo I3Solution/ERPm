@@ -257,6 +257,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 - [ ] **Task 20.4.3:** Xây dựng màn hình **Thiết kế Role Động (Dynamic Role & IAM Policy Builder)** hỗ trợ 2 chế độ đồng bộ 2 chiều:
   - **Tab 1 - Ma trận trực quan (Visual Matrix):** Tick chọn quyền `Xem / Thêm / Sửa / Xóa / Duyệt / Hủy` theo từng trang và chọn `DataScope` (`Từ chi nhánh hiện tại trở xuống`, `Chọn chi nhánh cụ thể`, `Phòng ban`, `Toàn công ty`...).
   - **Tab 2 - Trình soạn thảo JSON (AWS IAM JSON Editor):** Chỉnh sửa trực tiếp cấu trúc JSON `Statements` dành cho Admin nâng cao.
+  - **Tiến độ 2026-11-02 (chờ tester, chưa merge):** BE `0d6928c`, `c17818b`; FE `b31d209` trên nhánh `thien/step20-role-designer`. Chi tiết: [step-20-role-designer](../steps/step-20-role-designer.md). Còn thiếu từ bài học HRM9: lưu cả ma trận trong 1 transaction, cache quyền dùng chung nhiều instance (tách task riêng).
 - [ ] **Task 20.4.4:** Cập nhật từ điển song ngữ VI/EN (`system_dictionary.json`) cho toàn bộ nhãn giao diện và thông báo lỗi phân quyền.
 
 ### Phase 20.5: Kiểm thử Tự động (Verification) & Nghiệm thu

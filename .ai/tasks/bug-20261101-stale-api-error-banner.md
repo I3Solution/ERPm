@@ -2,7 +2,7 @@
 
 > **Loại:** bug
 > **Ngày tạo:** 2026-11-01 · **Người làm:** _(giao: Phúc hoặc Lợi — code lõi dùng chung)_ · **Người yêu cầu:** Thiện
-> **Trạng thái:** Doing (đã sửa, chờ tester)
+> **Trạng thái:** Doing (đã sửa lần 2, chờ tester kiểm lại)
 > **Liên quan:** `src/app/core/api.interceptor.ts`, `src/app/core/services/api-error.service.ts`, `src/app/app.component.html`; code gốc commit `1059c82` (bizyoh, 2026-10-30)
 
 ## 1. Mô tả
@@ -21,9 +21,10 @@
 - Viết 1 spec Karma: gọi lỗi → banner hiện; gọi thành công tiếp theo → banner biến mất.
 
 ## 4. Kiểm tra
-- `apiInterceptor` thêm `tap` chỉ xử lý `HttpResponse` (bỏ qua các sự kiện trung gian của HttpClient): response thành công của một request `/api/` xoá `ApiErrorService.message`. Request không phải `/api/` không đụng tới banner.
-- Spec mới `src/app/core/api.interceptor.spec.ts` (3 test): lỗi → hiện, request thành công kế tiếp → biến mất; lỗi mới nhất vẫn hiện; request ngoài `/api/` không xoá banner.
-- Karma 75/75 (72 cũ + 3 mới), `ng build` 0 lỗi. Chưa kiểm tay trên trình duyệt: để tester (đăng nhập sai rồi đúng, banner phải mất khi vào `/dashboard`).
+- **Lần 1** (`tap` xoá banner ở mọi response thành công): tester (erpm-a9) phát hiện **regression**: response thành công của request chạy song song cũng xoá banner của lỗi thật (mở `/org` khi `/branches/tree` lỗi 500: 57 ms lỗi, 71 ms hai request 200 → banner mất). Báo cáo: `notes/ai-team/test-reports/bug-20261101-stale-api-error-banner.md`.
+- **Lần 2 (sửa):** `ApiErrorService` đếm thứ tự bắt đầu request (`begin()`); `fail()` ghi lại số request đã bắt đầu tại thời điểm lỗi; `succeeded(order)` chỉ xoá banner khi request **bắt đầu sau** lỗi gần nhất. Interceptor gọi `begin()` / `succeeded()` / `fail()`; request không phải `/api/` không đụng tới banner.
+- Spec `api.interceptor.spec.ts` (5 test): lỗi → request thành công sau đó xoá; lỗi mới nhất vẫn hiện; **thành công song song bắt đầu trước lỗi không xoá banner** (ca tester); request bắt đầu sau lỗi xoá được dù request cũ còn treo; request ngoài `/api/` bỏ qua. Spec `app.component.spec.ts` dùng service thật thay vì giả lập thiếu hàm.
+- Karma 77/77, `ng build` 0 lỗi. Chưa kiểm tay lại trình duyệt: để tester chạy lại ca `/org` với `/branches/tree` = 500.
 
 ## 5. Việc còn lại
-- Tester kiểm tay; sau khi pass báo BA cập nhật `status.md` và Trello. PR: ERPm-FE (nhánh `thien/bug-stale-api-error-banner`) và root (log + bump).
+- Tester kiểm lại; pass thì báo BA cập nhật `status.md` và Trello. PR: ERPm-FE #6 (nhánh `thien/bug-stale-api-error-banner`) và root #12 (log + bump).

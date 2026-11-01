@@ -133,7 +133,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Quy tắc Đặt tên Nhánh & Submodules:**
      - Đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loi/s20-fe-roles`).
      - Tuân thủ nghiêm ngặt quy tắc push Submodule con trước khi push repo cha (`git config push.recurseSubmodules check`).
-
+   - **Ghi chú (Thiện ↔ Phúc đã trao đổi riêng, 2026-11-01):** với các step/module do Thiện phụ trách (hiện là IAM/HRM, step 20), Thiện tự xem lại kết quả (UI, test) rồi tự merge PR của chính mình vào `master`, không chờ Phúc review từng PR — đổi lại Thiện luôn báo Phúc commit/PR cuối sau khi merge để Phúc nắm được. Đây là ngoại lệ đã thống nhất cho phần việc của Thiện, không áp dụng cho PR của người khác; mọi PR khác vẫn theo đúng mục 8 (Phúc review và merge).
 ---
 
 ## 📂 THƯ MỤC AI CẦN BIẾT

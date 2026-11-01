@@ -31,6 +31,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Frontend (Angular + Ionic):** Standalone components, Signals, thiết kế Responsive Adaptive (hỗ trợ cả Mobile màn hình nhỏ và Desktop bảng dữ liệu lớn). Toàn bộ Form nhập liệu lưu dữ liệu bắt buộc dùng `FormGroup` (`ReactiveFormsModule`) kết hợp bộ component chuẩn hóa `<app-form-control>` (`FormControlComponent`) và `<app-input-control>` (`InputControlComponent`) nhận `type`, `dataSource`.
    - **Đa ngôn ngữ (i18n):** Mọi thông báo lỗi, nhãn giao diện và master data (Item, Category) phải tuân thủ chuẩn đa ngôn ngữ Anh - Việt qua từ điển `app_dictionaries` và JSONB translations.
    - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
+   - **Thông báo Doanh nghiệp (Enterprise Notifications):** Mọi tính năng nghiệp vụ có phát sinh sự kiện quan trọng (tạo mới, gửi duyệt, phê duyệt, từ chối, hủy chứng từ, cảnh báo ngưỡng an toàn, quá hạn công nợ/hợp đồng, phân quyền tài khoản) bắt buộc phải tích hợp phát sinh thông báo qua Notification Engine theo đúng hướng dẫn tại [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md).
 
 5. **Quy tắc Git Commit (Commit Message Convention):**
    - Mọi lệnh `git commit` trên repo gốc, `ERPm-BE`, `ERPm-FE` và các Submodules bắt buộc tuân thủ cú pháp:
@@ -103,21 +104,36 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      Nghiệm thu: <copy từ plan/task>
      Commit: BE xxxxxxx · FE xxxxxxx · root xxxxxxx (điền khi xong)
      ```
-   - **Checklist bắt buộc mỗi card:**
+   - **Checklist bắt buộc mỗi card (Thiện, 2026-11-01 — dùng đúng tính năng Checklist của Trello, như a Phúc đang làm, không chỉ ghi chữ trong mô tả):**
+     - Khi raise card: tạo 1 Checklist tên **"Nghiem thu bat buoc"** (`trelloWriteChecklist`), đủ 7 mục bên dưới, để nguyên `INCOMPLETE`.
+     - Khi Tester PASS và đã merge: **tick từng ô tương ứng đã đạt** trên chính checklist đó (không chỉ comment PASS rồi bỏ đó) — ai kéo card sang Done thì người đó tick.
      - Clean Architecture; comment trong code bằng tiếng Anh.
      - Có nhãn và lỗi VI/EN.
+     - Đã đánh giá và tích hợp Notification cho các sự kiện nghiệp vụ liên quan theo chuẩn [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md) (nếu tính năng có phát sinh sự kiện).
      - Build và test:
        - BE: `dotnet build` 0 warning / 0 error, `ERPm.Verification` đạt hết;
        - FE: `npm run build` 0 error.
      - Commit đúng tag.
      - Đã tick `- [x]` trong plan (hoặc file task chuyển `Done`) và ghi commit.
      - Đã cập nhật `.ai/status.md`.
-   - **Chuyển cột:**
+   - **Chuyển cột & Kỷ luật Ghi nhận Hoạt động (Trello Activity Tracking):**
      - Còn phụ thuộc chưa xong thì để **Blocked**.
      - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
      - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
-     - **Bắt buộc (Lợi, 2026-11-01): mỗi lần chuyển cột (trạng thái) của card phải comment kèm SHA commit liên quan** (BE/FE/root, commit nào có thì ghi commit đó — không có commit thật thì ghi lý do, ví dụ "chờ review"). Không chuyển cột mà không có comment SHA, để ai xem card cũng tra được đúng mã nguồn ứng với trạng thái đó.
-     - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ. Đính trực tiếp vào card Trello (kéo-thả hoặc dán ảnh vào ô bình luận). AI không có công cụ tự đính kèm ảnh lên Trello hay vẽ chú thích lên ảnh — khi AI phát hiện/raise bug có giao diện, ghi rõ trong card "cần người đính kèm ảnh chụp, xem mô tả bước X" để người nhận việc hoặc Thiện tự đính ảnh vào.
+     - **QUY TẮC BẮT BUỘC TOÀN DỰ ÁN: COMMENT HASH COMMIT KHI CHUYỂN CỘT (TRELLO AUDIT TRAIL):**
+       - **BẮT BUỘC 100%:** Bất kỳ thao tác kéo/chuyển cột nào trên Trello (`Todo` ➔ `Doing`, `Doing` ➔ `Review`, `Review` ➔ `Done`, `Blocked`), người thực hiện (hoặc AI Agent) **PHẢI COMMENT NGAY LẬP TỨC** hash commit liên quan vào card để ghi nhận activity và phục vụ truy vết (tracking) sau này.
+       - **Tuyệt đối không chuyển cột mà không có comment SHA commit:**
+         - **Sang Doing:** Comment nhánh cá nhân bắt đầu làm + SHA commit mốc xuất phát (nếu có).
+         - **Sang Review:** Bắt buộc comment SHA commit PR / commit đã push trên nhánh cá nhân (BE / FE / submodule) + bằng chứng build pass.
+         - **Sang Done:** Bắt buộc comment danh sách đầy đủ các SHA commit đã merge vào `master` (gồm cả BE, FE và repo root) + tóm tắt kết quả verification test.
+         - **Sang Blocked:** Comment rõ nguyên nhân bị chặn, mã task/PR hoặc người đang phụ thuộc.
+       - **Cú pháp Comment Chuẩn hóa (Bắt buộc dùng):**
+         `[Chuyển <Cột Mới>] Commit <Tầng> liên quan: <hash_commit>. <Tóm tắt kết quả / tiến độ nghiệm thu>.`
+         *Ví dụ thực tế:*
+         `[Chuyển Done] Commit BE liên quan: 30d9fa5. SignalR WebSocket hub (/hubs/notifications) và REST API endpoints (/api/v1/sys/notifications) đạt 100% nghiệm thu.`
+     - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ.
+       - AI không có công cụ tự chụp màn hình app đang chạy (không có trình duyệt/computer-use trong phiên), nhưng **tự vẽ chú thích được** lên ảnh người dùng gửi sẵn (Python/PIL: khoanh vùng, mũi tên, nhãn chữ).
+       - **Đính kèm (chốt 2026-11-01, tránh tốn token):** mặc định AI chỉ đưa **đường dẫn file ảnh đã chú thích** (đường dẫn đầy đủ trong scratchpad) để Thiện/người nhận việc tự kéo-thả vào Trello — **không** xuất bản Artifact cho việc này (tốn token). Chỉ xuất bản Artifact khi được yêu cầu riêng.
 
 8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Chế độ Tự kiểm tra Tự merge PR (Autonomous Merge):**
    - **Phân vai trách nhiệm (RACI):**
@@ -133,6 +149,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
        4. **Submodule pointer:** Tuân thủ tuyệt đối quy tắc `git config push.recurseSubmodules check` — **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
        5. **Code comments:** 100% comment trong source code bằng Tiếng Anh.
        6. **Đa ngôn ngữ (i18n):** Đồng bộ đầy đủ từ điển VI/EN ở cả `system_dictionary.json` và `system.json`.
+       7. **Bắt buộc (Thiện, 2026-11-02): kiểm tra xung đột TRƯỚC khi mở PR, xử lý xong mới mở.** Trước khi tạo/báo PR, `git fetch origin` rồi thử `git merge origin/master --no-commit --no-ff` cục bộ (hoặc xem GitHub có báo "This branch has conflicts that must be resolved" không) trên **cả root lẫn từng submodule liên quan**. Có xung đột (kể cả chỉ là con trỏ submodule lệch nhau do nhánh khác đã merge) thì merge/rebase `origin/master` vào nhánh của mình, giải xong, build+test lại, rồi mới mở PR hoặc báo Review. Không để PR ở trạng thái "dirty"/conflict chờ người khác phát hiện.
      - **Kỷ luật Truy vết & Báo cáo sau khi Merge (Post-Merge Accountability):**
        1. **Trello:** Chuyển card sang cột **Done**, bắt buộc comment kèm SHA commit liên quan (BE / FE / root).
        2. **Plan Step:** Tick `- [x]` trong plan của Step (`.ai/plans/plan-step-XX.md`) kèm mã SHA commit.

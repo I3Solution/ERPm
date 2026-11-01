@@ -104,7 +104,9 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      Nghiệm thu: <copy từ plan/task>
      Commit: BE xxxxxxx · FE xxxxxxx · root xxxxxxx (điền khi xong)
      ```
-   - **Checklist bắt buộc mỗi card:**
+   - **Checklist bắt buộc mỗi card (Thiện, 2026-11-01 — dùng đúng tính năng Checklist của Trello, như a Phúc đang làm, không chỉ ghi chữ trong mô tả):**
+     - Khi raise card: tạo 1 Checklist tên **"Nghiem thu bat buoc"** (`trelloWriteChecklist`), đủ 7 mục bên dưới, để nguyên `INCOMPLETE`.
+     - Khi Tester PASS và đã merge: **tick từng ô tương ứng đã đạt** trên chính checklist đó (không chỉ comment PASS rồi bỏ đó) — ai kéo card sang Done thì người đó tick.
      - Clean Architecture; comment trong code bằng tiếng Anh.
      - Có nhãn và lỗi VI/EN.
      - Đã đánh giá và tích hợp Notification cho các sự kiện nghiệp vụ liên quan theo chuẩn [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md) (nếu tính năng có phát sinh sự kiện).

@@ -149,6 +149,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
        4. **Submodule pointer:** Tuân thủ tuyệt đối quy tắc `git config push.recurseSubmodules check` — **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
        5. **Code comments:** 100% comment trong source code bằng Tiếng Anh.
        6. **Đa ngôn ngữ (i18n):** Đồng bộ đầy đủ từ điển VI/EN ở cả `system_dictionary.json` và `system.json`.
+       7. **Bắt buộc (Thiện, 2026-11-02): kiểm tra xung đột TRƯỚC khi mở PR, xử lý xong mới mở.** Trước khi tạo/báo PR, `git fetch origin` rồi thử `git merge origin/master --no-commit --no-ff` cục bộ (hoặc xem GitHub có báo "This branch has conflicts that must be resolved" không) trên **cả root lẫn từng submodule liên quan**. Có xung đột (kể cả chỉ là con trỏ submodule lệch nhau do nhánh khác đã merge) thì merge/rebase `origin/master` vào nhánh của mình, giải xong, build+test lại, rồi mới mở PR hoặc báo Review. Không để PR ở trạng thái "dirty"/conflict chờ người khác phát hiện.
      - **Kỷ luật Truy vết & Báo cáo sau khi Merge (Post-Merge Accountability):**
        1. **Trello:** Chuyển card sang cột **Done**, bắt buộc comment kèm SHA commit liên quan (BE / FE / root).
        2. **Plan Step:** Tick `- [x]` trong plan của Step (`.ai/plans/plan-step-XX.md`) kèm mã SHA commit.

@@ -9,7 +9,7 @@ Nhìn cột "Chi nhánh" biết ngay nhân viên thuộc đơn vị nào (Công 
 
 | Nơi | Nội dung |
 | :--- | :--- |
-| `shared/components/branch-breadcrumbs/` (`app-branch-breadcrumbs`) | Ô hiện tên đơn vị (đậm) kèm cha mờ bên cạnh; **rê chuột / focus / chạm** mở popover liệt kê các cấp từ gốc (Tập đoàn › Công ty › Chi nhánh…) thụt lề, công ty tô màu chính, node cuối đậm. Popover `position: fixed` nên không bị bảng cuộn cắt; Esc / cuộn trang thì đóng. Đầu vào `tree`, `branchId`, `skipGroup`. Id không có trong cây: không vẽ gì. |
+| `shared/components/branch-breadcrumbs/` (`app-branch-breadcrumbs`) | Ô hiện tên đơn vị (đậm); **rê chuột / focus / chạm** mở popover liệt kê các cấp từ gốc (Tập đoàn › Công ty › Chi nhánh…) thụt lề, công ty tô màu chính, node cuối đậm. Popover `position: fixed` nên không bị bảng cuộn cắt; Esc / cuộn trang thì đóng. Đầu vào `tree`, `branchId`, `skipGroup`. Id không có trong cây: không vẽ gì. |
 | `core/models/org-tree.util.ts` | `branchIndex()` (Map id→node và id→cha, **cache theo tham chiếu mảng cây** nên cả bảng chỉ dựng một lần) và `branchPath()` (đi ngược theo cha, chi phí bằng độ sâu, có chặn vòng lặp). |
 | Màn Nhân viên (HRM) | Cột Chi nhánh dùng breadcrumb; thêm bộ lọc `type="branch-tree"` trên đầu bảng (`branchFilterControl`, gửi `branchId`, xoá thì bỏ tham số). |
 | BE `EmployeeFilterQuery.BranchId` | `EmployeeService` tính cây con bằng `OrgTree.Subtree` một lần rồi lọc `BranchId IN (...)`: chọn công ty / chi nhánh thì có cả nhân viên ở node con. |

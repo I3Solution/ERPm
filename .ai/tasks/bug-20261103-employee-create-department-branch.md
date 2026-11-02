@@ -2,7 +2,7 @@
 
 > **Loại:** bug
 > **Ngày tạo:** 2026-11-03 · **Người làm:** Thiện (AI executor) · **Người yêu cầu:** BA (Phúc báo "thêm nhân viên không được")
-> **Trạng thái:** Done (merge theo lệnh Thiện 2026-11-03; HRM `9b2346d`, BE `a969c18`, FE `e9cf053`, root `afbe117`; tester chưa kiểm trình duyệt)
+> **Trạng thái:** Done (merge theo lệnh Thiện 2026-11-03; HRM `9b2346d`, BE `a969c18`, FE `e9cf053`, root `afbe117`; tester erpm-5c PASS cả trình duyệt: Karma 133/133, Verification 136, Hrm 28)
 > **Liên quan:** S20.4.5 (quy tắc M1/BA chọn (b)), `OrgRules.RequirePlacementAsync`
 
 ## 1. Hiện tượng

@@ -21,13 +21,22 @@ Trạng thái: **chờ tester** (chưa merge). Nhánh `thien/step20-work-history
 - Việc tính nơi công tác hiện tại và đồng bộ hồ sơ nhân viên do BE làm (`RefreshEmployeeAsync`), FE không tự suy ra.
 
 ## Lệnh và kết quả kiểm tra
-- BE: `dotnet build` 0 warning / 0 error; `ERPm.Verification` 131/131.
-- FE: `ng build` 0 lỗi (cảnh báo budget bundle có sẵn); Karma 109/109.
+- BE: `dotnet build` 0 warning / 0 error; `ERPm.Verification` 132/132, `ERPm.Hrm.Verification` 28/28.
+- FE: `ng build` 0 lỗi (cảnh báo budget bundle có sẵn); Karma 110/110.
 - **Chưa test**: thao tác trên trình duyệt; giao tester.
+
+## Lỗi tester trả lại (erpm-5c, 2026-11-02)
+| Mã | Xử lý |
+| :--- | :--- |
+| M1 (BE) phòng ban khác chi nhánh vẫn lưu được | `OrgRules.RequirePlacementAsync` kiểm `department.BranchId == branchId` (lỗi `error.inventory.branch_mismatch`), +1 check Verification |
+| N1 xóa dòng cuối rồi không thêm lại được | Nút điều chuyển luôn bật, đổi nhãn "Thêm dòng đầu tiên" khi chưa có dòng; +1 spec |
+| N3 mobile cột thao tác bảng cấp phòng ban | Nút xuống dòng thay vì cuộn ngang |
+| N2 dòng ngày tương lai không tự áp dụng | **Chờ BA quyết** có job hằng ngày không: `RefreshEmployeeAsync` chỉ chạy khi có ghi; timeline FE đã đánh dấu "Chưa hiệu lực" |
 
 ## Việc còn lại
 | Việc | Trạng thái | Ghi chú |
 | :--- | :--- | :--- |
-| Kiểm tay QTCT và cấp phòng ban | Todo | Chờ tester |
+| Tester kiểm lại M1 | Todo | Chờ tester |
+| Job hằng ngày áp dụng dòng QTCT đến ngày hiệu lực (N2) | Todo | BA quyết phạm vi |
 | Dọn cấu trúc thư mục các màn cũ | Todo | [refactor-20261102-fe-per-screen-folders](../tasks/refactor-20261102-fe-per-screen-folders.md), sau khi xong S20.4.5 |
 | Màn danh mục cấp phòng ban chưa có kiểm tra "mỗi công ty chỉ thấy cấp của mình" bằng UI | Todo | BE đã giới hạn theo phạm vi dữ liệu (BUG-20261101) |

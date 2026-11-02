@@ -2,7 +2,7 @@
 
 > **Loại:** db
 > **Ngày tạo:** 2026-11-02 · **Người làm:** Thiện (AI executor) · **Người yêu cầu:** BA (quyết N2 của tester)
-> **Trạng thái:** Doing (dev xong, chờ tester)
+> **Trạng thái:** Done (tester PASS 2026-11-02; BE `3099951`, root `607e832`)
 > **Liên quan:** S20.4.5 ([step-20-work-history-ui](../steps/step-20-work-history-ui.md)), tester N2
 
 ## 1. Mô tả
@@ -28,5 +28,6 @@ Dòng QTCT đã duyệt có `DateEffective` trong tương lai (HR lên lịch đ
 - Verification: 136/136 (+3 check: áp dòng đã đến ngày và bỏ qua dòng tương lai, idempotent và nhận dòng tương lai khi đến ngày, thời điểm chạy kế tiếp).
 
 ## 5. Việc còn lại
-- Tester kiểm: khởi động API với một dòng QTCT đã đến ngày nhưng cache lệch (ghi thẳng vào bảng), hồ sơ nhân viên tự đúng sau khi API khởi động.
+- Tester đã kiểm bằng API thật (dòng hôm qua áp, dòng +30 ngày không áp, nghỉ việc, chưa duyệt, xóa mềm, cùng ngày, idempotent).
+- Gợi ý của tester, chưa làm: `RefreshStaleAsync` nạp toàn bộ dòng QTCT đã duyệt vào bộ nhớ mỗi lần chạy (lo khi dữ liệu lớn); job chưa ghi audit từng nhân viên.
 - Đã chạy tại UTC (cùng cách các chỗ khác lấy "hôm nay"); nếu cần theo múi giờ công ty thì tách task.

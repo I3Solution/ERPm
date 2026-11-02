@@ -4,6 +4,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Completed
 
+- [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị các phân hệ (Cơ cấu tổ chức, Cấp phòng ban, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 116/116 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). BE 980cd80 · FE 219b833.
 - [x] **N2 Job làm mới hồ sơ nhân viên hằng ngày (2026-11-02):** `EmployeeSnapshotWorker` chạy khi API khởi động và mỗi ngày 00:05 UTC, áp lại dòng QTCT đã duyệt có hiệu lực mới nhất cho nhân viên có cache lệch (dòng điều chuyển đặt trước khi đến ngày không còn làm hồ sơ sai). Tester PASS. Task: [db-20261102-employee-snapshot-daily-refresh](tasks/db-20261102-employee-snapshot-daily-refresh.md). BE 3099951 · root 607e832.
 - [x] **S20.4.5 Màn QTCT + danh mục cấp phòng ban (2026-11-02):** `/employees/:id/work-history` (timeline, điều chuyển, nghỉ việc, sửa/xóa) và `/department-levels` (CRUD theo công ty); BE thêm lọc `?employeeId=` và quy tắc phòng ban phải nằm trong cây chi nhánh. Tester PASS lần 4. Còn lại (task riêng): job hằng ngày áp dụng dòng QTCT có hiệu lực tương lai. Log: [step-20-work-history-ui](steps/step-20-work-history-ui.md). BE f4fef0e · HRM 266096d · FE 0fee8ed · root ffc362c.
 - [x] **Refactor thư mục theo màn (2026-11-02):** HRM (employees, job-positions, org-tree), CRM (partners), SD (pos), WMS (items, inventory), dashboard vào thư mục riêng, không đổi hành vi (Karma 111/111). Còn lại: tách `SYS/roles` thành thư mục con. Task: [refactor-20261102-fe-per-screen-folders](tasks/refactor-20261102-fe-per-screen-folders.md). HRM 529b5bd · CRM 0e582e0 · SD f4a04b2 · WMS 0198d56 · dashboard 545535c · FE 3f531a4 · root 62de2a9.
@@ -61,7 +62,9 @@ Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-inter
 >
 > **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
 
-## Completed — Đã hoàn thành rà soát
+## Completed
+
+- [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
 - [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
 - [x] Ghi [báo cáo rà soát 2026-10-29](reviews/2026-10-29-source-review.md) với 22 phát hiện và vị trí source; lưu [Step 18](steps/step-18-source-review-and-development-assessment.md).
@@ -96,7 +99,9 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
 >
 > **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
 
-## Completed — Đã hoàn thành rà soát
+## Completed
+
+- [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
 - [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
 - [x] Ghi [báo cáo rà soát 2026-10-29](reviews/2026-10-29-source-review.md) với 22 phát hiện và vị trí source; lưu [Step 18](steps/step-18-source-review-and-development-assessment.md).

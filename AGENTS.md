@@ -29,10 +29,21 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Database (PostgreSQL):** Tiền tệ & số lượng bắt buộc dùng `decimal(18, 4)`. Hỗ trợ Soft-delete và Auditing.
    - **Kế toán & Kho:** Không hard-delete chứng từ giao dịch tài chính đã ghi sổ (`Posted`). Thiết kế bảng sẵn sàng cho Double-Entry Ledger.
    - **Frontend (Angular + Ionic):** Standalone components, Signals, thiết kế Responsive Adaptive (hỗ trợ cả Mobile màn hình nhỏ và Desktop bảng dữ liệu lớn). Toàn bộ Form nhập liệu lưu dữ liệu bắt buộc dùng `FormGroup` (`ReactiveFormsModule`) kết hợp bộ component chuẩn hóa `<app-form-control>` (`FormControlComponent`) và `<app-input-control>` (`InputControlComponent`) nhận `type`, `dataSource`.
+   - **Cấu trúc thư mục FE — mỗi màn 1 thư mục riêng, không để file rời ở gốc module (Thiện, 2026-11-02):** **Bắt buộc:** `<ten-component>.component.ts/.html/.scss/.spec.ts` của một màn phải nằm trong thư mục con `<module>/<ten-man>/`, KHÔNG được để rời trực tiếp dưới gốc module (vd sai: `HRM/employees.component.ts`; đúng: `HRM/employees/employees.component.ts`). Theo đúng cách tổ chức của ERP cũ `C:\Drive\Is\Source\FE\ART-ERP-FE\src\app\pages\<MODULE>\<ten-man>\` — mỗi màn/dialog là 1 thư mục con riêng (vd `ADMIN/permission/`, `ADMIN/form-permission/` tách biệt dù cùng nhóm phân quyền). Sub-widget bên trong 1 màn thì đặt dưới `components/` con của màn đó (vd `CRM/business-partner-detail/components/bp-items/`). Khi 1 màn có nhiều chế độ hiển thị rõ rệt (bảng/ma trận, JSON editor, dialog sao chép, khung xem trước...), mỗi chế độ là 1 component riêng trong thư mục con của màn, không nhồi chung vào 1 file `.component.ts` lớn.
    - **Đa ngôn ngữ (i18n):** Mọi thông báo lỗi, nhãn giao diện và master data (Item, Category) phải tuân thủ chuẩn đa ngôn ngữ Anh - Việt qua từ điển `app_dictionaries` và JSONB translations.
    - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
+   - **Thông báo Doanh nghiệp (Enterprise Notifications):** Mọi tính năng nghiệp vụ có phát sinh sự kiện quan trọng (tạo mới, gửi duyệt, phê duyệt, từ chối, hủy chứng từ, cảnh báo ngưỡng an toàn, quá hạn công nợ/hợp đồng, phân quyền tài khoản) bắt buộc phải tích hợp phát sinh thông báo qua Notification Engine theo đúng hướng dẫn tại [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md).
 
-5. **Quy tắc Git Commit (Commit Message Convention):**
+5. **Quy tắc Git Commit & Quản lý Nhánh (Commit & Branch Convention):**
+   - **TUYỆT ĐỐI KHÔNG CODE VÀ PUSH TRỰC TIẾP TRÊN NHÁNH `master`:**
+     - Cấm tuyệt đối việc sửa code, commit hoặc push trực tiếp trên nhánh `master` ở mọi repo (`ERPm`, `ERPm-BE`, `ERPm-FE`, và các submodule con).
+     - Trước khi bắt đầu làm bất kỳ task nào, luôn cập nhật nhánh `master` (`git checkout master && git pull origin master`), sau đó tạo nhánh cá nhân:
+       - Cú pháp tên nhánh: `<tên-người>/<step-hoặc-task>-<nội-dung-ngắn>` (Ví dụ: `loipham/step20-mobile-menu`, `thien/s20-be-iam`, `phuc/s20-arch-review`).
+       - Định danh chuẩn của 3 thành viên: Lợi là `loipham/*`, Thiện là `thien/*`, Phúc là `phuc/*`. Tuyệt đối không tạo nhánh mang tên người khác.
+     - Toàn bộ code và commit chỉ được thực hiện trên nhánh cá nhân.
+     - Sau khi hoàn thành và tự kiểm tra đạt 100% (build pass, test pass), push nhánh cá nhân lên remote và mở Pull Request (PR) về `master` (hoặc merge qua PR theo quy trình nhóm).
+     - Nhánh `master` cục bộ chỉ dùng để checkout và pull code mới nhất đã merge (`git pull origin master`), không dùng để can thiệp mã nguồn trực tiếp.
+   - **Quy tắc Git Commit (Commit Message Convention):**
    - Mọi lệnh `git commit` trên repo gốc, `ERPm-BE`, `ERPm-FE` và các Submodules bắt buộc tuân thủ cú pháp:
      `[tag] nội dung commit` hoặc `[tag](MODULE) nội dung commit`
    - **Bộ 6 Tag chuẩn:**
@@ -103,20 +114,36 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      Nghiệm thu: <copy từ plan/task>
      Commit: BE xxxxxxx · FE xxxxxxx · root xxxxxxx (điền khi xong)
      ```
-   - **Checklist bắt buộc mỗi card:**
+   - **Checklist bắt buộc mỗi card (Thiện, 2026-11-01 — dùng đúng tính năng Checklist của Trello, như a Phúc đang làm, không chỉ ghi chữ trong mô tả):**
+     - Khi raise card: tạo 1 Checklist tên **"Nghiem thu bat buoc"** (`trelloWriteChecklist`), đủ 7 mục bên dưới, để nguyên `INCOMPLETE`.
+     - Khi Tester PASS và đã merge: **tick từng ô tương ứng đã đạt** trên chính checklist đó (không chỉ comment PASS rồi bỏ đó) — ai kéo card sang Done thì người đó tick.
      - Clean Architecture; comment trong code bằng tiếng Anh.
      - Có nhãn và lỗi VI/EN.
+     - Đã đánh giá và tích hợp Notification cho các sự kiện nghiệp vụ liên quan theo chuẩn [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md) (nếu tính năng có phát sinh sự kiện).
      - Build và test:
        - BE: `dotnet build` 0 warning / 0 error, `ERPm.Verification` đạt hết;
        - FE: `npm run build` 0 error.
      - Commit đúng tag.
      - Đã tick `- [x]` trong plan (hoặc file task chuyển `Done`) và ghi commit.
      - Đã cập nhật `.ai/status.md`.
-   - **Chuyển cột:**
+   - **Chuyển cột & Kỷ luật Ghi nhận Hoạt động (Trello Activity Tracking):**
      - Còn phụ thuộc chưa xong thì để **Blocked**.
      - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
      - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
-     - **Bắt buộc (Lợi, 2026-11-01): mỗi lần chuyển cột (trạng thái) của card phải comment kèm SHA commit liên quan** (BE/FE/root, commit nào có thì ghi commit đó — không có commit thật thì ghi lý do, ví dụ "chờ review"). Không chuyển cột mà không có comment SHA, để ai xem card cũng tra được đúng mã nguồn ứng với trạng thái đó.
+     - **QUY TẮC BẮT BUỘC TOÀN DỰ ÁN: COMMENT HASH COMMIT KHI CHUYỂN CỘT (TRELLO AUDIT TRAIL):**
+       - **BẮT BUỘC 100%:** Bất kỳ thao tác kéo/chuyển cột nào trên Trello (`Todo` ➔ `Doing`, `Doing` ➔ `Review`, `Review` ➔ `Done`, `Blocked`), người thực hiện (hoặc AI Agent) **PHẢI COMMENT NGAY LẬP TỨC** hash commit liên quan vào card để ghi nhận activity và phục vụ truy vết (tracking) sau này.
+       - **Tuyệt đối không chuyển cột mà không có comment SHA commit:**
+         - **Sang Doing:** Comment nhánh cá nhân bắt đầu làm + SHA commit mốc xuất phát (nếu có).
+         - **Sang Review:** Bắt buộc comment SHA commit PR / commit đã push trên nhánh cá nhân (BE / FE / submodule) + bằng chứng build pass.
+         - **Sang Done:** Bắt buộc comment danh sách đầy đủ các SHA commit đã merge vào `master` (gồm cả BE, FE và repo root) + tóm tắt kết quả verification test.
+         - **Sang Blocked:** Comment rõ nguyên nhân bị chặn, mã task/PR hoặc người đang phụ thuộc.
+       - **Cú pháp Comment Chuẩn hóa (Bắt buộc dùng):**
+         `[Chuyển <Cột Mới>] Commit <Tầng> liên quan: <hash_commit>. <Tóm tắt kết quả / tiến độ nghiệm thu>.`
+         *Ví dụ thực tế:*
+         `[Chuyển Done] Commit BE liên quan: 30d9fa5. SignalR WebSocket hub (/hubs/notifications) và REST API endpoints (/api/v1/sys/notifications) đạt 100% nghiệm thu.`
+     - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ.
+       - AI không có công cụ tự chụp màn hình app đang chạy (không có trình duyệt/computer-use trong phiên), nhưng **tự vẽ chú thích được** lên ảnh người dùng gửi sẵn (Python/PIL: khoanh vùng, mũi tên, nhãn chữ).
+       - **Đính kèm (chốt 2026-11-01, tránh tốn token):** mặc định AI chỉ đưa **đường dẫn file ảnh đã chú thích** (đường dẫn đầy đủ trong scratchpad) để Thiện/người nhận việc tự kéo-thả vào Trello — **không** xuất bản Artifact cho việc này (tốn token). Chỉ xuất bản Artifact khi được yêu cầu riêng.
 
 8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Chế độ Tự kiểm tra Tự merge PR (Autonomous Merge):**
    - **Phân vai trách nhiệm (RACI):**
@@ -132,6 +159,7 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
        4. **Submodule pointer:** Tuân thủ tuyệt đối quy tắc `git config push.recurseSubmodules check` — **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
        5. **Code comments:** 100% comment trong source code bằng Tiếng Anh.
        6. **Đa ngôn ngữ (i18n):** Đồng bộ đầy đủ từ điển VI/EN ở cả `system_dictionary.json` và `system.json`.
+       7. **Bắt buộc (Thiện, 2026-11-02): kiểm tra xung đột TRƯỚC khi mở PR, xử lý xong mới mở.** Trước khi tạo/báo PR, `git fetch origin` rồi thử `git merge origin/master --no-commit --no-ff` cục bộ (hoặc xem GitHub có báo "This branch has conflicts that must be resolved" không) trên **cả root lẫn từng submodule liên quan**. Có xung đột (kể cả chỉ là con trỏ submodule lệch nhau do nhánh khác đã merge) thì merge/rebase `origin/master` vào nhánh của mình, giải xong, build+test lại, rồi mới mở PR hoặc báo Review. Không để PR ở trạng thái "dirty"/conflict chờ người khác phát hiện.
      - **Kỷ luật Truy vết & Báo cáo sau khi Merge (Post-Merge Accountability):**
        1. **Trello:** Chuyển card sang cột **Done**, bắt buộc comment kèm SHA commit liên quan (BE / FE / root).
        2. **Plan Step:** Tick `- [x]` trong plan của Step (`.ai/plans/plan-step-XX.md`) kèm mã SHA commit.
@@ -146,7 +174,10 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - *Mô hình theo tầng (Layer-based):* Áp dụng cho tính năng lõi/hạ tầng sâu. Thiện làm toàn bộ Backend trên repo `ERPm-BE`; Lợi làm toàn bộ Frontend trên repo `ERPm-FE` (không bao giờ chạm chung file code).
      - *Mô hình theo phân hệ dọc (Vertical Slice):* Áp dụng cho tính năng nghiệp vụ độc lập. Thiện làm trọn gói Module A (BE + FE của module đó); Lợi làm trọn gói Module B (BE + FE của module đó).
    - **Quy tắc Đặt tên Nhánh & Submodules:**
-     - Đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loi/s20-fe-roles`).
+     - **Bắt buộc luôn tạo nhánh cá nhân từ `master` mới nhất trước khi bắt đầu code; TUYỆT ĐỐI KHÔNG code và push trực tiếp trên `master`.**
+     - Cú pháp đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loipham/s20-fe-roles`, `phuc/s20-arch-review`).
+     - Phân biệt rõ định danh cá nhân: Lợi dùng `loipham/*`, Thiện dùng `thien/*`, Phúc dùng `phuc/*`. Tuyệt đối không tạo nhánh nhầm tên người khác.
+     - Sau khi code và tự kiểm thử đạt 100%, push nhánh cá nhân lên remote và mở PR về `master` (hoặc merge qua PR). Master local chỉ dùng để `git pull origin master`.
      - Tuân thủ nghiêm ngặt quy tắc push Submodule con trước khi push repo cha (`git config push.recurseSubmodules check`).
 ---
 

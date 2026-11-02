@@ -2,7 +2,7 @@
 
 > **Loại:** db
 > **Ngày tạo:** 2026-11-02 · **Người làm:** Thiện (AI executor) · **Người yêu cầu:** BA (quyết N2 của tester)
-> **Trạng thái:** Todo
+> **Trạng thái:** Doing (dev xong, chờ tester)
 > **Liên quan:** S20.4.5 ([step-20-work-history-ui](../steps/step-20-work-history-ui.md)), tester N2
 
 ## 1. Mô tả
@@ -21,5 +21,12 @@ Dòng QTCT đã duyệt có `DateEffective` trong tương lai (HR lên lịch đ
 ## 4. Kiểm tra
 - Check Verification: tạo dòng ngày hôm qua nhưng ghi trực tiếp để bỏ qua refresh, chạy một vòng job, snapshot nhân viên khớp; chạy lần hai không đổi gì.
 
+## 4b. Đã làm (2026-11-02)
+- `EmployeeSnapshot.ApplyAsync` (logic dùng chung, `ERPm.Infrastructure/Services/HumanResource/EmployeeSnapshot.cs`): `WorkHistoryService.RefreshEmployeeAsync` gọi lại hàm này, không nhân đôi.
+- `EmployeeSnapshotRefresher.RefreshStaleAsync(today)`: tìm nhân viên có cache lệch dòng QTCT đã duyệt hiệu lực mới nhất (thứ tự ngày, giờ tạo, id) rồi áp lại; trả số nhân viên đã sửa; idempotent nên nhiều instance chạy trùng không sai.
+- `EmployeeSnapshotWorker` (BackgroundService, đăng ký trong `DependencyInjection`): chạy một lần khi khởi động (bù thời gian tắt máy) rồi mỗi ngày 00:05 UTC; lỗi một lần chỉ ghi log, ngày sau chạy tiếp.
+- Verification: 136/136 (+3 check: áp dòng đã đến ngày và bỏ qua dòng tương lai, idempotent và nhận dòng tương lai khi đến ngày, thời điểm chạy kế tiếp).
+
 ## 5. Việc còn lại
-- Toàn bộ (Todo). Làm sau khi tester PASS lần 2 và S20.4.5 đã merge; không chặn S20.4.5.
+- Tester kiểm: khởi động API với một dòng QTCT đã đến ngày nhưng cache lệch (ghi thẳng vào bảng), hồ sơ nhân viên tự đúng sau khi API khởi động.
+- Đã chạy tại UTC (cùng cách các chỗ khác lấy "hôm nay"); nếu cần theo múi giờ công ty thì tách task.

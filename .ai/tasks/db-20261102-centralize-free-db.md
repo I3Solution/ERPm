@@ -2,8 +2,8 @@
 
 > **Loại:** db  
 > **Ngày tạo:** 2026-11-02 · **Người làm:** Phúc · **Người yêu cầu:** Phúc (Tech Lead)  
-> **Trạng thái:** Doing  
-> **Liên quan:** Toàn bộ dự án ERPm (BE, FE, DB sync giữa Phúc, Thiện, Lợi)  
+> **Trạng thái:** Done  
+> **Liên quan:** Toàn bộ dự án ERPm (BE commit f32bdbb, root commit)  
 
 ---
 
@@ -12,29 +12,27 @@
 - **Yêu cầu:** Thiết lập một cơ sở dữ liệu PostgreSQL tập trung trên Cloud hoàn toàn miễn phí (Serverless PostgreSQL), có tính năng kết nối SSL an toàn, hoạt động 24/7 để cả 3 người cùng trỏ `DefaultConnection` về một nơi.
 
 ## 2. Phân tích & Lựa chọn giải pháp
-1. **Neon.tech (Đề xuất số 1):**
-   - Bản miễn phí: 0.5 GB lưu trữ, 100 giờ tính toán active/tháng (với tính năng tự ngủ khi idle và tự thức dậy sau 500ms khi có request gọi tới).
-   - Tương thích 100% với EF Core & Npgsql trên .NET 10.
-   - Hỗ trợ Connection Pooling sẵn (PgBouncer trên port 6543 hoặc port 5432).
-2. **Supabase.com (Đề xuất số 2):**
-   - Bản miễn phí: 500 MB lưu trữ, có Web UI Table Editor xem dữ liệu trực quan rất mạnh mẽ.
-   - Chạy ổn định 24/7.
-3. **Quy chuẩn bảo mật:**
+1. **Neon.tech (Đã triển khai thành công):**
+   - Host: `ep-summer-art-a1un6qi7-pooler.ap-southeast-1.aws.neon.tech` (Singapore).
+   - Database: `neondb`.
+   - Kết nối: SSL Mode=Require;Trust Server Certificate=true.
+   - Hoạt động 24/7, có connection pooler tự động scale.
+2. **Quy chuẩn bảo mật:**
    - Connection string chứa mật khẩu chỉ lưu trong `ERPm-BE/src/ERPm.API/appsettings.local.json` (đã có trong `.gitignore`).
-   - Tuyệt đối không commit credential lên repository.
+   - Revert mật khẩu khỏi `appsettings.json` để tránh rủi ro commit secret lên Git.
 
 ## 3. Cách làm (Quy trình thực hiện)
-1. Khởi tạo Project PostgreSQL trên nền tảng Cloud (Neon / Supabase).
-2. Lấy chuỗi kết nối Npgsql chuẩn (.NET EF Core).
-3. Cập nhật `appsettings.local.json` trên máy Phúc.
-4. Chạy `dotnet ef database update` để migrate toàn bộ 23+ bảng của hệ thống lên Cloud DB.
-5. Chạy seed data cơ bản (Tập đoàn, Công ty, Chi nhánh, Admin, Từ điển).
-6. Chia sẻ connection string nội bộ cho Thiện và Lợi cấu hình vào máy cá nhân.
+1. Cấu hình chuỗi kết nối Neon vào `appsettings.local.json`.
+2. Sửa `DesignTimeDbContextFactory.cs` (commit `f32bdbb`) để tự động đọc chuỗi kết nối từ `appsettings.local.json` thay vì hardcode localhost.
+3. Chạy lệnh `dotnet ef database update`: Đã áp dụng toàn bộ 7 migration (Initial schema, StabilizeMvp, InventoryCarryingValue, IamOrganization, NotificationEngine, DepartmentLevel, DepartmentRole) lên Neon DB.
+4. Chạy lệnh `--migrate` với `EssentialDataSeeder`: Đã khởi tạo bảng từ điển đa ngôn ngữ VI/EN, ngôn ngữ, tài khoản kế toán, đơn vị tính, kho mặc định, template thông báo.
+5. Tạo tài khoản quản trị `admin` / `Admin@123456`.
 
 ## 4. Kiểm tra
-- `dotnet ef database update` thành công không lỗi.
-- `dotnet run --project tests/ERPm.Verification` kiểm tra kết nối và truy vấn đạt.
-- 3 máy cùng đọc được danh sách User / Chi nhánh / Mặt hàng.
+- `dotnet ef database update`: 100% migrations applied thành công trên Neon.
+- `dotnet run --project src/ERPm.API -- --migrate`: Seed data thành công.
+- `dotnet run --project tests/ERPm.Hrm.Verification`: 28/28 checks pass.
 
 ## 5. Việc còn lại
-- Đang thực hiện: Phúc tạo tài khoản và project Cloud DB, lấy connection string.
+- Không. Đã hoàn thành và sẵn sàng chia sẻ cho Thiện, Lợi.
+

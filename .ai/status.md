@@ -23,10 +23,10 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **Màn Nhân viên: breadcrumb đơn vị + lọc theo cây tổ chức đã merge master (2026-11-01):** component dùng chung `app-branch-breadcrumbs` (rê chuột hiện các cấp từ gốc), bộ lọc `branchId` (gồm node con), từ điển `emp.all_branches`; Verification 123, Karma 72. Xem [`step-20-fe-employee-branch-view.md`](steps/step-20-fe-employee-branch-view.md).
 - [x] **BUG-20261101 đã merge master (2026-11-01):** danh sách / tra cứu cấp phòng ban lọc theo phạm vi công ty, giống chức danh. Xem [`bug-20261101-department-levels-scope.md`](tasks/bug-20261101-department-levels-scope.md).
 - [x] **Kế hoạch Master Step 22 (2026-11-01):** Lập đặc tả kiến trúc chuẩn Contract-First cho Phân hệ Bán hàng & Phân phối Doanh nghiệp (Enterprise SD: Bảng giá, Báo giá khách hàng, Đơn đặt hàng & Phê duyệt hạn mức nợ/Giữ tồn kho, Trả hàng bán & Báo cáo doanh số) — [plan Step 22](plans/plan-step-22-enterprise-sales-distribution.md).
+- [x] **Centralized Cloud Database Neon.tech (2026-11-02):** Hoàn thành thiết lập PostgreSQL Serverless tập trung dùng chung cho cả 3 người (Phúc, Thiện, Lợi); migrate toàn bộ 7 migration và seed dữ liệu cơ bản + tài khoản admin — xem [db-20261102-centralize-free-db.md](tasks/db-20261102-centralize-free-db.md).
 
 ## In-Progress
 
-- [db] Centralize Free Database cho team (3 người): đang triển khai Cloud PostgreSQL — xem [db-20261102-centralize-free-db.md](tasks/db-20261102-centralize-free-db.md).
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
 - Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).
 - CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.

@@ -34,7 +34,16 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
    - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
    - **Thông báo Doanh nghiệp (Enterprise Notifications):** Mọi tính năng nghiệp vụ có phát sinh sự kiện quan trọng (tạo mới, gửi duyệt, phê duyệt, từ chối, hủy chứng từ, cảnh báo ngưỡng an toàn, quá hạn công nợ/hợp đồng, phân quyền tài khoản) bắt buộc phải tích hợp phát sinh thông báo qua Notification Engine theo đúng hướng dẫn tại [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md).
 
-5. **Quy tắc Git Commit (Commit Message Convention):**
+5. **Quy tắc Git Commit & Quản lý Nhánh (Commit & Branch Convention):**
+   - **TUYỆT ĐỐI KHÔNG CODE VÀ PUSH TRỰC TIẾP TRÊN NHÁNH `master`:**
+     - Cấm tuyệt đối việc sửa code, commit hoặc push trực tiếp trên nhánh `master` ở mọi repo (`ERPm`, `ERPm-BE`, `ERPm-FE`, và các submodule con).
+     - Trước khi bắt đầu làm bất kỳ task nào, luôn cập nhật nhánh `master` (`git checkout master && git pull origin master`), sau đó tạo nhánh cá nhân:
+       - Cú pháp tên nhánh: `<tên-người>/<step-hoặc-task>-<nội-dung-ngắn>` (Ví dụ: `loipham/step20-mobile-menu`, `thien/s20-be-iam`, `phuc/s20-arch-review`).
+       - Định danh chuẩn của 3 thành viên: Lợi là `loipham/*`, Thiện là `thien/*`, Phúc là `phuc/*`. Tuyệt đối không tạo nhánh mang tên người khác.
+     - Toàn bộ code và commit chỉ được thực hiện trên nhánh cá nhân.
+     - Sau khi hoàn thành và tự kiểm tra đạt 100% (build pass, test pass), push nhánh cá nhân lên remote và mở Pull Request (PR) về `master` (hoặc merge qua PR theo quy trình nhóm).
+     - Nhánh `master` cục bộ chỉ dùng để checkout và pull code mới nhất đã merge (`git pull origin master`), không dùng để can thiệp mã nguồn trực tiếp.
+   - **Quy tắc Git Commit (Commit Message Convention):**
    - Mọi lệnh `git commit` trên repo gốc, `ERPm-BE`, `ERPm-FE` và các Submodules bắt buộc tuân thủ cú pháp:
      `[tag] nội dung commit` hoặc `[tag](MODULE) nội dung commit`
    - **Bộ 6 Tag chuẩn:**
@@ -165,7 +174,10 @@ Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Ph�
      - *Mô hình theo tầng (Layer-based):* Áp dụng cho tính năng lõi/hạ tầng sâu. Thiện làm toàn bộ Backend trên repo `ERPm-BE`; Lợi làm toàn bộ Frontend trên repo `ERPm-FE` (không bao giờ chạm chung file code).
      - *Mô hình theo phân hệ dọc (Vertical Slice):* Áp dụng cho tính năng nghiệp vụ độc lập. Thiện làm trọn gói Module A (BE + FE của module đó); Lợi làm trọn gói Module B (BE + FE của module đó).
    - **Quy tắc Đặt tên Nhánh & Submodules:**
-     - Đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loi/s20-fe-roles`).
+     - **Bắt buộc luôn tạo nhánh cá nhân từ `master` mới nhất trước khi bắt đầu code; TUYỆT ĐỐI KHÔNG code và push trực tiếp trên `master`.**
+     - Cú pháp đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loipham/s20-fe-roles`, `phuc/s20-arch-review`).
+     - Phân biệt rõ định danh cá nhân: Lợi dùng `loipham/*`, Thiện dùng `thien/*`, Phúc dùng `phuc/*`. Tuyệt đối không tạo nhánh nhầm tên người khác.
+     - Sau khi code và tự kiểm thử đạt 100%, push nhánh cá nhân lên remote và mở PR về `master` (hoặc merge qua PR). Master local chỉ dùng để `git pull origin master`.
      - Tuân thủ nghiêm ngặt quy tắc push Submodule con trước khi push repo cha (`git config push.recurseSubmodules check`).
 ---
 

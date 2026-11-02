@@ -525,17 +525,17 @@ export interface SalesFunnelDto {
 - [ ] **BE-22.6:** Unit Tests & Verification Tests trong `ERPm.Verification` (Cam kết 100% pass, 0 warning).
 
 ### 4.3. Lợi (Frontend Developer):
-- **Nhánh đề xuất:** `loi/s22-sd-frontend`
-- [ ] **FE-22.1:** Dựng TypeScript Interfaces & Mock Services bám sát 100% API Contract (không phụ thuộc BE).
-- [ ] **FE-22.2:** Màn hình Quản lý Bảng giá (Danh sách, Tạo/Sửa bảng giá, Lưới phân cấp số lượng sỉ/lẻ).
-- [ ] **FE-22.3:** Màn hình Quản lý Báo giá: Danh sách, Form lập báo giá chuyên nghiệp, Nút In PDF A4 & Nút Chuyển đơn.
-- [ ] **FE-22.4:** Màn hình Quản lý Đơn bán hàng (Sales Order):
+- **Nhánh thực hiện:** `loipham/s22-sd-frontend`
+- [x] **FE-22.1:** Dựng TypeScript Interfaces & Mock Services bám sát 100% API Contract (không phụ thuộc BE). (Hoàn thành 2026-11-02).
+- [x] **FE-22.2:** Màn hình Quản lý Bảng giá (Danh sách, Tạo/Sửa bảng giá, Lưới phân cấp số lượng sỉ/lẻ, Mô phỏng tính giá). (Hoàn thành 2026-11-02).
+- [x] **FE-22.3:** Màn hình Quản lý Báo giá: Danh sách, Form lập báo giá chuyên nghiệp, Nút In PDF A4 & Nút Chuyển đơn. (Hoàn thành 2026-11-02).
+- [x] **FE-22.4:** Màn hình Quản lý Đơn bán hàng (Sales Order): (Hoàn thành 2026-11-02).
   - Danh sách Đơn bán hàng (Responsive Desktop/Mobile, Lọc trạng thái, Chi nhánh, Nhân viên).
   - Chi tiết Đơn bán hàng (Status Stepper, Cảnh báo công nợ, Nút Xác nhận/Duyệt nợ/Hủy đơn).
-- [ ] **FE-22.5:** Màn hình Trả hàng bán (Sales Returns): Chọn đơn/hóa đơn gốc, nhập số lượng trả, hiển thị tiền hoàn.
-- [ ] **FE-22.6:** Màn hình In ấn hóa đơn & Báo giá chuẩn (Template K80, A4, A5).
-- [ ] **FE-22.7:** Từ điển VI/EN đầy đủ cho toàn bộ phân hệ SD mới.
-- [ ] **FE-22.8:** Đổi cờ kết nối từ Mock sang API thật khi Thiện hoàn thành.
+- [x] **FE-22.5:** Màn hình Trả hàng bán (Sales Returns): Chọn đơn/hóa đơn gốc, nhập số lượng trả, hiển thị tiền hoàn. (Hoàn thành 2026-11-02).
+- [x] **FE-22.6:** Màn hình In ấn hóa đơn & Báo giá chuẩn (Template K80, A4, A5). (Hoàn thành 2026-11-02).
+- [x] **FE-22.7:** Từ điển VI/EN đầy đủ cho toàn bộ phân hệ SD mới. (Hoàn thành 2026-11-02).
+- [x] **FE-22.8:** Đổi cờ kết nối từ Mock sang API thật khi Thiện hoàn thành (Cấu hình cờ `useMock` trong `SdService`). (Hoàn thành 2026-11-02).
 
 ---
 

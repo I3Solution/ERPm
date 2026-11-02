@@ -41,6 +41,23 @@ Tách rõ 2 tầng, không gộp chung:
 - Thay `AddConsole()` bằng Serilog, sink ghi file JSON cuộn theo ngày (và tuỳ chọn sink PostgreSQL bảng riêng `tbl_SYS_RequestLog` nếu cần tra cứu qua UI) — có `RequestId`, `UserId`, `Path`, `Method`, `StatusCode`, `DurationMs`, `Exception`.
 - Không làm dashboard phân tích tự chế như HRM9; nếu Thiện cần xem nhanh thì làm 1 màn "Nhật ký hệ thống" lọc theo thời gian/level/user là đủ cho giai đoạn này.
 
+## 4b. "Lịch sử thay đổi" cho người dùng cuối (bổ sung 2026-11-02, theo yêu cầu Thiện)
+
+Khác Tầng A (màn quản trị cho Admin): đây là thành phần **gắn trực tiếp vào từng form nghiệp vụ** (đơn hàng, hồ sơ nhân viên...) để người dùng thường xem "ai tạo/sửa gì, lúc nào" — không phải bảng log kỹ thuật.
+
+**HRM9 làm gì** (đọc source, xem chi tiết `notes/hrm9-ho-so/lich-su-thay-doi-nguoi-dung-cuoi.md`):
+- **Không có** nút "Lịch sử" dùng chung trên form. Chỉ có (1) vài màn nhật ký chung mở từ menu quản trị (`Sys_LogTrackingChange`, `Hre_LogTracking`), (2) mỗi thực thể tự viết 1 màn lịch sử riêng (`Cat_OrgHistory`, `Hre_CardHistory`...) — không nhất quán.
+- Màn chung hiển thị khá tốt: **Tên trường, Giá trị cũ, Giá trị mới, Người sửa, Ngày** (có dịch tên bảng/trường, đổi GUID thành tên) — nhưng nguồn dữ liệu là **file JSON ghi ra đĩa server** (`~/Log/TrackingChangeLog`), đọc hết file rồi lọc trong RAM — không phải bảng DB, mất khi dựng lại server, nhiều server thì mỗi cái một bộ, chậm khi log lớn.
+- Tên tham chiếu (vd tên phòng ban) tra cứu **lúc xem**, hiển thị tên **hiện tại** chứ không phải tên **tại thời điểm sửa** — sai lịch sử nếu tên đã đổi sau đó.
+- Quyền xem các màn nhật ký đòi `ManageSettings` (quyền quản trị) — người dùng thường (kể cả người xem được chính bản ghi đó) không xem được lịch sử của nó.
+
+**Áp dụng cho ERPm:**
+1. Không viết file JSON ra đĩa như HRM9 — dùng ngay bảng `tbl_SYS_AuditLog` ở Tầng A (mục 4) làm nguồn dữ liệu chung, đã có JSONB OldValues/NewValues + index theo (TableName, RecordId).
+2. Khi ghi log (interceptor `SaveChangesAsync`): lưu **cả ID lẫn nhãn hiển thị tại thời điểm sửa** (vd `DepartmentId` + `DepartmentName` snapshot) — không tra tên hiện tại lúc hiển thị như lỗi của HRM9.
+3. Làm 1 component Angular dùng chung `<app-change-history>` nhận `(entityType, entityId)`, gắn như tab/ngăn kéo vào mọi form chi tiết (đơn hàng, hồ sơ nhân viên, role...) — không viết riêng từng màn như HRM9.
+4. Hiển thị timeline gom theo lần lưu: "Nguyễn Văn A đã sửa lúc 14:32 02/11: Phòng ban: Kinh doanh → Kế toán", ẩn IP/chi tiết kỹ thuật (phần đó để màn Audit Trail cho Admin ở Tầng A).
+5. Phân quyền: **ai xem được bản ghi (theo scope dữ liệu hiện có) thì xem được lịch sử của nó**, không cần quyền admin riêng — trừ trường nhạy cảm (lương, giá vốn) cần quyền riêng để hiện trong lịch sử.
+
 ## 5. Việc còn lại
-- Đây là tài liệu khảo sát, **chưa code**. Cần Thiện quyết định mức ưu tiên (so với Role designer S20.4.3 đang làm) rồi mới raise thành task `[add]` thật (BE: AuditLog interceptor + bảng; FE: màn xem log) và giao việc.
+- Đây là tài liệu khảo sát, **chưa code**. Cần Thiện quyết định mức ưu tiên (so với Role designer S20.4.3 đang làm) rồi mới raise thành task `[add]` thật (BE: AuditLog interceptor + bảng; FE: màn xem log cho Admin Tầng A, + component `<app-change-history>` cho người dùng cuối Tầng 4b) và giao việc.
 - Đề xuất: không gấp bằng S20.4.3/S20.4.5 đang Doing — để ở Backlog, ưu tiên sau khi xong Step 20.4, trước khi Step 22 (SD) đi vào Posted chứng từ nhiều hơn.

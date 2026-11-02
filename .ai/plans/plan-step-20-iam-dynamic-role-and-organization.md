@@ -253,7 +253,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
     4. Phạm vi:
        - cấp phòng ban: chỉ có ô chọn cấp khi tạo / sửa phòng ban (lọc theo công ty). Màn danh mục cấp riêng để sau;
        - màn QTCT tách thành **Task 20.4.5** (để sau).
-- [ ] **Task 20.4.5 (bổ sung 2026-10-31):** Màn QTCT (`/hrm/work-histories`) trong hồ sơ nhân viên: timeline, thêm điều chuyển / nghỉ việc; và màn danh mục cấp phòng ban (`/hrm/department-levels`).
+- [x] **Task 20.4.5 (Done 2026-11-02; BE `f4fef0e`, HRM `266096d`, FE `0fee8ed`, root `ffc362c`):** Màn QTCT (`/hrm/work-histories`) trong hồ sơ nhân viên: timeline, thêm điều chuyển / nghỉ việc; và màn danh mục cấp phòng ban (`/hrm/department-levels`).
   - **Tiến độ 2026-11-02 (chờ tester, chưa merge):** nhánh `thien/step20-work-history`; màn `/employees/:id/work-history` và `/department-levels`. Chi tiết: [step-20-work-history-ui](../steps/step-20-work-history-ui.md).
 - [x] **Task 20.4.3 (Done 2026-11-02; BE `bf15bf0`, HRM `2de228c`, FE `c56c982`):** Xây dựng màn hình **Thiết kế Role Động (Dynamic Role & IAM Policy Builder)** hỗ trợ 2 chế độ đồng bộ 2 chiều:
   - **Tab 1 - Ma trận trực quan (Visual Matrix):** Tick chọn quyền `Xem / Thêm / Sửa / Xóa / Duyệt / Hủy` theo từng trang và chọn `DataScope` (`Từ chi nhánh hiện tại trở xuống`, `Chọn chi nhánh cụ thể`, `Phòng ban`, `Toàn công ty`...).

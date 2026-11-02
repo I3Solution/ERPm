@@ -1,6 +1,6 @@
 # Step 20 – S20.4.5 Màn QTCT (work history) + danh mục cấp phòng ban
 
-Trạng thái: **chờ tester** (chưa merge). Nhánh `thien/step20-work-history` ở root, ERPm-BE, ERPm-FE và ERPm-FE-HRM.
+Trạng thái: **Done** (tester PASS lần 4, đã merge 2026-11-02). BE `f4fef0e`, HRM `266096d`, FE `0fee8ed`, root `ffc362c`.
 
 ## Mục tiêu
 Điều chuyển nhân viên và cho nghỉ việc bằng giao diện (trước đây sửa nhân viên khóa các trường tổ chức và chưa có đường nào khác), và cho mỗi công ty tự quản các cấp phòng ban. Theo thẻ Trello S20.4.5 và bài học HRM9 (`notes/hrm9-ho-so/loi-van-hanh-phan-quyen-qtct.md`).

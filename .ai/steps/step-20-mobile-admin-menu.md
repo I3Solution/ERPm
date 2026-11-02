@@ -1,7 +1,7 @@
 # 📱 Step Log: B1 - Mục "Quản trị" trên thanh menu dưới (Mobile Bottom Navigation & Admin Hub)
 
 - **Ngày thực hiện:** 2026-11-02
-- **Người thực hiện:** Thiện (Developer)
+- **Người thực hiện:** Lợi (Developer)
 - **Mã Task / Trello:** [B1](https://trello.com/c/raopDQNF/24-addfe-b1-m%E1%BB%A5c-qu%E1%BA%A3n-tr%E1%BB%8B-tr%C3%AAn-thanh-menu-d%C6%B0%E1%BB%9Bi-mobile) — Plan Step 20 §6 ưu tiên #5.
 - **Trạng thái:** Hoàn thành (100% build & verification passed).
 

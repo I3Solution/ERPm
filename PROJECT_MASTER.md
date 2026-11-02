@@ -281,3 +281,8 @@ Khi thực hiện bất kỳ nhiệm vụ nào trong dự án, AI Agent **phải
     - Tuyệt đối không chuyển trạng thái mà không bình luận hash commit nhằm đảm bảo khả năng truy vết mã nguồn (activity tracking & audit trail) xuyên suốt dự án.
     - Cú pháp comment chuẩn hóa:
       `[Chuyển <Cột Mới>] Commit <Tầng> liên quan: <hash_commit>. <Tóm tắt kết quả/tiến độ nghiệm thu>.`
+11. **TUYỆT ĐỐI KHÔNG CODE VÀ PUSH TRỰC TIẾP TRÊN NHÁNH `master`:**
+    - Cấm tuyệt đối việc sửa code, commit hoặc push trực tiếp trên nhánh `master` ở tất cả các repository (repo gốc `ERPm`, `ERPm-BE`, `ERPm-FE`, và các submodule).
+    - Mọi công việc/task đều bắt buộc phải tạo nhánh cá nhân từ nhánh `master` mới nhất (`loipham/<step-hoặc-task>`, `thien/<step-hoặc-task>`, `phuc/<step-hoặc-task>`).
+    - Toàn bộ code và commit chỉ được thực hiện trên nhánh cá nhân. Sau khi hoàn thành và vượt qua kiểm tra nghiệm thu (build 0 error, tests pass 100%), push nhánh cá nhân lên remote và mở Pull Request (PR) về `master` (hoặc merge qua PR theo quy trình của dự án).
+    - Nhánh `master` ở local chỉ dùng để đồng bộ (`git checkout master && git pull origin master`), tuyệt đối không dùng để sửa code trực tiếp.

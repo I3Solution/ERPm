@@ -21,16 +21,16 @@ Trạng thái: **chờ tester** (chưa merge). Nhánh `thien/step20-work-history
 - Việc tính nơi công tác hiện tại và đồng bộ hồ sơ nhân viên do BE làm (`RefreshEmployeeAsync`), FE không tự suy ra.
 
 ## Lệnh và kết quả kiểm tra
-- BE: `dotnet build` 0 warning / 0 error; `ERPm.Verification` 132/132, `ERPm.Hrm.Verification` 28/28.
-- FE: `ng build` 0 lỗi (cảnh báo budget bundle có sẵn); Karma 110/110.
+- BE: `dotnet build` 0 warning / 0 error; `ERPm.Verification` 133/133, `ERPm.Hrm.Verification` 28/28.
+- FE: `ng build` 0 lỗi (cảnh báo budget bundle có sẵn); Karma 111/111.
 - **Chưa test**: thao tác trên trình duyệt; giao tester.
 
 ## Lỗi tester trả lại (erpm-5c, 2026-11-02)
 | Mã | Xử lý |
 | :--- | :--- |
-| M1 (BE) phòng ban khác chi nhánh vẫn lưu được | `OrgRules.RequirePlacementAsync` kiểm `department.BranchId == branchId` (lỗi `error.inventory.branch_mismatch`), +1 check Verification |
+| M1 (BE) phòng ban khác chi nhánh vẫn lưu được | `OrgRules.RequirePlacementAsync` kiểm chi nhánh nhận phòng ban phải nằm trong cây từ `department.BranchId` xuống (BA chốt 2026-11-02: cửa hàng con dùng chung phòng ban của chi nhánh cha; lỗi `error.inventory.branch_mismatch`), +2 check Verification (từ chối chi nhánh ngoài cây, cho phép cửa hàng con); FE lọc phòng ban theo cùng quy tắc |
 | N1 xóa dòng cuối rồi không thêm lại được | Nút điều chuyển luôn bật, đổi nhãn "Thêm dòng đầu tiên" khi chưa có dòng; +1 spec |
-| N3 mobile cột thao tác bảng cấp phòng ban | Nút xuống dòng thay vì cuộn ngang |
+| N3 mobile cột thao tác bảng cấp phòng ban | ≤700px ẩn cột phụ; ≤480px gộp mã và thứ tự dưới tên, còn 2 cột (tên, thao tác) |
 | N2 dòng ngày tương lai không tự áp dụng | **Chờ BA quyết** có job hằng ngày không: `RefreshEmployeeAsync` chỉ chạy khi có ghi; timeline FE đã đánh dấu "Chưa hiệu lực" |
 
 ## Việc còn lại

@@ -2,7 +2,7 @@
 
 > **Loại:** refactor
 > **Ngày tạo:** 2026-11-02 · **Người làm:** Thiện (AI executor) · **Người yêu cầu:** Thiện (qua BA)
-> **Trạng thái:** Doing (đã di chuyển màn rời; đã tách `roles`, chờ tester và lệnh merge)
+> **Trạng thái:** Done (di chuyển màn rời + tách `roles` đã merge; FE `2692d2d`, root `3c447cd`; tester erpm-5c PASS 2026-11-03)
 > **Liên quan:** AGENTS.md (quy tắc thư mục), tham chiếu `ART-ERP-FE/src/app/pages/` (ví dụ `ADMIN/permission/`, `CRM/business-partner-detail/components/bp-items/`)
 
 ## 1. Mô tả
@@ -49,5 +49,5 @@ Mỗi widget một component riêng trong `SYS/roles/components/`, hành vi khô
 `roles.component` còn danh sách role, bản nháp, lưu và xung đột 409. Bằng chứng: `ng build` 0 lỗi; Karma 145/145 (trước tách 112 + 33 spec mới của các component con, các spec cũ về ma trận và tài khoản chuyển sang component tương ứng).
 
 ## 5. Việc còn lại
-- Tester kiểm tay màn Vai trò: mở role, tick Cho phép/Từ chối, chọn phạm vi, chế độ JSON, tab Tài khoản.
+- Chưa kiểm: tiếng Anh và dark mode của màn Vai trò (tester ghi chú). Control con dùng `[formControl]` nên DOM không còn thuộc tính `formcontrolname` (e2e hiện chưa chọn theo thuộc tính này).
 - Nhánh refactor cũ đã merge; PR tách roles: nhánh `thien/refactor-roles-split`.

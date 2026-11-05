@@ -517,7 +517,7 @@ export interface SalesFunnelDto {
 
 ### 4.2. Thiện (Backend Developer):
 - **Nhánh đề xuất:** `thien/s22-sd-backend`
-- [ ] **BE-22.1:** Thiết kế Migration bảng `tbl_SD_PriceList`, `tbl_SD_PriceListItem`, bổ sung quan hệ Partner.
+- [x] **BE-22.1:** Thiết kế Migration bảng `tbl_SD_PriceList`, `tbl_SD_PriceListItem`, bổ sung quan hệ Partner. (BE 5280b66 trên `thien/s22-pricelist`, chờ merge; log `.ai/steps/step-22-sd-price-list-be.md`)
 - [ ] **BE-22.2:** Service & Controller Bảng giá + Tự động tính giá tối ưu (Pricing Engine).
 - [ ] **BE-22.3:** Entity, Migration, Service & Controller Báo giá (`tbl_SD_SalesQuotation`) + Chuyển đổi sang Sales Order.
 - [ ] **BE-22.4:** Nâng cấp `SalesOrder`: Logic Giữ chỗ kho (`StockReservation`), Kiểm tra hạn mức nợ (`CreditLimitCheck`), Tích hợp Step 21 Notification khi duyệt đơn.

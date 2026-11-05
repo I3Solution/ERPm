@@ -42,7 +42,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
-- Step 22 BE (Thiện): S22.1.1 bảng giá đã merge (BE 1b444d3, root c6674d6); S22.1.2 API bảng giá + Pricing Engine đã push (BE 2716782, FE 07f5954, nhánh `thien/s22-pricing-api`), chờ merge — xem [step log](steps/step-22-sd-pricing-api-be.md); tiếp theo S22.2.1 (báo giá).
+- Step 22 BE (Thiện): S22.1.1 và S22.1.2 (bảng giá, Pricing Engine) đã merge (BE 2306980, FE cfecc88, root 2b527eb); S22.2.1 báo giá + convert-to-order đã push (BE 481e0eb, FE 626a8a2, nhánh `thien/s22-quotation`), chờ merge — xem [step log](steps/step-22-sd-quotation-be.md); tiếp theo S22.3.1 (nâng cấp SalesOrder).
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
 - Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).
 - CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.

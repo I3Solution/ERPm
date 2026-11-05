@@ -39,12 +39,13 @@ Theo quy tắc kỹ thuật trong `AGENTS.md` (cập nhật ngày 2026-11-03):
 - Xóa các file cũ trong `core/services/` và `core/models/sd.models.ts`.
 - Chạy `ng build` và Karma tests đạt 100%.
 - Commit với tag `[refactor]` theo đúng quy chuẩn:
-  - WMS: `baf2975`
-  - CRM: `fb54a0c`
-  - SD: `b933f22`
-  - dashboard: `69b106a`
-  - HRM: `61b2f1d`
-  - ERPm-FE: `abd1bdc`
+  - WMS: `baf2975` · PR #3: https://github.com/I3Solution/ERPm-FE-WMS/pull/3
+  - CRM: `fb54a0c` · PR #3: https://github.com/I3Solution/ERPm-FE-CRM/pull/3
+  - SD: `b933f22` · PR #4: https://github.com/I3Solution/ERPm-FE-SD/pull/4
+  - dashboard: `69b106a` · PR #2: https://github.com/I3Solution/ERPm-FE-DASHBOARD/pull/2
+  - HRM: `61b2f1d` · PR #9: https://github.com/I3Solution/ERPm-FE-HRM/pull/9
+  - ERPm-FE: `abd1bdc` · PR #14: https://github.com/I3Solution/ERPm-FE/pull/14
+  - ERPm (root): `caad5bc` · PR #26: https://github.com/I3Solution/ERPm/pull/26
 
 ## 4. Kiểm tra
 - `ng build`: 0 error

@@ -1,6 +1,6 @@
 # Bug: Step 22 BE — 3 lỗi từ tester (S22.1.1–S22.3.1)
 
-- **Trạng thái:** Doing (đã sửa và push cùng PR S22.4.1, chờ merge và tester kiểm lại)
+- **Trạng thái:** Done (merge cùng S22.4.1: BE 27435e0, FE 16fa9a8, root b416294; tester erpm-ce kiểm lại PASS trên BE 27435e0)
 - **Loại / tag:** bug / `[fix]`
 - **Người báo:** tester `erpm-ce` (báo cáo `notes/ai-team/test-reports/S22-BE-20261106.md`), master 416ba70
 - **Nhánh:** `thien/s22-sales-return` (BE 40ebc92, FE 8ac1645), gộp vào PR S22.4.1 để tránh xung đột cùng tệp kiểm thử và từ điển
@@ -29,3 +29,7 @@
 ## Kiểm tra
 - `dotnet build`: 0 warning, 0 error; `ERPm.Verification`: 245 check đạt (gồm S22.4.1).
 - Việc còn lại: tester kiểm lại sau khi merge; ghi `Done` và commit merge khi xong.
+
+## F4 (tester, lần 2) — hóa đơn thiếu id dòng và GET chi tiết
+- Trả hàng theo hóa đơn bắt buộc `invoiceItemId` nhưng `SalesInvoiceItemDto` không có `id` và chưa có `GET /sales/invoices/{id}`.
+- Đã thêm `id` dòng và `GET /api/v1/sales/invoices/{id}` (BE d340a54, nhánh `thien/s22-sales-analytics`, chờ merge; xem `.ai/steps/step-22-sd-sales-analytics-be.md`). Yêu cầu trả theo hóa đơn bỏ qua `unitPrice` là chủ ý (giá hoàn lấy từ dòng hóa đơn).

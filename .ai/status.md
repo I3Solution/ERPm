@@ -42,7 +42,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
-- Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán + bút toán đảo đã push (BE 40ebc92, FE 8ac1645, nhánh `thien/s22-sales-return`, đã gộp sửa 3 lỗi tester [bug](tasks/bug-20261106-s22-be-tester-f1-f3.md)), chờ merge — xem [step log](steps/step-22-sd-sales-return-be.md); tiếp theo S22.5.1 phần BE (báo cáo doanh số/KPI).
+- Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán và sửa 3 lỗi tester đã merge (BE 27435e0, FE 16fa9a8, root b416294; tester PASS); S22.5.1 báo cáo doanh số/KPI (Dapper) + chi tiết hóa đơn F4 đã push (BE d340a54, nhánh `thien/s22-sales-analytics`), chờ merge — xem [step log](steps/step-22-sd-sales-analytics-be.md).
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
 - Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).
 - CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.

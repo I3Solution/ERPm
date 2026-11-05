@@ -49,7 +49,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Next Steps
 
-1. **Step 20.4 FE — Phân quyền động:** 20.4.1, 20.4.2, 20.6.6 xong. Còn 20.4.3 Role designer (ma trận + JSON, gán role theo user), 20.4.4 từ điển, 20.4.5 QTCT + danh mục cấp; ngoài ra `DepartmentId` cho chứng từ, mục "Quản trị" trên menu mobile. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
+1. **Step 20.4 FE — Phân quyền động:** 20.4.1, 20.4.2, 20.4.4 (từ điển), 20.6.6, S20-DEP xong. Còn 20.4.3 Role designer (ma trận + JSON, gán role theo user), 20.4.5 QTCT + danh mục cấp. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
 3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.
@@ -72,6 +72,7 @@ Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-inter
 
 ## Completed
 
+- [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
 - [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
@@ -109,6 +110,7 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
 
 ## Completed
 
+- [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
 - [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.

@@ -47,3 +47,10 @@ dotnet run --project tests/ERPm.Hrm.Verification --no-build
 2. FE cần đọc `permissions[]` thay cho kiểm tra `role === 'Admin'`.
 3. Gán `DepartmentId` khi tạo chứng từ (hiện nullable, chưa có UI/DTO nhập).
 4. Merge `thien/step-20-iam` vào `master` sau khi FE xong và Phúc review.
+
+## 7. Task 20.5.2 — xác nhận build toàn repo (2026-11-07)
+- **Mục tiêu:** xác nhận BE và FE trên `master` build sạch sau khi Step 20 và Step 22 BE đã vào master (thủ tục, không đổi mã).
+- **BE** (ERPm-BE `789a008`): `dotnet build ERPm.sln --no-incremental` → **0 warning, 0 error** (gồm `ERPm.Verification` và `ERPm.Hrm.Verification`).
+- **FE** (ERPm-FE `6606a8a`): `npm run build` → build thành công, **0 error**. Còn 1 cảnh báo ngân sách: initial bundle 849,95 kB, vượt ngân sách 500 kB thêm 349,95 kB (đã có từ trước, status ghi ~604 kB ở Step 18; nay lớn hơn do thêm màn Step 20/22). Cần task riêng để chia nhỏ hoặc nâng ngân sách; không thuộc 20.5.2.
+- **Lệnh đã chạy:** `dotnet build ERPm.sln -v q --no-incremental` (trong git worktree sạch tại `origin/master`, vì một API chạy sẵn khóa DLL của thư mục chính), `npm run build` trong `ERPm-FE`.
+- **Kết quả:** đạt. Việc còn lại của Step 20 theo mục 6 không đổi.

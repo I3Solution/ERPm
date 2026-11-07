@@ -42,6 +42,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
+- Step 22 BE: `create-invoice` từ đơn bán đã push (BE b63c248, FE 16c3756, nhánh `thien/s22-order-create-invoice`), chờ merge — xem [step log](steps/step-22-sd-order-create-invoice-be.md). F5 (SELF tạo/đọc đơn, báo giá) đã merge (BE d4d1e42, root 04a62ce), chờ tester kiểm lại.
 - Bug F5 người bán SELF không tạo/đọc được đơn và báo giá: đã sửa và push (BE 2a1a38d, nhánh `thien/fix-selfscope-order-quotation`), chờ merge — xem [bug](tasks/bug-20261107-selfscope-order-quotation.md).
 - Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán và sửa 3 lỗi tester đã merge (BE 27435e0, FE 16fa9a8, root b416294; tester PASS); S22.5.1 báo cáo doanh số/KPI (Dapper) + chi tiết hóa đơn F4 đã push (BE d340a54, nhánh `thien/s22-sales-analytics`), chờ merge — xem [step log](steps/step-22-sd-sales-analytics-be.md).
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.

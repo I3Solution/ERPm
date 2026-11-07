@@ -54,6 +54,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
+- Dialog dùng chung (Confirm/Info/Warning/Error/Prompt) thay `window.confirm/alert` ([task](tasks/change-20261107-shared-dialog.md)); còn chuyển 14 chỗ trong HRM/SD/WMS.
 - Fix thông báo đơn bán và trả hàng phát sai người nhận ([task](tasks/bug-20261107-order-return-notification-recipients.md)).
 - Fix thông báo báo giá phát sai người nhận (BE, chờ tester và merge): [task](tasks/bug-20261107-quotation-notification-recipients.md).
 - S23.3.1 (BE): đơn bán VAT theo dòng, giờ giao UTC, bản chụp địa chỉ giao, chờ tester và merge sau S23.2.2 ([task](tasks/change-20261107-sales-order-vat-time.md)).

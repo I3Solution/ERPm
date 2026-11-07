@@ -322,7 +322,7 @@ export interface SalesOrderItemDto {
 export interface SalesOrderDetailDto {
   id: number;
   externalId: string;
-  orderNumber: string;          // SO-YYYYMM-XXXX
+  orderNumber: string;          // Quyết định 2026-11-07 (Thiện): GIỮ ĐỊNH DẠNG CŨ SO0000000XXX (không đổi sang SO-YYYYMM-XXXX như Contract nháp bên dưới) — dùng chung sequence erpm_document_number tăng đơn điệu với hóa đơn/phiếu, dữ liệu cũ đã theo kiểu này, đổi không có lợi nghiệp vụ. Báo giá/phiếu trả vẫn theo BG-/SR-YYYYMM-XXXX. Muốn đồng bộ thì raise task riêng (đổi chỉ cho đơn mới, giữ số cũ).
   orderDate: string;
   expectedDeliveryDate?: string;
   quotationId?: number;

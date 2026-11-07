@@ -322,7 +322,7 @@ export interface SalesOrderItemDto {
 export interface SalesOrderDetailDto {
   id: number;
   externalId: string;
-  orderNumber: string;          // SO-YYYYMM-XXXX
+  orderNumber: string;          // Quyết định 2026-11-07 (Thiện): GIỮ ĐỊNH DẠNG CŨ SO0000000XXX (không đổi sang SO-YYYYMM-XXXX như Contract nháp bên dưới) — dùng chung sequence erpm_document_number tăng đơn điệu với hóa đơn/phiếu, dữ liệu cũ đã theo kiểu này, đổi không có lợi nghiệp vụ. Báo giá/phiếu trả vẫn theo BG-/SR-YYYYMM-XXXX. Muốn đồng bộ thì raise task riêng (đổi chỉ cho đơn mới, giữ số cũ).
   orderDate: string;
   expectedDeliveryDate?: string;
   quotationId?: number;
@@ -517,11 +517,11 @@ export interface SalesFunnelDto {
 
 ### 4.2. Thiện (Backend Developer):
 - **Nhánh đề xuất:** `thien/s22-sd-backend`
-- [ ] **BE-22.1:** Thiết kế Migration bảng `tbl_SD_PriceList`, `tbl_SD_PriceListItem`, bổ sung quan hệ Partner.
-- [ ] **BE-22.2:** Service & Controller Bảng giá + Tự động tính giá tối ưu (Pricing Engine).
-- [ ] **BE-22.3:** Entity, Migration, Service & Controller Báo giá (`tbl_SD_SalesQuotation`) + Chuyển đổi sang Sales Order.
-- [ ] **BE-22.4:** Nâng cấp `SalesOrder`: Logic Giữ chỗ kho (`StockReservation`), Kiểm tra hạn mức nợ (`CreditLimitCheck`), Tích hợp Step 21 Notification khi duyệt đơn.
-- [ ] **BE-22.5:** Entity & Service Trả hàng bán (`tbl_SD_SalesReturn`) + Bút toán hạch toán tự động (521/131/156/632).
+- [x] **BE-22.1:** Thiết kế Migration bảng `tbl_SD_PriceList`, `tbl_SD_PriceListItem`, bổ sung quan hệ Partner. (BE 1b444d3, root c6674d6 đã merge; log `.ai/steps/step-22-sd-price-list-be.md`)
+- [x] **BE-22.2:** Service & Controller Bảng giá + Tự động tính giá tối ưu (Pricing Engine). (BE 2306980, FE cfecc88, root 2b527eb đã merge; log `.ai/steps/step-22-sd-pricing-api-be.md`)
+- [x] **BE-22.3:** Entity, Migration, Service & Controller Báo giá (`tbl_SD_SalesQuotation`) + Chuyển đổi sang Sales Order. (BE a566cc5, FE 9cea176, root 84e0ffe đã merge; log `.ai/steps/step-22-sd-quotation-be.md`; chưa làm `send-email` và thông báo)
+- [x] **BE-22.4:** Nâng cấp `SalesOrder`: Logic Giữ chỗ kho (`StockReservation`), Kiểm tra hạn mức nợ (`CreditLimitCheck`), Tích hợp Step 21 Notification khi duyệt đơn. (BE 416ba70, root ba42c88 đã merge; log `.ai/steps/step-22-sd-order-credit-reservation-be.md`; chưa làm `create-invoice`)
+- [x] **BE-22.5:** Entity & Service Trả hàng bán (`tbl_SD_SalesReturn`) + Bút toán hạch toán tự động (521/131/156/632). (BE 27435e0, FE 16fa9a8, root b416294 đã merge; gồm sửa lỗi tester F1-F3; log `.ai/steps/step-22-sd-sales-return-be.md`)
 - [ ] **BE-22.6:** Unit Tests & Verification Tests trong `ERPm.Verification` (Cam kết 100% pass, 0 warning).
 
 ### 4.3. Lợi (Frontend Developer):

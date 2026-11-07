@@ -4,10 +4,14 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Completed
 
+- [x] **Refactor tách services FE theo vai trò module (2026-11-05):** Di chuyển toàn bộ các service nghiệp vụ từ `core/services/` về đúng thư mục module tương ứng (`WMS/services/{item,stock}`, `CRM/services/partner`, `SD/services/{sales,sd}`, `SD/models/sd.models`, `dashboard/services/dashboard`, `SYS/services/{branch,org-admin}`), giữ `core/services/` chỉ chứa 100% cross-cutting services (`auth`, `api-error`, `localization`, `theme`, `notification-*`) theo quy tắc AGENTS.md (2026-11-03). Đã cập nhật 100% đường dẫn import, `ng build` 0 error, Karma unit tests **145/145 pass**. Log: [refactor-20261105-fe-module-services](tasks/refactor-20261105-fe-module-services.md). WMS baf2975 · CRM fb54a0c · SD b933f22 · dashboard 69b106a · HRM 61b2f1d · FE abd1bdc.
+
 - [x] **Step 22 FE — Toàn diện Phân hệ Bán hàng & Phân phối (2026-11-02):** Hoàn thành toàn bộ mục 4.3 trong plan Step 22 (FE-22.1 đến FE-22.8) gồm DTO contract & Mock engine, Màn hình Quản lý Bảng giá & Chiết khấu bậc thang + Mô phỏng tính giá (`PriceListsComponent`), Màn hình Báo giá Khách hàng (`QuotationsComponent`) + 1-Click chuyển đổi sang Đơn hàng, Màn hình Đơn bán hàng (`OrdersComponent`) + Status Stepper + Cảnh báo hạn mức công nợ + Giữ chỗ tồn kho, Màn hình Trả hàng bán & Giảm trừ công nợ (`ReturnsComponent`), Bộ mẫu in chứng từ doanh nghiệp K80/A4/A5 (`PrintPreviewDialogComponent`), và đồng bộ 100% từ điển song ngữ VI/EN. Karma tests 132/132 pass (thêm 16 unit tests mới), FE build 0 error, BE build 0 warning / 0 error. Log: [step-22-enterprise-sales-distribution-fe](steps/step-22-enterprise-sales-distribution-fe.md).
 
 - [x] **Quy định cấm code và push trực tiếp trên nhánh master (2026-11-02):** Ban hành Quy tắc bắt buộc 11 trong PROJECT_MASTER.md và cập nhật AGENTS.md (mục 5 & mục 8): Cấm tuyệt đối code, commit hoặc push trực tiếp trên master. Mọi công việc bắt buộc phải tạo nhánh cá nhân từ master mới nhất (`loipham/*`, `thien/*`, `phuc/*`) để thực hiện, tự kiểm tra đạt 100% rồi mở PR về master.
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị các phân hệ (Cơ cấu tổ chức, Cấp phòng ban, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 116/116 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). BE 980cd80 · FE 219b833.
+- [x] **Refactor thư mục màn: tách `SYS/roles` (2026-11-03):** `permission-matrix`, `data-scope`, `policy-json-editor`, `account-access` (kèm `user-role-assignment`, `effective-permission-preview`) trong `SYS/roles/components/`, hành vi không đổi. Xem [refactor-20261102-fe-per-screen-folders](tasks/refactor-20261102-fe-per-screen-folders.md). FE 2692d2d, root 3c447cd; tester erpm-5c PASS (Karma 145/145).
+- [x] **Bug thêm nhân viên báo sai "Kho và chi nhánh không khớp" (2026-11-03):** form Nhân viên lọc phòng ban theo chi nhánh; BE dùng mã lỗi `error.org.department_branch_mismatch` / `error.org.branch_mismatch` (VI/EN). Xem [bug-20261103-employee-create-department-branch](tasks/bug-20261103-employee-create-department-branch.md). HRM 9b2346d, BE a969c18, FE e9cf053, root afbe117.
 - [x] **N2 Job làm mới hồ sơ nhân viên hằng ngày (2026-11-02):** `EmployeeSnapshotWorker` chạy khi API khởi động và mỗi ngày 00:05 UTC, áp lại dòng QTCT đã duyệt có hiệu lực mới nhất cho nhân viên có cache lệch (dòng điều chuyển đặt trước khi đến ngày không còn làm hồ sơ sai). Tester PASS. Task: [db-20261102-employee-snapshot-daily-refresh](tasks/db-20261102-employee-snapshot-daily-refresh.md). BE 3099951 · root 607e832.
 - [x] **S20.4.5 Màn QTCT + danh mục cấp phòng ban (2026-11-02):** `/employees/:id/work-history` (timeline, điều chuyển, nghỉ việc, sửa/xóa) và `/department-levels` (CRUD theo công ty); BE thêm lọc `?employeeId=` và quy tắc phòng ban phải nằm trong cây chi nhánh. Tester PASS lần 4. Còn lại (task riêng): job hằng ngày áp dụng dòng QTCT có hiệu lực tương lai. Log: [step-20-work-history-ui](steps/step-20-work-history-ui.md). BE f4fef0e · HRM 266096d · FE 0fee8ed · root ffc362c.
 - [x] **Refactor thư mục theo màn (2026-11-02):** HRM (employees, job-positions, org-tree), CRM (partners), SD (pos), WMS (items, inventory), dashboard vào thư mục riêng, không đổi hành vi (Karma 111/111). Còn lại: tách `SYS/roles` thành thư mục con. Task: [refactor-20261102-fe-per-screen-folders](tasks/refactor-20261102-fe-per-screen-folders.md). HRM 529b5bd · CRM 0e582e0 · SD f4a04b2 · WMS 0198d56 · dashboard 545535c · FE 3f531a4 · root 62de2a9.
@@ -38,6 +42,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
+- Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán và sửa 3 lỗi tester đã merge (BE 27435e0, FE 16fa9a8, root b416294; tester PASS); S22.5.1 báo cáo doanh số/KPI (Dapper) + chi tiết hóa đơn F4 đã push (BE d340a54, nhánh `thien/s22-sales-analytics`), chờ merge — xem [step log](steps/step-22-sd-sales-analytics-be.md).
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
 - Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).
 - CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.
@@ -45,7 +50,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Next Steps
 
-1. **Step 20.4 FE — Phân quyền động:** 20.4.1, 20.4.2, 20.6.6 xong. Còn 20.4.3 Role designer (ma trận + JSON, gán role theo user), 20.4.4 từ điển, 20.4.5 QTCT + danh mục cấp; ngoài ra `DepartmentId` cho chứng từ, mục "Quản trị" trên menu mobile. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
+1. **Step 20.4 FE — Phân quyền động:** 20.4.1, 20.4.2, 20.4.4 (từ điển), 20.6.6, S20-DEP xong. Còn 20.4.3 Role designer (ma trận + JSON, gán role theo user), 20.4.5 QTCT + danh mục cấp. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
 2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
 2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
 3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.
@@ -68,6 +73,7 @@ Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-inter
 
 ## Completed
 
+- [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
 - [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
@@ -105,6 +111,7 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
 
 ## Completed
 
+- [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
 - [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.

@@ -2,7 +2,7 @@
 
 > **Loại:** refactor
 > **Ngày tạo:** 2026-11-02 · **Người làm:** Thiện (AI executor) · **Người yêu cầu:** Thiện (qua BA)
-> **Trạng thái:** Doing (đã di chuyển màn rời; còn tách `roles` thành thư mục con, chờ tester/Thiện)
+> **Trạng thái:** Done (di chuyển màn rời + tách `roles` đã merge; FE `2692d2d`, root `3c447cd`; tester erpm-5c PASS 2026-11-03)
 > **Liên quan:** AGENTS.md (quy tắc thư mục), tham chiếu `ART-ERP-FE/src/app/pages/` (ví dụ `ADMIN/permission/`, `CRM/business-partner-detail/components/bp-items/`)
 
 ## 1. Mô tả
@@ -36,7 +36,18 @@ Di chuyển bằng `git mv`, sửa import tương đối và route, không đổ
 `SYS/users`, `SYS/roles`, `SYS/notifications/*`, `HRM/department-levels`, `HRM/work-histories` đã đúng chuẩn. ACC/MFG/PM/PUR/SCM chỉ có README, chưa có màn.
 Bằng chứng không đổi hành vi: `ng build` 0 lỗi; Karma 111/111 trước và sau; mọi màn giữ nguyên route.
 
+## 4c. Tách `SYS/roles` (2026-11-03)
+Mỗi widget một component riêng trong `SYS/roles/components/`, hành vi không đổi:
+| Component | Việc |
+| :--- | :--- |
+| `permission-matrix` | Ma trận quyền theo module, tick Cho phép / Từ chối; phát ra mô hình mới, không tự sửa |
+| `data-scope` | Phạm vi dữ liệu và danh sách đơn vị của CUSTOM_BRANCHES |
+| `policy-json-editor` | Ô JSON chính sách, dùng chung cho role và chính sách riêng của tài khoản |
+| `account-access` | Tab Tài khoản: chọn tài khoản, lưu quyền riêng; chứa 2 component dưới |
+| `user-role-assignment` | Role bổ sung và chính sách riêng của một tài khoản |
+| `effective-permission-preview` | Xem trước quyền hiệu lực kèm nguồn cấp |
+`roles.component` còn danh sách role, bản nháp, lưu và xung đột 409. Bằng chứng: `ng build` 0 lỗi; Karma 145/145 (trước tách 112 + 33 spec mới của các component con, các spec cũ về ma trận và tài khoản chuyển sang component tương ứng).
+
 ## 5. Việc còn lại
-- Tách `SYS/roles` thành `permission-matrix/`, `policy-json-editor/`, `effective-permission-preview/`, `user-role-assignment/` (chưa làm).
-- Nhánh refactor xếp chồng lên nhánh S20.4.5 (cùng file `employees.component.*`), nên merge S20.4.5 trước.
-- Tester kiểm hồi quy nhanh các màn bị di chuyển trên trình duyệt.
+- Chưa kiểm: tiếng Anh và dark mode của màn Vai trò (tester ghi chú). Control con dùng `[formControl]` nên DOM không còn thuộc tính `formcontrolname` (e2e hiện chưa chọn theo thuộc tính này).
+- Nhánh refactor cũ đã merge; PR tách roles: nhánh `thien/refactor-roles-split`.

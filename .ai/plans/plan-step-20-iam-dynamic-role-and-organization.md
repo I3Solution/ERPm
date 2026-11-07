@@ -259,7 +259,7 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
   - **Tab 1 - Ma trận trực quan (Visual Matrix):** Tick chọn quyền `Xem / Thêm / Sửa / Xóa / Duyệt / Hủy` theo từng trang và chọn `DataScope` (`Từ chi nhánh hiện tại trở xuống`, `Chọn chi nhánh cụ thể`, `Phòng ban`, `Toàn công ty`...).
   - **Tab 2 - Trình soạn thảo JSON (AWS IAM JSON Editor):** Chỉnh sửa trực tiếp cấu trúc JSON `Statements` dành cho Admin nâng cao.
   - **Tiến độ 2026-11-02 (chờ tester, chưa merge):** BE `0d6928c`, `c17818b`; FE `b31d209` trên nhánh `thien/step20-role-designer`. Chi tiết: [step-20-role-designer](../steps/step-20-role-designer.md). Còn thiếu từ bài học HRM9: lưu cả ma trận trong 1 transaction, cache quyền dùng chung nhiều instance (tách task riêng).
-- [ ] **Task 20.4.4:** Cập nhật từ điển song ngữ VI/EN (`system_dictionary.json`) cho toàn bộ nhãn giao diện và thông báo lỗi phân quyền.
+- [x] **Task 20.4.4 (Done 2026-11-05):** Cập nhật từ điển song ngữ VI/EN (system_dictionary.json & system.json) cho toàn bộ nhãn giao diện, thông báo lỗi phân quyền, dọn sạch 15 key duplicate và sửa lỗi cú pháp JSON.
 
 ### Phase 20.5: Kiểm thử Tự động (Verification) & Nghiệm thu
 - [x] **Task 20.5.1:** Bổ sung bộ test tích hợp PostgreSQL vào `tests/ERPm.Verification`:
@@ -415,10 +415,10 @@ Khi một câu lệnh `Allow` được kích hoạt, Backend sẽ dịch `DataSc
 | 1 | **[bug] B2** `GET /hrm/department-levels` lộ cấp riêng của công ty khác cho admin công ty | P1, làm trước — rò rỉ dữ liệu, sửa nhanh (~30 phút), cùng kiểu lỗi đã vá cho chức danh ở BE#4 | Lọc theo `CompanyId` null (dùng chung) hoặc trùng công ty người gọi |
 | 2 | **20.4.3** Role designer (ma trận quyền + JSON editor) | P1 | **Đã chốt (BA):** gán role phụ cho user (nhiều role, `PUT /sys/roles/users/{id}`) và inline policy (JSON, nâng cao) làm **trong màn Role designer**, không làm trong hộp thoại tạo/sửa tài khoản (giữ hộp thoại đó đơn giản: chỉ tạo user + chọn nhân sự). Hiển thị rõ lỗi 403 `error.iam.escalation` / `error.iam.company_scope` bằng câu thân thiện, không chỉ in mã lỗi. |
 | 3 | **20.4.5** Màn QTCT (`/hrm/work-histories`) + danh mục cấp phòng ban (`/hrm/department-levels`) | P1 | Hiện sửa nhân viên khóa các trường tổ chức (công ty/chi nhánh/phòng ban/chức danh) vì phải đổi qua QTCT — nghĩa là **chưa có cách điều chuyển nhân viên bằng giao diện** cho tới khi task này xong. Ưu tiên cao vì chặn một thao tác nghiệp vụ thật. |
-| 4 | **20.4.4** Từ điển VI/EN | P2, làm chung PR với #2, #3 | Rà khóa còn thiếu của Role designer và QTCT; nhắc quy tắc sửa cả 2 file cùng PR. |
+| 4 | **20.4.4** Từ điển VI/EN - **Đã xong (2026-11-05)** | P2 | Đã đồng bộ 100% hai file VI/EN, thêm menu.departments, loại bỏ 15 key trùng lặp và sửa lỗi cú pháp JSON. |
 | 5 | **[FE] B1** Mục "Quản trị" trên thanh menu dưới (mobile) - **Đã xong (2026-11-02)** | P2 | **Đã chốt (BA):** dùng tab **"Thêm"** ở cuối thanh menu dưới (mẫu Ionic phổ biến), mở trang danh sách các màn quản trị — không thêm tab riêng cho từng màn. Log: [step-20-mobile-admin-menu](../steps/step-20-mobile-admin-menu.md). |
 | 6 | **[QA] B6** Đưa 39+12+12 kịch bản kiểm tay thành E2E chính thức, chạy trong CI | P2 | **Đã chốt (BA): dùng Playwright**, không dùng Cypress — chạy headless tốt hơn trên `ubuntu-latest`, hỗ trợ đa trình duyệt, API hiện đại, tích hợp GitHub Actions sẵn có dễ hơn. Cần DB tạm giống cách `ERPm.Verification` đang làm. |
-| 7 | **S20-DEP** Gán `DepartmentId` cho chứng từ (đơn bán, hóa đơn, đơn mua, phiếu nhập/xuất) | P2 | Cột và bộ lọc đã có, chỉ thiếu DTO/UI. |
+| 7 | **S20-DEP** Gán DepartmentId cho chứng từ (đơn bán, hóa đơn, đơn mua, phiếu nhập/xuất) - **Đã xong (2026-11-05)** | P2 | Bổ sung DepartmentId cho SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue (DTO & Services) và UI tạo/xem chi tiết đơn bán hàng SD. |
 | 8 | **[bug] B3** Danh sách nhân viên chỉ lọc theo từ khóa và "chưa có tài khoản" | P3 | Công ty lớn cần lọc thêm theo chi nhánh/phòng ban/chức danh ở server. |
 | 9 | **[FE] B5** Cây tổ chức tải tối đa 1000 phòng ban một lần, không phân trang | P3 | Đủ cho giai đoạn đầu; cần ngưỡng cảnh báo hoặc tải theo nhánh khi công ty lớn. |
 | 10 | **[tool] B7** Script nạp dữ liệu demo (`notes/erpm-test-web/seed-testweb.py`, local) | P3 | Cân nhắc đưa vào `tools/` của BE để dùng chung. |

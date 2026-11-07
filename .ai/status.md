@@ -4,6 +4,8 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## Completed
 
+- [x] **Bug Sales Orders in trắng trang, thiếu nút Edit, tương phản Dark Mode (2026-11-07):** Áp dụng Isolated Iframe Printing cho chức năng in chứng từ bán hàng (loại bỏ ảnh hưởng của layout 100vh và overflow hidden); bổ sung nút Chỉnh sửa (Edit) cho đơn hàng Draft/PendingApproval/Confirmed và cột Thao tác; định nghĩa token bề mặt Dark Mode (--erpm-surface-*) và sửa chữ trắng trên nền trắng. Build pass 100%. Task: [bug-20261107-sales-orders-print-edit-darkmode](tasks/bug-20261107-sales-orders-print-edit-darkmode.md). SD b01fdcd · FE 480b570.
+
 - [x] **Task 20.5.2 (2026-11-07):** xác nhận build toàn repo trên master: BE `dotnet build ERPm.sln` 0 warning / 0 error (789a008); FE `npm run build` 0 error (6606a8a), còn cảnh báo ngân sách bundle ban đầu 849,95 kB so với 500 kB — xem [step log](steps/step-20-iam-dynamic-role-and-organization.md) mục 7.
 
 - [x] **Refactor tách services FE theo vai trò module (2026-11-05):** Di chuyển toàn bộ các service nghiệp vụ từ `core/services/` về đúng thư mục module tương ứng (`WMS/services/{item,stock}`, `CRM/services/partner`, `SD/services/{sales,sd}`, `SD/models/sd.models`, `dashboard/services/dashboard`, `SYS/services/{branch,org-admin}`), giữ `core/services/` chỉ chứa 100% cross-cutting services (`auth`, `api-error`, `localization`, `theme`, `notification-*`) theo quy tắc AGENTS.md (2026-11-03). Đã cập nhật 100% đường dẫn import, `ng build` 0 error, Karma unit tests **145/145 pass**. Log: [refactor-20261105-fe-module-services](tasks/refactor-20261105-fe-module-services.md). WMS baf2975 · CRM fb54a0c · SD b933f22 · dashboard 69b106a · HRM 61b2f1d · FE abd1bdc.
@@ -79,6 +81,8 @@ Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-inter
 
 ## Completed
 
+- [x] **Bug Sales Orders in trắng trang, thiếu nút Edit, tương phản Dark Mode (2026-11-07):** Áp dụng Isolated Iframe Printing cho chức năng in chứng từ bán hàng (loại bỏ ảnh hưởng của layout 100vh và overflow hidden); bổ sung nút Chỉnh sửa (Edit) cho đơn hàng Draft/PendingApproval/Confirmed và cột Thao tác; định nghĩa token bề mặt Dark Mode (--erpm-surface-*) và sửa chữ trắng trên nền trắng. Build pass 100%. Task: [bug-20261107-sales-orders-print-edit-darkmode](tasks/bug-20261107-sales-orders-print-edit-darkmode.md). SD b01fdcd · FE 480b570.
+
 - [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
 
@@ -116,6 +120,8 @@ Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đâ
 > **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
 
 ## Completed
+
+- [x] **Bug Sales Orders in trắng trang, thiếu nút Edit, tương phản Dark Mode (2026-11-07):** Áp dụng Isolated Iframe Printing cho chức năng in chứng từ bán hàng (loại bỏ ảnh hưởng của layout 100vh và overflow hidden); bổ sung nút Chỉnh sửa (Edit) cho đơn hàng Draft/PendingApproval/Confirmed và cột Thao tác; định nghĩa token bề mặt Dark Mode (--erpm-surface-*) và sửa chữ trắng trên nền trắng. Build pass 100%. Task: [bug-20261107-sales-orders-print-edit-darkmode](tasks/bug-20261107-sales-orders-print-edit-darkmode.md). SD b01fdcd · FE 480b570.
 
 - [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
 - [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát

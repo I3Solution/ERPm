@@ -137,3 +137,4 @@ deliveryAddressId?: number;   // ID địa chỉ giao hàng chọn từ danh sá
 - **Task S23.3.2 Cải tiến Form Đơn bán - Khách hàng:** Thêm icon chuyển nhanh sang trang xem chi tiết khách hàng; khi chọn khách hàng thì tự động gọi API lấy danh sách địa chỉ giao vào dropdown.
 - **Task S23.3.3 Cải tiến Chọn sản phẩm:** Tích hợp `<app-async-select>` tìm kiếm sản phẩm; khi quét hoặc chọn trùng sản phẩm thì tự động tăng số lượng và hiện thông báo.
 - **Task S23.3.4 Hoàn thiện UI Đơn bán:** Format tiền tệ chuẩn `1.000.000 đ`; icon xóa màu đỏ nổi bật; chọn giờ:phút ngày giao; tính hiển thị tổng tiền gồm thuế VAT.
+

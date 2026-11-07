@@ -6,6 +6,7 @@
 | 1.5 (Step 20): Tổ chức đa cấp, Chức danh & Phân quyền động AWS IAM JSON | Đã hoàn thành lõi BE & phần lớn FE; Thiện & Lợi đang hoàn tất các task cuối |
 | 1.6 (Step 21): Enterprise Notification Engine (SignalR, Outbox, In-App, Email) | Nền tảng thông báo đa kênh toàn hệ thống (đã hoàn thành lõi trên nhánh `loipham/Notification`) |
 | **Giai đoạn tiếp theo (Step 22): Chuyên sâu Bán hàng & Phân phối Doanh nghiệp (Enterprise SD)** | **Đã có Kế hoạch Master Contract-First tại [plan-step-22-enterprise-sales-distribution.md](plans/plan-step-22-enterprise-sales-distribution.md): Bảng giá, Báo giá khách hàng, Đơn đặt hàng & Phê duyệt hạn mức nợ/Giữ tồn kho, Trả hàng bán & Báo cáo doanh số** |
+| **Step 23: UX Refactor, Master Item, CRM Delivery Addresses & Sales Order UX** | **Đã có Kế hoạch chi tiết tại [plan-step-23-ux-refactor-item-crm-sales-enhancements.md](plans/plan-step-23-ux-refactor-item-crm-sales-enhancements.md): Dialog chuẩn hóa, Async Select, Branch Kho, Item Giá/Thuế, CRM Đa địa chỉ, Đơn bán UX** |
 | 2: Mua hàng và sổ quỹ | Có API đơn Draft/Confirmed và nhập mua hạch toán 156/331; chưa có luồng PO–nhận hàng–hóa đơn/thu chi đầy đủ |
 | 3: Kế toán tài chính | Có ledger nền tảng; chưa có bộ sổ/báo cáo đầy đủ |
 | 4: Native/offline, phân hệ mở rộng | Chưa triển khai |

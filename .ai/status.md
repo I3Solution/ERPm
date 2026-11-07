@@ -1,4 +1,4 @@
-# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
+﻿# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
 
 Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
 
@@ -40,8 +40,10 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **Kế hoạch Master Step 22 (2026-11-01):** Lập đặc tả kiến trúc chuẩn Contract-First cho Phân hệ Bán hàng & Phân phối Doanh nghiệp (Enterprise SD: Bảng giá, Báo giá khách hàng, Đơn đặt hàng & Phê duyệt hạn mức nợ/Giữ tồn kho, Trả hàng bán & Báo cáo doanh số) — [plan Step 22](plans/plan-step-22-enterprise-sales-distribution.md).
 - [x] **Centralized Cloud Database Neon.tech (2026-11-02):** Hoàn thành thiết lập PostgreSQL Serverless tập trung dùng chung cho cả 3 người (Phúc, Thiện, Lợi); migrate toàn bộ 7 migration và seed dữ liệu cơ bản + tài khoản admin — xem [db-20261102-centralize-free-db.md](tasks/db-20261102-centralize-free-db.md).
 
+- [x] **Kế hoạch Master Step 23 (2026-11-07):** Lập đặc tả tối ưu UX/UI, Dialog chuẩn hóa, Async Select, Branch Kho, Master Item Giá/Thuế, CRM Đa địa chỉ giao hàng & Đơn bán hàng UX — xem [plan Step 23](plans/plan-step-23-ux-refactor-item-crm-sales-enhancements.md).
 ## In-Progress
 
+- Bug F5 người bán SELF không tạo/đọc được đơn và báo giá: đã sửa và push (BE 2a1a38d, nhánh `thien/fix-selfscope-order-quotation`), chờ merge — xem [bug](tasks/bug-20261107-selfscope-order-quotation.md).
 - Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán và sửa 3 lỗi tester đã merge (BE 27435e0, FE 16fa9a8, root b416294; tester PASS); S22.5.1 báo cáo doanh số/KPI (Dapper) + chi tiết hóa đơn F4 đã push (BE d340a54, nhánh `thien/s22-sales-analytics`), chờ merge — xem [step log](steps/step-22-sd-sales-analytics-be.md).
 - Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
 - Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).

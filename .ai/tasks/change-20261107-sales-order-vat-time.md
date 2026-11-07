@@ -2,7 +2,7 @@
 
 > **Loại:** change (Step 23 nhóm 2, đặc tả BA mục 3 của spec S23.2.2)
 > **Ngày tạo:** 2026-11-07 · **Người làm:** Thiện (BE) · **Người yêu cầu:** BA
-> **Trạng thái:** Doing (chờ tester và Thiện gõ merge)
+> **Trạng thái:** Done (đã merge master; lỗi địa chỉ đã xóa mềm sửa ở nhánh `thien/s23-order-keep-address-copy`)
 > **Liên quan:** Trello https://trello.com/c/5tO1Kk3a · nhánh `thien/s23-sales-order-vat-time` (BE, FE, root) · dựa trên S23.2.1 và S23.2.2 (merge sau BE #25, #26)
 
 ## 1. Mô tả
@@ -31,3 +31,7 @@
 ## 5. Việc còn lại
 - BA/Lợi: FE chuyển sang `vatRate` theo dòng và `deliveryAddressId`; BA quyết định có cần task cho hóa đơn từ đơn có VAT không.
 - Tester kiểm; Thiện gõ merge sau BE #25, #26 (FE #19 trước FE của task này). Migration trên Neon chờ Thiện ra lệnh trực tiếp.
+
+## 6. Sau khi tester kiểm (2026-11-07)
+- **Lỗi đã sửa:** lưu lại (PUT) đơn có địa chỉ giao đã bị xóa mềm, khi client gửi lại đúng `deliveryAddressId` đang lưu trên đơn, trả 400. Nay id trùng id đang lưu và cùng khách hàng thì giữ nguyên bản chụp, không tra lại bảng địa chỉ; đổi sang id khác hoặc đổi khách hàng thì vẫn kiểm. Thêm 2 check (Verification 346).
+- **Đã chấp nhận, FE cần biết:** đơn nháp cũ có thuế đầu đơn tự do chỉ có `TaxAmount` đầu đơn, dòng không có VAT. Khi PUT: gửi lại thuế đầu đơn khác tổng thuế dòng thì 400; không gửi `taxAmount` thì thuế về 0 (tổng giảm). Màn sửa đơn cũ phải gửi `vatRate` từng dòng.

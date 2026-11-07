@@ -2,7 +2,7 @@
 
 > **Loại:** bug
 > **Ngày tạo:** 2026-11-07 · **Người làm:** Thiện (BE) · **Người yêu cầu:** BA
-> **Trạng thái:** Doing (chờ merge, Thiện gõ lệnh)
+> **Trạng thái:** Done (BE #28 và root #42 đã merge theo lệnh của Thiện; FE và BE master cùng mã băm blob 8b6d823)
 > **Liên quan:** BE nhánh `thien/fix-dictionary-fe-be-drift` (8f4878a), root cùng tên
 
 ## Hiện tượng

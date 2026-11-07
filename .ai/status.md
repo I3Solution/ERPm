@@ -42,7 +42,8 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
-- Refactor IAM lưu role trong 1 transaction: khảo sát cho thấy đã nguyên tử; sửa việc phát thông báo trước khi lưu (BE 9337925, nhánh `thien/refactor-role-matrix-transaction`), chờ merge — xem [task](tasks/refactor-20261107-iam-role-save-atomic.md).
+- Refactor IAM lưu role trong 1 transaction: khảo sát cho thấy đã nguyên tử; sửa việc phát thông báo trước khi lưu (BE 9337925, PR BE #23), chờ merge — xem [task](tasks/refactor-20261107-iam-role-save-atomic.md).
+- Refactor IAM phiên bản quyền dùng chung nhiều instance (sequence `erpm_permission_version`, migration `AddPermissionVersion`) đã push (BE 49eacb3, PR BE #24, gộp cả #23), chờ merge — xem [task](tasks/refactor-20261107-iam-permission-version.md).
 - Step 22 BE: `create-invoice` từ đơn bán đã push (BE b63c248, FE 16c3756, nhánh `thien/s22-order-create-invoice`), chờ merge — xem [step log](steps/step-22-sd-order-create-invoice-be.md). F5 (SELF tạo/đọc đơn, báo giá) đã merge (BE d4d1e42, root 04a62ce), chờ tester kiểm lại.
 - Bug F5 người bán SELF không tạo/đọc được đơn và báo giá: đã sửa và push (BE 2a1a38d, nhánh `thien/fix-selfscope-order-quotation`), chờ merge — xem [bug](tasks/bug-20261107-selfscope-order-quotation.md).
 - Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán và sửa 3 lỗi tester đã merge (BE 27435e0, FE 16fa9a8, root b416294; tester PASS); S22.5.1 báo cáo doanh số/KPI (Dapper) + chi tiết hóa đơn F4 đã push (BE d340a54, nhánh `thien/s22-sales-analytics`), chờ merge — xem [step log](steps/step-22-sd-sales-analytics-be.md).

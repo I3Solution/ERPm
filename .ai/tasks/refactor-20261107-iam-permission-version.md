@@ -1,6 +1,6 @@
 # Refactor: phiên bản quyền dùng chung nhiều instance (IAM)
 
-- **Trạng thái:** Doing (đã merge BE 9f84091, chờ tester kiểm lại)
+- **Trạng thái:** Done (BE 9f84091; tester erpm-44 PASS, thử 2 tiến trình API thật cùng DB: đổi quyền ở instance này, instance kia thấy ngay)
 - **Loại / tag:** refactor / `[refactor]`
 - **Trello:** https://trello.com/c/i16woq9C
 - **Nhánh:** `thien/refactor-permission-version` (BE), đã gộp nhánh `thien/refactor-role-matrix-transaction` để tránh xung đột cùng tệp kiểm thử

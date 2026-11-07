@@ -1,6 +1,6 @@
 # Refactor: lưu ma trận role trong 1 transaction (IAM)
 
-- **Trạng thái:** Doing (đã merge BE 64cc59e, chờ tester kiểm lại)
+- **Trạng thái:** Done (BE 64cc59e; tester erpm-44 PASS trên BE 9f84091, Verification 287)
 - **Loại / tag:** refactor / `[refactor]`
 - **Trello:** https://trello.com/c/ZaCzcH2C
 - **Nhánh:** `thien/refactor-role-matrix-transaction` (BE)

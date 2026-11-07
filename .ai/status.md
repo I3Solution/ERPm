@@ -50,6 +50,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
+- S23.3.1 (BE): đơn bán VAT theo dòng, giờ giao UTC, bản chụp địa chỉ giao, chờ tester và merge sau S23.2.2 ([task](tasks/change-20261107-sales-order-vat-time.md)).
 - S23.2.2 (BE): API địa chỉ giao hàng + hạn mức nợ không giới hạn, chờ tester và merge sau S23.2.1 ([task](tasks/change-20261107-partner-delivery-address-api.md)).
 - S23.2.1 (BE): địa chỉ giao hàng đối tác + cờ không giới hạn nợ, BE 8166055 chờ tester và merge ([task](tasks/db-20261107-partner-delivery-address.md)).
 - Step 22 BE: thông báo báo giá (chấp nhận, từ chối, chuyển đơn) đã merge (BE 0a9d596, root 9f7558a). `send-email` báo giá **chờ quyết định hạ tầng email** (Step 21 chưa có SMTP, outbox chỉ gửi tới tài khoản hệ thống) — xem [step log](steps/step-22-sd-quotation-notifications-be.md). F6 (người SELF xuất hóa đơn bị che kho) chờ BA.

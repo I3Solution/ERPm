@@ -75,3 +75,11 @@ Tiền tố `/api/v1`. Header chuẩn auth như các API khác.
 ## 7. Việc còn lại / ghi chú
 - Migration S23.2.1 trên Neon: chỉ chạy khi Thiện ra lệnh trực tiếp trong phiên executor.
 - Test cần có: mặc định đầu tiên, xóa mặc định → chuyển, set-default nguyên tử, giới hạn 20, 404 theo DataScope, bật unlimited cần quyền, unlimited bỏ qua kiểm hạn mức ở mọi điểm.
+
+
+## 8. Tiến độ Thực thi Frontend (S23.2.3, S23.2.4, S23.3.2, S23.3.3, S23.3.4)
+- [x] **S23.2.3 (CRM FE):** Chuyển màn hình Khách hàng sang trang riêng (`/crm/partners/new`, `/crm/partners/:id/edit`) có nút Back và quản lý nhiều địa chỉ giao hàng (`<app-partner-delivery-addresses>`) — CRM `c02c194` (`2f95335`), FE `245668e` (`9e9eb7f`).
+- [x] **S23.2.4 (CRM FE):** Checkbox `'Không giới hạn hạn mức công nợ'` (`isUnlimitedCredit`) trên Form Khách hàng, tự động disable & đưa `creditLimit` về `0` — CRM `c02c194` (`2f95335`), FE `245668e` (`9e9eb7f`).
+- [x] **S23.3.2 (SD FE):** Nút 1-click nhảy tới trang chi tiết Khách hàng và tự động tải danh sách địa chỉ giao hàng + chọn địa chỉ mặc định trên Form Đơn bán — SD `e595dd6` (`591625a`), FE `245668e` (`9e9eb7f`).
+- [x] **S23.3.3 (SD FE):** Tích hợp `<app-async-select>` tìm kiếm sản phẩm theo SKU/Tên/Barcode và tự động cộng dồn số lượng khi chọn sản phẩm trùng — SD `e595dd6` (`591625a`), FE `245668e` (`9e9eb7f`).
+- [x] **S23.3.4 (SD FE):** Hoàn thiện UI Đơn bán: format tiền tệ `1,000,000 đ`, nút xóa dòng màu đỏ (`danger`), chọn ngày giờ giao dự kiến (`datetime-local`), thuế suất VAT theo dòng và tổng tiền thuế GTGT — SD `e595dd6` (`591625a`), FE `245668e` (`9e9eb7f`).

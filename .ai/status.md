@@ -52,6 +52,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
+- Fix thông báo báo giá phát sai người nhận (BE, chờ tester và merge): [task](tasks/bug-20261107-quotation-notification-recipients.md).
 - S23.3.1 (BE): đơn bán VAT theo dòng, giờ giao UTC, bản chụp địa chỉ giao, chờ tester và merge sau S23.2.2 ([task](tasks/change-20261107-sales-order-vat-time.md)).
 - S23.2.2 (BE): API địa chỉ giao hàng + hạn mức nợ không giới hạn, chờ tester và merge sau S23.2.1 ([task](tasks/change-20261107-partner-delivery-address-api.md)).
 - S23.2.1 (BE): địa chỉ giao hàng đối tác + cờ không giới hạn nợ, BE 8166055 chờ tester và merge ([task](tasks/db-20261107-partner-delivery-address.md)).

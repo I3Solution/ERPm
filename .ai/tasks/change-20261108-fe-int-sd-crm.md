@@ -17,7 +17,7 @@
 
 ## 2. Kiểm tra
 - `npm run build`: 0 lỗi. Karma: 176/176 (thêm `partner.service.spec.ts` 9 test hợp đồng; 5 spec cũ phụ thuộc dữ liệu giả chuyển sang `HttpTestingController`).
-- **Kiểm hợp đồng trên API thật** (API chạy trên DB local tạm, kịch bản gửi đúng các body mà service FE tạo): 47 bước PASS gồm tạo/sửa/đọc lại khách, 2 địa chỉ + đặt mặc định + lỗi `error.crm.delivery_address_recipient_required`, bảng giá tạo/sửa/tính giá, báo giá tạo/sửa/gửi/chấp nhận/chuyển đơn, đơn VAT 8% + giờ giao + địa chỉ (thuế 24, tổng 324), xác nhận/hủy kèm lý do, chờ duyệt nợ, từ chối duyệt thiếu lý do, duyệt có lý do, xuất hóa đơn, trả hàng, các danh sách phân trang.
+- **Kiểm hợp đồng trên API thật** (API chạy trên DB local tạm, kịch bản gửi đúng các body mà service FE tạo): mọi bước PASS, gồm tạo/sửa/đọc lại khách, 2 địa chỉ + đặt mặc định + lỗi `error.crm.delivery_address_recipient_required`, bảng giá tạo/sửa/tính giá, báo giá tạo/sửa/gửi/chấp nhận/chuyển đơn, đơn VAT 8% + giờ giao + địa chỉ (thuế 24, tổng 324), xác nhận/hủy kèm lý do, chờ duyệt nợ, từ chối duyệt thiếu lý do, duyệt có lý do, xuất hóa đơn, trả hàng, các danh sách phân trang.
 - **Chưa làm:** thao tác bằng giao diện trên trình duyệt (phiên này không có công cụ điều khiển trình duyệt). Tester nên bấm thử các màn Khách hàng, Báo giá, Đơn bán, Trả hàng, Bảng giá trên API thật.
 
 ## 3. Phát hiện cần quyết định

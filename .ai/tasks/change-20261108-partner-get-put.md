@@ -14,11 +14,11 @@ Màn Khách hàng sửa tên, điện thoại, email, địa chỉ, MST, hạn m
 - Kiểm tra: tên bắt buộc ≤255, loại hợp lệ, điện thoại ≤50, email ≤100, MST ≤50, địa chỉ ≤500, ghi chú ≤2000, hạn mức ≥0 tối đa 4 chữ số thập phân (`error.validation.number`), bảng giá phải đang hoạt động (giữ nguyên bảng giá đã tắt thì được). Trường tùy chọn để trống sẽ xóa giá trị. Mã lỗi đều đã có trong từ điển, không thêm khóa mới.
 - Người sửa và thời điểm ghi theo auditing chuẩn (`LastModifiedBy/At`).
 - `Partner` chưa có phạm vi dữ liệu theo chi nhánh (tồn đọng đã ghi ở S23.2.2), nên 404 chỉ khi không tồn tại.
-- Lưu ý FE: PUT thay toàn bộ các trường trên (không phải cập nhật từng phần); trường gửi thiếu sẽ bị xóa hoặc về mặc định (`creditLimit` 0, `isActive` true).
+- **Hợp đồng PUT (sau khi tester kiểm):** `name`, `partnerType`, `creditLimit` và `isActive` là BẮT BUỘC: thiếu hoặc sai tên trường trả 400 `error.validation.request` và không đổi dữ liệu. Các trường còn lại (phone, email, address, taxCode, priceListId, notes) thay toàn bộ giá trị cũ, thiếu = xóa; vì vậy FE luôn GET rồi gửi đủ các trường. Email phải đúng định dạng cơ bản (chỉ khi PUT).
 
 ## 3. Kiểm tra
 - `dotnet build ERPm.sln`: 0 warning, 0 error.
-- `ERPm.Verification` (Docker cục bộ): 367 check đạt (12 mới): đọc theo id, 404, sửa đủ trường, không đổi mã/công nợ/cờ không giới hạn, ghi người sửa, xóa trường tùy chọn và ngừng hoạt động, từ chối tên trống, điện thoại quá dài, hạn mức âm, bảng giá không tồn tại, loại sai, đối tác không tồn tại.
+- `ERPm.Verification` (Docker cục bộ): 374 check đạt (12 mới + 7 cho trường bắt buộc và email): đọc theo id, 404, sửa đủ trường, không đổi mã/công nợ/cờ không giới hạn, ghi người sửa, xóa trường tùy chọn và ngừng hoạt động, từ chối tên trống, điện thoại quá dài, hạn mức âm, bảng giá không tồn tại, loại sai, đối tác không tồn tại.
 
 ## 4. Việc còn lại
 - Tester kiểm API thật (cả quyền view/create); Thiện gõ merge. Sau đó FE nối `getPartner/updatePartner` (FE-INT.1).

@@ -119,11 +119,11 @@ deliveryAddressId?: number;   // ID địa chỉ giao hàng chọn từ danh sá
 ## ✅ 4. CHI TIẾT CÁC NHIỆM VỤ (TASK DETAILS)
 
 ### Nhóm 1: Phúc (Lead / Core Shared & Master Data)
-- **Task S23.0.1 Component Dialog chuẩn hóa:** Dựng service `DialogService` và component Ionic/Angular cho Confirm (`Yes/No` / `OK/Cancel`), Alert/Info, Warning, Error. Trả về `Promise<boolean>` tiện lợi.
-- **Task S23.0.2 Component Search Select Async & Nút Back:** Component `<app-async-select>` nhận callback API tìm kiếm từ xa, debounce 300ms, spinner, hiển thị item custom; `<app-back-button>` đồng bộ điều hướng.
-- **Task S23.0.3 Quy chuẩn Modal/Popup:** Cấu hình toàn bộ modal popup nhập liệu `backdropDismiss: false`, có nút X hoặc Hủy rõ ràng; các form nghiệp vụ nặng chuyển dần thành route page riêng.
-- **Task S23.1.1 Bổ sung OrgUnitType Kho (Warehouse):** Cập nhật enum `OrgUnitType` (thêm `Warehouse`), cấu hình migration và hiển thị icon Kho chuyên biệt trên cây tổ chức.
-- **Task S23.1.2 Refactor Master Item:** Thêm trường `VatRate`, `SellingPrice`, `PurchasePrice` vào Entity `Item`, migration DB, cập nhật form tạo/sửa Item trên FE.
+- [x] **Task S23.0.1 Component Dialog chuẩn hóa:** Dựng service `DialogService` và component Ionic/Angular cho Confirm (`Yes/No` / `OK/Cancel`), Alert/Info, Warning, Error. Trả về `Promise<boolean>` tiện lợi. (FE `6aaa6f6`, BE `671cd8f`, Root `943aa9d`).
+- [x] **Task S23.0.2 Component Search Select Async & Nút Back:** Component `<app-async-select>` nhận callback API tìm kiếm từ xa, debounce 250ms, spinner, hiển thị item custom; `<app-back-button>` đồng bộ điều hướng tự động hoặc fallback url. (FE `a2f4ac7`/`f0c1e81`).
+- [x] **Task S23.0.3 Quy chuẩn Modal/Popup:** Cấu hình toàn bộ modal popup nhập liệu chặn click backdrop (`backdropDismiss: false`), có nút X hoặc Hủy rõ ràng; các form nghiệp vụ nặng chuyển dần thành route page riêng. (FE `a2f4ac7`/`f0c1e81`, WMS `cfd64e4`/`cd7b180`).
+- [x] **Task S23.1.1 Bổ sung OrgUnitType Kho (Warehouse):** Cập nhật enum `OrgUnitType` (thêm `Warehouse = 3`), cấu hình migration DB và hiển thị icon Kho chuyên biệt (`📦`) trên cây tổ chức. (BE `d32a690`/`218f917`, FE `a2f4ac7`/`f0c1e81`).
+- [x] **Task S23.1.2 Refactor Master Item:** Thêm trường `VatRate`, `SalePrice`, `CostPrice` vào Entity `Item`, migration DB, cập nhật form tạo/sửa Item và bảng Item hiển thị VAT trên FE. (BE `d32a690`/`218f917`, FE `a2f4ac7`/`f0c1e81`, WMS `cfd64e4`/`cd7b180`).
 
 ### Nhóm 2: Thiện (Backend Developer)
 - **Task S23.2.1 Entity & Migration Địa chỉ giao hàng & Checkbox nợ:** Tạo bảng `tbl_CRM_PartnerDeliveryAddress`, thêm `IsUnlimitedCredit` vào `tbl_MD_Partner`.

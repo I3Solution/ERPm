@@ -1,4 +1,4 @@
-﻿# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
+# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
 
 Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
 

@@ -56,6 +56,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 
 ## In-Progress
 
+- FE-INT.1: FE SD + CRM dùng API thật, bỏ dữ liệu giả ([task](tasks/change-20261108-fe-int-sd-crm.md)), chờ tester và merge.
 - Dialog dùng chung (Confirm/Info/Warning/Error/Prompt) thay `window.confirm/alert` ([task](tasks/change-20261107-shared-dialog.md)); còn chuyển 14 chỗ trong HRM/SD/WMS.
 - Fix thông báo đơn bán và trả hàng phát sai người nhận ([task](tasks/bug-20261107-order-return-notification-recipients.md)).
 - Fix thông báo báo giá phát sai người nhận (BE, chờ tester và merge): [task](tasks/bug-20261107-quotation-notification-recipients.md).

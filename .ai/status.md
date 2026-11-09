@@ -67,6 +67,7 @@ Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; t
 - [x] **Kế hoạch Master Step 23 (2026-11-07):** Lập đặc tả tối ưu UX/UI, Dialog chuẩn hóa, Async Select, Branch Kho, Master Item Giá/Thuế, CRM Đa địa chỉ giao hàng & Đơn bán hàng UX — xem [plan Step 23](plans/plan-step-23-ux-refactor-item-crm-sales-enhancements.md).
 ## In-Progress
 
+- BUG-20261108a: đơn đã duyệt nợ được xuất hóa đơn không bị chặn hạn mức ([task](tasks/bug-20261108-invoice-honor-credit-approval.md)), chờ tester và merge.
 - BE-INT.1: GET + PUT /partners/{id} ([task](tasks/change-20261108-partner-get-put.md)), chờ tester và merge.
 - Dialog dùng chung (Confirm/Info/Warning/Error/Prompt) thay `window.confirm/alert` ([task](tasks/change-20261107-shared-dialog.md)); còn chuyển 14 chỗ trong HRM/SD/WMS.
 - Fix thông báo đơn bán và trả hàng phát sai người nhận ([task](tasks/bug-20261107-order-return-notification-recipients.md)).

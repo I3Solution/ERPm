@@ -1,8 +1,10 @@
-# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
+﻿# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
 
 Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
 
 ## Completed
+
+- [x] **Refactor chuyển đổi toàn diện bảng HTML thuần `<table>` sang `<app-data-table>` (2026-11-09):** Rà soát toàn bộ dự án FE và chuyển đổi 100% các màn hình dữ liệu chính (11 trang) và chi tiết dòng chứng từ (3 trang) sang component dùng chung `<app-data-table>` (`DataTableComponent`, `DataTableCellDirective`, `TableColumn`). Hỗ trợ sticky columns, text/number/currency format tự động, badge styling, loading skeleton và responsive desktop/mobile. Các module đã chuyển đổi gồm CRM Partners, SD Quotations, SD Returns, SD Price Lists, WMS Items, WMS Inventory, HRM Employees, HRM Department Levels, HRM Job Positions, SYS Users, SYS Notification Templates, SYS Notification Center, SD Quotation Detail Lines, SD Return Detail Lines và Price List Items. FE `npm run build` 0 error (Exit code 0). CRM 97b4128 · HRM d88e3ba · SD 963b862 · WMS 9cecbf8 · FE 689d037. Task: [refactor-20261109-migrate-tables-to-app-data-table](tasks/refactor-20261109-migrate-tables-to-app-data-table.md).
 
 - [x] **Tái cấu trúc DataTableComponent dùng chung & Nâng cấp Giao diện Đơn bán hàng SD (2026-11-09):** Xây dựng component bảng dữ liệu dùng chung `<app-data-table>` hỗ trợ cả Chế độ Danh sách (List mode, custom cell directive `appDataTableCell`, sorting, selection) và Chế độ Nhập liệu FormArray (Editable mode); refactor toàn diện Màn hình Danh sách Đơn bán hàng (`/sales/orders`) và Màn hình Chi tiết Đơn bán hàng (`/sales/orders/:id` ở cả View Mode và Edit Mode); giải quyết triệt để lỗi menu dropdown chọn sản phẩm bị che khuất bằng cơ chế Smart Drop-Up kết hợp định vị `position: fixed` không phụ thuộc overflow của bảng; triệt tiêu hiện tượng thanh scroll ngang lơ lửng giữa bảng và giữ bố cục khít theo số lượng dòng thực tế. FE build pass 100% (0 error). SD b6329da · FE a18fe3b · root 3e0b28b.
 

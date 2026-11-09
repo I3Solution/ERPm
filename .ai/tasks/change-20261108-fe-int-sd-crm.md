@@ -20,8 +20,16 @@
 - **Kiểm hợp đồng trên API thật** (API chạy trên DB local tạm, kịch bản gửi đúng các body mà service FE tạo): mọi bước PASS, gồm tạo/sửa/đọc lại khách, 2 địa chỉ + đặt mặc định + lỗi `error.crm.delivery_address_recipient_required`, bảng giá tạo/sửa/tính giá, báo giá tạo/sửa/gửi/chấp nhận/chuyển đơn, đơn VAT 8% + giờ giao + địa chỉ (thuế 24, tổng 324), xác nhận/hủy kèm lý do, chờ duyệt nợ, từ chối duyệt thiếu lý do, duyệt có lý do, xuất hóa đơn, trả hàng, các danh sách phân trang.
 - **Chưa làm:** thao tác bằng giao diện trên trình duyệt (phiên này không có công cụ điều khiển trình duyệt). Tester nên bấm thử các màn Khách hàng, Báo giá, Đơn bán, Trả hàng, Bảng giá trên API thật.
 
+## 2b. Sửa sau khi Tester 1 trả FAIL (2026-11-10)
+- Bỏ hết dữ liệu mẫu còn sót: hộp thoại Tạo báo giá, chi tiết báo giá, hộp thoại Lập phiếu trả hàng (nay chọn hóa đơn gốc thật hoặc trả không hóa đơn, dòng hàng lấy từ hóa đơn), bộ chọn sản phẩm và mô phỏng tính giá ở Bảng giá, chi nhánh ở chi tiết bảng giá, trả hàng chi tiết, form đơn cũ `order-form-dialog` (xóa vì không còn dùng). Khách, chi nhánh, kho, sản phẩm đến từ `SdLookupService` (đọc API thật); sản phẩm dùng `app-async-select`. Đầu trang in lấy theo chi nhánh của chứng từ (không còn tên công ty và mã số thuế giả). Không còn `salespersonId` cố định 1.
+- Sửa đối tác không xóa bảng giá (giữ `priceListId` đang lưu), tick Không giới hạn nợ giữ nguyên hạn mức; hạn mức mặc định của đối tác mới là 0.
+- Nút Xác nhận đơn kiểm `sd:order:confirm`; thêm nút Khách chấp nhận / Khách từ chối ở báo giá (hỏi xác nhận), nút "Đánh dấu đã gửi" thay "Gửi email" (hệ thống chưa gửi email); xóa địa chỉ giao hỏi xác nhận.
+- 27 khóa từ điển thiếu hoặc mới (FE + BE giống từng byte; FE đang là tập cha nên BE lấy theo FE, gồm 2 khóa Lợi thêm chỉ ở FE).
+- Karma 176/178: 2 spec `BackButton` lỗi sẵn trên master (không thuộc thay đổi này, Dev 2 xử lý). Spec `app.component` của master thiếu đối số thứ 7: đã sửa một dòng.
+- Chưa làm: lấy `vatRate` từ Item (FE `ItemDto` chưa có trường dù BE đã có từ S23.1.2); VAT trên dòng vẫn nhập tay, mặc định 0.
+
 ## 3. Phát hiện cần quyết định
-1. **Hóa đơn từ đơn đã duyệt nợ vẫn bị chặn hạn mức.** Đơn vượt hạn mức được duyệt (`Overridden`), nhưng `create-invoice` với thanh toán nợ trả 409 `error.sales.credit_limit` vì `PostInvoiceAsync` kiểm lại hạn mức. Cần BA quyết định: đơn đã duyệt có được bỏ qua kiểm hạn mức khi xuất hóa đơn không (lỗi BE từ Step 22).
+1. **(Đã sửa ở BE #38, tester PASS)** Hóa đơn từ đơn đã duyệt nợ vẫn bị chặn hạn mức. Đơn vượt hạn mức được duyệt (`Overridden`), nhưng `create-invoice` với thanh toán nợ trả 409 `error.sales.credit_limit` vì `PostInvoiceAsync` kiểm lại hạn mức. Cần BA quyết định: đơn đã duyệt có được bỏ qua kiểm hạn mức khi xuất hóa đơn không (lỗi BE từ Step 22).
 2. **Chưa có màn xuất hóa đơn từ đơn** trong FE: `createInvoiceFromOrder` đã có trong service, nhưng chưa có nút (cần thiết kế: chọn kho, hình thức thanh toán).
 3. Còn dữ liệu mẫu cứng ở `order-detail.component.ts` (danh mục sản phẩm mặc định khi API trống) và màn tạo đơn dùng VAT mặc định 10%; Item chưa có `vatRate` (card S23.1.2 của Phúc).
 4. Chi tiết trả hàng và đơn còn mã chỉnh sửa cũ của chế độ sửa (không còn vào được); nên dọn khi tách List/Detail (Dev 2).

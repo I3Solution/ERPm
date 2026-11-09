@@ -53,3 +53,21 @@
 ## 4. Kết quả nghiệm thu
 - `npm run build`: Hoàn thành 100% không có lỗi (0 error).
 - Toàn bộ các màn hình hiển thị danh sách và chứng từ chi tiết hoạt động đồng nhất, mã nguồn ngắn gọn, dễ bảo trì và mở rộng.
+
+## 5. Cập nhật sửa lỗi EditMode trên các trang Detail (2026-11-09)
+### Hiện tượng & Nguyên nhân gốc
+- Khi người dùng bấm "Chỉnh sửa" trên `sales/quotations/:id` hoặc `sales/price-lists/:id`: danh sách chi tiết dòng sản phẩm / mức giá vẫn ở trạng thái xem, không cho sửa.
+- **Nguyên nhân 1:** Trong nhánh render object thuần (`!formArray`) của `DataTableComponent`, hàm `getCellTemplate(col, false)` và context `{ canEdit: false }` bị gán cứng là `false` thay vì sử dụng getter `isEditActive`. Do đó, các template projection sử dụng `let-canEdit="canEdit"` luôn nhận `canEdit === false`.
+- **Nguyên nhân 2:** Component `price-list-detail` chưa truyền `[canEdit]="isEditing()"` xuống component con `<app-price-list-items>`, và bản thân `price-list-items` chưa hỗ trợ nhập liệu inline cho các cột số lượng tối thiểu, đơn giá và phần trăm chiết khấu.
+
+### Giải pháp xử lý
+1. **`DataTableComponent` (`data-table.component.html`):** Thay thế `getCellTemplate(col, false)` và `canEdit: false` bằng `getCellTemplate(col, isEditActive)` và `canEdit: isEditActive`.
+2. **`QuotationDetailComponent` (`quotation-detail.component.html`):** Khi `isEditing()` chuyển sang `true`, `canEdit` truyền vào template projection là `true`, lập tức kích hoạt dropdown chọn sản phẩm, các ô input số lượng, đơn giá, chiết khấu và nút xóa dòng.
+3. **`PriceListDetailComponent` & `PriceListItemsComponent`:**
+   - Truyền `[canEdit]="isEditing()"` từ `price-list-detail` xuống `price-list-items`.
+   - `price-list-items` kích hoạt chế độ sửa inline cho `minQuantity`, `unitPrice` (`erpmCurrencyInput`) và `discountPercent` khi `canEdit === true`.
+   - Ẩn nút "➕ Thêm mức giá" và nút xóa `🗑️` ở chế độ xem; chỉ hiển thị khi `canEdit === true`.
+   - Hỗ trợ lưu trữ `originalPriceList` để rollback sạch sẽ khi bấm "✕ Hủy chỉnh sửa".
+4. **Commits liên quan:**
+   - Submodule `SD`: `6d647b2` - `[fix](SD) enable inline edit mode for price list items and quotation detail`
+   - Repo `ERPm-FE`: `1bea28a` - `[fix](SHARED) pass isEditActive to cell template context in DataTableComponent`

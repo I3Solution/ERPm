@@ -1,10 +1,10 @@
 # Step 2.2 Follow-up — Backend Roslyn Indexer Quality
 
-> **Status:** Implementation in progress — implementation branch created; verification pending  
+> **Status:** Implementation merged via PR #60; CI passed; real-workspace verification pending  
 > **Created:** 2026-11-10  
 > **Target repository:** `I3Solution/ERPm` (umbrella)  
 > **Integration branch:** `master`  
-> **Implementation branch:** `loipham/phase2-backend-indexer-quality-impl`  
+> **Implementation branch:** `loipham/phase2-backend-indexer-quality-impl` (merged via PR #60)  
 > **Scope:** `tools/ERPm.CodeIndex` and its tests/documentation only
 
 ## 1. Objective
@@ -182,7 +182,7 @@ Implementation has started on `loipham/phase2-backend-indexer-quality-impl`, bas
 - A new xUnit test project covers generated-file policy, handwritten Designer inclusion, Roslyn symbol categories and call/reference syntax classification.
 - CI now runs the code-index test project.
 
-This is an implementation snapshot, not a verification result. CI compilation/tests and the real ERPm re-index/query comparison remain pending. The tests currently cover deterministic classification/filter helpers; additional end-to-end indexer assertions may be added if CI or the real smoke test reveals gaps.
+The implementation is merged in PR #60. GitHub Actions run #432 passed the backend, frontend and code-index jobs; the code-index job passed CLI build, xUnit tests and pinned workspace-manifest validation. The tests currently cover deterministic classification/filter helpers; the real ERPm re-index/query comparison remains pending and may reveal a need for additional end-to-end assertions.
 
 ## 10. Context packet / provenance
 

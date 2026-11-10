@@ -407,8 +407,10 @@ The follow-up will:
 
 ## 16. Backend indexer quality implementation — 2026-11-10
 
-**Status:** Implementation in progress; CI and real-workspace verification pending.  
+**Status:** Implementation merged via PR #60; CI passed; real-workspace verification pending.  
 **Implementation branch:** `loipham/phase2-backend-indexer-quality-impl`  
+**PR:** [#60](https://github.com/I3Solution/ERPm/pull/60), merged into `master`.  
+**Merge commit:** `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5`.  
 **Base:** PR #59 merge commit `a459edbc87d92ee959cdc42572235a40aee44aab`.  
 **Detailed plan:** [plan-step-2.2-backend-indexer-quality.md](plan-step-2.2-backend-indexer-quality.md).
 
@@ -422,4 +424,17 @@ Implementation changes currently on the branch:
 - Added xUnit tests for generated-file inclusion/exclusion, handwritten Designer files, symbol categories and call/reference syntax.
 - Added the code-index test project to the CI workflow and updated CLI documentation.
 
-**Not yet verified:** No local build/test or real ERPm 0.2.0 re-index has been run in this session. CI must validate compilation/tests; user workspace smoke testing must confirm actual indexing, source SHA, record counts and baseline comparison. Do not mark Step 2.2 complete until those results are recorded.
+**CI verification — PASS:** GitHub Actions run #432 on PR #60 head `52457bf16997f0918b2b1af6614040840670eb08` completed successfully. Backend, frontend and code-index jobs all passed. The code-index job passed CLI build, xUnit tests and pinned workspace-manifest validation.
+
+**Merge:** PR #60 merged into `master` at `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5` on 2026-11-10.
+
+**Real-workspace acceptance remains pending:** The user has not yet run the 0.2.0 index against the exact pinned ERPm-BE SHA or compared it with the preserved 0.1.0 baseline. CI does not replace this smoke test. Keep Step 2.2 open until indexing, query samples, generated-file exclusion, source spans and baseline comparison are verified.
+
+
+## 17. PR #60 merged — verification checkpoint (2026-11-10)
+
+- Root `master` now points to merge commit `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5`.
+- PR #60 implementation is integrated; no further implementation merge is required before the smoke test.
+- GitHub Actions run #432 passed all three jobs: backend, frontend and code-index. Code-index build, unit tests and workspace-manifest validation passed.
+- User plans to perform local verification on the next work session. Until then, the `0.1.0` cache remains the comparison baseline and must not be overwritten or deleted.
+- Next action: run the `0.2.0` backend index on `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`, inspect output and compare with `0.1.0`. Record real counts and query evidence before marking BEQ acceptance complete.

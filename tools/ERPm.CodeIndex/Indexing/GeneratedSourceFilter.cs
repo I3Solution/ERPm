@@ -34,6 +34,7 @@ public static class GeneratedSourceFilter
 
         var fileName = segments.LastOrDefault() ?? relativePath;
         if (fileName.EndsWith(".g.cs", StringComparison.OrdinalIgnoreCase)
+            || fileName.EndsWith(".g.i.cs", StringComparison.OrdinalIgnoreCase)
             || fileName.EndsWith(".generated.cs", StringComparison.OrdinalIgnoreCase))
         {
             return false;

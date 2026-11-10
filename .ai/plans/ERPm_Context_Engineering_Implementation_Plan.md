@@ -1063,7 +1063,7 @@ Phase 1 should establish the schemas and ownership rules before Phase
 
 ## 15. Immediate Next Actions
 
-The next implementation cycle should focus only on Phase 1.
+At the time this plan was drafted, the next implementation cycle focused only on Phase 1. The execution outcome is recorded in Section 18.
 
 ### Task 1 --- Establish a clean baseline
 
@@ -1165,7 +1165,7 @@ prove useful through CLI workflows.
 
 ### Phase 1 — Context Optimization
 
-<badge>Implementation complete</badge>
+**Implementation complete**
 
 The Phase 1 implementation and available static/integration validation have been completed and merged into the Umbrella repository.
 
@@ -1200,7 +1200,7 @@ Deferred validation and follow-up:
 
 ### Phase 2 — Code Intelligence and Dependency Indexing
 
-<badge color="info">Next planned phase — not started</badge>
+**Next planned phase — not started**
 
 Phase 2 is the next planned implementation stage. Its initial scope is:
 

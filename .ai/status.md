@@ -7,7 +7,7 @@
 ## Workspace baseline
 
 - Umbrella repository: `I3Solution/ERPm`, integration branch: `master`.
-- Current root baseline: `d72119b308d6d11f4ba886e4368ab2f53616cb53` (PR #58 merge).
+- Current root master baseline: `a459edbc87d92ee959cdc42572235a40aee44aab` (PR #59 merge); implementation branch is based on this exact commit.
 - Backend gitlink: `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.
 - Frontend gitlink: `ERPm-FE@dbeaf66687454452886201bb669df1e25478d893`.
 - Chi tiết ownership và quan hệ tích hợp: [Context Workspace Map](context/README.md).
@@ -32,15 +32,16 @@
   - Detailed plan: [plan-step-2.2-backend-indexer-quality.md](plans/plan-step-2.2-backend-indexer-quality.md).
   - Step log: [step-2.2-backend-indexer-quality.md](steps/step-2.2-backend-indexer-quality.md).
   - Baseline indexer version: `0.1.0`; preserve its local cache for comparison.
-  - Known quality work: exclude generated paths/files; classify Roslyn symbol kinds explicitly; preserve valid namespace source context and calls/references semantics; add fixture regression tests; version the new index separately.
-  - The user's observed baseline includes 1,661 records from generated paths. This is not yet corrected or re-measured.
+  - Implementation branch: `loipham/phase2-backend-indexer-quality-impl`.
+  - Current changes: indexer `0.2.0` / schema v2, generated-source filtering, explicit source/target symbol categories, stricter call/reference classification, version-specific symbol search, xUnit tests and CI test step.
+  - The user's observed `0.1.0` baseline includes 1,661 records from generated paths; the `0.2.0` re-index has not yet been run.
 
 ## Next Steps
 
-1. Merge the backend indexer quality plan/step documentation PR.
-2. Implement the follow-up on a new `loipham/*` branch from current `master`.
-3. Add deterministic fixture tests and CI coverage.
-4. Run the new indexer version against the exact pinned ERPm-BE SHA and compare against the preserved `0.1.0` baseline.
+1. Complete CI build/tests for `loipham/phase2-backend-indexer-quality-impl` and resolve any failures.
+2. Review the implementation diff and open/merge its PR only after CI passes.
+3. Run indexer `0.2.0` against the exact pinned ERPm-BE SHA in the user's Windows workspace.
+4. Compare `0.2.0` against the preserved `0.1.0` baseline, including generated paths, relation counts, symbol-kind distribution and representative queries.
 5. Only after backend quality acceptance, proceed to the TypeScript/Angular indexer.
 6. Later implement EF metadata, cross-layer tracing and Phase 2 evaluation.
 7. Measure context/token impact on a real task; do not claim savings before measurement.

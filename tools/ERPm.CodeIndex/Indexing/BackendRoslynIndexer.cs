@@ -8,8 +8,8 @@ namespace ERPm.CodeIndex.Indexing;
 
 public sealed class BackendRoslynIndexer
 {
-    public const string IndexerVersion = "0.1.0";
-    public const int SchemaVersion = 1;
+    public const string IndexerVersion = "0.2.0";
+    public const int SchemaVersion = 2;
 
     public async Task<IReadOnlyList<IndexRecord>> IndexAsync(
         string repositoryPath,
@@ -34,6 +34,8 @@ public sealed class BackendRoslynIndexer
         var solution = await workspace.OpenSolutionAsync(solutionPath, cancellationToken: cancellationToken);
         var generatedAt = DateTimeOffset.UtcNow;
         var records = new List<IndexRecord>();
+        var includedTreeCount = 0;
+        var excludedTreeCount = 0;
 
         foreach (var project in solution.Projects.OrderBy(item => item.Name, StringComparer.Ordinal))
         {
@@ -56,15 +58,35 @@ public sealed class BackendRoslynIndexer
                 continue;
             }
 
+            var includedTrees = new HashSet<SyntaxTree>();
+            foreach (var syntaxTree in compilation.SyntaxTrees)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var sourceText = await syntaxTree.GetTextAsync(cancellationToken);
+                if (GeneratedSourceFilter.ShouldInclude(
+                    syntaxTree.FilePath,
+                    repositoryPath,
+                    sourceText.ToString()))
+                {
+                    includedTrees.Add(syntaxTree);
+                    includedTreeCount++;
+                }
+                else
+                {
+                    excludedTreeCount++;
+                }
+            }
+
             AddNamespaceMembers(
                 compilation.Assembly.GlobalNamespace,
                 repositoryPath,
                 repositoryId,
                 commitSha,
                 generatedAt,
+                includedTrees,
                 records);
 
-            foreach (var syntaxTree in compilation.SyntaxTrees)
+            foreach (var syntaxTree in includedTrees)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -72,14 +94,21 @@ public sealed class BackendRoslynIndexer
 
                 foreach (var node in root.DescendantNodes())
                 {
-                    if (node is not (SimpleNameSyntax or ObjectCreationExpressionSyntax))
+                    if (node is not (SimpleNameSyntax
+                        or ObjectCreationExpressionSyntax
+                        or ImplicitObjectCreationExpressionSyntax))
                     {
                         continue;
                     }
 
-                    var symbol = node is ObjectCreationExpressionSyntax creation
-                        ? semanticModel.GetSymbolInfo(creation, cancellationToken).Symbol
-                        : semanticModel.GetSymbolInfo(node, cancellationToken).Symbol;
+                    var symbol = node switch
+                    {
+                        ObjectCreationExpressionSyntax creation =>
+                            semanticModel.GetSymbolInfo(creation, cancellationToken).Symbol,
+                        ImplicitObjectCreationExpressionSyntax implicitCreation =>
+                            semanticModel.GetSymbolInfo(implicitCreation, cancellationToken).Symbol,
+                        _ => semanticModel.GetSymbolInfo(node, cancellationToken).Symbol
+                    };
 
                     if (symbol is null)
                     {
@@ -87,8 +116,7 @@ public sealed class BackendRoslynIndexer
                     }
 
                     var span = syntaxTree.GetLineSpan(node.Span);
-                    var isCall = node is ObjectCreationExpressionSyntax
-                        || node.Ancestors().OfType<InvocationExpressionSyntax>().Any();
+                    var relation = ReferenceRelationClassifier.GetRelation(node);
                     var enclosingSymbol = semanticModel.GetEnclosingSymbol(node.SpanStart, cancellationToken);
 
                     records.Add(new IndexRecord(
@@ -98,20 +126,25 @@ public sealed class BackendRoslynIndexer
                         commitSha,
                         GetRepositoryRelativePath(syntaxTree.FilePath, repositoryPath),
                         "reference",
+                        SymbolKindClassifier.GetCategory(symbol),
                         CreateSymbolId(symbol),
                         node.ToString(),
                         symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                         "C#",
                         span.StartLinePosition.Line + 1,
                         span.EndLinePosition.Line + 1,
-                        isCall ? "calls" : "references",
+                        relation,
                         enclosingSymbol is null ? null : CreateSymbolId(enclosingSymbol),
+                        enclosingSymbol is null ? null : SymbolKindClassifier.GetCategory(enclosingSymbol),
                         CreateSymbolId(symbol),
                         "verified",
                         generatedAt));
                 }
             }
         }
+
+        Console.Error.WriteLine(
+            $"Backend source filtering: included {includedTreeCount} syntax trees; excluded {excludedTreeCount} generated/out-of-repository trees.");
 
         if (diagnostics.Count > 0)
         {
@@ -136,17 +169,22 @@ public sealed class BackendRoslynIndexer
         string repositoryId,
         string commitSha,
         DateTimeOffset generatedAt,
+        ISet<SyntaxTree> includedTrees,
         ICollection<IndexRecord> records)
     {
         foreach (var member in namespaceSymbol.GetMembers())
         {
             if (member is INamespaceSymbol childNamespace)
             {
-                AddNamespaceMembers(childNamespace, repositoryPath, repositoryId, commitSha, generatedAt, records);
+                AddNamespaceMembers(
+                    childNamespace, repositoryPath, repositoryId, commitSha,
+                    generatedAt, includedTrees, records);
                 continue;
             }
 
-            AddSymbolAndMembers(member, repositoryPath, repositoryId, commitSha, generatedAt, records);
+            AddSymbolAndMembers(
+                member, repositoryPath, repositoryId, commitSha,
+                generatedAt, includedTrees, records);
         }
     }
 
@@ -156,10 +194,13 @@ public sealed class BackendRoslynIndexer
         string repositoryId,
         string commitSha,
         DateTimeOffset generatedAt,
+        ISet<SyntaxTree> includedTrees,
         ICollection<IndexRecord> records)
     {
         var sourceLocation = symbol.Locations.FirstOrDefault(location =>
-            location.IsInSource && location.SourceTree is not null);
+            location.IsInSource
+            && location.SourceTree is not null
+            && includedTrees.Contains(location.SourceTree));
 
         if (sourceLocation?.SourceTree is not null)
         {
@@ -171,12 +212,14 @@ public sealed class BackendRoslynIndexer
                 commitSha,
                 GetRepositoryRelativePath(sourceLocation.SourceTree.FilePath, repositoryPath),
                 "definition",
+                SymbolKindClassifier.GetCategory(symbol),
                 CreateSymbolId(symbol),
                 symbol.Name,
                 symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 "C#",
                 span.StartLinePosition.Line + 1,
                 span.EndLinePosition.Line + 1,
+                null,
                 null,
                 null,
                 null,
@@ -190,7 +233,9 @@ public sealed class BackendRoslynIndexer
             {
                 if (!member.IsImplicitlyDeclared)
                 {
-                    AddSymbolAndMembers(member, repositoryPath, repositoryId, commitSha, generatedAt, records);
+                    AddSymbolAndMembers(
+                        member, repositoryPath, repositoryId, commitSha,
+                        generatedAt, includedTrees, records);
                 }
             }
         }

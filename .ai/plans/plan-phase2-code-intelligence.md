@@ -403,3 +403,23 @@ The follow-up will:
 6. Re-index the real ERPm backend and compare results before declaring the backend slice complete.
 
 **Verification state:** PR #58 CI passed and the user confirmed the workspace manifest and real backend indexing smoke test succeeded. The quality follow-up tests and re-index have not yet been run. Do not claim the complete Step 2.1/2.2 exit criteria are satisfied.
+
+
+## 16. Backend indexer quality implementation — 2026-11-10
+
+**Status:** Implementation in progress; CI and real-workspace verification pending.  
+**Implementation branch:** `loipham/phase2-backend-indexer-quality-impl`  
+**Base:** PR #59 merge commit `a459edbc87d92ee959cdc42572235a40aee44aab`.  
+**Detailed plan:** [plan-step-2.2-backend-indexer-quality.md](plan-step-2.2-backend-indexer-quality.md).
+
+Implementation changes currently on the branch:
+
+- Backend indexer version `0.2.0`, schema version 2.
+- Added schema v2 with explicit `symbolKind` and `sourceSymbolKind`; schema v1 remains unchanged.
+- Added generated-source filtering for `obj/`, `bin/`, `.g.cs`, `.g.i.cs`, `.generated.cs`, auto-generated headers and source paths outside the backend repository.
+- Added explicit symbol-kind mapping and narrowed `calls` to invocation targets and explicit/implicit object creation. Other simple-name references remain `references`.
+- Updated `find symbol` to read only the active indexer-version cache so schema v1/v2 records are not mixed.
+- Added xUnit tests for generated-file inclusion/exclusion, handwritten Designer files, symbol categories and call/reference syntax.
+- Added the code-index test project to the CI workflow and updated CLI documentation.
+
+**Not yet verified:** No local build/test or real ERPm 0.2.0 re-index has been run in this session. CI must validate compilation/tests; user workspace smoke testing must confirm actual indexing, source SHA, record counts and baseline comparison. Do not mark Step 2.2 complete until those results are recorded.

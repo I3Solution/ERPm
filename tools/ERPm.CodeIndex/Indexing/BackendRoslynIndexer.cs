@@ -88,6 +88,7 @@ public sealed class BackendRoslynIndexer
                     var span = syntaxTree.GetLineSpan(node.Span);
                     var isCall = node is ObjectCreationExpressionSyntax
                         || node.Ancestors().OfType<InvocationExpressionSyntax>().Any();
+                    var enclosingSymbol = semanticModel.GetEnclosingSymbol(node.SpanStart, cancellationToken);
 
                     records.Add(new IndexRecord(
                         SchemaVersion,
@@ -103,6 +104,7 @@ public sealed class BackendRoslynIndexer
                         span.StartLinePosition.Line + 1,
                         span.EndLinePosition.Line + 1,
                         isCall ? "calls" : "references",
+                        enclosingSymbol is null ? null : CreateSymbolId(enclosingSymbol),
                         CreateSymbolId(symbol),
                         "verified",
                         generatedAt));
@@ -174,6 +176,7 @@ public sealed class BackendRoslynIndexer
                 "C#",
                 span.StartLinePosition.Line + 1,
                 span.EndLinePosition.Line + 1,
+                null,
                 null,
                 null,
                 "verified",

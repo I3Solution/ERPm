@@ -1,0 +1,47 @@
+version: 1
+repositories:
+  - id: erpm-root
+    repository: I3Solution/ERPm
+    path: .
+    purpose: Workspace orchestration, integration metadata, shared plans, tasks, reviews and CI.
+    owns:
+      - umbrella_submodule_pointers
+      - workspace_context_metadata
+      - cross_repository_integration_checks
+      - shared_project_plans_and_status
+    does_not_own:
+      - backend_runtime_source
+      - frontend_runtime_source
+    bootstrap:
+      - AGENTS.md
+      - .ai/context/README.md
+      - .ai/context/context-policy.md
+      - .ai/status.md
+    status: verified
+  - id: erpm-be
+    repository: I3Solution/ERPm-BE
+    path: ERPm-BE
+    purpose: Backend application and database implementation.
+    owns:
+      - backend_domain_application_infrastructure_api
+      - ef_core_migrations_and_database_seeders
+      - backend_tests
+    bootstrap:
+      - ERPm-BE/AGENTS.md
+      - ERPm-BE/PROJECT_MASTER.md_sections_relevant_to_task
+      - ERPm-BE/.ai/status.md_relevant_sections
+    status: verified_at_pinned_revision
+  - id: erpm-fe
+    repository: I3Solution/ERPm-FE
+    path: ERPm-FE
+    purpose: Frontend application and feature module integration.
+    owns:
+      - angular_shell_and_shared_ui
+      - feature_module_submodule_pointers
+      - frontend_routes_services_and_components
+      - frontend_dictionary_bundle
+    bootstrap:
+      - ERPm-FE/AGENTS.md
+      - ERPm-FE/PROJECT_MASTER.md_sections_relevant_to_task
+      - ERPm-FE/.ai/status.md_relevant_sections
+    status: verified_at_pinned_revision

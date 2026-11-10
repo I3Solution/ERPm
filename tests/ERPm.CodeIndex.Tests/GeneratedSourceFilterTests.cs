@@ -1,4 +1,5 @@
 using ERPm.CodeIndex.Indexing;
+using Xunit;
 
 namespace ERPm.CodeIndex.Tests;
 

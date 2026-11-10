@@ -1,0 +1,55 @@
+version: 1
+routing_unit: business_domain_or_feature_module
+domains:
+  - id: frontend-shell
+    repository: erpm-fe
+    scope: Angular application shell, shared components, routing, core cross-cutting services and theme.
+    status: partial
+  - id: SYS
+    repository: erpm-fe
+    scope: System administration and shared system UI; observed as local FE code, not a standalone FE module submodule.
+    status: verified_at_audited_tree
+  - id: ACC
+    repository: erpm-fe
+    scope: Accounting feature module.
+    status: verified_as_fe_submodule
+  - id: CRM
+    repository: erpm-fe
+    scope: Customer and partner feature module.
+    status: verified_as_fe_submodule
+  - id: HRM
+    repository: erpm-fe
+    scope: Human resources feature module.
+    status: verified_as_fe_submodule
+  - id: MFG
+    repository: erpm-fe
+    scope: Manufacturing feature module.
+    status: verified_as_fe_submodule
+  - id: PM
+    repository: erpm-fe
+    scope: Project management feature module.
+    status: verified_as_fe_submodule
+  - id: PUR
+    repository: erpm-fe
+    scope: Purchasing feature module.
+    status: verified_as_fe_submodule
+  - id: SCM
+    repository: erpm-fe
+    scope: Supply chain feature module.
+    status: verified_as_fe_submodule
+  - id: SD
+    repository: erpm-fe
+    scope: Sales and distribution feature module.
+    status: verified_as_fe_submodule
+  - id: WMS
+    repository: erpm-fe
+    scope: Warehouse management feature module.
+    status: verified_as_fe_submodule
+  - id: backend-platform
+    repository: erpm-be
+    scope: Backend Clean Architecture layers, API, persistence and shared infrastructure.
+    status: partial
+notes:
+  - "This is a routing registry, not a complete business capability map."
+  - "Confirm domain ownership by tracing routes, API endpoints, imports and project references before changing code."
+  - "SYS is local to ERPm-FE at the audited revision; do not assume every FE module is a git submodule."

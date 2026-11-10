@@ -1,191 +1,58 @@
-﻿# 🤖 AGENTS.MD: HƯỚNG DẪN DÀNH CHO AI AGENT TRONG DỰ ÁN ERPM
+# ERPm — AI Agent Bootstrap
 
-Chào bạn AI Assistant, bạn đang làm việc trên dự án **ERPm** - Phần mềm Quản trị Bán hàng, Tồn kho & Kế toán mở rộng (C# .NET 10, PostgreSQL, Angular + Ionic Hybrid).
+Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các repository con. Tài liệu này là **điểm vào/routing**, không phải yêu cầu đọc toàn bộ tài liệu dự án ở mọi task.
 
----
+## 1. Bootstrap — đọc theo thứ tự
 
-## 📌 QUY TẮC HOẠT ĐỘNG BẮT BUỘC
+1. Xác định repository hiện tại, branch, HEAD và trạng thái working tree.
+2. Đọc [workspace map](.ai/context/README.md) và [context policy](.ai/context/context-policy.md).
+3. Đọc [current status](.ai/status.md) để biết trạng thái hiện hành.
+4. Dựa vào task để chọn đúng domain/repository. Chỉ đọc phần liên quan trong `PROJECT_MASTER.md`, roadmap, plan, task và source code.
+5. Trước khi sửa code, lập danh sách scope dự kiến và xác nhận các dependency trực tiếp. Mở rộng phạm vi khi có bằng chứng kỹ thuật.
 
-1. **Đọc tài liệu cốt lõi trước khi thực hiện nhiệm vụ:**
-   - [PROJECT_MASTER.md](PROJECT_MASTER.md): Tài liệu kiến trúc chuẩn, quy ước code và mô hình dữ liệu.
-   - [.ai/roadmap.md](.ai/roadmap.md): Lộ trình phát triển qua các Sprint.
-   - [.ai/status.md](.ai/status.md): Trạng thái hiện tại của dự án và các việc cần làm tiếp theo.
+**Không mặc định đọc toàn bộ** `PROJECT_MASTER.md`, `.ai/roadmap.md`, `.ai/status.md`, toàn bộ plan hoặc toàn bộ source tree. Các tài liệu này được truy xuất theo chủ đề/phần liên quan. Nếu task thay đổi kiến trúc, contract, schema hoặc quy tắc dùng chung, phải đọc thêm các phần chuẩn tương ứng.
 
-2. **Quy chuẩn lưu vết từng Step vào thư mục `.ai/steps/`:**
-   - Mỗi khi bạn hoàn thành một tính năng, cấu hình hoặc sửa đổi kiến trúc lớn, bạn **PHẢI** tạo hoặc cập nhật file log theo định dạng:
-     `.ai/steps/step-[số thứ tự]-[tên-ngắn-gọn].md`
-   - File log cần nêu rõ:
-     - Mục tiêu của step.
-     - Danh sách file đã tạo / chỉnh sửa.
-     - Các lệnh đã chạy (ví dụ `dotnet build`, `dotnet ef migrations add ...`).
-     - Kết quả kiểm tra (Verification).
-     - Hướng đi cho step tiếp theo.
+## 2. Workspace và source of truth
 
-3. **Cập nhật `.ai/status.md`:**
-   - Sau khi ghi log step, cập nhật lại trạng thái: Chuyển các việc đã làm sang **Completed**, cập nhật **In-Progress** và **Next Steps**.
+- Umbrella repo: `I3Solution/ERPm`, nhánh tích hợp `master`.
+- Backend: `ERPm-BE`; frontend: `ERPm-FE`. Root gitlink SHA là revision được pin cho workspace, không tự ý thay bằng HEAD mới nhất của repo con.
+- Metadata trong `.ai/context/` mô tả routing và quan hệ đã xác minh. Khi có khác biệt, Git tree/gitlink và source code tại revision đang checkout là sự thật; cập nhật metadata sau khi xác minh.
+- `PROJECT_MASTER.md` là nguồn quy ước kiến trúc/kỹ thuật dùng chung. `AGENTS.md` tại repository con bổ sung quy tắc cục bộ; nếu xung đột, dừng và báo rõ thay vì tự chọn.
 
-4. **Kỷ luật Kỹ thuật (Technical Discipline):**
-   - **Backend (.NET 10):** Tuân thủ Clean Architecture (`Domain` -> `Application` -> `Infrastructure` -> `API`). Không nhồi nhét business logic vào Controllers.
-   - **Database (PostgreSQL):** Tiền tệ & số lượng bắt buộc dùng `decimal(18, 4)`. Hỗ trợ Soft-delete và Auditing.
-   - **Kế toán & Kho:** Không hard-delete chứng từ giao dịch tài chính đã ghi sổ (`Posted`). Thiết kế bảng sẵn sàng cho Double-Entry Ledger.
-   - **Frontend (Angular + Ionic):** Standalone components, Signals, thiết kế Responsive Adaptive (hỗ trợ cả Mobile màn hình nhỏ và Desktop bảng dữ liệu lớn). Toàn bộ Form nhập liệu lưu dữ liệu bắt buộc dùng `FormGroup` (`ReactiveFormsModule`) kết hợp bộ component chuẩn hóa `<app-form-control>` (`FormControlComponent`) và `<app-input-control>` (`InputControlComponent`) nhận `type`, `dataSource`. TUYỆT ĐỐI KHÔNG dùng các thẻ HTML thuần như `<input>`, `<select>`, `<textarea>` trong template form hoặc cell bảng `app-column`. Mọi trường tìm kiếm / chọn Item/Sản phẩm (hàng hóa, vật tư) BẮT BUỘC dùng component tìm kiếm bất đồng bộ `<app-async-select>` (`AsyncSelectComponent`), không dùng thẻ `<select>` tĩnh.
-   - **Cấu trúc thư mục FE — mỗi màn 1 thư mục riêng, không để file rời ở gốc module (Thiện, 2026-11-02):** **Bắt buộc:** `<ten-component>.component.ts/.html/.scss/.spec.ts` của một màn phải nằm trong thư mục con `<module>/<ten-man>/`, KHÔNG được để rời trực tiếp dưới gốc module (vd sai: `HRM/employees.component.ts`; đúng: `HRM/employees/employees.component.ts`). Theo đúng cách tổ chức của ERP cũ `C:\Drive\Is\Source\FE\ART-ERP-FE\src\app\pages\<MODULE>\<ten-man>\` — mỗi màn/dialog là 1 thư mục con riêng (vd `ADMIN/permission/`, `ADMIN/form-permission/` tách biệt dù cùng nhóm phân quyền). Sub-widget bên trong 1 màn thì đặt dưới `components/` con của màn đó (vd `CRM/business-partner-detail/components/bp-items/`). Khi 1 màn có nhiều chế độ hiển thị rõ rệt (bảng/ma trận, JSON editor, dialog sao chép, khung xem trước...), mỗi chế độ là 1 component riêng trong thư mục con của màn, không nhồi chung vào 1 file `.component.ts` lớn.
-   - **Cấu trúc thư mục `services/` — tách theo vai trò, không dồn 1 cục (Thiện, 2026-11-03):** `ERPm-FE/src/app/core/services/` chỉ chứa service **cross-cutting thật** dùng chung toàn app: `auth`, `api-error`, `localization`, `theme`, `notification-*` (chuông/toast/SignalR). Service thuộc về nghiệp vụ của 1 module (vd `item.service.ts`, `stock.service.ts` gọi API `/wms/...` → thuộc WMS; `partner.service.ts` gọi `/partners` → thuộc CRM; `sales.service.ts` gọi `/sales/...` → thuộc SD; `branch.service.ts`, `org-admin.service.ts` gọi `/branches`, org admin → thuộc SYS; `dashboard.service.ts` → thuộc `modules/dashboard`) phải đặt trong `modules/<MODULE>/services/`, KHÔNG để chung ở `core/services/`. Theo đúng cách tách của ERP cũ `C:\Drive\Is\Source\FE\ART-ERP-FE\src\app\services\` (chia `auth/`, `core/`, `custom/`, `page/`, `static/`, `util/` theo vai trò kỹ thuật, không gộp phẳng). Việc màn nào thuộc module nào tra theo endpoint API service đó gọi, không đoán theo tên file.
-   - **Đa ngôn ngữ (i18n):** Mọi thông báo lỗi, nhãn giao diện và master data (Item, Category) phải tuân thủ chuẩn đa ngôn ngữ Anh - Việt qua từ điển `app_dictionaries` và JSONB translations.
-   - **Code Comments (English Only):** Toàn bộ comment trong mã nguồn (Backend C#, Frontend TypeScript/HTML/SCSS, SQL scripts) bắt buộc 100% bằng Tiếng Anh (English comments only). Không viết comment tiếng Việt trong source code.
-   - **Thông báo Doanh nghiệp (Enterprise Notifications):** Mọi tính năng nghiệp vụ có phát sinh sự kiện quan trọng (tạo mới, gửi duyệt, phê duyệt, từ chối, hủy chứng từ, cảnh báo ngưỡng an toàn, quá hạn công nợ/hợp đồng, phân quyền tài khoản) bắt buộc phải tích hợp phát sinh thông báo qua Notification Engine theo đúng hướng dẫn tại [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md).
+## 3. Quy tắc Git bắt buộc
 
-5. **Quy tắc Git Commit & Quản lý Nhánh (Commit & Branch Convention):**
-   - **TUYỆT ĐỐI KHÔNG CODE VÀ PUSH TRỰC TIẾP TRÊN NHÁNH `master`:**
-     - Cấm tuyệt đối việc sửa code, commit hoặc push trực tiếp trên nhánh `master` ở mọi repo (`ERPm`, `ERPm-BE`, `ERPm-FE`, và các submodule con).
-     - Trước khi bắt đầu làm bất kỳ task nào, luôn cập nhật nhánh `master` (`git checkout master && git pull origin master`), sau đó tạo nhánh cá nhân:
-       - Cú pháp tên nhánh: `<tên-người>/<step-hoặc-task>-<nội-dung-ngắn>` (Ví dụ: `loipham/step20-mobile-menu`, `thien/s20-be-iam`, `phuc/s20-arch-review`).
-       - Định danh chuẩn của 3 thành viên: Lợi là `loipham/*`, Thiện là `thien/*`, Phúc là `phuc/*`. Tuyệt đối không tạo nhánh mang tên người khác.
-     - Toàn bộ code và commit chỉ được thực hiện trên nhánh cá nhân.
-     - Sau khi hoàn thành và tự kiểm tra đạt 100% (build pass, test pass), push nhánh cá nhân lên remote và mở Pull Request (PR) về `master` (hoặc merge qua PR theo quy trình nhóm).
-     - Nhánh `master` cục bộ chỉ dùng để checkout và pull code mới nhất đã merge (`git pull origin master`), không dùng để can thiệp mã nguồn trực tiếp.
-   - **Quy tắc Git Commit (Commit Message Convention):**
-   - Mọi lệnh `git commit` trên repo gốc, `ERPm-BE`, `ERPm-FE` và các Submodules bắt buộc tuân thủ cú pháp:
-     `[tag] nội dung commit` hoặc `[tag](MODULE) nội dung commit`
-   - **Bộ 6 Tag chuẩn:**
-     - `[add]`: Thêm mới tính năng, bảng, API, màn hình, thành phần.
-     - `[update]`: Cập nhật nghiệp vụ, nâng cấp cấu trúc, thay đổi yêu cầu hoặc tối ưu hiệu năng/UI.
-     - `[fix]`: Sửa lỗi (bug logic, lỗi giao diện, lỗi build/SQL).
-     - `[refactor]`: Tái cấu trúc mã nguồn (gom hàm, tách file) không làm thay đổi nghiệp vụ.
-     - `[db]`: Thay đổi riêng về SQL Schema, EF Migration, Index, Seed data.
-     - `[docs]`: Cập nhật tài liệu (`PROJECT_MASTER.md`, `AGENTS.md`, `.ai/`).
-   - **Bắt buộc với repo có Submodule (`ERPm-FE` và các `ERPm-FE-<MODULE>`, cả repo gốc `ERPm`):** trước khi push, chạy một lần
-     ```
-     git config push.recurseSubmodules check
-     ```
-     Lệnh này chặn ngay nếu con trỏ submodule trỏ tới một commit mà submodule đó chưa push lên remote của chính nó — đây là lỗi hay gặp nhất khi làm việc nhiều repo (commit con nằm trên máy nhưng quên `git push` trong repo con trước khi push repo cha). Đã từng xảy ra 3 lần trong step 20 (SD/CRM lúc merge, CRM, WMS lúc gán quyền IAM), khiến CI báo `upload-pack: not our ref` / `repository not found` và PR không chạy được kiểm tra tự động.
-     - Thứ tự push đúng: **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
-     - Nghi CI đỏ ngay ở bước tải code (checkout): so trực tiếp con trỏ mà repo cha đang trỏ với các nhánh trên remote của submodule, ví dụ `git ls-remote <remote-submodule> | grep <hash>`; thiếu thì vào đúng submodule đó `git push`.
-     - Submodule đang ở trạng thái "detached HEAD" (sau `git submodule update`, sau khi kiểm tay...): `git push origin <nhánh>` **không đẩy gì** và không báo lỗi rõ nếu có cờ `-q`. Đẩy đúng bằng `git push origin HEAD:refs/heads/<nhánh>`, rồi so `git rev-parse HEAD` với `git ls-remote origin refs/heads/<nhánh>` để chắc chắn remote đã nhận đúng commit, trước khi mở PR ở repo cha.
+- **Không sửa, commit hoặc push trực tiếp trên `master`.**
+- Tạo nhánh cá nhân từ `master` mới nhất: `loipham/*`, `thien/*`, hoặc `phuc/*` đúng người thực hiện.
+- Commit message: `[tag] nội dung` hoặc `[tag](MODULE) nội dung`; tag hợp lệ: `add`, `update`, `fix`, `refactor`, `db`, `docs`.
+- Với submodule: commit/push repo con trước, sau đó mới cập nhật gitlink ở repo cha. Bật `git config push.recurseSubmodules check` trước khi push.
+- Mở PR về `master`; kiểm tra xung đột và chạy lại kiểm thử sau khi đồng bộ master.
 
-6. **Quy tắc ghi chép theo loại Task:**
-   - Mỗi việc thuộc đúng một loại dưới đây và được ghi ở đúng nơi tương ứng. Viết bằng Tiếng Việt.
+## 4. Kỷ luật kỹ thuật
 
-     | Loại | Khi nào | Ghi ở đâu | Tag commit |
-     | :--- | :--- | :--- | :--- |
-     | **Step** (tính năng lớn theo roadmap) | Nhiều tầng/nhiều ngày, có đặc tả | Đặc tả: `.ai/plans/plan-step-XX-[ten].md` (tick `- [x]` từng Task khi xong). Log: `.ai/steps/step-XX-[ten].md` | `[add]` / `[update]` |
-     | **change** (thay đổi yêu cầu) | Đổi nghiệp vụ/đặc tả đã chốt | Thuộc step đang làm: thêm mục "Thay đổi yêu cầu" (ngày, người yêu cầu, lý do, phạm vi) vào plan của step đó. Không thuộc step nào: `.ai/tasks/change-*.md` | `[update]` |
-     | **bug** (sửa lỗi) | Lỗi logic, giao diện, build, SQL | `.ai/tasks/bug-*.md`: hiện tượng, cách tái hiện, nguyên nhân gốc, cách sửa, test chống tái phát | `[fix]` |
-     | **refactor** | Tái cấu trúc, không đổi nghiệp vụ | `.ai/tasks/refactor-*.md`: lý do, phạm vi, bằng chứng không đổi hành vi (test trước/sau) | `[refactor]` |
-     | **db** (schema, migration, seed riêng lẻ) | Không nằm trong một step | `.ai/tasks/db-*.md`: migration, ảnh hưởng dữ liệu cũ, cách rollback | `[db]` |
-     | **spike** (khảo sát, so sánh phương án) | Cần tìm hiểu trước khi quyết | `.ai/tasks/spike-*.md`: câu hỏi, phương án, kết luận/đề xuất | `[docs]` |
-     | **review** (rà soát mã/tài liệu) | Đánh giá chất lượng, đối chiếu | `.ai/reviews/YYYY-MM-DD-[ten].md` | `[docs]` |
+- BE: .NET 10, Clean Architecture; business logic không đặt trong Controller.
+- DB: PostgreSQL; tiền tệ/số lượng dùng `decimal(18,4)` theo chuẩn hiện hành; giữ auditing/soft-delete theo domain; không hard-delete giao dịch đã Posted.
+- FE: Angular + Ionic; ưu tiên standalone components, Signals, Reactive Forms và component chuẩn của dự án. Tuân thủ quy tắc FE cụ thể trong `ERPm-FE/AGENTS.md`.
+- Mọi comment trong source code phải bằng tiếng Anh.
+- UI text và thông báo phải tuân thủ i18n; đồng bộ dictionary FE/BE khi thay đổi.
+- Sự kiện nghiệp vụ cần notification phải theo `docs/NOTIFICATION_INTEGRATION_GUIDE.md`.
+- Không tự suy đoán module từ tên file; trace endpoint/API ownership khi cần phân loại.
 
-   - **Tên file task:** `.ai/tasks/[loai]-YYYYMMDD-[ten-ngan].md`, theo mẫu [`.ai/tasks/_TEMPLATE.md`](.ai/tasks/_TEMPLATE.md). Trường `Trạng thái` chỉ dùng: `Todo` / `Doing` / `Blocked` / `Done`.
-   - **Task làm dở hoặc bị chặn:**
-     - Thuộc một step: ghi vào mục **"Việc còn lại"** ở cuối file plan của step đó (task, trạng thái, ghi chú, đang chờ ai/việc gì).
-     - Task riêng lẻ: để `Trạng thái: Blocked` hoặc `Doing` trong file task, ghi rõ việc còn lại.
-     - `.ai/status.md` chỉ ghi một dòng ở **In-Progress** / **Next Steps** và trỏ link tới plan hoặc file task, không chép lại chi tiết.
-   - **Khi xong:** chuyển trạng thái sang `Done`, ghi kết quả kiểm tra và commit liên quan, rồi thêm một dòng vào **Completed** của `.ai/status.md`.
-   - Việc nhỏ (sửa chính tả, đổi một nhãn) không cần file task; commit message đúng tag là đủ.
+## 5. Task records và verification
 
-7. **Quy tắc tạo card Trello:**
-   - **Nguồn chuẩn:** đặc tả nằm trong repo (plan của step hoặc file `.ai/tasks/`). Trello chỉ để theo dõi tiến độ. Mỗi card có link tới đúng mục trong plan / file task, không chép lại toàn bộ đặc tả. Không ghi tên khách hàng vào card hay label.
-   - **Cột:**
+- Step plan: `.ai/plans/plan-step-XX-*.md`.
+- Step log: `.ai/steps/step-XX-*.md`.
+- Task lẻ: `.ai/tasks/<type>-YYYYMMDD-*.md` theo `.ai/tasks/_TEMPLATE.md`.
+- Review: `.ai/reviews/YYYY-MM-DD-*.md`.
+- Current status: `.ai/status.md`; lịch sử dài chuyển vào `.ai/history/` sau khi lưu snapshot.
+- Khi hoàn tất, ghi rõ file thay đổi, lệnh kiểm tra, kết quả thực tế, commit/PR và việc còn lại. Không ghi PASS nếu chưa chạy kiểm tra.
 
-     | Cột | Ý nghĩa | `Trạng thái` trong repo |
-     | :--- | :--- | :--- |
-     | Backlog | Đã ghi nhận, chưa lên kế hoạch | — |
-     | Todo | Sẵn sàng làm, đủ đặc tả | `Todo` |
-     | Doing | Đang làm (mỗi người tối đa 2 card) | `Doing` |
-     | Blocked | Bị chặn; ghi rõ đang chờ card / người nào | `Blocked` |
-     | Review | Đã push nhánh, chờ review / merge | `Doing` |
-     | Done | Đã merge master và đạt nghiệm thu | `Done` |
+## 6. Context packet trước khi code
 
-   - **Tên card:** `[tag](MODULE) <MÃ> <tiêu đề ngắn>`
-     - `tag` giống commit;
-     - `MÃ` là `S20.6.1` cho task thuộc step, hoặc `BUG-YYYYMMDD` / `DB-…` / `SPIKE-…` / `REF-…` / `CHG-…` cho task lẻ.
-     - Ví dụ: `[db](IAM) S20.6.1 Bảng tbl_SYS_DepartmentRole`.
-   - **Label:**
-     - Loại: `Step` · `change` · `bug` · `refactor` · `db` · `spike` · `review`
-     - Tầng: `BE` · `FE` · `DB` · `Docs`
-     - Module: `IAM` · `HRM` · `SYS` · `SD` · `ACC`…
-     - Ưu tiên: `P1 Lõi` · `P2` · `P3 Mở rộng`
-   - **Mô tả card:**
-     ```
-     Liên quan: <link plan/task trên GitHub> – mục <Task XX>
-     Phụ thuộc: <mã card> | Không
-     Nhánh: <ten>/<step>-<ngan>
-     Việc phải làm: <copy từ plan/task>
-     Nghiệm thu: <copy từ plan/task>
-     Commit: BE xxxxxxx · FE xxxxxxx · root xxxxxxx (điền khi xong)
-     ```
-   - **Checklist bắt buộc mỗi card (Thiện, 2026-11-01 — dùng đúng tính năng Checklist của Trello, như a Phúc đang làm, không chỉ ghi chữ trong mô tả):**
-     - Khi raise card: tạo 1 Checklist tên **"Nghiem thu bat buoc"** (`trelloWriteChecklist`), đủ 7 mục bên dưới, để nguyên `INCOMPLETE`.
-     - Khi Tester PASS và đã merge: **tick từng ô tương ứng đã đạt** trên chính checklist đó (không chỉ comment PASS rồi bỏ đó) — ai kéo card sang Done thì người đó tick.
-     - Clean Architecture; comment trong code bằng tiếng Anh.
-     - Có nhãn và lỗi VI/EN.
-     - Đã đánh giá và tích hợp Notification cho các sự kiện nghiệp vụ liên quan theo chuẩn [docs/NOTIFICATION_INTEGRATION_GUIDE.md](docs/NOTIFICATION_INTEGRATION_GUIDE.md) (nếu tính năng có phát sinh sự kiện).
-     - Build và test:
-       - BE: `dotnet build` 0 warning / 0 error, `ERPm.Verification` đạt hết;
-       - FE: `npm run build` 0 error.
-     - Commit đúng tag.
-     - Đã tick `- [x]` trong plan (hoặc file task chuyển `Done`) và ghi commit.
-     - Đã cập nhật `.ai/status.md`.
-   - **Chuyển cột & Kỷ luật Ghi nhận Hoạt động (Trello Activity Tracking):**
-     - Còn phụ thuộc chưa xong thì để **Blocked**.
-     - Chỉ kéo sang **Done** khi đã merge master và đủ checklist.
-     - Đổi yêu cầu giữa chừng: ghi mục "Thay đổi yêu cầu" trong plan rồi comment lên card.
-     - **QUY TẮC BẮT BUỘC TOÀN DỰ ÁN: COMMENT HASH COMMIT KHI CHUYỂN CỘT (TRELLO AUDIT TRAIL):**
-       - **BẮT BUỘC 100%:** Bất kỳ thao tác kéo/chuyển cột nào trên Trello (`Todo` ➔ `Doing`, `Doing` ➔ `Review`, `Review` ➔ `Done`, `Blocked`), người thực hiện (hoặc AI Agent) **PHẢI COMMENT NGAY LẬP TỨC** hash commit liên quan vào card để ghi nhận activity và phục vụ truy vết (tracking) sau này.
-       - **Tuyệt đối không chuyển cột mà không có comment SHA commit:**
-         - **Sang Doing:** Comment nhánh cá nhân bắt đầu làm + SHA commit mốc xuất phát (nếu có).
-         - **Sang Review:** Bắt buộc comment SHA commit PR / commit đã push trên nhánh cá nhân (BE / FE / submodule) + bằng chứng build pass.
-         - **Sang Done:** Bắt buộc comment danh sách đầy đủ các SHA commit đã merge vào `master` (gồm cả BE, FE và repo root) + tóm tắt kết quả verification test.
-         - **Sang Blocked:** Comment rõ nguyên nhân bị chặn, mã task/PR hoặc người đang phụ thuộc.
-       - **Cú pháp Comment Chuẩn hóa (Bắt buộc dùng):**
-         `[Chuyển <Cột Mới>] Commit <Tầng> liên quan: <hash_commit>. <Tóm tắt kết quả / tiến độ nghiệm thu>.`
-         *Ví dụ thực tế:*
-         `[Chuyển Done] Commit BE liên quan: 30d9fa5. SignalR WebSocket hub (/hubs/notifications) và REST API endpoints (/api/v1/sys/notifications) đạt 100% nghiệm thu.`
-     - **Bắt buộc (Thiện, 2026-11-01): card loại `bug` có giao diện phải kèm ảnh chụp màn hình, ghi chú rõ trong ảnh** (khoanh vùng lỗi, hoặc chú thích ngay cạnh) — không chỉ mô tả bằng chữ.
-       - AI không có công cụ tự chụp màn hình app đang chạy (không có trình duyệt/computer-use trong phiên), nhưng **tự vẽ chú thích được** lên ảnh người dùng gửi sẵn (Python/PIL: khoanh vùng, mũi tên, nhãn chữ).
-       - **Đính kèm (chốt 2026-11-01, tránh tốn token):** mặc định AI chỉ đưa **đường dẫn file ảnh đã chú thích** (đường dẫn đầy đủ trong scratchpad) để Thiện/người nhận việc tự kéo-thả vào Trello — **không** xuất bản Artifact cho việc này (tốn token). Chỉ xuất bản Artifact khi được yêu cầu riêng.
+Với task vượt quá một file hoặc liên quan nhiều repo, trước khi triển khai phải tóm tắt:
+- mục tiêu và acceptance criteria;
+- repo + exact HEAD/gitlink SHA;
+- file/symbol/API/DB liên quan và bằng chứng;
+- dependency trực tiếp, test cần chạy;
+- phạm vi không đụng tới và unknowns.
 
-8. **Quy tắc Phối hợp Nhóm 3 người (Phúc, Thiện, Lợi) & Chế độ Tự kiểm tra Tự merge PR (Autonomous Merge):**
-   - **Phân vai trách nhiệm (RACI):**
-     - **Phúc (Tech Lead / Architect):** Lập Kế hoạch Step tổng (.ai/plans/plan-step-XX.md), chốt **API Contract** trước khi bắt đầu code, tạo và phân công card Trello cho các thành viên, rà soát kiến trúc định kỳ (Periodic Architectural Review) và hỗ trợ giải quyết các bài toán kỹ thuật/xung đột phức tạp khi thành viên yêu cầu.
-     - **Thiện (Developer):** Thực thi các task Backend (hoặc Module phụ trách) bám sát đúng API Contract, tự kiểm tra đạt 100% verification tests, tự merge PR của mình vào master và báo cáo commit cho Phúc.
-     - **Lợi (Developer):** Thực thi các task Frontend (hoặc Module phụ trách), sử dụng Mock Data bám sát API Contract để dựng UI/Form/Signals hoàn chỉnh độc lập, tự kiểm tra build & giao diện, tự merge PR của mình vào master và báo cáo commit cho Phúc.
-   - **Chế độ Tự kiểm tra & Tự merge PR (Self-Verification & Autonomous Merge Policy - Áp dụng chính thức từ 2026-11-01):**
-     - **Toàn quyền tự chủ (Autonomous Merge):** Các thành viên (Thiện, Lợi, Phúc) được toàn quyền **tự xem lại kết quả, tự kiểm tra nghiệm thu và tự merge PR của chính mình vào nhánh master** trên cả repo con (ERPm-BE, ERPm-FE, các submodule) và repo cha (ERPm), **không cần chờ Phúc review từng PR** nhằm tối đa hóa tốc độ phát triển độc lập.
-     - **Kỷ luật Tự kiểm tra bắt buộc trước khi Merge (Self-Verification Mandatory Checklist):**
-       1. **BE:** `dotnet build` đạt 0 warning / 0 error; `ERPm.Verification` (và test domain như `ERPm.Hrm.Verification`) đạt 100%.
-       2. **FE:** `npm run build` đạt 0 error; Karma unit tests đạt 100% (nếu có).
-       3. **UI / Nghiệp vụ:** Tự chạy thử trên trình duyệt local, thao tác các tính năng vừa code, đảm bảo không vỡ layout responsive (Desktop & Mobile) và không có lỗi console.
-       4. **Submodule pointer:** Tuân thủ tuyệt đối quy tắc `git config push.recurseSubmodules check` — **luôn push submodule con trước**, rồi mới push repo cha đang trỏ tới commit đó.
-       5. **Code comments:** 100% comment trong source code bằng Tiếng Anh.
-       6. **Đa ngôn ngữ (i18n):** Đồng bộ đầy đủ từ điển VI/EN ở cả `system_dictionary.json` và `system.json`.
-       7. **Bắt buộc (Thiện, 2026-11-02): kiểm tra xung đột TRƯỚC khi mở PR, xử lý xong mới mở.** Trước khi tạo/báo PR, `git fetch origin` rồi thử `git merge origin/master --no-commit --no-ff` cục bộ (hoặc xem GitHub có báo "This branch has conflicts that must be resolved" không) trên **cả root lẫn từng submodule liên quan**. Có xung đột (kể cả chỉ là con trỏ submodule lệch nhau do nhánh khác đã merge) thì merge/rebase `origin/master` vào nhánh của mình, giải xong, build+test lại, rồi mới mở PR hoặc báo Review. Không để PR ở trạng thái "dirty"/conflict chờ người khác phát hiện.
-     - **Kỷ luật Truy vết & Báo cáo sau khi Merge (Post-Merge Accountability):**
-       1. **Trello:** Chuyển card sang cột **Done**, bắt buộc comment kèm SHA commit liên quan (BE / FE / root).
-       2. **Plan Step:** Tick `- [x]` trong plan của Step (`.ai/plans/plan-step-XX.md`) kèm mã SHA commit.
-       3. **Status:** Cập nhật 1 dòng vào mục `Completed` trong `.ai/status.md`.
-       4. **Thông báo Lead:** Báo Phúc commit/PR cuối vừa merge để Phúc nắm tiến độ tổng thể dự án.
-   - **Nguyên tắc "Contract-First" để làm việc độc lập:**
-     - Mọi tính năng kết nối FE-BE **bắt buộc phải có bảng API Contract** trong file plan của Step trước khi bắt đầu code (gồm Endpoint URL, Method, Request DTO mẫu, Response DTO mẫu và mã Error codes).
-     - **FE (Lợi):** Dựa vào Contract để tạo ngay TypeScript Interface, viết Mock Service trả về Observable/Signal data mẫu. Dựng xong toàn bộ UI, form validation, adaptive responsive độc lập.
-     - **BE (Thiện):** Dựa vào Contract để tạo Entity, Migration, Service và Controller trả về đúng cấu trúc JSON đã cam kết.
-     - **Khi tích hợp:** FE chỉ cần chuyển cờ gọi từ Mock Service sang HttpClient gọi API thật.
-   - **Hai mô hình phân chia task linh hoạt:**
-     - *Mô hình theo tầng (Layer-based):* Áp dụng cho tính năng lõi/hạ tầng sâu. Thiện làm toàn bộ Backend trên repo `ERPm-BE`; Lợi làm toàn bộ Frontend trên repo `ERPm-FE` (không bao giờ chạm chung file code).
-     - *Mô hình theo phân hệ dọc (Vertical Slice):* Áp dụng cho tính năng nghiệp vụ độc lập. Thiện làm trọn gói Module A (BE + FE của module đó); Lợi làm trọn gói Module B (BE + FE của module đó).
-   - **Quy tắc Đặt tên Nhánh & Submodules:**
-     - **Bắt buộc luôn tạo nhánh cá nhân từ `master` mới nhất trước khi bắt đầu code; TUYỆT ĐỐI KHÔNG code và push trực tiếp trên `master`.**
-     - Cú pháp đặt tên nhánh cá nhân: `<tên-người>/<step>-<nội-dung-ngắn>` (Ví dụ: `thien/s20-be-iam`, `loipham/s20-fe-roles`, `phuc/s20-arch-review`).
-     - Phân biệt rõ định danh cá nhân: Lợi dùng `loipham/*`, Thiện dùng `thien/*`, Phúc dùng `phuc/*`. Tuyệt đối không tạo nhánh nhầm tên người khác.
-     - Sau khi code và tự kiểm thử đạt 100%, push nhánh cá nhân lên remote và mở PR về `master` (hoặc merge qua PR). Master local chỉ dùng để `git pull origin master`.
-     - Tuân thủ nghiêm ngặt quy tắc push Submodule con trước khi push repo cha (`git config push.recurseSubmodules check`).
----
-
-## 📂 THƯ MỤC AI CẦN BIẾT
-- `.ai/` : Thư mục lưu vết kế hoạch và tiến độ của AI.
-- `.ai/plans/` : Đặc tả và chia Task của từng Step (kèm mục "Việc còn lại").
-- `.ai/steps/` : Nơi lưu chi tiết từng bước thực thi.
-- `.ai/tasks/` : Task lẻ không thuộc Step (bug, change, refactor, db, spike).
-- `.ai/reviews/` : Biên bản rà soát.
-- `PROJECT_MASTER.md` : Single Source of Truth về kiến trúc và coding conventions.
+Xem [Context Policy](.ai/context/context-policy.md) để biết cách mở rộng scope và ghi provenance.

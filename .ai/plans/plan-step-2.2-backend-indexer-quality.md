@@ -1,10 +1,10 @@
 # Step 2.2 Follow-up — Backend Roslyn Indexer Quality
 
-> **Status:** Planned — documentation PR only; implementation has not started  
+> **Status:** Implementation in progress — implementation branch created; verification pending  
 > **Created:** 2026-11-10  
 > **Target repository:** `I3Solution/ERPm` (umbrella)  
 > **Integration branch:** `master`  
-> **Implementation branch:** `loipham/phase2-backend-indexer-quality`  
+> **Implementation branch:** `loipham/phase2-backend-indexer-quality-impl`  
 > **Scope:** `tools/ERPm.CodeIndex` and its tests/documentation only
 
 ## 1. Objective
@@ -51,7 +51,7 @@ Implementation must inspect the exact current code and existing schema before de
 Define and test a deterministic source inclusion policy for the normal source index:
 
 - Always exclude files under repository-relative `obj/` and `bin/` path segments, case-insensitively.
-- Exclude compiler-generated source files identified by reliable generated-file conventions/markers (for example `.g.cs`, `.generated.cs`, and an auto-generated header).
+- Exclude compiler-generated source files identified by reliable generated-file conventions/markers (for example `.g.cs`, `.g.i.cs`, `.generated.cs`, and an auto-generated header).
 - Do not exclude a file solely because its name contains `Designer`; require the agreed generated marker/policy so handwritten designer-adjacent code is not silently lost.
 - Normalize paths before applying filters; keep emitted paths repository-relative with forward slashes.
 - Report excluded/generated file counts in a concise index summary if practical.
@@ -88,17 +88,17 @@ Required fixtures/assertions:
 4. `using` / namespace references retain namespace source context.
 5. Field and property symbols receive distinct categories/IDs.
 6. Auto-property backing-field behavior is explicit and regression-tested.
-7. Generated files under `obj/`, `bin/`, `.g.cs`, `.generated.cs` and auto-generated headers are excluded according to policy.
+7. Generated files under `obj/`, `bin/`, `.g.cs`, `.g.i.cs`, `.generated.cs` and auto-generated headers are excluded according to policy.
 8. A normal handwritten source file remains included.
 9. Repository-relative path and line spans remain correct.
 10. The same fixture source at the same commit/schema/indexer versions yields stable records apart from generation timestamps.
 
-If the current record schema cannot express the required symbol classification without ambiguity, propose a versioned schema change (v2) with migration/compatibility notes rather than silently changing v1 semantics.
+The implementation uses schema v2 with explicit `symbolKind` and `sourceSymbolKind`; schema v1 remains unchanged for baseline compatibility.
 
 ### 4.5 Versioning and cache
 
-- Increment the indexer version from `0.1.0` for behavior changes so the new output uses a separate cache directory.
-- Keep schema version 1 if the JSON contract remains unchanged; otherwise introduce schema version 2 and update its schema file/tests.
+- Increment the indexer version from `0.1.0` to `0.2.0`; the new output uses a separate cache directory.
+- Schema v2 is required because records now expose `symbolKind` and `sourceSymbolKind`; preserve the v1 schema and all existing v1 cache files.
 - Never overwrite or delete the user's existing `0.1.0` baseline cache.
 - Continue to key generated output by repository ID, exact commit SHA, schema version and indexer version.
 - Do not commit generated JSONL/cache files.
@@ -170,7 +170,21 @@ A lower record count is not automatically success. Confirm that excluded records
 5. Merge only after the acceptance criteria are evidenced.
 6. Update the Phase 2 plan and root status with actual verification outcomes; do not mark Step 2.1/2.2 complete solely because CI passes.
 
-## 9. Context packet / provenance
+## 9. Implementation snapshot (2026-11-10)
+
+Implementation has started on `loipham/phase2-backend-indexer-quality-impl`, based on root merge commit `a459edbc87d92ee959cdc42572235a40aee44aab` (PR #59). Current changes include:
+
+- `BackendRoslynIndexer` version `0.2.0`, schema version `2`.
+- Filtering for repository-relative `obj/` and `bin/`, `.g.cs`, `.g.i.cs`, `.generated.cs`, auto-generated headers, and source paths outside the backend root.
+- Explicit target and source symbol categories in schema v2; schema v1 is retained.
+- Calls are restricted to invocation target names and explicit/implicit object creation; other simple-name references remain `references`.
+- CLI symbol search reads only the current indexer-version cache, avoiding accidental mixing of v1/v2 records.
+- A new xUnit test project covers generated-file policy, handwritten Designer inclusion, Roslyn symbol categories and call/reference syntax classification.
+- CI now runs the code-index test project.
+
+This is an implementation snapshot, not a verification result. CI compilation/tests and the real ERPm re-index/query comparison remain pending. The tests currently cover deterministic classification/filter helpers; additional end-to-end indexer assertions may be added if CI or the real smoke test reveals gaps.
+
+## 10. Context packet / provenance
 
 - Root baseline: `I3Solution/ERPm@d72119b308d6d11f4ba886e4368ab2f53616cb53`.
 - Backend source: `I3Solution/ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.

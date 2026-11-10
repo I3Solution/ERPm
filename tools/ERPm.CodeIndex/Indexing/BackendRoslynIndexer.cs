@@ -28,7 +28,7 @@ public sealed class BackendRoslynIndexer
 
         using var workspace = MSBuildWorkspace.Create();
         var diagnostics = new List<string>();
-        workspace.WorkspaceFailed += (_, args) => diagnostics.Add(args.Diagnostic.ToString());
+        workspace.RegisterWorkspaceFailedHandler(diagnostic => diagnostics.Add(diagnostic.ToString()));
 
         var solution = await workspace.OpenSolutionAsync(solutionPath, cancellationToken: cancellationToken);
         var generatedAt = DateTimeOffset.UtcNow;

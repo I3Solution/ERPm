@@ -23,7 +23,7 @@
 
 - [ ] Phase 1 — Context Optimization: chuẩn hóa bootstrap instructions, workspace metadata, context policy và current status/history separation.
   - Branch: `loipham/step-context-phase1`.
-  - Plan: [ERPm Context Engineering Implementation Plan](../ERPm_Context_Engineering_Implementation_Plan.md) (nếu file plan chưa được đưa vào repo, tham chiếu bản làm việc ngoài repo).
+  - Log triển khai: [step-context-optimization-phase1.md](steps/step-context-optimization-phase1.md).
 
 ## Next Steps
 

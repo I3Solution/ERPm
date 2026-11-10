@@ -1,0 +1,37 @@
+version: 1
+integrations:
+  - id: fe-to-be-http-api
+    from: erpm-fe
+    to: erpm-be
+    mechanism: HTTP_API
+    contract_source: backend_api_routes_and_frontend_api_clients
+    status: partial
+    verification_required:
+      - trace_frontend_api_client_to_backend_route
+      - compare_request_response_dtos
+      - record_auth_and_error_contracts
+  - id: frontend-system-dictionary
+    from: erpm-fe
+    artifact: ERPm-FE/src/assets/i18n/system.json
+    to: erpm-be
+    artifact_target: ERPm-BE/src/ERPm.Infrastructure/Persistence/Seeders/system_dictionary.json
+    mechanism: mirrored_dictionary
+    status: verified_as_ci_checked_pair
+    verification:
+      - root_github_workflow_checks_dictionary_consistency
+    change_rule: "Update both dictionary files together and run the root CI dictionary check."
+  - id: root-to-fe-submodules
+    from: erpm-root
+    to: erpm-fe
+    mechanism: git_submodule_gitlinks
+    status: verified
+    change_rule: "Push child module commits before updating and pushing the ERPm-FE pointer."
+  - id: root-to-be
+    from: erpm-root
+    to: erpm-be
+    mechanism: git_submodule_gitlink
+    status: verified
+    change_rule: "Push ERPm-BE commit before updating and pushing the ERPm root pointer."
+unknowns:
+  - "Complete FE endpoint-to-BE route/DTO matrix has not yet been generated."
+  - "Database schema ownership and migration dependencies need automated extraction in Phase 2."

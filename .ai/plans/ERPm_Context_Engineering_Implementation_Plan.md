@@ -1214,3 +1214,17 @@ Phase 2 is the next planned implementation stage. Its initial scope is:
 Phase 2 must build on the existing workspace/domain metadata and preserve the source-of-truth rule: Git source and build/database manifests remain authoritative; generated indexes are disposable and tied to exact revisions.
 
 **Phase 2 start condition:** agree on the MVP scope, runtime/tooling choices, index storage, and first representative task set before implementation.
+
+
+### Phase 2 — Code Intelligence & Dependency Indexing
+
+**Status:** Planning started; implementation not yet started.
+
+- Phase 2 plan: [plan-phase2-code-intelligence.md](plan-phase2-code-intelligence.md).
+- Initial implementation slice: Step 2.1 shared index contract/workspace manifest + Step 2.2 Backend Roslyn vertical slice.
+- Baseline verified against root merge `5a43143a12d99ab5709d1d23d07225e98bbf783d`, BE `56385da65226f72c3b66f9c839e2fc430ce85210`, and FE `dbeaf66687454452886201bb669df1e25478d893`.
+- Phase 2 will index exact recursive gitlink revisions and reject mixed-SHA results.
+- No application source changes are included in the planning step. Implementation will use separate PRs with tests and measured outcomes.
+
+**Document status:** Proposed implementation plan; Phase 1 complete and Phase 2 planning started.\
+**Next review:** After the first Phase 2 vertical slice.

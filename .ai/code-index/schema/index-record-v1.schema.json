@@ -18,6 +18,7 @@
     "startLine",
     "endLine",
     "relation",
+    "sourceSymbolId",
     "targetSymbolId",
     "evidence",
     "generatedAtUtc"
@@ -36,6 +37,7 @@
     "startLine": { "type": "integer", "minimum": 1 },
     "endLine": { "type": "integer", "minimum": 1 },
     "relation": { "type": ["string", "null"] },
+    "sourceSymbolId": { "type": ["string", "null"] },
     "targetSymbolId": { "type": ["string", "null"] },
     "evidence": { "type": "string", "enum": ["verified", "partial", "unknown"] },
     "generatedAtUtc": { "type": "string", "format": "date-time" }

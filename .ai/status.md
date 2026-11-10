@@ -1,342 +1,39 @@
-# ERPm — Trạng thái hiện hành, Step 20 (2026-10-31)
+# ERPm — Trạng thái hiện hành
 
-Giai đoạn 1 đã có baseline ổn định với kiểm thử tự động; tiếp tục nghiệm thu quy trình thực tế. Giai đoạn 2 mới có API đơn mua/đơn bán Draft → Confirmed và nhập kho ghi nhận công nợ, chưa hoàn thiện mua hàng/sổ quỹ. Giai đoạn 3–4 chưa triển khai đầy đủ. Không sử dụng tỷ lệ hoàn thành lịch sử làm bằng chứng nghiệm thu.
+> Cập nhật: 2026-11-10
+> Nguồn trạng thái: các plan/task và commit đã merge; không suy diễn trạng thái từ log lịch sử.
+> Lịch sử trước Phase 1: [status-archive-2026-11-10.md](history/status-archive-2026-11-10.md).
 
-## Completed
+## Workspace baseline
 
-- [x] **Giữ phiên đăng nhập khi mở tab mới (Open link in new tab) và chuyển hướng đúng returnUrl (2026-11-10):** Chuyển cơ chế lưu trữ bearer token từ `sessionStorage` sang `localStorage` (kèm fallback), cho phép mở liên kết trên tab mới (`Open link in new tab`, `Ctrl+Click`) giữ nguyên phiên đăng nhập 100% không bị đá về `/login`; cập nhật `authGuard` và `permissionGuard` bảo toàn tham số `returnUrl: state.url` trong query params; sửa `LoginComponent` tự động điều hướng đúng trang đích thay vì hardcode `/dashboard`. Karma unit tests **171/171 pass** (thêm test case bảo toàn `returnUrl`), `ng build` 0 error. Task: [bug-20261110-open-link-new-tab-session](tasks/bug-20261110-open-link-new-tab-session.md).
+- Umbrella repository: `I3Solution/ERPm`, default integration branch: `master`.
+- Baseline snapshot: `a87ffcb2638075f7496b48bc615bd6c516d95db1`.
+- FE gitlink: `ERPm-FE@427ac894cdcf22a3f83ad11c8ac87d817cbec126`.
+- BE gitlink: `ERPm-BE@38763b0b67b96d5998dda76cd71e7015b458b5f4`.
+- Chi tiết ownership và quan hệ tích hợp: [Context Workspace Map](context/README.md).
 
-- [x] **Chuẩn hóa Form Controls & Async Item Search trên Frontend ERPm-FE (2026-11-09):** Bổ sung quy tắc kỹ thuật cấm dùng thẻ HTML thuần (<input>, <select>, <textarea>) và bắt buộc dùng <app-form-control>, <app-input-control> và <app-async-select> cho mọi trường tìm kiếm/chọn sản phẩm. Bổ sung @Input() set value và markForCheck() trên FormControlComponent và InputControlComponent; sửa triệt để lỗi mất dữ liệu số lượng, đơn giá, chiết khấu và lỗi nhận nhầm sản phẩm sang DB test item khi chuyển chế độ Chỉnh sửa; chuẩn hóa toàn bộ form và bảng trên SD (Quotations, Orders, Returns, PriceLists, Detail lines), CRM (Partners), WMS (Items, Inventory) và SYS (Notifications). ng build pass 100% (0 error). CRM ce5632a · WMS 9d750f6 · SD ba2fc66 · HRM c81d236 · FE 7ccfc0d. Task: [refactor-20261109-fe-form-controls-standard](tasks/refactor-20261109-fe-form-controls-standard.md).
+## Current focus
 
-- [x] **Refactor toàn diện <app-data-table> với <app-column> khai báo và tự động hóa EditMode (2026-11-09):** Nâng cấp `DataTableComponent` với `TableColumnComponent` (`<app-column>`), cho phép định nghĩa cột trực quan trong template HTML và loại bỏ 100% mảng `columns: TableColumn[]` trong các file `.ts`. Tự động hóa hoàn toàn chuyển đổi ô (Smart Cell Switching) theo cờ `[canEdit]`: render `<span>` định dạng chuẩn khi xem và `<app-form-control>` (`compact`, `size="sm"`) khi sửa; loại bỏ triệt để việc nhân đôi thẻ `<app-data-table>` ở các màn hình có chế độ View/Edit inline (`order-detail`, `quotation-detail`, `return-detail`). Áp dụng 100% cho toàn bộ các module: SD (Orders, Quotations, Returns, PriceLists, Detail lines), CRM (Partners), WMS (Items, Inventory), HRM (Employees, Department Levels, Job Positions), SYS (Users, Notification Center, Notification Templates). `npm run build` pass 100% (0 error). SD a8ddaad, f4418d3 · CRM 17c5ed3 · WMS 1ffc4e9 · HRM 31718ef · FE 77642f4, 532d35c · root 8023a4f, 8fef8ad. Task: [refactor-20261109-migrate-tables-to-app-data-table](tasks/refactor-20261109-migrate-tables-to-app-data-table.md).
+- Các kế hoạch gần nhất hiện diện trong repo: Step 22, Step 23 và Step 24.
+- Kế hoạch Step 24: [FE List/Detail and Integration](plans/plan-step-24-fe-list-detail-and-integration.md).
+- Các task phát sinh gần nhất được ghi riêng trong `.ai/tasks/`; kiểm tra trạng thái file task và PR/commit trước khi nhận định tiến độ.
+- Không coi nội dung lịch sử trong archive là công việc đang mở hoặc bằng chứng nghiệm thu mới.
 
-- [x] **Refactor chuyển đổi toàn diện bảng HTML thuần `<table>` sang `<app-data-table>` (2026-11-09):** Rà soát toàn bộ dự án FE và chuyển đổi 100% các màn hình dữ liệu chính (11 trang) và chi tiết dòng chứng từ (3 trang) sang component dùng chung `<app-data-table>` (`DataTableComponent`, `DataTableCellDirective`, `TableColumn`). Hỗ trợ sticky columns, text/number/currency format tự động, badge styling, loading skeleton và responsive desktop/mobile. Các module đã chuyển đổi gồm CRM Partners, SD Quotations, SD Returns, SD Price Lists, WMS Items, WMS Inventory, HRM Employees, HRM Department Levels, HRM Job Positions, SYS Users, SYS Notification Templates, SYS Notification Center, SD Quotation Detail Lines, SD Return Detail Lines và Price List Items. FE `npm run build` 0 error (Exit code 0). CRM 97b4128 · HRM d88e3ba · SD 963b862 · WMS 9cecbf8 · FE 689d037. Task: [refactor-20261109-migrate-tables-to-app-data-table](tasks/refactor-20261109-migrate-tables-to-app-data-table.md).
-
-- [x] **Tái cấu trúc DataTableComponent dùng chung & Nâng cấp Giao diện Đơn bán hàng SD (2026-11-09):** Xây dựng component bảng dữ liệu dùng chung `<app-data-table>` hỗ trợ cả Chế độ Danh sách (List mode, custom cell directive `appDataTableCell`, sorting, selection) và Chế độ Nhập liệu FormArray (Editable mode); refactor toàn diện Màn hình Danh sách Đơn bán hàng (`/sales/orders`) và Màn hình Chi tiết Đơn bán hàng (`/sales/orders/:id` ở cả View Mode và Edit Mode); giải quyết triệt để lỗi menu dropdown chọn sản phẩm bị che khuất bằng cơ chế Smart Drop-Up kết hợp định vị `position: fixed` không phụ thuộc overflow của bảng; triệt tiêu hiện tượng thanh scroll ngang lơ lửng giữa bảng và giữ bố cục khít theo số lượng dòng thực tế. FE build pass 100% (0 error). SD b6329da · FE a18fe3b · root 3e0b28b.
-
-- [x] **Step 23 Shared, Branch/Kho & Master Item Refactor (S23.0.1, S23.0.2, S23.0.3, S23.1.1, S23.1.2) (2026-11-08):** Xây dựng component Nút Back trang chuẩn hóa (`<app-back-button>`); hoàn thiện Async Select (`<app-async-select>`); chuẩn hóa chặn backdrop dismiss cho toàn bộ form popup nhập liệu; bổ sung `OrgUnitType` Kho (`Warehouse = 3`) trên cây tổ chức Branch kèm icon chuyên biệt (`📦`); refactor Master Item: bổ sung Thuế suất VAT (`VatRate`) trên backend, database migration PostgreSQL Neon và hiển thị/nhập liệu VAT trên giao diện danh mục mặt hàng. BE build 0 warning / 0 error, **355/355 checks pass** (`ERPm.Verification` đạt 100%), FE `ng build` 0 error. BE 3b779b4 · FE f0c1e81 · WMS cd7b180.
-
-- [x] **Step 23 FE — Cải tiến Màn hình Khách hàng (CRM) & Đơn bán hàng (SD) (S23.2.3, S23.2.4, S23.3.2, S23.3.3, S23.3.4) (2026-11-07):** Chuyển form Tạo/Sửa Khách hàng từ popup sang trang riêng (`/crm/partners/new`, `/crm/partners/:id/edit`) có nút Back chuẩn và sub-widget `<app-partner-delivery-addresses>` quản lý nhiều địa chỉ giao hàng; bổ sung checkbox `Không giới hạn hạn mức công nợ` (`isUnlimitedCredit`) tự động disable `creditLimit`; nâng cấp Form Đơn bán hàng với nút 1-click nhảy tới trang KH, tự động nạp sổ địa chỉ giao hàng và điền địa chỉ mặc định, tích hợp `<app-async-select>` tìm sản phẩm theo SKU/Tên/Barcode kèm cơ chế cộng dồn số lượng khi trùng SP, hỗ trợ chọn giờ phút giao hàng (`datetime-local`), cột thuế VAT (%) từng dòng và tổng thuế GTGT, định dạng tiền tệ rõ ràng và nút xóa dòng màu đỏ. Karma unit tests **11/11 pass**, FE build 0 error, BE build 0 warning / 0 error. Log: [step-23-crm-sd-fe-enhancements](steps/step-23-crm-sd-fe-enhancements.md). Chuyển tạo/sửa đơn bán trên /sales/orders sang trang chi tiết (/sales/orders/new, /sales/orders/:id?mode=edit) và căn chỉnh thẳng hàng nút nhảy sang trang KH. CRM 2f95335 · SD 591625a, b9f8648 · FE 9e9eb7f, 401f813.
-
-- [x] **Spike trả hàng bán và thiết kế lại bảng giá/chiết khấu (S23.4.1, 2026-11-07):** tài liệu đề xuất kiến trúc và 8 câu hỏi cần team chốt trước khi code. Task: [spike-20261107-sales-return-pricing-redesign](tasks/spike-20261107-sales-return-pricing-redesign.md).
-
-- [x] **Định dạng Ngày giờ dd/MM/yyyy HH:mm & Mở rộng Chỉnh sửa Trực tiếp (Inline Edit) Col 6-6 toàn bộ Chứng từ SD (2026-11-07):** Chuẩn hóa toàn bộ các ô nhập ngày (date/datetime) hiển thị và nhập liệu theo chuẩn `dd/MM/yyyy HH:mm` thông qua `InputControlComponent` & `datetime-local`; nhân rộng kiến trúc Inline Editing không dùng popup modal và layout Header chia 2 cột cân đối `col 6 - col 6` sang toàn bộ các trang chi tiết SD: Báo giá (`sales/quotations/:id`), Trả hàng bán (`sales/returns/:id`), Bảng giá (`sales/price-lists/:id`), Đơn bán hàng (`sales/orders/:id`); bảng chi tiết cho phép thêm/sửa/xóa dòng trực tiếp và tự động tính toán tổng tiền live; đồng bộ từ điển song ngữ i18n (`system.json`). Karma unit tests **151/151 pass**, FE build 0 error. Task: [change-20261107-datetime-format-inline-edit-all-sd](tasks/change-20261107-datetime-format-inline-edit-all-sd.md).
-
-- [x] **Chỉnh sửa trực tiếp trên trang Chi tiết Đơn bán hàng & Chia Header col 6-6 (2026-11-07):** Bỏ popup modal khi bấm Chỉnh sửa trên trang `sales/orders/:id`, cho phép chuyển đổi mượt mà giữa Chế độ Xem và Chế độ Chỉnh sửa trực tiếp trên trang chi tiết; chia bố cục Header thành 2 cột cân đối `col 6 - col 6` giúp các trường thông tin rộng rãi, thoáng mắt; hỗ trợ thêm/xóa dòng sản phẩm và tính toán live tổng thanh toán; khắc phục toàn diện các nhãn i18n bị hiển thị key thô. Karma unit tests **151/151 pass**, FE build 0 error. Task: [change-20261107-order-detail-inline-edit-col6](tasks/change-20261107-order-detail-inline-edit-col6.md). SD f6d622c · FE c044667.
-
-- [x] **Refactor tách riêng Trang Danh sách & Trang Chi tiết (Header/List detail) Phân hệ SD (2026-11-07):** Xóa bỏ layout chia 2 cột (split pane) bó hẹp trên màn hình SD; tách riêng thành các route và component toàn màn hình độc lập: Trang Danh sách (Full-width grid, bộ lọc nâng cao, đầy đủ các cột nghiệp vụ) và Trang Chi tiết (chuẩn ERP Header / Lines detail: Stepper tiến trình, cảnh báo hạn mức nợ, action bar và bảng line items rộng rãi). Áp dụng toàn diện cho Đơn bán hàng (`/sales/orders` & `/sales/orders/:id`), Báo giá (`/sales/quotations` & `/sales/quotations/:id`), Trả hàng bán (`/sales/returns` & `/sales/returns/:id`) và Bảng giá (`/sales/price-lists` & `/sales/price-lists/:id`). Kiểm tra 100% tương thích Dark Mode. Karma unit tests **150/150 pass**, FE build 0 error. Task: [refactor-20261107-sd-separate-list-detail-pages](tasks/refactor-20261107-sd-separate-list-detail-pages.md). SD b0be470 · FE d57f07b.
-
-- [x] **Bug Sales Orders in trắng trang, thiếu nút Edit, tương phản Dark Mode và định dạng tiền tệ (2026-11-07):** Áp dụng Isolated Iframe Printing cho chức năng in chứng từ bán hàng (loại bỏ ảnh hưởng của layout 100vh và overflow hidden); bổ sung nút Chỉnh sửa (Edit) cho đơn hàng Draft/PendingApproval/Confirmed và cột Thao tác; định nghĩa token bề mặt Dark Mode (--erpm-surface-*) và sửa chữ trắng trên nền trắng; xây dựng `CurrencyInputDirective` chuẩn hóa định dạng tiền tệ (phân cách hàng nghìn `30,500,000`), triệt tiêu mũi tên stepper trên toàn bộ ô nhập số tiền trong đơn hàng, báo giá và trả hàng. Build pass 100%. Task: [bug-20261107-sales-orders-print-edit-darkmode](tasks/bug-20261107-sales-orders-print-edit-darkmode.md). SD b01fdcd, 908550b · FE 480b570, 57b837e.
-
-- [x] **Task 20.5.2 (2026-11-07):** xác nhận build toàn repo trên master: BE `dotnet build ERPm.sln` 0 warning / 0 error (789a008); FE `npm run build` 0 error (6606a8a), còn cảnh báo ngân sách bundle ban đầu 849,95 kB so với 500 kB — xem [step log](steps/step-20-iam-dynamic-role-and-organization.md) mục 7.
-
-- [x] **Refactor tách services FE theo vai trò module (2026-11-05):** Di chuyển toàn bộ các service nghiệp vụ từ `core/services/` về đúng thư mục module tương ứng (`WMS/services/{item,stock}`, `CRM/services/partner`, `SD/services/{sales,sd}`, `SD/models/sd.models`, `dashboard/services/dashboard`, `SYS/services/{branch,org-admin}`), giữ `core/services/` chỉ chứa 100% cross-cutting services (`auth`, `api-error`, `localization`, `theme`, `notification-*`) theo quy tắc AGENTS.md (2026-11-03). Đã cập nhật 100% đường dẫn import, `ng build` 0 error, Karma unit tests **145/145 pass**. Log: [refactor-20261105-fe-module-services](tasks/refactor-20261105-fe-module-services.md). WMS baf2975 · CRM fb54a0c · SD b933f22 · dashboard 69b106a · HRM 61b2f1d · FE abd1bdc.
-
-- [x] **Step 22 FE — Toàn diện Phân hệ Bán hàng & Phân phối (2026-11-02):** Hoàn thành toàn bộ mục 4.3 trong plan Step 22 (FE-22.1 đến FE-22.8) gồm DTO contract & Mock engine, Màn hình Quản lý Bảng giá & Chiết khấu bậc thang + Mô phỏng tính giá (`PriceListsComponent`), Màn hình Báo giá Khách hàng (`QuotationsComponent`) + 1-Click chuyển đổi sang Đơn hàng, Màn hình Đơn bán hàng (`OrdersComponent`) + Status Stepper + Cảnh báo hạn mức công nợ + Giữ chỗ tồn kho, Màn hình Trả hàng bán & Giảm trừ công nợ (`ReturnsComponent`), Bộ mẫu in chứng từ doanh nghiệp K80/A4/A5 (`PrintPreviewDialogComponent`), và đồng bộ 100% từ điển song ngữ VI/EN. Karma tests 132/132 pass (thêm 16 unit tests mới), FE build 0 error, BE build 0 warning / 0 error. Log: [step-22-enterprise-sales-distribution-fe](steps/step-22-enterprise-sales-distribution-fe.md).
-
-- [x] **Quy định cấm code và push trực tiếp trên nhánh master (2026-11-02):** Ban hành Quy tắc bắt buộc 11 trong PROJECT_MASTER.md và cập nhật AGENTS.md (mục 5 & mục 8): Cấm tuyệt đối code, commit hoặc push trực tiếp trên master. Mọi công việc bắt buộc phải tạo nhánh cá nhân từ master mới nhất (`loipham/*`, `thien/*`, `phuc/*`) để thực hiện, tự kiểm tra đạt 100% rồi mở PR về master.
-- [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị các phân hệ (Cơ cấu tổ chức, Cấp phòng ban, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 116/116 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). BE 980cd80 · FE 219b833.
-- [x] **Refactor thư mục màn: tách `SYS/roles` (2026-11-03):** `permission-matrix`, `data-scope`, `policy-json-editor`, `account-access` (kèm `user-role-assignment`, `effective-permission-preview`) trong `SYS/roles/components/`, hành vi không đổi. Xem [refactor-20261102-fe-per-screen-folders](tasks/refactor-20261102-fe-per-screen-folders.md). FE 2692d2d, root 3c447cd; tester erpm-5c PASS (Karma 145/145).
-- [x] **Bug thêm nhân viên báo sai "Kho và chi nhánh không khớp" (2026-11-03):** form Nhân viên lọc phòng ban theo chi nhánh; BE dùng mã lỗi `error.org.department_branch_mismatch` / `error.org.branch_mismatch` (VI/EN). Xem [bug-20261103-employee-create-department-branch](tasks/bug-20261103-employee-create-department-branch.md). HRM 9b2346d, BE a969c18, FE e9cf053, root afbe117.
-- [x] **N2 Job làm mới hồ sơ nhân viên hằng ngày (2026-11-02):** `EmployeeSnapshotWorker` chạy khi API khởi động và mỗi ngày 00:05 UTC, áp lại dòng QTCT đã duyệt có hiệu lực mới nhất cho nhân viên có cache lệch (dòng điều chuyển đặt trước khi đến ngày không còn làm hồ sơ sai). Tester PASS. Task: [db-20261102-employee-snapshot-daily-refresh](tasks/db-20261102-employee-snapshot-daily-refresh.md). BE 3099951 · root 607e832.
-- [x] **S20.4.5 Màn QTCT + danh mục cấp phòng ban (2026-11-02):** `/employees/:id/work-history` (timeline, điều chuyển, nghỉ việc, sửa/xóa) và `/department-levels` (CRUD theo công ty); BE thêm lọc `?employeeId=` và quy tắc phòng ban phải nằm trong cây chi nhánh. Tester PASS lần 4. Còn lại (task riêng): job hằng ngày áp dụng dòng QTCT có hiệu lực tương lai. Log: [step-20-work-history-ui](steps/step-20-work-history-ui.md). BE f4fef0e · HRM 266096d · FE 0fee8ed · root ffc362c.
-- [x] **Refactor thư mục theo màn (2026-11-02):** HRM (employees, job-positions, org-tree), CRM (partners), SD (pos), WMS (items, inventory), dashboard vào thư mục riêng, không đổi hành vi (Karma 111/111). Còn lại: tách `SYS/roles` thành thư mục con. Task: [refactor-20261102-fe-per-screen-folders](tasks/refactor-20261102-fe-per-screen-folders.md). HRM 529b5bd · CRM 0e582e0 · SD f4a04b2 · WMS 0198d56 · dashboard 545535c · FE 3f531a4 · root 62de2a9.
-- [x] **S20.4.3 Role designer (2026-11-02):** Màn `/roles`: ma trận quyền theo module, tách "làm gì" / "thấy dữ liệu của ai", sao chép vai trò, JSON nâng cao, gán vai trò phụ + inline policy, xem trước quyền hiệu lực có nguồn (Deny tách riêng); BE thêm `GET /sys/roles/users/{id}/effective` và `version` (xmin) trả 409 khi sửa chồng. Tester PASS lần 2. Còn lại (task riêng): transaction cả ma trận, cache quyền đa instance. Log: [step-20-role-designer](steps/step-20-role-designer.md), [bug](tasks/bug-20261102-role-designer-matrix-reload.md). BE bf15bf0 · HRM 2de228c · FE c56c982.
-- [x] **Hoàn thiện Dark Mode & Triệt tiêu lỗi chữ đen trên nền đen (2026-11-01):** Khắc phục toàn diện độ tương phản Dark Mode trên toàn hệ thống FE: bổ sung bộ Design System alias tokens (--surface-*, --text-*, --border-*) trong ariables.scss, loại bỏ các mã màu hardcode tối trong Notification Center, Templates, Preferences, Toast, Popover và sửa nhãn checkbox input-control sang --erpm-text-body. Đạt 100% build và kiểm tra thực tế trên Chrome DevTools (FE 5845057).
-- [x] **Quy chuẩn Tracking Trello & Comment Commit SHA (2026-11-01):** Ban hành Quy tắc bắt buộc 10 (Rule 10) trong PROJECT_MASTER.md và chuẩn hóa mục 7, mục 8 trong AGENTS.md: Bất kỳ thao tác chuyển trạng thái (cột) nào trên Trello bắt buộc phải comment kèm Hash Commit (SHA) tương ứng và kết quả kiểm thử vào Activity Feed của Card để bảo đảm khả năng truy vết mã nguồn (audit trail) xuyên suốt dự án.
-- [x] Đồng bộ migration/snapshot/schema tham chiếu; nâng cấp schema UUID 9 bảng sang model hiện hành, giữ bản gốc legacy và ExternalId.
-- [x] Tài khoản ERPm nội bộ, Admin/Operator/Viewer, scope chi nhánh ở server, khóa đăng nhập, thu hồi tài khoản/token và audit.
-- [x] Posting nguyên tử; khóa cập nhật kho/công nợ, sequence mã chứng từ và idempotency; kiểm tra dữ liệu, kho–chi nhánh, tồn và hạn mức nợ.
-- [x] Giá vốn bình quân với carrying value chính xác; thanh toán một phần/tiền thừa; bút toán cân bằng bắt buộc và hủy hóa đơn bằng bút toán đảo.
-- [x] Sửa Signals/reactive form, dictionary bundle, routes, phân trang, tìm SKU/barcode/bản dịch; bỏ số liệu demo, tách state item theo màn hình.
-- [x] Kiểm tra: backend solution build 0 warning/0 error; **44 kiểm tra PostgreSQL/API đạt**. FE production build đạt, type-check spec đạt; **7 kiểm thử Chrome đạt**.
-- [x] **HRM (Step 20):** lõi nghiệp vụ thuần QTCT / phạm vi dữ liệu / tính công trong `ERPm.Domain/Services/HumanResource`, **28 kiểm tra HRM đạt** (`tests/ERPm.Hrm.Verification`, không cần DB, đã thêm vào CI) — [Step 20](steps/step-20-hrm-domain-rules.md).
-- [x] **IAM & tổ chức (Step 20 BE, đã merge master):** cây Tập đoàn/Công ty/Chi nhánh, phòng ban, chức danh, nhân viên + QTCT, role động JSONB, `[RequirePermission]` thay khóa cứng Admin, guard leo thang; **75 kiểm tra PostgreSQL/API đạt** — [Step 20 IAM](steps/step-20-iam-dynamic-role-and-organization.md).
-- [x] **Notification Engine (Step 21, nhánh loipham/Notification):** Nền tảng thông báo đa kênh toàn hệ thống (In-App SignalR, Outbox, Email, Smart IAM/Org router, Quiet Hours, Dynamic bilingual templates); tự động kích hoạt sự kiện WMS (tồn tối thiểu), SD (đơn mới, hủy hóa đơn), IAM (thay đổi vai trò); UI Angular 20 Standalone (Chuông, Popover, Toast, Notification Center, Preferences); **93/93 kiểm tra PostgreSQL/API đạt** — [Step 21](steps/step-21-enterprise-notification-engine.md).
-- [x] **Cập nhật Màn hình & Menu Notification (2026-11-01):** Tách cấu trúc thư mục 3 màn hình chuyên biệt (`notification-center`, `notification-preferences`, `notification-templates`), thêm màn hình Quản lý Mẫu thông báo (Templates) cho phép cấu hình động song ngữ và test bắn mẫu; bổ sung liên kết điều hướng Thông báo và Mẫu thông báo vào Sidebar Menu trên Desktop & Mobile, đồng bộ từ điển đa ngôn ngữ (FE 03b1686, BE fa1e9ba, root 7e23138).
-- [x] Tạo database local mới và admin ngẫu nhiên; giữ DB cũ; credentials chỉ trong file ignored. Thêm workflow CI root/BE/FE (chưa chạy trên GitHub).
-- [x] **Sửa lỗi FE module / build (2026-10-31):** Khôi phục `node_modules` bị thiếu/hỏng (`semver/functions/cmp`, `listr2`, `acorn`), sửa type mismatch trong `SD/pos.component.ts` và `sales.service.ts` (`requestId`, `selectedCustomerId`, `warehouseId`). FE build và `npm start` (`ng serve`) chạy bình thường 100% — [Task Bug](tasks/bug-20261031-fe-semver-missing-modules-and-pos-types.md).
-- [x] **CR-20-01 BE (20.6.0–20.6.5) + Task 20.3.3 (sửa/ngừng node cây tổ chức) đã merge master (2026-10-31):** cấp phòng ban + `Path`, role theo phòng ban, bắt buộc gán nhân sự khi tạo user, `PUT`/`DELETE /api/v1/branches`; **118 kiểm tra PostgreSQL/API đạt**, HRM 28 — [plan Phase 20.6](plans/plan-step-20-iam-dynamic-role-and-organization.md).
-- [x] **Step 20.4.1 FE (`AuthService.can()` + `permissionGuard`) đã merge master (2026-10-31):** quyền hiệu lực lấy từ `/auth/me`, 4 nút nghiệp vụ CRM/WMS/SD gắn `can()`; Karma 28/28, kiểm tra tay đạt.
-- [x] **CI GitHub Actions (root `ERPm`) đã chạy được (2026-10-31):** thêm secret `SUBMODULES_TOKEN`, vá từ điển VI/EN lệch BE/FE, bổ sung quy tắc `git config push.recurseSubmodules check` vào `AGENTS.md` (root + `ERPm-FE`) sau 3 lần CI đỏ do quên push commit submodule con.
-- [x] **Step 20.4.2 + 20.6.6 FE (màn tổ chức / chức danh + gán role / nhân viên + cấp tài khoản / user) đã merge master (2026-10-31):** đủ 4 nhóm nghiệp vụ ROLE (theo phòng ban và chức danh)/BRANCH (tạo + sửa + xóa)/USER (tạo, bắt buộc gán nhân sự)/HRM (tạo nhân viên); Karma 53/53, `ERPm.Verification` **120/120**, kiểm tay 39/39 — [plan Phase 20.4](plans/plan-step-20-iam-dynamic-role-and-organization.md).
-- [x] **Spike quy tắc C# từ HRM9 (2026-10-31):** 12 quy tắc nên áp dụng, danh sách không nên copy, 8 đề xuất chờ nhóm quyết định. Xem [`spike-20261031-hrm9-csharp-rules.md`](tasks/spike-20261031-hrm9-csharp-rules.md); chỉ tài liệu, chưa đổi code.
-- [x] **Màn Nhân viên: breadcrumb đơn vị + lọc theo cây tổ chức đã merge master (2026-11-01):** component dùng chung `app-branch-breadcrumbs` (rê chuột hiện các cấp từ gốc), bộ lọc `branchId` (gồm node con), từ điển `emp.all_branches`; Verification 123, Karma 72. Xem [`step-20-fe-employee-branch-view.md`](steps/step-20-fe-employee-branch-view.md).
-- [x] **BUG-20261101 đã merge master (2026-11-01):** danh sách / tra cứu cấp phòng ban lọc theo phạm vi công ty, giống chức danh. Xem [`bug-20261101-department-levels-scope.md`](tasks/bug-20261101-department-levels-scope.md).
-- [x] **Kế hoạch Master Step 22 (2026-11-01):** Lập đặc tả kiến trúc chuẩn Contract-First cho Phân hệ Bán hàng & Phân phối Doanh nghiệp (Enterprise SD: Bảng giá, Báo giá khách hàng, Đơn đặt hàng & Phê duyệt hạn mức nợ/Giữ tồn kho, Trả hàng bán & Báo cáo doanh số) — [plan Step 22](plans/plan-step-22-enterprise-sales-distribution.md).
-- [x] **Centralized Cloud Database Neon.tech (2026-11-02):** Hoàn thành thiết lập PostgreSQL Serverless tập trung dùng chung cho cả 3 người (Phúc, Thiện, Lợi); migrate toàn bộ 7 migration và seed dữ liệu cơ bản + tài khoản admin — xem [db-20261102-centralize-free-db.md](tasks/db-20261102-centralize-free-db.md).
-
-- [x] **Kế hoạch Master Step 23 (2026-11-07):** Lập đặc tả tối ưu UX/UI, Dialog chuẩn hóa, Async Select, Branch Kho, Master Item Giá/Thuế, CRM Đa địa chỉ giao hàng & Đơn bán hàng UX — xem [plan Step 23](plans/plan-step-23-ux-refactor-item-crm-sales-enhancements.md).
 ## In-Progress
 
-- BUG-20261108a: đơn đã duyệt nợ được xuất hóa đơn không bị chặn hạn mức ([task](tasks/bug-20261108-invoice-honor-credit-approval.md)), chờ tester và merge.
-- BE-INT.1: GET + PUT /partners/{id} ([task](tasks/change-20261108-partner-get-put.md)), chờ tester và merge.
-- Dialog dùng chung (Confirm/Info/Warning/Error/Prompt) thay `window.confirm/alert` ([task](tasks/change-20261107-shared-dialog.md)); còn chuyển 14 chỗ trong HRM/SD/WMS.
-- Fix thông báo đơn bán và trả hàng phát sai người nhận ([task](tasks/bug-20261107-order-return-notification-recipients.md)).
-- Fix thông báo báo giá phát sai người nhận (BE, chờ tester và merge): [task](tasks/bug-20261107-quotation-notification-recipients.md).
-- S23.3.1 (BE): đơn bán VAT theo dòng, giờ giao UTC, bản chụp địa chỉ giao, chờ tester và merge sau S23.2.2 ([task](tasks/change-20261107-sales-order-vat-time.md)).
-- S23.2.2 (BE): API địa chỉ giao hàng + hạn mức nợ không giới hạn, chờ tester và merge sau S23.2.1 ([task](tasks/change-20261107-partner-delivery-address-api.md)).
-- S23.2.1 (BE): địa chỉ giao hàng đối tác + cờ không giới hạn nợ, BE 8166055 chờ tester và merge ([task](tasks/db-20261107-partner-delivery-address.md)).
-- Step 22 BE: thông báo báo giá (chấp nhận, từ chối, chuyển đơn) đã merge (BE 0a9d596, root 9f7558a). `send-email` báo giá **chờ quyết định hạ tầng email** (Step 21 chưa có SMTP, outbox chỉ gửi tới tài khoản hệ thống) — xem [step log](steps/step-22-sd-quotation-notifications-be.md). F6 (người SELF xuất hóa đơn bị che kho) chờ BA.
-- Refactor IAM đã merge: lưu role nguyên tử, thông báo sau khi lưu ([task](tasks/refactor-20261107-iam-role-save-atomic.md), BE 64cc59e); phiên bản quyền dùng chung nhiều instance qua sequence `erpm_permission_version` ([task](tasks/refactor-20261107-iam-permission-version.md), BE 9f84091). Tester erpm-44 PASS (BE 9f84091), đã thử hai tiến trình API thật.
-- Step 22 BE: `create-invoice` từ đơn bán đã push (BE b63c248, FE 16c3756, nhánh `thien/s22-order-create-invoice`), chờ merge — xem [step log](steps/step-22-sd-order-create-invoice-be.md). F5 (SELF tạo/đọc đơn, báo giá) đã merge (BE d4d1e42, root 04a62ce), chờ tester kiểm lại.
-- Bug F5 người bán SELF không tạo/đọc được đơn và báo giá: đã sửa và push (BE 2a1a38d, nhánh `thien/fix-selfscope-order-quotation`), chờ merge — xem [bug](tasks/bug-20261107-selfscope-order-quotation.md).
-- Step 22 BE (Thiện): S22.1.1 đến S22.3.1 (bảng giá, Pricing Engine, báo giá, đơn bán kiểm nợ/giữ kho) đã merge (BE 416ba70, root ba42c88); S22.4.1 trả hàng bán và sửa 3 lỗi tester đã merge (BE 27435e0, FE 16fa9a8, root b416294; tester PASS); S22.5.1 báo cáo doanh số/KPI (Dapper) + chi tiết hóa đơn F4 đã push (BE d340a54, nhánh `thien/s22-sales-analytics`), chờ merge — xem [step log](steps/step-22-sd-sales-analytics-be.md).
-- Nghiệm thu thủ công trên thiết bị và quy trình bán–nhập–hủy–đối chiếu thực tế; chưa coi đây là nghiệm thu production.
-- Web test local (`:4200`, API `:5143`, DB `erpm_testweb`, dữ liệu giả) dựng cho Thiện xem giao diện — ghi chú `notes/erpm-test-web` (không push).
-- CI repo `ERPm-FE` (workflow riêng của chính repo, khác CI root) vẫn đỏ: thiếu secret `SUBMODULES_TOKEN` trên repo đó — chờ Phúc thêm.
-- FE đã lên Angular 20.3 / Ionic 8.8 (Step 18, `step-18-angular-20-env-config-and-secrets.md`); initial bundle ~604 kB còn vượt budget 500 kB và có warning empty-glob của Stencil.
+- [ ] Phase 1 — Context Optimization: chuẩn hóa bootstrap instructions, workspace metadata, context policy và current status/history separation.
+  - Branch: `loipham/step-context-phase1`.
+  - Plan: [ERPm Context Engineering Implementation Plan](../ERPm_Context_Engineering_Implementation_Plan.md) (nếu file plan chưa được đưa vào repo, tham chiếu bản làm việc ngoài repo).
 
 ## Next Steps
 
-1. **Step 20.4 FE — Phân quyền động:** 20.4.1, 20.4.2, 20.4.4 (từ điển), 20.6.6, S20-DEP xong. Còn 20.4.3 Role designer (ma trận + JSON, gán role theo user), 20.4.5 QTCT + danh mục cấp. Đặc tả: [plan](plans/plan-step-20-iam-dynamic-role-and-organization.md), BE: [step log](steps/step-20-iam-dynamic-role-and-organization.md).
-2. Nghiệm thu MVP theo [hướng dẫn chạy](../docs/LOCAL_DEVELOPMENT.md), bổ sung kiểm thử E2E toàn ứng dụng và CI cho private submodules.
-2. Hoàn thiện liên kết PO → nhận hàng/hóa đơn mua và phiếu thu/chi, công nợ đầu kỳ được hạch toán, quản lý tài khoản/hủy chứng từ qua UI.
-3. HRM bước 2: pháp nhân/cơ cấu đã ánh xạ vào `tbl_SYS_Branch` + `tbl_HRM_Department` (Step 20); còn hợp đồng, ca, chấm công + màn hình `ERPm-FE-HRM`.
-4. Sổ cái/báo cáo tài chính, chuyển kho/kiểm kê/đổi trả, native scanner/ESC-POS và offline theo roadmap.
+1. Review các metadata trong `.ai/context/` cùng owner của FE/BE để xác nhận domain boundaries và integration contracts.
+2. Đồng bộ bootstrap policy với `ERPm-FE/AGENTS.md` và `ERPm-BE/AGENTS.md` trên các nhánh riêng, sau khi xác minh HEAD của hai repo.
+3. Kiểm tra recursive submodule checkout, đặc biệt nested HRM gitlink từng có SHA chưa tra cứu được ở snapshot audit.
+4. Đo lại lượng tài liệu bootstrap mà coding agent thực sự đọc trước/sau thay đổi.
 
-Bằng chứng và giới hạn: [Step 19](steps/step-19-stabilization-and-internal-accounts.md), [đối chiếu F01–F22](reviews/2026-10-29-priority-resolution.md). SDK .NET 10 đã có ở thư mục người dùng nhưng chưa trên PATH; nhận định thiếu SDK trong Step 18 đã được đính chính.
+## Rules
 
-
----
-
-## Tài liệu trước Step 19 — lưu để truy vết
-
-# 📊 DỰ ÁN ERPM - BẢNG TRẠNG THÁI HIỆN TẠI (CURRENT STATUS)
-
-> **Đánh giá hiện hành: 2026-10-29 — Step 18.**
->
-> **Giai đoạn:** Giai đoạn 1 đã có source MVP, đang cần ổn định và nghiệm thu lại; Giai đoạn 2 mới có một phần khung.
->
-> **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
-
-## Completed
-
-- [x] **Giữ phiên đăng nhập khi mở tab mới (Open link in new tab) và chuyển hướng đúng returnUrl (2026-11-10):** Chuyển cơ chế lưu trữ bearer token từ `sessionStorage` sang `localStorage` (kèm fallback), cho phép mở liên kết trên tab mới (`Open link in new tab`, `Ctrl+Click`) giữ nguyên phiên đăng nhập 100% không bị đá về `/login`; cập nhật `authGuard` và `permissionGuard` bảo toàn tham số `returnUrl: state.url` trong query params; sửa `LoginComponent` tự động điều hướng đúng trang đích thay vì hardcode `/dashboard`. Karma unit tests **171/171 pass** (thêm test case bảo toàn `returnUrl`), `ng build` 0 error. Task: [bug-20261110-open-link-new-tab-session](tasks/bug-20261110-open-link-new-tab-session.md).
-
-- [x] **Refactor toàn diện <app-data-table> với <app-column> khai báo và tự động hóa EditMode (2026-11-09):** Nâng cấp `DataTableComponent` với `TableColumnComponent` (`<app-column>`), cho phép định nghĩa cột trực quan trong template HTML và loại bỏ 100% mảng `columns: TableColumn[]` trong các file `.ts`. Tự động hóa hoàn toàn chuyển đổi ô (Smart Cell Switching) theo cờ `[canEdit]`: render `<span>` định dạng chuẩn khi xem và `<app-form-control>` (`compact`, `size="sm"`) khi sửa; loại bỏ triệt để việc nhân đôi thẻ `<app-data-table>` ở các màn hình có chế độ View/Edit inline (`order-detail`, `quotation-detail`, `return-detail`). Áp dụng 100% cho toàn bộ các module: SD (Orders, Quotations, Returns, PriceLists, Detail lines), CRM (Partners), WMS (Items, Inventory), HRM (Employees, Department Levels, Job Positions), SYS (Users, Notification Center, Notification Templates). `npm run build` pass 100% (0 error). SD a8ddaad, f4418d3 · CRM 17c5ed3 · WMS 1ffc4e9 · HRM 31718ef · FE 77642f4, 532d35c · root 8023a4f, 8fef8ad. Task: [refactor-20261109-migrate-tables-to-app-data-table](tasks/refactor-20261109-migrate-tables-to-app-data-table.md).
-
-- [x] **Tái cấu trúc DataTableComponent dùng chung & Nâng cấp Giao diện Đơn bán hàng SD (2026-11-09):** Xây dựng component bảng dữ liệu dùng chung `<app-data-table>` hỗ trợ cả Chế độ Danh sách (List mode, custom cell directive `appDataTableCell`, sorting, selection) và Chế độ Nhập liệu FormArray (Editable mode); refactor toàn diện Màn hình Danh sách Đơn bán hàng (`/sales/orders`) và Màn hình Chi tiết Đơn bán hàng (`/sales/orders/:id` ở cả View Mode và Edit Mode); giải quyết triệt để lỗi menu dropdown chọn sản phẩm bị che khuất bằng cơ chế Smart Drop-Up kết hợp định vị `position: fixed` không phụ thuộc overflow của bảng; triệt tiêu hiện tượng thanh scroll ngang lơ lửng giữa bảng và giữ bố cục khít theo số lượng dòng thực tế. FE build pass 100% (0 error). SD b6329da · FE a18fe3b · root 3e0b28b.
-
-- [x] **Step 23 Shared, Branch/Kho & Master Item Refactor (S23.0.1, S23.0.2, S23.0.3, S23.1.1, S23.1.2) (2026-11-08):** Xây dựng component Nút Back trang chuẩn hóa (`<app-back-button>`); hoàn thiện Async Select (`<app-async-select>`); chuẩn hóa chặn backdrop dismiss cho toàn bộ form popup nhập liệu; bổ sung `OrgUnitType` Kho (`Warehouse = 3`) trên cây tổ chức Branch kèm icon chuyên biệt (`📦`); refactor Master Item: bổ sung Thuế suất VAT (`VatRate`) trên backend, database migration PostgreSQL Neon và hiển thị/nhập liệu VAT trên giao diện danh mục mặt hàng. BE build 0 warning / 0 error, **355/355 checks pass** (`ERPm.Verification` đạt 100%), FE `ng build` 0 error. BE 3b779b4 · FE f0c1e81 · WMS cd7b180.
-
-- [x] **Chỉnh sửa trực tiếp trên trang Chi tiết Đơn bán hàng & Chia Header col 6-6 (2026-11-07):** Bỏ popup modal khi bấm Chỉnh sửa trên trang `sales/orders/:id`, cho phép chuyển đổi mượt mà giữa Chế độ Xem và Chế độ Chỉnh sửa trực tiếp trên trang chi tiết; chia bố cục Header thành 2 cột cân đối `col 6 - col 6` giúp các trường thông tin rộng rãi, thoáng mắt; hỗ trợ thêm/xóa dòng sản phẩm và tính toán live tổng thanh toán; khắc phục toàn diện các nhãn i18n bị hiển thị key thô. Karma unit tests **151/151 pass**, FE build 0 error. Task: [change-20261107-order-detail-inline-edit-col6](tasks/change-20261107-order-detail-inline-edit-col6.md). SD f6d622c · FE c044667.
-
-- [x] **Refactor tách riêng Trang Danh sách & Trang Chi tiết (Header/List detail) Phân hệ SD (2026-11-07):** Xóa bỏ layout chia 2 cột (split pane) bó hẹp trên màn hình SD; tách riêng thành các route và component toàn màn hình độc lập: Trang Danh sách (Full-width grid, bộ lọc nâng cao, đầy đủ các cột nghiệp vụ) và Trang Chi tiết (chuẩn ERP Header / Lines detail: Stepper tiến trình, cảnh báo hạn mức nợ, action bar và bảng line items rộng rãi). Áp dụng toàn diện cho Đơn bán hàng (`/sales/orders` & `/sales/orders/:id`), Báo giá (`/sales/quotations` & `/sales/quotations/:id`), Trả hàng bán (`/sales/returns` & `/sales/returns/:id`) và Bảng giá (`/sales/price-lists` & `/sales/price-lists/:id`). Kiểm tra 100% tương thích Dark Mode. Karma unit tests **150/150 pass**, FE build 0 error. Task: [refactor-20261107-sd-separate-list-detail-pages](tasks/refactor-20261107-sd-separate-list-detail-pages.md). SD b0be470 · FE d57f07b.
-
-- [x] **Bug Sales Orders in trắng trang, thiếu nút Edit, tương phản Dark Mode và định dạng tiền tệ (2026-11-07):** Áp dụng Isolated Iframe Printing cho chức năng in chứng từ bán hàng (loại bỏ ảnh hưởng của layout 100vh và overflow hidden); bổ sung nút Chỉnh sửa (Edit) cho đơn hàng Draft/PendingApproval/Confirmed và cột Thao tác; định nghĩa token bề mặt Dark Mode (--erpm-surface-*) và sửa chữ trắng trên nền trắng; xây dựng `CurrencyInputDirective` chuẩn hóa định dạng tiền tệ (phân cách hàng nghìn `30,500,000`), triệt tiêu mũi tên stepper trên toàn bộ ô nhập số tiền trong đơn hàng, báo giá và trả hàng. Build pass 100%. Task: [bug-20261107-sales-orders-print-edit-darkmode](tasks/bug-20261107-sales-orders-print-edit-darkmode.md). SD b01fdcd, 908550b · FE 480b570, 57b837e.
-
-- [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
-- [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
-
-- [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
-- [x] Ghi [báo cáo rà soát 2026-10-29](reviews/2026-10-29-source-review.md) với 22 phát hiện và vị trí source; lưu [Step 18](steps/step-18-source-review-and-development-assessment.md).
-- [x] Xác minh production FE build exit 0, có 2 warning; phát hiện phần test chưa compile được (TS2339).
-- [x] Tái hiện cục bộ lỗi Signals ở POS/CRM/branch tree và effect POS/Inventory; đối chiếu contract localization và routes.
-- [x] Xác định model EF 23 bảng hiện hành không khớp migration/snapshot 9 bảng cũ.
-
-## In-Progress — Tình trạng thực tế
-
-- Giai đoạn 1: **cần ổn định lại**, chưa nghiệm thu kho–công nợ–kế toán hoặc vận hành đa người dùng.
-- Chưa bắt đầu sửa các phát hiện trong lượt review này; không chỉnh sửa source ứng dụng hoặc database.
-- Build BE/integration PostgreSQL chưa được xác minh: máy hiện chỉ có SDK .NET 8.0.400, các project nhắm net10.0.
-- FE thực tế dùng Angular 17.3 (runtime đang cài 17.3.12) + Ionic 8; chưa có cấu hình Capacitor/native/offline trong checkout.
-
-## Next Steps — Ưu tiên sau rà soát
-
-1. Chuẩn bị môi trường .NET 10; xác minh restore/build BE, đồng bộ migration và bootstrap/upgrade DB thử nghiệm không mất dữ liệu.
-2. Sửa computed/effect và tổng tiền FE; sửa routes, i18n contract, phân trang; bỏ số demo khỏi dashboard nghiệp vụ.
-3. Bổ sung xác thực/phân quyền, validation, kiểm tra kho–chi nhánh, cấp số chứng từ/idempotency và concurrency tồn kho/công nợ.
-4. Thống nhất giá vốn, thanh toán một phần/tiền thừa, posting bắt buộc và vòng đời chứng từ; kiểm thử đối chiếu kho–sổ–công nợ.
-5. Nghiệm thu lại Giai đoạn 1 theo test có bằng chứng, cập nhật roadmap/status BE/FE, rồi tiếp tục PUR/Sổ quỹ.
-
----
-
-## Lịch sử trước Step 18 — Giữ để truy vết
-
-Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đây là ghi nhận cũ, có điểm không còn khớp source. Dùng đánh giá hiện hành phía trên và báo cáo Step 18 để xác định công việc tiếp theo.
-
-> **Đánh giá hiện hành: 2026-10-29 — Step 18.**
->
-> **Giai đoạn:** Giai đoạn 1 đã có source MVP, đang cần ổn định và nghiệm thu lại; Giai đoạn 2 mới có một phần khung.
->
-> **Kết luận:** Chưa đủ bằng chứng sẵn sàng dùng dữ liệu thật. Các tỷ lệ 100% trong phần lịch sử bên dưới không phải kết quả nghiệm thu nghiệp vụ hiện hành.
-
-## Completed
-
-- [x] **Giữ phiên đăng nhập khi mở tab mới (Open link in new tab) và chuyển hướng đúng returnUrl (2026-11-10):** Chuyển cơ chế lưu trữ bearer token từ `sessionStorage` sang `localStorage` (kèm fallback), cho phép mở liên kết trên tab mới (`Open link in new tab`, `Ctrl+Click`) giữ nguyên phiên đăng nhập 100% không bị đá về `/login`; cập nhật `authGuard` và `permissionGuard` bảo toàn tham số `returnUrl: state.url` trong query params; sửa `LoginComponent` tự động điều hướng đúng trang đích thay vì hardcode `/dashboard`. Karma unit tests **171/171 pass** (thêm test case bảo toàn `returnUrl`), `ng build` 0 error. Task: [bug-20261110-open-link-new-tab-session](tasks/bug-20261110-open-link-new-tab-session.md).
-
-- [x] **Refactor toàn diện <app-data-table> với <app-column> khai báo và tự động hóa EditMode (2026-11-09):** Nâng cấp `DataTableComponent` với `TableColumnComponent` (`<app-column>`), cho phép định nghĩa cột trực quan trong template HTML và loại bỏ 100% mảng `columns: TableColumn[]` trong các file `.ts`. Tự động hóa hoàn toàn chuyển đổi ô (Smart Cell Switching) theo cờ `[canEdit]`: render `<span>` định dạng chuẩn khi xem và `<app-form-control>` (`compact`, `size="sm"`) khi sửa; loại bỏ triệt để việc nhân đôi thẻ `<app-data-table>` ở các màn hình có chế độ View/Edit inline (`order-detail`, `quotation-detail`, `return-detail`). Áp dụng 100% cho toàn bộ các module: SD (Orders, Quotations, Returns, PriceLists, Detail lines), CRM (Partners), WMS (Items, Inventory), HRM (Employees, Department Levels, Job Positions), SYS (Users, Notification Center, Notification Templates). `npm run build` pass 100% (0 error). SD a8ddaad, f4418d3 · CRM 17c5ed3 · WMS 1ffc4e9 · HRM 31718ef · FE 77642f4, 532d35c · root 8023a4f, 8fef8ad. Task: [refactor-20261109-migrate-tables-to-app-data-table](tasks/refactor-20261109-migrate-tables-to-app-data-table.md).
-
-- [x] **Tái cấu trúc DataTableComponent dùng chung & Nâng cấp Giao diện Đơn bán hàng SD (2026-11-09):** Xây dựng component bảng dữ liệu dùng chung `<app-data-table>` hỗ trợ cả Chế độ Danh sách (List mode, custom cell directive `appDataTableCell`, sorting, selection) và Chế độ Nhập liệu FormArray (Editable mode); refactor toàn diện Màn hình Danh sách Đơn bán hàng (`/sales/orders`) và Màn hình Chi tiết Đơn bán hàng (`/sales/orders/:id` ở cả View Mode và Edit Mode); giải quyết triệt để lỗi menu dropdown chọn sản phẩm bị che khuất bằng cơ chế Smart Drop-Up kết hợp định vị `position: fixed` không phụ thuộc overflow của bảng; triệt tiêu hiện tượng thanh scroll ngang lơ lửng giữa bảng và giữ bố cục khít theo số lượng dòng thực tế. FE build pass 100% (0 error). SD b6329da · FE a18fe3b · root 3e0b28b.
-
-- [x] **Step 23 Shared, Branch/Kho & Master Item Refactor (S23.0.1, S23.0.2, S23.0.3, S23.1.1, S23.1.2) (2026-11-08):** Xây dựng component Nút Back trang chuẩn hóa (`<app-back-button>`); hoàn thiện Async Select (`<app-async-select>`); chuẩn hóa chặn backdrop dismiss cho toàn bộ form popup nhập liệu; bổ sung `OrgUnitType` Kho (`Warehouse = 3`) trên cây tổ chức Branch kèm icon chuyên biệt (`📦`); refactor Master Item: bổ sung Thuế suất VAT (`VatRate`) trên backend, database migration PostgreSQL Neon và hiển thị/nhập liệu VAT trên giao diện danh mục mặt hàng. BE build 0 warning / 0 error, **355/355 checks pass** (`ERPm.Verification` đạt 100%), FE `ng build` 0 error. BE 3b779b4 · FE f0c1e81 · WMS cd7b180.
-
-- [x] **Chỉnh sửa trực tiếp trên trang Chi tiết Đơn bán hàng & Chia Header col 6-6 (2026-11-07):** Bỏ popup modal khi bấm Chỉnh sửa trên trang `sales/orders/:id`, cho phép chuyển đổi mượt mà giữa Chế độ Xem và Chế độ Chỉnh sửa trực tiếp trên trang chi tiết; chia bố cục Header thành 2 cột cân đối `col 6 - col 6` giúp các trường thông tin rộng rãi, thoáng mắt; hỗ trợ thêm/xóa dòng sản phẩm và tính toán live tổng thanh toán; khắc phục toàn diện các nhãn i18n bị hiển thị key thô. Karma unit tests **151/151 pass**, FE build 0 error. Task: [change-20261107-order-detail-inline-edit-col6](tasks/change-20261107-order-detail-inline-edit-col6.md). SD f6d622c · FE c044667.
-
-- [x] **Refactor tách riêng Trang Danh sách & Trang Chi tiết (Header/List detail) Phân hệ SD (2026-11-07):** Xóa bỏ layout chia 2 cột (split pane) bó hẹp trên màn hình SD; tách riêng thành các route và component toàn màn hình độc lập: Trang Danh sách (Full-width grid, bộ lọc nâng cao, đầy đủ các cột nghiệp vụ) và Trang Chi tiết (chuẩn ERP Header / Lines detail: Stepper tiến trình, cảnh báo hạn mức nợ, action bar và bảng line items rộng rãi). Áp dụng toàn diện cho Đơn bán hàng (`/sales/orders` & `/sales/orders/:id`), Báo giá (`/sales/quotations` & `/sales/quotations/:id`), Trả hàng bán (`/sales/returns` & `/sales/returns/:id`) và Bảng giá (`/sales/price-lists` & `/sales/price-lists/:id`). Kiểm tra 100% tương thích Dark Mode. Karma unit tests **150/150 pass**, FE build 0 error. Task: [refactor-20261107-sd-separate-list-detail-pages](tasks/refactor-20261107-sd-separate-list-detail-pages.md). SD b0be470 · FE d57f07b.
-
-- [x] **Bug Sales Orders in trắng trang, thiếu nút Edit, tương phản Dark Mode và định dạng tiền tệ (2026-11-07):** Áp dụng Isolated Iframe Printing cho chức năng in chứng từ bán hàng (loại bỏ ảnh hưởng của layout 100vh và overflow hidden); bổ sung nút Chỉnh sửa (Edit) cho đơn hàng Draft/PendingApproval/Confirmed và cột Thao tác; định nghĩa token bề mặt Dark Mode (--erpm-surface-*) và sửa chữ trắng trên nền trắng; xây dựng `CurrencyInputDirective` chuẩn hóa định dạng tiền tệ (phân cách hàng nghìn `30,500,000`), triệt tiêu mũi tên stepper trên toàn bộ ô nhập số tiền trong đơn hàng, báo giá và trả hàng. Build pass 100%. Task: [bug-20261107-sales-orders-print-edit-darkmode](tasks/bug-20261107-sales-orders-print-edit-darkmode.md). SD b01fdcd, 908550b · FE 480b570, 57b837e.
-
-- [x] **Task S20-DEP & Task 20.4.4 (2026-11-05):** Gán DepartmentId cho chứng từ (SalesOrder, SalesInvoice, PurchaseOrder, StockReceipt, StockIssue) ở BE DTO/Services và UI SD (order-form-dialog, order-detail-drawer, models); sửa lỗi cú pháp JSON system.json, dọn sạch 15 key duplicate và đồng bộ 100% hai file từ điển VI/EN (system_dictionary.json & system.json).
-- [x] **Task B1 - Mục "Quản trị" trên menu mobile & Màn hình Trung tâm Quản trị (2026-11-02):** Bổ sung tab "Thêm" (`menu.more`) trên thanh menu dưới mobile (`.mobile-bottom-bar`) với active highlighting; xây dựng màn hình Trung tâm Quản trị (`AdminHubComponent`) hiển thị 6 phân hệ (Cơ cấu tổ chức, Chức danh, Nhân viên, Tài khoản, Vai trò, Mẫu thông báo) được bảo vệ bởi `auth.can()`; đồng bộ từ điển song ngữ VI/EN (`system.json` & `system_dictionary.json`). Karma tests 101/101 pass, FE production build pass, BE build 0/0. Log: [step-20-mobile-admin-menu](steps/step-20-mobile-admin-menu.md). — Đã hoàn thành rà soát
-
-- [x] Kiểm kê source root/BE/FE và 10 submodule; đọc kiến trúc, roadmap, status và các luồng nghiệp vụ hiện có.
-- [x] Ghi [báo cáo rà soát 2026-10-29](reviews/2026-10-29-source-review.md) với 22 phát hiện và vị trí source; lưu [Step 18](steps/step-18-source-review-and-development-assessment.md).
-- [x] Xác minh production FE build exit 0, có 2 warning; phát hiện phần test chưa compile được (TS2339).
-- [x] Tái hiện cục bộ lỗi Signals ở POS/CRM/branch tree và effect POS/Inventory; đối chiếu contract localization và routes.
-- [x] Xác định model EF 23 bảng hiện hành không khớp migration/snapshot 9 bảng cũ.
-
-## In-Progress — Tình trạng thực tế
-
-- Giai đoạn 1: **cần ổn định lại**, chưa nghiệm thu kho–công nợ–kế toán hoặc vận hành đa người dùng.
-- Chưa bắt đầu sửa các phát hiện trong lượt review này; không chỉnh sửa source ứng dụng hoặc database.
-- Build BE/integration PostgreSQL chưa được xác minh: máy hiện chỉ có SDK .NET 8.0.400, các project nhắm net10.0.
-- FE thực tế dùng Angular 17.3 (runtime đang cài 17.3.12) + Ionic 8; chưa có cấu hình Capacitor/native/offline trong checkout.
-
-## Next Steps — Ưu tiên sau rà soát
-
-1. Chuẩn bị môi trường .NET 10; xác minh restore/build BE, đồng bộ migration và bootstrap/upgrade DB thử nghiệm không mất dữ liệu.
-2. Sửa computed/effect và tổng tiền FE; sửa routes, i18n contract, phân trang; bỏ số demo khỏi dashboard nghiệp vụ.
-3. Bổ sung xác thực/phân quyền, validation, kiểm tra kho–chi nhánh, cấp số chứng từ/idempotency và concurrency tồn kho/công nợ.
-4. Thống nhất giá vốn, thanh toán một phần/tiền thừa, posting bắt buộc và vòng đời chứng từ; kiểm thử đối chiếu kho–sổ–công nợ.
-5. Nghiệm thu lại Giai đoạn 1 theo test có bằng chứng, cập nhật roadmap/status BE/FE, rồi tiếp tục PUR/Sổ quỹ.
-
----
-
-## Lịch sử trước Step 18 — Giữ để truy vết
-
-Các số liệu hoàn thành, phiên bản stack và lệnh chạy dưới đây là ghi nhận cũ, có điểm không còn khớp source. Dùng đánh giá hiện hành phía trên và báo cáo Step 18 để xác định công việc tiếp theo.
-
-> **Cập nhật lần cuối:** 2026-10-29  
-> **Giai đoạn hiện tại:** Giai đoạn 1 (Nền tảng Kiến trúc Nhanh & Multi-Branch Deep Dive) -> Chuẩn bị bước vào Giai đoạn 2 (Mua hàng & Sổ quỹ)  
-> **Trạng thái:** Backend .NET 8 Clean Architecture hoàn thiện + Multi-Branch Tree Select vô hạn tầng + Lọc dữ liệu cha con tự động cho toàn bộ hệ thống.
-
----
-
-## 📌 1. TIẾN ĐỘ TỔNG QUAN
-
-| Hạng mục / Phân hệ | Tiến độ | Trạng thái | Ghi chú |
-| :--- | :---: | :---: | :--- |
-| **Quy chuẩn & Kế hoạch Master** | 100% |  Hoàn thành | Đã tạo `PROJECT_MASTER.md`, `AGENTS.md`, `.ai/` |
-| **Backend Clean Architecture (.NET 10)** | 100% |  Hoàn thành | Đã tách 4 tầng (`net10.0`), build 0 errors ([step-16.md](steps/step-16-upgrade-dotnet-10-lts.md)) |
-| **PostgreSQL & Schema Script** | 100% |  Hoàn thành | Đã có [erpm_schema.sql](../ERPm-BE/database/erpm_schema.sql) 540+ dòng |
-| **Phân hệ ITEM & Danh mục** | 100% |  Hoàn thành | Backend CRUD + Frontend Adaptive UI hoàn chỉnh ([step-02.md](steps/step-02-frontend-angular-ionic-setup.md)) |
-| **Phân hệ Đa ngôn ngữ (i18n)** | 100% |  Hoàn thành | Backend Bundle API + Frontend TranslatePipe & Signal (VI/EN) |
-| **Frontend Angular + Ionic Hybrid** | 100% |  Hoàn thành | Hoàn thiện tất cả 5 màn hình, build 0 errors ([step-03.md](steps/step-03-full-mvp-sales-inventory-pos.md)) |
-| **Phân hệ Bán hàng & POS Touch** | 100% |  Hoàn thành | Giao diện thu ngân POS, giỏ hàng, thanh toán, in hóa đơn nhiệt |
-| **Phân hệ Tồn kho (Inventory)** | 100% |  Hoàn thành | Xem tồn tức thời, cảnh báo hết hàng, lập phiếu nhập kho nhanh |
-| **Phân hệ Khách hàng (Partner)** | 100% |  Hoàn thành | Danh bạ KH/NCC, phân loại, hạn mức nợ và theo dõi công nợ |
-| **Hạt nhân Kế toán (Double-Entry)** | 100% |  Hoàn thành | Tự động sinh bút toán Nợ/Có (111/131/511/632/156) khi bán hàng |
-| **Tâm điểm Chi nhánh (Multi-Branch)** | 100% |  Hoàn thành | Cây phân cấp, branch_id cho toàn bộ chứng từ & kho bãi ([step-05.md](steps/step-05-multi-branch-architecture-and-table-prefix-redesign.md)) |
-| **Framework Base CRUD cho Solo Dev** | 100% |  Hoàn thành | Generic Base CRUD Type-safe + Module Folder ([step-06.md](steps/step-06-solo-dev-rapid-crud-architecture-and-module-modularization.md)) |
-| **Frontend Modularization & 3 Files Triad** | 100% |  Hoàn thành | Tách thư mục modules, tách độc lập .ts, .html, .scss ([step-07.md](steps/step-07-frontend-modularization-and-component-triad-separation.md)) |
-| **Design System & Ionic Customization** | 100% |  Hoàn thành | Tokens, Tables, Ionic Overrides & Reusable UI ([step-08.md](steps/step-08-modern-design-system-and-ionic-customization.md)) |
-| **Multi-Branch Tree-Select & Querying** | 100% |  Hoàn thành | Tree Select menu đệ quy vô hạn + BFS lọc cha con con cháu ([step-09.md](steps/step-09-multi-branch-nested-tree-select-and-recursive-filtering.md)) |
-| **Custom Select, Pointer & Full i18n** | 100% |  Hoàn thành | Custom Select Component, triệt tiêu caret nhấp nháy, phủ song ngữ 100% ([step-10.md](steps/step-10-custom-select-cursor-and-complete-i18n.md)) |
-| **Dynamic Item Attributes (JSONB)** | 100% |  Hoàn thành | Thuộc tính động Schema-driven + PostgreSQL JSONB + GIN Index ([step-11.md](steps/step-11-dynamic-item-attributes-jsonb.md)) |
-| **Git Remote & Gitignore Configuration** | 100% |  Hoàn thành | Cấu hình remote `origin` GitHub & Master `.gitignore` ([step-12.md](steps/step-12-git-remote-and-gitignore-setup.md)) |
-| **Multi-Repo & Submodules Architecture** | 100% |  Hoàn thành | Tách BE/FE thành 2 repo riêng, phân rã submodule FE lồng nhau ([step-13.md](steps/step-13-multi-repo-and-submodule-enterprise-architecture.md)) |
-| **Enterprise Module Acronyms & Gitmodules** | 100% |  Hoàn thành | Chuẩn hóa 10 module viết tắt (ACC, SD, PUR, WMS, CRM, HRM, MFG, SCM, PM, DASHBOARD) ([step-14.md](steps/step-14-enterprise-erp-module-standardization.md)) |
-| **Dual-Key Architecture (`int Id` + `UUIDv7 ExternalId`)** | 100% |  Hoàn thành | PK/FK `int` tự tăng + `ExternalId` UUIDv7 Covering Index ([step-15.md](steps/step-15-dual-key-int-id-and-uuidv7-external-id.md)) |
-| **Nâng cấp Backend lên .NET 10 LTS (`net10.0`)** | 100% |  Hoàn thành | EF Core 10.0.14, Npgsql 10.0.3, Native `Guid.CreateVersion7()` ([step-16.md](steps/step-16-upgrade-dotnet-10-lts.md)) |
-| **Standardized Reactive Forms (`FormGroup` + `InputControl` / `FormControl`)** | 100% |  Hoàn thành | `<app-form-control>` & `<app-input-control>` đa kiểu dữ liệu ([step-17.md](steps/step-17-standardized-form-group-and-input-control-components.md)) |
-| **Angular 20 + Cấu hình môi trường & Bảo mật cấu hình** | 100% |  Hoàn thành | Angular 20.3 + Ionic 8.8, `environment.apiBaseUrl`, bỏ mật khẩu DB khỏi `appsettings.json`, link tài liệu tương đối ([step-18.md](steps/step-18-angular-20-env-config-and-secrets.md)) |
-
----
-
-## 🛠️ 2. CÔNG VIỆC VỪA HOÀN THÀNH (COMPLETED IN STEP 15, 16, 17 & 18)
-- [x] **Nâng cấp Frontend (`ERPm-FE`) lên Angular 20 (step-18):**
-  - `@angular/*` `17.3` -> `20.3`, `@angular/cli` `20.3`, TypeScript `5.8`, `zone.js` `0.15`, `@ionic/angular` `8.3` -> `8.8` (bản Ionic 8 hỗ trợ Angular 20).
-  - `styles.scss`: đổi `@import` sang `@use` (Sass `@import` đã deprecated), build 0 warning Sass.
-- [x] **Cấu hình môi trường Frontend:** Thêm `src/environments/environment.ts` + `environment.development.ts` (`apiBaseUrl`), thay toàn bộ 7 service hard-code `http://localhost:5000`.
-- [x] **Bảo mật cấu hình Backend:** Bỏ mật khẩu DB khỏi `appsettings.json`; mật khẩu cấp qua `dotnet user-secrets` (dev) hoặc biến môi trường `ConnectionStrings__DefaultConnection` (server).
-- [x] **Tài liệu:** Đổi link tuyệt đối `file:///d:/WORKING%20PLACE/ERPm/...` sang đường dẫn tương đối (mở được trên mọi máy); cập nhật phiên bản Angular 20.
-- [x] **Chuẩn hóa `FormGroup` & Bộ Component `InputControlComponent` / `FormControlComponent`:**
-  - Xây dựng [`InputControlComponent`](../ERPm-FE/src/app/shared/components/input-control/input-control.component.ts) (`<app-input-control>`) xử lý tự động theo `type` (`'text' | 'number' | 'currency' | 'date' | 'email' | 'tel' | 'textarea' | 'select' | 'checkbox'`) và `dataSource` (`SelectOption[]`).
-  - Xây dựng [`FormControlComponent`](../ERPm-FE/src/app/shared/components/form-control/form-control.component.ts) (`<app-form-control>`) bọc `<app-input-control>`, tích hợp `ControlValueAccessor` + `NgControl`, tự động vẽ nhãn, đơn vị, dấu `*` bắt buộc và thông báo lỗi validation.
-  - Chuyển đổi toàn bộ các Form nhập liệu lưu dữ liệu (`InventoryComponent`, `ItemsComponent` kể cả Dynamic Attributes JSONB, `PartnersComponent`, `PosComponent`) từ `[(ngModel)]` sang `FormGroup` (`ReactiveFormsModule`).
-- [x] **Nâng cấp toàn bộ Backend (`ERPm-BE`) lên .NET 10 LTS (`net10.0`):**
-  - Chuyển đổi 4 projects (`ERPm.Domain`, `ERPm.Application`, `ERPm.Infrastructure`, `ERPm.API`) lên `net10.0`.
-  - Nâng cấp `Microsoft.EntityFrameworkCore` (`10.0.14`), `Npgsql.EntityFrameworkCore.PostgreSQL` (`10.0.3`), `EFCore.NamingConventions` (`10.0.1`), `Microsoft.AspNetCore.OpenApi` (`10.0.14`).
-  - Cập nhật `Uuid7Generator.NewUuid7()` sử dụng trực tiếp hàm gốc `Guid.CreateVersion7()` của .NET 10.
-- [x] **Chuẩn hóa Quy tắc Git Commit (`[tag]` / `[tag](MODULE)`):**
-  - Thiết lập quy chuẩn commit message thống nhất trên cả 3 repo (`ERPm` Root, `ERPm-BE`, `ERPm-FE`) với 6 tag chuẩn: `[add]`, `[update]`, `[fix]`, `[refactor]`, `[db]`, `[docs]`.
-  - Cập nhật đồng bộ vào [AGENTS.md](../AGENTS.md), [ERPm-BE/AGENTS.md](../ERPm-BE/AGENTS.md), [ERPm-FE/AGENTS.md](../ERPm-FE/AGENTS.md) và cả 3 file `PROJECT_MASTER.md`.
-- [x] **Thiết kế & triển khai kiến trúc Dual-Key (`int Id` + `Guid ExternalId` UUIDv7):**
-  - Chuyển khóa chính `Id` và toàn bộ khóa ngoại (`FK`) của các bảng sang `int` tự tăng (`GENERATED BY DEFAULT AS IDENTITY`) để tối ưu tốc độ `JOIN` nội bộ.
-  - Bổ sung bộ sinh `Uuid7Generator.NewUuid7()` chuẩn RFC 9562 (48-bit Unix Timestamp ms Big-Endian) trong `BaseEntity.cs` và hàm `uuid_generate_v7()` trong `erpm_schema.sql`.
-  - Đánh Unique Covering Index (`INCLUDE (id, is_deleted) WITH (fillfactor = 95)`) cho cột `external_id` trên toàn bộ các bảng.
-  - Đảm bảo toàn bộ các API `GET` / `GetById` / Filter nội bộ chỉ dùng `int Id`, chưa cần dùng đến `ExternalId`.
-- [x] **Chuẩn hóa danh mục 10 Module ERP viết tắt chuẩn mực:**
-  - `ACC`, `SD`, `PUR`, `WMS`, `CRM`, `HRM`, `MFG`, `SCM`, `PM`, `DASHBOARD`.
-- [x] **Tái cấu trúc CSDL PostgreSQL theo module:**
-  - Chuẩn hóa các bảng bán hàng thành `tbl_SALE_Order`, `tbl_SALE_OrderItem`, `tbl_SALE_Invoice`, `tbl_SALE_InvoiceItem`.
-  - Giữ vững các bảng `tbl_PURCHASE_...`, `tbl_WMS_...`, `tbl_CRM_...`, `tbl_ACC_...`, `tbl_SYS_...`.
-- [x] **Cập nhật Backend Clean Architecture:**
-  - Gom các Controllers theo thư mục module: `Controllers/SD/`, `Controllers/PUR/`, `Controllers/WMS/`, `Controllers/CRM/`, `Controllers/SYS/`, `Controllers/DASHBOARD/`.
-  - Biên dịch kiểm tra: `dotnet build` đạt **0 Warning, 0 Error**.
-- [x] **Cập nhật Frontend Angular 18 Submodules & .gitmodules:**
-  - Tách bạch 10 Submodules tương ứng với remote `https://github.com/I3Solution/ERPm-FE-[MODULE].git`.
-  - Mỗi submodule đều sở hữu `.ai/plan.md` (kế hoạch con từ task FE giao), `.ai/status.md` và `.ai/steps/`.
-  - Biên dịch kiểm tra: `npm run build` đạt **0 Error**.
-- [x] **Cập nhật tài liệu hệ thống:** `PROJECT_MASTER.md`, `README.md`, `.gitmodules`.
-- [x] **Tách Backend & Frontend thành 2 Git Repo độc lập:**
-  - `ERPm-BE`: `https://github.com/I3Solution/ERPm-BE.git` (.NET 8 Clean Architecture, PostgreSQL).
-  - `ERPm-FE`: `https://github.com/I3Solution/ERPm-FE.git` (Angular 18 Standalone, Ionic 8 Hybrid).
-- [x] **Phân rã 5 Git Submodule cho Frontend:**
-  - `catalog`: `https://github.com/I3Solution/ERPm-FE-catalog.git`
-  - `dashboard`: `https://github.com/I3Solution/ERPm-FE-dashboard.git`
-  - `inventory`: `https://github.com/I3Solution/ERPm-FE-inventory.git`
-  - `partners`: `https://github.com/I3Solution/ERPm-FE-partners.git`
-  - `sales`: `https://github.com/I3Solution/ERPm-FE-sales.git`
-- [x] **Hệ thống Quản lý Kế hoạch & Trạng thái độc lập:**
-  - Mỗi repo chính (`ERPm-BE`, `ERPm-FE`) có `PROJECT_MASTER.md`, `AGENTS.md`, `.ai/` riêng.
-  - Mỗi submodule FE có `.ai/plan.md` (kế hoạch con từ task FE giao), `.ai/status.md`, `.ai/steps/` riêng.
-- [x] **Liên kết Submodules:** Cấu hình `.gitmodules` ở cả tầng Root và tầng Frontend.
-- [x] **Kiểm thử biên dịch:** `dotnet build` (0 Error) và `npm run build` (0 Error).
-- [x] **Cấu hình Git Remote Repository:**
-  - Thiết lập remote `origin` trỏ tới `https://github.com/I3Solution/ERPm.git`.
-  - Kiểm tra và xác nhận cả `fetch` và `push` đều kết nối thành công.
-- [x] **Chuẩn hóa Master `.gitignore`:**
-  - Bổ sung bộ lọc cho .NET 8 (bin, obj, publish, .vs, nupkg, test results, cache).
-  - Bổ sung bộ lọc cho Angular 18 & Node.js (node_modules, .angular, dist, coverage, logs).
-  - Bổ sung bộ lọc cho IDEs & Hệ điều hành (VS Code, JetBrains, Windows Thumbs/Desktop.ini, macOS .DS_Store).
-  - Bảo vệ các tệp bí mật (.env, appsettings local/secrets).
-- [x] **Mô hình Thuộc tính Động Schema-Driven (Hybrid Metadata + JSONB):**
-  - Tạo bảng metadata `tbl_WMS_ItemAttribute` quản lý danh mục thuộc tính người dùng tự định nghĩa (`code`, `name`, `data_type`, `options`, `unit`, `is_required`, `is_filterable`).
-  - Bổ sung cột `attributes jsonb DEFAULT '{}'::jsonb` vào `tbl_WMS_Item` với chỉ mục GIN `idx_tbl_wms_item_attributes_gin` cho tốc độ truy vấn JSON path tức thì.
-- [x] **Backend .NET 8 Clean Architecture:**
-  - Entity `ItemAttribute`, `Item.Attributes` mapping qua EF Core Npgsql `jsonb` với `ValueComparer`.
-  - Base CRUD Controller `ItemAttributesController` hỗ trợ endpoint `/api/v1/wms/item-attributes/by-category/{categoryId?}`.
-  - Data Seeder nạp sẵn các thuộc tính thực tế: Màu sắc (`color`), Kích cỡ / Quy cách (`size`), Xuất xứ (`origin`), Thời hạn bảo hành (`warranty_months`).
-- [x] **Frontend Dynamic UI (Angular 18 Standalone + Signals):**
-  - `ItemService.loadAttributes()` tải danh sách thuộc tính động từ Backend hoặc fallback mặc định.
-  - Form tạo sản phẩm mới tự động sinh các trường điều khiển theo kiểu dữ liệu (`Select` dùng `CustomSelectComponent`, `Number`, `Text`, `Date`, `Boolean`).
-  - Hiển thị Pills/Badges thuộc tính trên Desktop Table và Mobile Cards.
-- [x] **Kỷ luật Kỹ thuật (Technical Discipline):**
-  - Toàn bộ comment trong source code (C#, TypeScript, SCSS, SQL) đều 100% Tiếng Anh (English only).
-  - Biên dịch kiểm tra: `dotnet build` (0 Warning, 0 Error) và `npm run build` (0 Error).
-- [x] **Xây dựng Reusable Component `CustomSelectComponent` (`app-custom-select`):**
-  - Xóa bỏ hoàn toàn thẻ `<select>` / `<option>` native thô với nền xanh OS.
-  - Tích hợp `ControlValueAccessor` tương thích hoàn hảo với `[(ngModel)]` và Form Controls.
-  - Hỗ trợ thanh tìm kiếm lọc tức thì bên trong dropdown (dành cho danh sách nhiều mục).
-  - Tự động đóng dropdown khi click ra ngoài hoặc bấm phím Escape.
-  - Áp dụng thành công cho: Lọc kho hàng (Inventory), Modal nhập kho (Warehouse, Supplier, Item), Phân loại đối tác (Partners), và Chọn khách hàng (POS).
-- [x] **Chuẩn hóa Cursor Pointer & Khắc phục triệt để lỗi con trỏ chuột nhấp nháy trên thẻ `<span>`:**
-  - Thiết lập kỷ luật toàn cục: `body *:not(input):not(textarea):not([contenteditable="true"]) { caret-color: transparent !important; }`.
-  - Ép `cursor: pointer !important; user-select: none !important;` lên tất cả các vùng tương tác (buttons, select triggers, tree nodes, table headers, pills, chips, icons) và toàn bộ các phần tử con (`*`).
-- [x] **Phủ sóng Đa ngôn ngữ (i18n) 100% trên toàn bộ màn hình:**
-  - Từ điển `DEFAULT_FALLBACK_DICTIONARY` mở rộng hơn 80+ keys song ngữ Anh - Việt.
-  - Thay thế toàn bộ text cứng bằng `translate` pipe trên: Inventory, Catalog, Partners, Dashboard, POS, Branch Tree Select.
-- [x] **Kiểm thử biên dịch:**
-  - `npm run build`: **0 Warning, 0 Error, Code 0** (12.7s).
-
----
-
-## 🚀 3. HƯỚNG DẪN KHỞI CHẠY & KIỂM THỬ
-1. **Cơ sở dữ liệu:** File độc lập [database/erpm_schema.sql](../ERPm-BE/database/erpm_schema.sql).
-2. **Backend .NET 10 Web API:** Lần đầu đặt chuỗi kết nối (không commit mật khẩu):
-   `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=erpm_db;Username=postgres;Password=<mật-khẩu>" --project ERPm-BE/src/ERPm.API`
-   rồi chạy `dotnet run --project ERPm-BE/src/ERPm.API` (Swagger UI: `http://localhost:5000/swagger`).
-3. **Frontend Angular 20 + Ionic:** Chạy `npm install` rồi `ng serve` trong thư mục `ERPm-FE/` (`http://localhost:4200`). Đổi địa chỉ API tại `ERPm-FE/src/environments/environment*.ts`.
+- Chỉ mục `Completed` ghi việc đã merge và có bằng chứng kiểm tra; nội dung đang làm nằm trong `In-Progress`.
+- Mỗi task/step giữ chi tiết tại plan hoặc task file; status chỉ giữ snapshot ngắn và liên kết.
+- Không xóa lịch sử. Khi cần rút gọn status, archive snapshot trước rồi mới thay thế.

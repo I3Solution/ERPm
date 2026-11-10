@@ -379,3 +379,27 @@ No application source changes are authorized by this plan. Tooling implementatio
 3. `dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-be`.
 4. Query a known backend type, method and caller with `find symbol`; inspect the JSONL source paths, line spans and commit SHA.
 5. Add fixture tests and close the remaining Step 2.2 scope gaps before declaring the vertical slice complete.
+
+
+## 15. Backend indexer quality follow-up
+
+**Status:** Planned; implementation not started.  
+**Detailed plan:** [plan-step-2.2-backend-indexer-quality.md](plan-step-2.2-backend-indexer-quality.md).
+
+After PR #58 was merged, the user ran the local CLI against the pinned backend revision `56385da65226f72c3b66f9c839e2fc430ce85210` and generated 148,944 records. The user-reported baseline contains 142,818 references and 6,126 definitions; references comprise 127,338 calls and 15,480 non-call references. A total of 1,661 records came from generated paths (1,604 references and 57 definitions).
+
+Sample inspection showed:
+- Calls are overwhelmingly associated with method source symbols (127,260 of 127,338); the remaining 78 require explicit classification rather than being assumed invalid.
+- Non-N/T/M source symbol IDs include Roslyn field IDs, including auto-property backing fields. This is valid symbol information and must not be discarded.
+- Namespace source context appears on namespace/using references and is valid; it must not be coerced into a method/type context.
+- Existing generic type definitions/references and cross-controller usages are queryable.
+
+The follow-up will:
+1. Exclude `obj/`, `bin/` and reliably identified generated source files from the normal source index.
+2. Add explicit, tested Roslyn symbol-kind classification for namespace/type/method/field/property/event/parameter/local and unknown kinds as supported.
+3. Preserve the distinction between `calls` and `references`, including valid namespace-level references and backing-field identity.
+4. Add deterministic fixture regression tests for calls, constructors, generic types, namespace imports, fields/properties, generated files, paths and line spans.
+5. Increment the indexer version so new output uses a separate cache path; preserve the existing `0.1.0` baseline.
+6. Re-index the real ERPm backend and compare results before declaring the backend slice complete.
+
+**Verification state:** PR #58 CI passed and the user confirmed the workspace manifest and real backend indexing smoke test succeeded. The quality follow-up tests and re-index have not yet been run. Do not claim the complete Step 2.1/2.2 exit criteria are satisfied.

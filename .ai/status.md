@@ -29,13 +29,14 @@
 
 ## In-Progress
 
-- Không có hạng mục triển khai Phase 1 đang mở.
+- [ ] Phase 2 — Code Intelligence & Dependency Indexing: lập kế hoạch kiến trúc và chuẩn bị vertical slice đầu tiên. Chi tiết: [Phase 2 plan](plans/plan-phase2-code-intelligence.md). Implementation chưa bắt đầu.
 
 ## Next Steps
 
-1. Khi có task code thực tế đầu tiên, đo baseline token/context trên cùng task và lưu prompt, phạm vi source đã đọc, token usage và kết quả.
-2. Xác nhận domain ownership với owner FE/BE; hoàn thiện FE endpoint → BE route/DTO matrix bằng truy vết source khi task thực tế yêu cầu.
-3. Rà soát riêng roadmap snapshot để đồng bộ phần ưu tiên Step 22/23/24; không suy ra trạng thái thực thi chỉ từ tiêu đề roadmap.
+1. Hoàn tất Step 2.1: chốt index contract, workspace manifest và cache/provenance policy.
+2. Hoàn tất Step 2.2: xây dựng Backend Roslyn vertical slice, kiểm thử bằng fixture và truy vấn symbol thực tế.
+3. Sau khi vertical slice đạt tiêu chí, triển khai TypeScript/Angular indexer và database metadata index theo [Phase 2 plan](plans/plan-phase2-code-intelligence.md).
+4. Khi có task code thực tế phù hợp, đo baseline token/context theo cùng task; không dùng task giả để tạo số liệu.
 
 ## Rules
 

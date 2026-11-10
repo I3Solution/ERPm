@@ -4,7 +4,7 @@ Local-first code intelligence CLI for the ERPm umbrella workspace.
 
 ## Prerequisites
 
-- .NET SDK 10.0.403 (see the workspace global.json).
+- The .NET SDK version pinned by the umbrella repository global.json.
 - Git.
 - ERPm umbrella repository with recursive submodules checked out at their pinned revisions.
 

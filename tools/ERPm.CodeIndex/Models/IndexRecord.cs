@@ -7,6 +7,7 @@ public sealed record IndexRecord(
     string CommitSha,
     string Path,
     string Kind,
+    string SymbolKind,
     string SymbolId,
     string Name,
     string? QualifiedName,
@@ -15,6 +16,7 @@ public sealed record IndexRecord(
     int EndLine,
     string? Relation,
     string? SourceSymbolId,
+    string? SourceSymbolKind,
     string? TargetSymbolId,
     string Evidence,
     DateTimeOffset GeneratedAtUtc);

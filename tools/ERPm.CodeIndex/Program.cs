@@ -113,8 +113,15 @@ static void FindSymbols(WorkspaceManifest manifest, string pattern)
         throw new DirectoryNotFoundException("No current backend index exists. Run 'index repo erpm-be' first.");
     }
 
-    var matches = Directory.GetFiles(cacheRoot, "symbols.jsonl", SearchOption.AllDirectories)
-        .SelectMany(File.ReadLines)
+    var currentIndexPath = Path.Combine(cacheRoot, BackendRoslynIndexer.IndexerVersion, "symbols.jsonl");
+    if (!File.Exists(currentIndexPath))
+    {
+        throw new FileNotFoundException(
+            $"No backend index for indexer {BackendRoslynIndexer.IndexerVersion} exists. Run 'index repo erpm-be' first.",
+            currentIndexPath);
+    }
+
+    var matches = File.ReadLines(currentIndexPath)
         .Select(line => JsonSerializer.Deserialize<IndexRecord>(line, JsonOptions()))
         .Where(record => record is not null
             && record.Name.Contains(pattern, StringComparison.OrdinalIgnoreCase))

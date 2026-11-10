@@ -1228,3 +1228,32 @@ Phase 2 must build on the existing workspace/domain metadata and preserve the so
 
 **Document status:** Proposed implementation plan; Phase 1 complete and Phase 2 planning started.\
 **Next review:** After the first Phase 2 vertical slice.
+
+
+---
+
+## 19. Phase 2 implementation update — 2026-11-10
+
+This section supersedes the earlier Phase 2 status snapshot in Section 18 where it described Phase 2 as not started or the initial backend implementation as unverified.
+
+### Verified progress
+
+- Phase 2 architecture/implementation plan merged: PR #57.
+- Initial Code Index CLI merged: PR #58; merge commit `d72119b308d6d11f4ba886e4368ab2f53616cb53`.
+- User confirmed PR #58 CI passed.
+- User ran `workspace status`; all 12 root/recursive submodule repositories matched their expected pinned revisions.
+- User ran the real backend index command successfully against `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`, producing 148,944 records under the ignored local cache.
+- User queried `BaseCrudController` and inspected aggregate/sample statistics for definitions, references, calls, generated paths and source symbol IDs.
+
+### Current state
+
+The initial backend indexer is operational for the tested workspace and symbol query. Its quality is not yet accepted as complete: generated source contributes 1,661 baseline records, and symbol-kind/source-context behavior needs fixture coverage and clearer classification.
+
+- Detailed follow-up plan: [Backend Indexer Quality](plan-step-2.2-backend-indexer-quality.md).
+- Step log: [Step 2.2 Backend Indexer Quality](../steps/step-2.2-backend-indexer-quality.md).
+- Implementation has not started in this follow-up branch.
+- Frontend and database indexers remain deferred until the backend indexer's quality acceptance criteria are met.
+
+### Safety and evidence
+
+The existing `0.1.0` index cache is the comparison baseline and must not be deleted or overwritten. No application source changes, submodule gitlink changes, production database access, or `global.json` changes are part of this quality follow-up. The real re-index comparison and fixture tests remain pending.

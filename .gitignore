@@ -116,3 +116,6 @@ $RECYCLE.BIN/
 *~
 .directory
 .fuse_hidden*
+
+## ERPm local generated code intelligence cache
+.ai/code-index/cache/

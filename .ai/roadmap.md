@@ -1,4 +1,6 @@
-# Mốc hiện hành — Step 22 Planning, 2026-11-01
+# Master Roadmap — Planning Snapshot (2026-11-01)
+
+> Đây là snapshot kế hoạch được cập nhật lần cuối ngày 2026-11-01, không phải trạng thái thực thi trực tiếp. Trạng thái hiện hành và thứ tự ưu tiên phải đọc từ [.ai/status.md](status.md); các plan/task mới hơn là nguồn đặc tả chi tiết.
 
 | Giai đoạn | Trạng thái có bằng chứng |
 | --- | --- |

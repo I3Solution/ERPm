@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/I3Solution/ERPm/blob/master/.ai/code-index/schema/index-record-v1.schema.json",
+  "title": "ERPm Code Index Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "indexerVersion",
+    "repositoryId",
+    "commitSha",
+    "path",
+    "kind",
+    "symbolId",
+    "name",
+    "qualifiedName",
+    "language",
+    "startLine",
+    "endLine",
+    "relation",
+    "targetSymbolId",
+    "evidence",
+    "generatedAtUtc"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "indexerVersion": { "type": "string", "minLength": 1 },
+    "repositoryId": { "type": "string", "minLength": 1 },
+    "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+" },
+    "kind": { "type": "string", "enum": ["definition", "reference", "project", "dependency"] },
+    "symbolId": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "qualifiedName": { "type": ["string", "null"] },
+    "language": { "type": "string", "minLength": 1 },
+    "startLine": { "type": "integer", "minimum": 1 },
+    "endLine": { "type": "integer", "minimum": 1 },
+    "relation": { "type": ["string", "null"] },
+    "targetSymbolId": { "type": ["string", "null"] },
+    "evidence": { "type": "string", "enum": ["verified", "partial", "unknown"] },
+    "generatedAtUtc": { "type": "string", "format": "date-time" }
+  }
+}

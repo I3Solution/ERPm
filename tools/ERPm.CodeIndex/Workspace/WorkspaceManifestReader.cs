@@ -49,7 +49,11 @@ public sealed class WorkspaceManifestReader
         var current = new DirectoryInfo(Path.GetFullPath(startDirectory));
         while (current is not null)
         {
-            if (File.Exists(Path.Combine(current.FullName, ".gitmodules")))
+            var hasUmbrellaMetadata = File.Exists(Path.Combine(current.FullName, ".gitmodules"))
+                && File.Exists(Path.Combine(current.FullName, ".ai", "context", "README.md"))
+                && Directory.Exists(Path.Combine(current.FullName, "ERPm-BE"));
+
+            if (hasUmbrellaMetadata)
             {
                 return current.FullName;
             }
@@ -58,7 +62,7 @@ public sealed class WorkspaceManifestReader
         }
 
         throw new DirectoryNotFoundException(
-            "Could not locate the ERPm workspace. Start the command inside the umbrella repository.");
+            "Could not locate the ERPm umbrella workspace. Start the command inside the umbrella repository or one of its checked-out submodules.");
     }
 
     private static string ToRepositoryId(string path) =>

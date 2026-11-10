@@ -7,7 +7,8 @@ workspace:
   integration_branch: master
   audited_root_commit: a87ffcb2638075f7496b48bc615bd6c516d95db1
   phase1_branch: loipham/step-context-phase1
-  phase1_root_commit: 22066d1b0015aa451fc0a8017e5ca1c7706bc394
+  phase1_branch_head_commit: cf87df111ba7b9606151b01aff10361462c0a0e9
+  phase1_merge_commit: 6c3204172ade56ac6b575f38d34dc38f8b85d049
   source_of_truth: git_tree_and_pinned_gitlinks
 repositories:
   - id: erpm-root
@@ -32,6 +33,6 @@ repositories:
     baseline_revision: 427ac894cdcf22a3f83ad11c8ac87d817cbec126
     status: verified
 notes:
-  - "Pinned revisions describe the audited root commit, not necessarily the latest child repository branches."
-  - "Update this file whenever a submodule pointer changes."
+  - "Root baseline and Phase 1 merge commit are recorded separately; child pinned revisions match the root gitlinks at Phase 1."
+  - "Update this file whenever workspace topology or a submodule pointer changes."
   - "Nested FE module submodules are not expanded here; use ERPm-FE gitlinks at its pinned revision."

@@ -2,6 +2,7 @@ using ERPm.CodeIndex.Indexing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Xunit;
 
 namespace ERPm.CodeIndex.Tests;
 

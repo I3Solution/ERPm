@@ -14,6 +14,7 @@ public sealed record IndexRecord(
     int StartLine,
     int EndLine,
     string? Relation,
+    string? SourceSymbolId,
     string? TargetSymbolId,
     string Evidence,
     DateTimeOffset GeneratedAtUtc);

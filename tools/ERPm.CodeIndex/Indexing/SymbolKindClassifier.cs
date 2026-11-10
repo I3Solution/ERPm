@@ -22,12 +22,17 @@ public static class SymbolKindClassifier
 
 public static class ReferenceRelationClassifier
 {
-    public static string GetRelation(SyntaxNode node) =>
-        node is ObjectCreationExpressionSyntax
-            or ImplicitObjectCreationExpressionSyntax
-            || node is SimpleNameSyntax simpleName && IsInvocationTarget(simpleName)
+    public static string GetRelation(SyntaxNode node)
+    {
+        if (node is ObjectCreationExpressionSyntax or ImplicitObjectCreationExpressionSyntax)
+        {
+            return "calls";
+        }
+
+        return node is SimpleNameSyntax simpleName && IsInvocationTarget(simpleName)
             ? "calls"
             : "references";
+    }
 
     private static bool IsInvocationTarget(SimpleNameSyntax node)
     {

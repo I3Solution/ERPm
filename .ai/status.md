@@ -28,6 +28,7 @@
 
 ## In Progress
 
+- LD.5 BE: danh sách SD nhẹ (summary, lọc ngày, q, sort) ([task](tasks/change-20261110-ld5-sd-light-lists.md)), chờ tester và merge; FE chờ khung LD.1.
 - [ ] Phase 2 — Backend indexer quality follow-up (implementation merged; real-workspace acceptance pending).
   - Detailed plan: [plan-step-2.2-backend-indexer-quality.md](plans/plan-step-2.2-backend-indexer-quality.md).
   - Step log: [step-2.2-backend-indexer-quality.md](steps/step-2.2-backend-indexer-quality.md).

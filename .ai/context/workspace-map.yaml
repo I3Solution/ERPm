@@ -6,6 +6,8 @@ workspace:
   repository: I3Solution/ERPm
   integration_branch: master
   audited_root_commit: a87ffcb2638075f7496b48bc615bd6c516d95db1
+  phase1_branch: loipham/step-context-phase1
+  phase1_root_commit: 22066d1b0015aa451fc0a8017e5ca1c7706bc394
   source_of_truth: git_tree_and_pinned_gitlinks
 repositories:
   - id: erpm-root
@@ -19,13 +21,15 @@ repositories:
     path: ERPm-BE
     repository: I3Solution/ERPm-BE
     role: backend
-    pinned_revision: 38763b0b67b96d5998dda76cd71e7015b458b5f4
+    pinned_revision: 56385da65226f72c3b66f9c839e2fc430ce85210
+    baseline_revision: 38763b0b67b96d5998dda76cd71e7015b458b5f4
     status: verified
   - id: erpm-fe
     path: ERPm-FE
     repository: I3Solution/ERPm-FE
     role: frontend
-    pinned_revision: 427ac894cdcf22a3f83ad11c8ac87d817cbec126
+    pinned_revision: dbeaf66687454452886201bb669df1e25478d893
+    baseline_revision: 427ac894cdcf22a3f83ad11c8ac87d817cbec126
     status: verified
 notes:
   - "Pinned revisions describe the audited root commit, not necessarily the latest child repository branches."

@@ -223,7 +223,6 @@ public sealed class BackendRoslynIndexer
                 null,
                 null,
                 null,
-                null,
                 "verified",
                 generatedAt));
         }

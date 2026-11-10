@@ -7,7 +7,7 @@
 ## Workspace baseline
 
 - Umbrella repository: `I3Solution/ERPm`, integration branch: `master`.
-- Current root master baseline: `a459edbc87d92ee959cdc42572235a40aee44aab` (PR #59 merge); implementation branch is based on this exact commit.
+- Current root master baseline: `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5` (PR #60 merge).
 - Backend gitlink: `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.
 - Frontend gitlink: `ERPm-FE@dbeaf66687454452886201bb669df1e25478d893`.
 - Chi tiết ownership và quan hệ tích hợp: [Context Workspace Map](context/README.md).
@@ -28,23 +28,23 @@
 
 ## In Progress
 
-- [ ] Phase 2 — Backend indexer quality follow-up.
+- [ ] Phase 2 — Backend indexer quality follow-up (implementation merged; real-workspace acceptance pending).
   - Detailed plan: [plan-step-2.2-backend-indexer-quality.md](plans/plan-step-2.2-backend-indexer-quality.md).
   - Step log: [step-2.2-backend-indexer-quality.md](steps/step-2.2-backend-indexer-quality.md).
   - Baseline indexer version: `0.1.0`; preserve its local cache for comparison.
-  - Implementation branch: `loipham/phase2-backend-indexer-quality-impl`.
+  - Implementation PR: [PR #60](https://github.com/I3Solution/ERPm/pull/60), merged to `master` as `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5`.
   - Current changes: indexer `0.2.0` / schema v2, generated-source filtering, explicit source/target symbol categories, stricter call/reference classification, version-specific symbol search, xUnit tests and CI test step.
-  - The user's observed `0.1.0` baseline includes 1,661 records from generated paths; the `0.2.0` re-index has not yet been run.
+  - CI run #432 passed: backend, frontend and code-index jobs all succeeded; code-index build, unit tests and workspace-manifest validation passed.
+  - The user's observed `0.1.0` baseline includes 1,661 records from generated paths; the `0.2.0` re-index has not yet been run. Preserve the old cache.
 
 ## Next Steps
 
-1. Complete CI build/tests for `loipham/phase2-backend-indexer-quality-impl` and resolve any failures.
-2. Review the implementation diff and open/merge its PR only after CI passes.
-3. Run indexer `0.2.0` against the exact pinned ERPm-BE SHA in the user's Windows workspace.
-4. Compare `0.2.0` against the preserved `0.1.0` baseline, including generated paths, relation counts, symbol-kind distribution and representative queries.
-5. Only after backend quality acceptance, proceed to the TypeScript/Angular indexer.
-6. Later implement EF metadata, cross-layer tracing and Phase 2 evaluation.
-7. Measure context/token impact on a real task; do not claim savings before measurement.
+1. Run the merged indexer `0.2.0` against the exact pinned ERPm-BE SHA in the user's Windows workspace.
+2. Compare `0.2.0` against the preserved `0.1.0` baseline: generated paths, relation counts, symbol-kind distribution and representative queries.
+3. Record the actual smoke-test results and close the backend quality acceptance criteria only when evidence supports it.
+4. Only after backend quality acceptance, proceed to the TypeScript/Angular indexer.
+5. Later implement EF metadata, cross-layer tracing and Phase 2 evaluation.
+6. Measure context/token impact on a real task; do not claim savings before measurement.
 
 ## Rules
 

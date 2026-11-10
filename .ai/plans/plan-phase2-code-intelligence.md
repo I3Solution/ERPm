@@ -1,6 +1,6 @@
 # Phase 2 — Code Intelligence & Dependency Indexing
 
-> **Status:** Planning / architecture baseline  
+> **Status:** Implementation in progress — initial backend vertical slice  
 > **Created:** 2026-11-10  
 > **Owner:** ERPm Context Engineering  
 > **Target repository:** `I3Solution/ERPm` (umbrella), with read-only indexing of pinned child repositories  
@@ -349,3 +349,33 @@ Phase 2 is complete when:
 Start with **Step 2.1 + Step 2.2 as the first vertical slice**: define the common contract/workspace manifest, then implement a Roslyn backend index that can answer one real symbol/reference query. This validates the core provenance and retrieval design before adding TypeScript, Angular and database adapters.
 
 No application source changes are authorized by this plan. Tooling implementation will be delivered in separate reviewable PRs with tests and measured outcomes.
+
+
+## 14. Implementation snapshot — initial backend vertical slice
+
+**Branch:** `loipham/phase2-code-indexer-backend`  
+**Base:** root `master` at merge commit `fa9c58f51d2b0de2c32de2a8e3c6368d39dd891b`.
+
+### Implemented in the current branch
+
+- `.ai/code-index/schema/index-record-v1.schema.json`: versioned JSON Schema for provenance-rich definition/reference records and source-to-target relationship edges.
+- `tools/ERPm.CodeIndex/Workspace/`: discovers the umbrella root, reads root HEAD and recursive submodule SHAs, and rejects submodules not checked out at their pinned revisions.
+- `tools/ERPm.CodeIndex/Indexing/BackendRoslynIndexer.cs`: loads `ERPm-BE/ERPm.sln` with MSBuildWorkspace; indexes source definitions and compiler-resolved syntax references with caller/target symbol IDs and source spans.
+- `tools/ERPm.CodeIndex/Program.cs`: initial `workspace status`, `index repo erpm-be`, and `find symbol` commands.
+- Generated index output is keyed by repository ID, pinned commit SHA and indexer version under `.ai/code-index/cache/`; the cache is ignored by Git.
+- CLI usage and current limitations are documented in `tools/ERPm.CodeIndex/README.md`.
+
+### Explicitly not complete yet
+
+- No build or test result is claimed: this branch has not yet been built or executed in the user's Windows workspace.
+- No fixture test project or JSON Schema runtime validation has been added yet.
+- Project-reference graph, inheritance/implementation edges, ASP.NET route/DTO extraction and robust caller query are not yet implemented.
+- Roslyn workspace diagnostics are surfaced, but partial indexing and failed project-load behavior still need explicit acceptance tests.
+
+### Verification required before marking Step 2.1 / 2.2 complete
+
+1. `dotnet build tools/ERPm.CodeIndex/ERPm.CodeIndex.csproj`.
+2. `dotnet run --project tools/ERPm.CodeIndex -- workspace status` and compare every recursive SHA with `git submodule status --recursive`.
+3. `dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-be`.
+4. Query a known backend type, method and caller with `find symbol`; inspect the JSONL source paths, line spans and commit SHA.
+5. Add fixture tests and close the remaining Step 2.2 scope gaps before declaring the vertical slice complete.

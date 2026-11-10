@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis.Text;
-
 namespace ERPm.CodeIndex.Indexing;
 
 public static class GeneratedSourceFilter

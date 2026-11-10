@@ -35,6 +35,6 @@ internal static class GitCommand
                 $"git {string.Join(' ', arguments)} failed: {error.Trim()}");
         }
 
-        return output.TrimEnd('\\r', '\\n');
+        return output.TrimEnd('\r', '\n');
     }
 }

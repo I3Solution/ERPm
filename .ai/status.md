@@ -1,17 +1,16 @@
 # ERPm — Trạng thái hiện hành
 
 > Cập nhật: 2026-11-10
-> Nguồn trạng thái: các plan/task và commit đã merge; không suy diễn trạng thái từ log lịch sử.
+> Nguồn trạng thái: các plan/task, commit đã merge và kết quả verification có bằng chứng.
 > Lịch sử trước Phase 1: [status-archive-2026-11-10.md](history/status-archive-2026-11-10.md).
 
 ## Workspace baseline
 
 - Umbrella repository: `I3Solution/ERPm`, default integration branch: `master`.
-- Baseline snapshot: `a87ffcb2638075f7496b48bc615bd6c516d95db1`.
-- FE baseline gitlink: `ERPm-FE@427ac894cdcf22a3f83ad11c8ac87d817cbec126`.
-- FE Phase 1 branch pointer: `ERPm-FE@dbeaf66687454452886201bb669df1e25478d893`.
-- BE baseline gitlink: `ERPm-BE@38763b0b67b96d5998dda76cd71e7015b458b5f4`.
-- BE Phase 1 branch pointer: `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.
+- Baseline snapshot trước Phase 1: `a87ffcb2638075f7496b48bc615bd6c516d95db1`.
+- Phase 1 merge commit: `6c3204172ade56ac6b575f38d34dc38f8b85d049`.
+- FE gitlink tại Phase 1: `ERPm-FE@dbeaf66687454452886201bb669df1e25478d893`.
+- BE gitlink tại Phase 1: `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.
 - Chi tiết ownership và quan hệ tích hợp: [Context Workspace Map](context/README.md).
 
 ## Current focus
@@ -21,18 +20,22 @@
 - Các task phát sinh gần nhất được ghi riêng trong `.ai/tasks/`; kiểm tra trạng thái file task và PR/commit trước khi nhận định tiến độ.
 - Không coi nội dung lịch sử trong archive là công việc đang mở hoặc bằng chứng nghiệm thu mới.
 
+## Completed
+
+- [x] Phase 1 — Context Optimization: bootstrap theo task, workspace/domain metadata, progressive context policy và tách current status khỏi lịch sử.
+  - Verification: recursive submodule checkout thành công; root GitHub Actions backend/frontend checks đều PASS; bốn file YAML metadata parse thành công.
+  - Implementation PRs: root #54, FE #28, BE #39.
+  - Benchmark token/context thực tế được hoãn đến task đầu tiên phù hợp; không dùng task giả để tạo baseline.
+
 ## In-Progress
 
-- [ ] Phase 1 — Context Optimization: chuẩn hóa bootstrap instructions, workspace metadata, context policy và current status/history separation.
-  - Branch: `loipham/step-context-phase1`.
-  - Log triển khai: [step-context-optimization-phase1.md](steps/step-context-optimization-phase1.md).
+- Không có hạng mục triển khai Phase 1 đang mở.
 
 ## Next Steps
 
-1. Review các metadata trong `.ai/context/` cùng owner của FE/BE để xác nhận domain boundaries và integration contracts.
-2. Kiểm tra recursive submodule checkout, đặc biệt nested HRM gitlink từng có SHA chưa tra cứu được ở snapshot audit.
-3. Đo lại lượng tài liệu bootstrap mà coding agent thực sự đọc trước/sau thay đổi.
-4. Review domain boundaries và hoàn thiện endpoint/DTO integration map.
+1. Khi có task code thực tế đầu tiên, đo baseline token/context trên cùng task và lưu prompt, phạm vi source đã đọc, token usage và kết quả.
+2. Xác nhận domain ownership với owner FE/BE; hoàn thiện FE endpoint → BE route/DTO matrix bằng truy vết source khi task thực tế yêu cầu.
+3. Rà soát riêng roadmap snapshot để đồng bộ phần ưu tiên Step 22/23/24; không suy ra trạng thái thực thi chỉ từ tiêu đề roadmap.
 
 ## Rules
 

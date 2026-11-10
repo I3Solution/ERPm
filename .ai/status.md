@@ -8,8 +8,10 @@
 
 - Umbrella repository: `I3Solution/ERPm`, default integration branch: `master`.
 - Baseline snapshot: `a87ffcb2638075f7496b48bc615bd6c516d95db1`.
-- FE gitlink: `ERPm-FE@427ac894cdcf22a3f83ad11c8ac87d817cbec126`.
-- BE gitlink: `ERPm-BE@38763b0b67b96d5998dda76cd71e7015b458b5f4`.
+- FE baseline gitlink: `ERPm-FE@427ac894cdcf22a3f83ad11c8ac87d817cbec126`.
+- FE Phase 1 branch pointer: `ERPm-FE@dbeaf66687454452886201bb669df1e25478d893`.
+- BE baseline gitlink: `ERPm-BE@38763b0b67b96d5998dda76cd71e7015b458b5f4`.
+- BE Phase 1 branch pointer: `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.
 - Chi tiết ownership và quan hệ tích hợp: [Context Workspace Map](context/README.md).
 
 ## Current focus
@@ -28,9 +30,9 @@
 ## Next Steps
 
 1. Review các metadata trong `.ai/context/` cùng owner của FE/BE để xác nhận domain boundaries và integration contracts.
-2. Đồng bộ bootstrap policy với `ERPm-FE/AGENTS.md` và `ERPm-BE/AGENTS.md` trên các nhánh riêng, sau khi xác minh HEAD của hai repo.
-3. Kiểm tra recursive submodule checkout, đặc biệt nested HRM gitlink từng có SHA chưa tra cứu được ở snapshot audit.
-4. Đo lại lượng tài liệu bootstrap mà coding agent thực sự đọc trước/sau thay đổi.
+2. Kiểm tra recursive submodule checkout, đặc biệt nested HRM gitlink từng có SHA chưa tra cứu được ở snapshot audit.
+3. Đo lại lượng tài liệu bootstrap mà coding agent thực sự đọc trước/sau thay đổi.
+4. Review domain boundaries và hoàn thiện endpoint/DTO integration map.
 
 ## Rules
 

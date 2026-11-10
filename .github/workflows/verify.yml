@@ -48,3 +48,18 @@ jobs:
         working-directory: ERPm-FE
         env:
           CHROME_BIN: /usr/bin/google-chrome
+
+  code-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Build code index CLI
+        run: dotnet build tools/ERPm.CodeIndex/ERPm.CodeIndex.csproj
+      - name: Validate pinned workspace manifest
+        run: dotnet run --project tools/ERPm.CodeIndex -- workspace status

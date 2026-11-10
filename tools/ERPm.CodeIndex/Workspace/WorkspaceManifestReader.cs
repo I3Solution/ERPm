@@ -15,9 +15,9 @@ public sealed class WorkspaceManifestReader
         var status = GitCommand.Run(rootPath, "submodule", "status", "--recursive");
         var revisions = new List<RepositoryRevision>();
 
-        foreach (var rawLine in status.Split('\\n', StringSplitOptions.RemoveEmptyEntries))
+        foreach (var rawLine in status.Split('\n', StringSplitOptions.RemoveEmptyEntries))
         {
-            var line = rawLine.TrimEnd('\\r');
+            var line = rawLine.TrimEnd('\r');
             var match = SubmoduleLine.Match(line);
             if (!match.Success)
             {

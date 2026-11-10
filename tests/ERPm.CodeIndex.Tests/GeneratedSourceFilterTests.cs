@@ -12,6 +12,7 @@ public sealed class GeneratedSourceFilterTests
     [InlineData("src/bin/Debug/net10.0/Generated.cs")]
     [InlineData("SRC/OBJ/Generated.cs")]
     [InlineData("src/Generated.g.cs")]
+    [InlineData("src/Generated.g.i.cs")]
     [InlineData("src/Generated.G.CS")]
     [InlineData("src/Generated.generated.cs")]
     public void Excludes_build_and_convention_generated_paths(string relativePath)

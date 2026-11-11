@@ -1,6 +1,6 @@
 # Step 2.2 Follow-up — Backend Roslyn Indexer Quality
 
-> **Status:** Implementation merged via PR #60; CI passed; real-workspace verification pending  
+> **Status:** Real-workspace verification completed; Step 2.2 accepted with documented follow-ups  
 > **Created:** 2026-11-10  
 > **Target repository:** `I3Solution/ERPm` (umbrella)  
 > **Integration branch:** `master`  
@@ -192,3 +192,34 @@ The implementation is merged in PR #60. GitHub Actions run #432 passed the backe
 - Source files inspected at root `master`: `BackendRoslynIndexer.cs`, `IndexRecord.cs`, `index-record-v1.schema.json`, `Program.cs`, and `README.md`.
 - Retrieval reason: verify actual indexing behavior and record contract before defining implementation changes.
 - Confidence: high for observed code paths and user-reported counts; generated-file classification and full symbol-kind distribution remain to be validated by tests.
+
+
+## 11. Real-workspace verification — 2026-11-11
+
+**Result: accepted for the implemented backend-indexer quality scope.** The user's Windows workspace supplied the following evidence:
+
+- Root repository: `I3Solution/ERPm@468e7025fa4dee1e61bb651ed58c106361f05639`.
+- Backend gitlink and actual checkout: `ERPm-BE@235173fd193ae2fb60081fa4573434f5edd506f3`; exact match, with no backend working-tree changes.
+- Recursive submodule status showed no uninitialized or mismatched entries (no leading `-`, `+` or conflict marker).
+- `dotnet test tests/ERPm.CodeIndex.Tests/ERPm.CodeIndex.Tests.csproj`: 12 passed, 0 failed.
+- `dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-be`: 50,471 records; 195 syntax trees included and 45 excluded.
+- Record distribution: 6,066 definitions and 44,405 references.
+- Reference relations: 8,807 calls and 35,598 references.
+- Generated `obj/` or `bin/` path records: 0.
+- Symbol-kind counts: namespace 3,733; type 7,197; typeParameter 154; field 1,868; method 12,718; parameter 8,839; local 4,401; property 11,497; other 64.
+- Reference source-symbol kinds: namespace 3,731; type 3,107; method 37,000; field 567.
+- Representative `calls` samples resolved method-to-method invocation targets. `references` samples correctly retained namespace/using and generic base-type references.
+- `find symbol BaseCrudController` returned two generic type definitions and references from multiple concrete controllers with source paths, line spans and exact symbol IDs.
+
+### Interpretation and limitations
+
+- The 0.2.0 cache is under `235173fd193ae2fb60081fa4573434f5edd506f3/0.2.0`; the old 0.1.0 cache was not overwritten.
+- The old 0.1.0 baseline used backend SHA `56385da65226f72c3b66f9c839e2fc430ce85210`, while 0.2.0 used `235173fd193ae2fb60081fa4573434f5edd506f3`. Therefore, record-count differences are not a controlled A/B comparison and must not be attributed solely to indexer changes.
+- Inheritance currently appears as a type reference whose source context may be the namespace. A dedicated `inherits` relation and reliable declaring-type source context are deferred to the unified relationship work in Step 2.5.
+- The index is compiler-backed source evidence, not a complete runtime call graph. Dynamic dispatch, reflection and unresolved runtime behavior remain outside its guarantees.
+
+### Acceptance decision
+
+BEQ-01 through BEQ-08 are supported by the implementation, tests and real-workspace evidence. BEQ-09 is supported by CI plus the user-run test/index/query smoke checks. BEQ-10 is consistent with the inspected workspace: no application source, gitlink or `global.json` change was made as part of this verification.
+
+The task is accepted for the current Step 2.2 scope. A same-SHA 0.1.0/0.2.0 comparison is not required to claim the specific verified properties above and remains an optional measurement, not a blocker. Inheritance relation extraction remains explicitly deferred to Step 2.5.

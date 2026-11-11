@@ -1,6 +1,6 @@
 # Phase 2 — Code Intelligence & Dependency Indexing
 
-> **Status:** Implementation in progress — initial backend vertical slice  
+> **Status:** Step 2.2 backend quality accepted; Step 2.3 frontend vertical slice next  
 > **Created:** 2026-11-10  
 > **Owner:** ERPm Context Engineering  
 > **Target repository:** `I3Solution/ERPm` (umbrella), with read-only indexing of pinned child repositories  
@@ -438,3 +438,41 @@ Implementation changes currently on the branch:
 - GitHub Actions run #432 passed all three jobs: backend, frontend and code-index. Code-index build, unit tests and workspace-manifest validation passed.
 - User plans to perform local verification on the next work session. Until then, the `0.1.0` cache remains the comparison baseline and must not be overwritten or deleted.
 - Next action: run the `0.2.0` backend index on `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`, inspect output and compare with `0.1.0`. Record real counts and query evidence before marking BEQ acceptance complete.
+
+
+## 18. Backend quality acceptance and Step 2.3 handoff — 2026-11-11
+
+### Step 2.2 acceptance evidence
+
+The user completed the real-workspace verification after PR #60:
+
+- Root snapshot: `468e7025fa4dee1e61bb651ed58c106361f05639`.
+- Backend gitlink and checkout: `235173fd193ae2fb60081fa4573434f5edd506f3`, exact match.
+- Unit tests: 12 passed, 0 failed.
+- Backend 0.2.0 index: 50,471 records; 195 syntax trees included and 45 excluded.
+- Definitions: 6,066; references: 44,405; calls: 8,807; non-call references: 35,598.
+- No `obj/` or `bin/` path records.
+- `BaseCrudController` lookup returned both generic definitions and references from multiple controllers; sampled calls/references were inspected.
+
+The old 0.1.0 baseline was generated from BE SHA `56385da65226f72c3b66f9c839e2fc430ce85210`, whereas 0.2.0 was generated from `235173fd193ae2fb60081fa4573434f5edd506f3`. The record-count delta is therefore not a controlled A/B comparison. Preserve the 0.1.0 cache; do not attribute all count changes to indexer filtering.
+
+**Accepted scope:** generated-source exclusion, symbol-kind classification, calls/references distinction, versioned cache, fixture tests, CI and real-workspace indexing/query smoke test. Dedicated `inherits` / `implements` edges and declaring-type source context remain deferred to Step 2.5 (unified relationship model).
+
+### Step 2.3 — Frontend TypeScript/Angular vertical slice
+
+Detailed plan: [plan-step-2.3-frontend-typescript-indexer.md](plan-step-2.3-frontend-typescript-indexer.md).
+
+Use the exact FE snapshot from the verified root workspace, not moving branch heads:
+
+- Root: `I3Solution/ERPm@468e7025fa4dee1e61bb651ed58c106361f05639`.
+- FE: `ERPm-FE@62270988b42eece930c702d1272fe857d31bcbb9`.
+- Nested modules: ACC `2061e4d7424539f1fe7de920ede86a81264e9098`; CRM `9b66e321d6cff83ed703d080c3e5e19996816477`; HRM `f66e1bb61fe222684a9c63addde93c11d1559df3`; MFG `438693239d984e3c2ae060d4f24033ab41d7855d`; PM `e0d4154fede259e9c9da778e8f77aff947640e29`; PUR `c7e1c0c7f0957a91bba5e8892d1257d4640a2e33`; SCM `0661fdfb7361957b1594890d5efa7a2bc9329624`; SD `750960006dd1190682556334fdf3a64b6273aad4`; WMS `fd320c77642a0860ca8cfad25de10ea9bd1e796c`; dashboard `4380f4b433de6ec86be5b4934279af177be5dca5`.
+
+Initial implementation sequence:
+1. Inspect FE package manager, lockfiles, TypeScript 5.8.3 configuration, Angular 20.3 metadata conventions and nested module boundaries at the exact pinned snapshot.
+2. Define a repository-scoped frontend indexer that consumes the existing common provenance/schema/cache policy; do not index a moving branch or combine revisions.
+3. Start with TypeScript Compiler API definitions, imports and compiler-resolved references using the project's pinned TypeScript version.
+4. Add Angular component/service/guard/route metadata and API client HTTP method/path literals as isolated extractors with explicit evidence levels.
+5. Add deterministic fixtures and one real FE module smoke test before broadening to all modules.
+
+**Constraints:** no FE application source changes, no package upgrades in application projects, no generated index/cache commits, no claim of complete Angular runtime DI/template analysis, and no cross-layer route match based on names alone. Tooling dependencies belong to the indexer tool, isolated from application dependency manifests where practical.

@@ -1,55 +1,53 @@
 # ERPm — Trạng thái hiện hành
 
-> Cập nhật: 2026-11-10  
-> Nguồn trạng thái: plan/step, commit đã merge và kết quả verification có bằng chứng.  
+> Cập nhật: 2026-11-11  
+> Nguồn trạng thái: merged PRs, plan/step và verification có bằng chứng.  
 > Lịch sử trước Phase 1: [status-archive-2026-11-10.md](history/status-archive-2026-11-10.md).
 
 ## Workspace baseline
 
 - Umbrella repository: `I3Solution/ERPm`, integration branch: `master`.
-- Current root master baseline: `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5` (PR #60 merge).
-- Backend gitlink: `ERPm-BE@56385da65226f72c3b66f9c839e2fc430ce85210`.
-- Frontend gitlink: `ERPm-FE@dbeaf66687454452886201bb669df1e25478d893`.
-- Chi tiết ownership và quan hệ tích hợp: [Context Workspace Map](context/README.md).
+- Root snapshot verified by user: `468e7025fa4dee1e61bb651ed58c106361f05639`.
+- Backend gitlink and checkout: `ERPm-BE@235173fd193ae2fb60081fa4573434f5edd506f3`.
+- Frontend gitlink: `ERPm-FE@62270988b42eece930c702d1272fe857d31bcbb9`.
+- Recursive FE module pins observed: ACC `2061e4d7424539f1fe7de920ede86a81264e9098`; CRM `9b66e321d6cff83ed703d080c3e5e19996816477`; HRM `f66e1bb61fe222684a9c63addde93c11d1559df3`; MFG `438693239d984e3c2ae060d4f24033ab41d7855d`; PM `e0d4154fede259e9c9da778e8f77aff947640e29`; PUR `c7e1c0c7f0957a91bba5e8892d1257d4640a2e33`; SCM `0661fdfb7361957b1594890d5efa7a2bc9329624`; SD `750960006dd1190682556334fdf3a64b6273aad4`; WMS `fd320c77642a0860ca8cfad25de10ea9bd1e796c`; dashboard `4380f4b433de6ec86be5b4934279af177be5dca5`.
+- Workspace map and ownership: [Context Workspace Map](context/README.md).
 
 ## Completed
 
-- [x] Phase 1 — Context Optimization: bootstrap theo task, workspace/domain metadata, progressive context policy và tách current status khỏi lịch sử.
-  - Verification: recursive submodule checkout thành công; root GitHub Actions backend/frontend checks PASS; bốn file YAML metadata parse thành công.
-  - Implementation PRs: root #54, FE #28, BE #39; validation follow-up #55.
-  - Benchmark token/context thực tế vẫn được hoãn đến task phù hợp.
-- [x] Phase 2 architecture and implementation plan — [PR #57](https://github.com/I3Solution/ERPm/pull/57) merged.
-- [x] Initial Code Index CLI implementation — [PR #58](https://github.com/I3Solution/ERPm/pull/58) merged.
-  - Added workspace manifest validation, local cache, JSONL index contract and initial Roslyn backend definitions/references indexer.
-  - User confirmed PR #58 CI passed.
-  - User ran `workspace status`; all 12 root/recursive repositories matched expected pinned SHAs.
-  - User ran backend indexing successfully at the pinned BE SHA; output contained 148,944 records.
-  - User queried `BaseCrudController` and inspected index statistics/samples.
+- [x] Phase 1 — Context Optimization; implementation and available static/integration validation merged. Empirical context/token benchmark remains deferred until a suitable real task.
+- [x] Phase 2 architecture and implementation plan — PR #57.
+- [x] Initial Code Index CLI and workspace manifest — PR #58.
+- [x] Backend Roslyn indexer quality — PR #60 implementation; PR #61 documentation follow-up.
+  - CI run #432 passed backend, frontend and code-index jobs.
+  - User-run unit tests: 12 passed, 0 failed.
+  - User-run real Backend index 0.2.0 at exact root-pinned SHA `235173fd193ae2fb60081fa4573434f5edd506f3`: 50,471 records; 195 syntax trees included, 45 excluded; 0 `obj/bin` path records.
+  - Index distribution: 6,066 definitions; 44,405 references; 8,807 calls; 35,598 non-call references.
+  - `BaseCrudController` lookup and representative call/reference samples inspected successfully.
+  - Old 0.1.0 baseline is from a different BE SHA; no controlled count comparison is claimed. Its cache remains preserved.
+  - Dedicated inheritance/implementation relations are deferred to Step 2.5.
 
 ## In Progress
 
-- LD.5 BE: danh sách SD nhẹ (summary, lọc ngày, q, sort) ([task](tasks/change-20261110-ld5-sd-light-lists.md)), chờ tester và merge; FE chờ khung LD.1.
-- [ ] Phase 2 — Backend indexer quality follow-up (implementation merged; real-workspace acceptance pending).
-  - Detailed plan: [plan-step-2.2-backend-indexer-quality.md](plans/plan-step-2.2-backend-indexer-quality.md).
-  - Step log: [step-2.2-backend-indexer-quality.md](steps/step-2.2-backend-indexer-quality.md).
-  - Baseline indexer version: `0.1.0`; preserve its local cache for comparison.
-  - Implementation PR: [PR #60](https://github.com/I3Solution/ERPm/pull/60), merged to `master` as `1f742cb08b9c2bca507b7d1bf285696cf48ff2a5`.
-  - Current changes: indexer `0.2.0` / schema v2, generated-source filtering, explicit source/target symbol categories, stricter call/reference classification, version-specific symbol search, xUnit tests and CI test step.
-  - CI run #432 passed: backend, frontend and code-index jobs all succeeded; code-index build, unit tests and workspace-manifest validation passed.
-  - The user's observed `0.1.0` baseline includes 1,661 records from generated paths; the `0.2.0` re-index has not yet been run. Preserve the old cache.
+- LD.5 BE: danh sách SD nhẹ (summary, lọc ngày, q, sort), chờ tester và merge; FE chờ khung LD.1.
+- [ ] Phase 2 Step 2.3 — Frontend TypeScript/Angular indexer.
+  - Plan: [plan-step-2.3-frontend-typescript-indexer.md](plans/plan-step-2.3-frontend-typescript-indexer.md).
+  - Scope: exact FE root and recursive module gitlink SHAs; TypeScript 5.8.3 compiler configuration; source definitions/imports/references; Angular metadata and API client HTTP literals where statically discoverable.
+  - Start with workspace/tooling discovery and a small fixture-backed vertical slice; no FE application source changes.
 
 ## Next Steps
 
-1. Run the merged indexer `0.2.0` against the exact pinned ERPm-BE SHA in the user's Windows workspace.
-2. Compare `0.2.0` against the preserved `0.1.0` baseline: generated paths, relation counts, symbol-kind distribution and representative queries.
-3. Record the actual smoke-test results and close the backend quality acceptance criteria only when evidence supports it.
-4. Only after backend quality acceptance, proceed to the TypeScript/Angular indexer.
-5. Later implement EF metadata, cross-layer tracing and Phase 2 evaluation.
-6. Measure context/token impact on a real task; do not claim savings before measurement.
+1. Implement Step 2.3 discovery and TypeScript indexer vertical slice on a `loipham/*` branch.
+2. Add Angular component/service/route and API client metadata extraction with explicit evidence/provenance.
+3. Run fixture tests and a real pinned FE module smoke test.
+4. Step 2.4: EF Core model and migration metadata.
+5. Step 2.5: unified query, inheritance/implementation and cross-layer tracing.
+6. Step 2.6: retrieval quality, performance and context/token evaluation on representative real tasks.
 
 ## Rules
 
-- Only mark work Completed after it is merged and has verification evidence.
-- Keep implementation detail in the relevant plan/step log; status remains a short snapshot.
-- Preserve local user changes. Never reset or overwrite unrelated working-tree modifications.
+- Only mark work completed after merge and verification evidence.
+- Keep implementation details in the relevant plan/step log; status remains a concise snapshot.
+- Preserve local user changes. Never reset, clean, or overwrite unrelated working-tree modifications.
 - Never commit generated index/cache files.
+- Index only exact root-pinned recursive submodule revisions; reject mixed-SHA results.

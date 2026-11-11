@@ -230,8 +230,8 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 
 ### Deliverables
 
-- [ ] Update `AGENTS.md` with mandatory task-record lifecycle and ownership rules.
-- [ ] Document the progress workflow in `.ai/tasks/README.md`.
+- [x] Update `AGENTS.md` with mandatory task-record lifecycle and ownership rules.
+- [x] Document the progress workflow in `.ai/tasks/README.md`.
 - [ ] Add PR validation for task-record presence, naming, template structure and allowed status values, with explicit exemptions for trivial/mechanical changes.
 - [ ] Implement a deterministic status generator that reads merged task records and preserves links/evidence.
 - [ ] Add a post-merge workflow on root `master` to regenerate the project status from the latest merged state.

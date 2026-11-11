@@ -1,63 +1,40 @@
-# Task Progress Records
+# Task Records
 
-This directory is the source of truth for task-level progress in the ERPm umbrella repository.
+Mỗi task có một Markdown record riêng. Task record là nơi duy nhất lưu trạng thái và tiến độ của task đó.
 
-## Required naming convention
+## Naming convention
 
-Keep the existing convention:
+Giữ nguyên quy ước hiện tại:
 
 `.ai/tasks/<type>-YYYYMMDD-<short-description>.md`
 
-Allowed task types are defined by the existing template: `bug`, `change`, `refactor`, `db`, and `spike`.
+Các loại task: `bug`, `change`, `refactor`, `db`, `spike`.
 
-Do not introduce a parallel TASK-ID naming scheme, YAML/JSON task records, or a shared per-workstream progress file.
+Không tạo TASK-ID registry, YAML/JSON record hoặc file tiến độ dùng chung theo workstream.
 
-## When a record is required
+## Quy tắc thực hiện
 
-Create or update one task record for each meaningful task that changes project code, architecture, configuration, CI/CD, or project documentation.
+- Với task mới có thay đổi đáng kể về code, kiến trúc, cấu hình, CI/CD hoặc tài liệu dự án: tạo task record khi bắt đầu, theo `_TEMPLATE.md`.
+- Nếu tiếp tục cùng một task qua nhiều PR, cập nhật đúng record đó.
+- Mỗi Agent chỉ cập nhật record của task mình phụ trách.
+- Không cập nhật record của Agent khác nếu không có bàn giao rõ ràng.
+- Task cũ trước khi quy tắc này được áp dụng được giữ nguyên và bỏ qua; không migration hoặc kiểm tra hồi tố.
+- Thay đổi typo/format hoặc thao tác máy móc có thể không cần record.
 
-- Create the record when the task starts, not only when it is finished.
-- Commit the record in the same PR as the implementation/documentation it describes.
-- If the same task spans multiple PRs, update its existing record.
-- Link the relevant step plan, roadmap, issue, commit and PR where applicable.
-- Trivial typo/format-only or mechanical changes with no meaningful project impact may be exempt. When uncertain, create a record.
+## Trạng thái của task
 
-## Ownership
+Ghi trạng thái ngay trong task record bằng một trong các giá trị:
 
-The developer/Agent doing the work updates that task's record. Keep independent tasks in independent files. Do not edit another Agent's record without an explicit handoff.
+- `Todo`: chưa bắt đầu.
+- `Doing`: đang thực hiện.
+- `Blocked`: đang bị chặn.
+- `Done`: hoàn tất phần việc và đã ghi bằng chứng kiểm tra thực tế.
 
-Agents must not edit `.ai/status.md` directly. It is the project-level generated summary.
+Task record cần nêu rõ phạm vi, tiến độ/các thay đổi, kiểm tra đã chạy và kết quả, việc còn lại, commit/PR/CI liên quan nếu có. Không ghi PASS nếu chưa chạy kiểm tra.
 
-## Status and evidence
+## Không sử dụng status chung
 
-Use only the statuses in `_TEMPLATE.md`: `Todo`, `Doing`, `Blocked`, `Done`.
-
-A task record must describe scope, implementation, checks actually run, their actual results, remaining work and relevant evidence. Do not claim a test passed unless it was run. A `Done` label alone is not proof of merge or verification.
-
-## Automation contract
-
-- PR validation will check task-record presence and structure for meaningful changes.
-- After merge to root `master`, status aggregation will read task records from the latest merged branch state.
-- The aggregator will preserve links to task records and GitHub evidence.
-- Generated status must be deterministic and safe under concurrent merges.
-- The initial publication target is a GitHub Actions artifact. Committing `.ai/status.md` later must use a bot PR/reviewed path, never a direct bot push to protected `master`.
-
-Until the validator and aggregator workflows are implemented, follow these rules manually; do not assume automation is already active.
-
-## Validator
-
-Run the repository-wide compatibility check:
-
-```bash
-python tools/progress/validate_tasks.py
-```
-
-This mode validates the existing filename convention, task type, status and title while accepting historical metadata layouts already present in the repository.
-
-For a new or updated task record, run strict validation:
-
-```bash
-python tools/progress/validate_tasks.py --strict .ai/tasks/change-YYYYMMDD-short-description.md
-```
-
-Strict mode requires the current template metadata and numbered sections 1–5. The validator is read-only: it reports problems and never rewrites task records. Historical records are not bulk-migrated merely to satisfy the new template.
+- Không tạo, sửa, cập nhật hoặc tự động sinh nội dung vào `.ai/status.md`.
+- `.ai/status.md` là snapshot lịch sử/legacy, không phải nguồn trạng thái hiện hành.
+- Không có status generator, PR validator hoặc workflow tổng hợp trạng thái chung trong quy trình này.
+- Muốn biết tiến độ, mở task record tương ứng trong `.ai/tasks/`.

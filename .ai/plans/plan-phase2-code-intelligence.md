@@ -1,6 +1,6 @@
 # Phase 2 — Code Intelligence & Dependency Indexing
 
-> **Status:** Step 2.2 backend quality accepted; Step 2.3 frontend vertical slice next  
+> **Status:** Step 2.2 backend quality accepted; Step 2.3 frontend implementation and verification complete on feature branch; final review/PR pending  
 > **Created:** 2026-11-10  
 > **Owner:** ERPm Context Engineering  
 > **Target repository:** `I3Solution/ERPm` (umbrella), with read-only indexing of pinned child repositories  
@@ -110,17 +110,24 @@ Package versions must be selected and verified against the actual .NET SDK, FE l
 
 ### 4.3 Index record contract
 
-Every indexed record must include:
+The record contract is explicitly versioned. Schema versions are not interchangeable and consumers must validate the declared version before deserialization:
 
-- `schemaVersion` and `indexerVersion`.
-- `repositoryId`, repository-relative `path`, and exact `commitSha`.
-- `kind`, stable `symbolId`, `name`, optional `qualifiedName`, and `language`.
-- Source span: `startLine`, `endLine` (and character offsets where available).
-- Typed relations such as `defines`, `references`, `calls`, `imports`, `implements`, `inherits`, `injects`, `routesTo`, `exposesApi`, `mapsToTable`, `mapsToColumn`, `migrates`.
-- `confidence` / evidence status: `verified`, `partial`, or `unknown`.
-- Generation timestamp and source provenance.
+- **Schema v1:** historical backend contract; immutable.
+- **Schema v2:** current backend Roslyn contract, including the existing C#-oriented `symbolKind` and `sourceSymbolKind`; immutable during Step 2.3.
+- **Schema v3:** new language-neutral contract introduced for frontend TypeScript/Angular observations. It must not silently alter or reinterpret v1/v2 records.
 
-Symbol identity must be language-aware and deterministic. Do not use display names alone as unique IDs. For unresolved/dynamic relationships, preserve the observation with an explicit partial/unknown status instead of inventing a target.
+All versions retain the common provenance invariants: `schemaVersion`, `indexerVersion`, `repositoryId`, repository-relative `path`, exact `commitSha`, stable identity where applicable, source evidence, and generation timestamp. Version-specific required fields and enums are defined by their own JSON Schemas and typed models.
+
+Schema v3 must support:
+- Language-neutral observation and symbol categories without constraining TypeScript/Angular kinds to the existing Roslyn enum.
+- Stable symbol IDs derived from repository identity, normalized repository-relative path, semantic scope/kind and compiler symbol identity; display names alone are never unique IDs.
+- Source spans with line and character offsets when available.
+- Controlled typed relation values and evidence status (`verified`, `partial`, `unknown`); unresolved targets must remain unresolved rather than fabricated.
+- Typed Angular observations for component, injectable/service, guard and route metadata.
+- Typed API observations for HTTP method, URL classification (`literal`, `interpolated`, `dynamic`), original expression and literal path only when directly present in source.
+- Explicit provenance tying every record to one repository and one exact pinned SHA.
+
+Do not use an arbitrary untyped metadata bag or overload `qualifiedName`/`symbolId` with Angular or API payloads. Keep backend v2 serialization unchanged in Step 2.3; any future backend migration requires a separate plan, compatibility tests and before/after verification.
 
 ### 4.4 Revision and cache policy
 
@@ -207,7 +214,7 @@ The CLI must support machine-readable JSON output for agent consumption and conc
 
 ### Step 2.1 — Contract and CLI skeleton
 
-- [ ] Define versioned JSONL record schema and stable ID rules.
+- [x] Define versioned JSONL record schemas and stable ID rules (v1/v2 immutable; frontend v3 introduced in Step 2.3).
 - [ ] Define workspace manifest format including root and recursive gitlink SHAs.
 - [ ] Add local cache policy and ensure generated artifacts are not committed.
 - [ ] Create CLI skeleton with `workspace status`, `index` and `find` command contracts.
@@ -226,16 +233,18 @@ The CLI must support machine-readable JSON output for agent consumption and conc
 
 **Exit:** a developer can query a real ERPm backend symbol and receive exact definitions/references with file spans and pinned SHA.
 
-### Step 2.3 — Frontend TypeScript vertical slice
+### Step 2.3 — Frontend TypeScript/Angular vertical slice
 
-- [ ] Load FE root and all nested module repositories at pinned gitlink SHAs.
-- [ ] Use the FE TypeScript 5.8.3 compiler configuration.
-- [ ] Index source files, modules, classes, interfaces, imports and references.
-- [ ] Add Angular component/service/route metadata extraction.
-- [ ] Add API client method and HTTP literal extraction.
-- [ ] Add fixture tests and one real FE module smoke test.
+- [x] Complete pinned FE tooling, compiler configuration, CI/runtime and nested repository-boundary discovery.
+- [x] Introduce schema v3 and a typed frontend record model; preserve backend schema v2 unchanged.
+- [x] Add an isolated Node worker pinned to TypeScript 5.8.3 with its own package manifest and lockfile.
+- [x] Use FE root `tsconfig.app.json` and `src/main.ts` as the initial compiler Program entry; report actual Program coverage rather than claiming every repository TypeScript file is included.
+- [x] Attribute every source file to the longest matching repository root from the validated recursive manifest, using that repository's exact SHA.
+- [x] Index TypeScript definitions, imports and compiler-resolved references.
+- [x] Add isolated Angular component/service/guard/route and API HTTP observations with explicit evidence and URL classification.
+- [x] Add fixture tests, repository/SHA provenance checks and real FE Program smoke tests in CI and the local Windows workspace.
 
-**Exit:** a developer can query a real Angular symbol/import/API client and receive exact source evidence.
+**Exit:** a developer can query a real Angular symbol/import/API client and receive exact source evidence, repository identity, pinned SHA and schema-v3 provenance.
 
 ### Step 2.4 — Database metadata index
 
@@ -446,7 +455,7 @@ Implementation changes currently on the branch:
 
 The user completed the real-workspace verification after PR #60:
 
-- Root snapshot: `468e7025fa4dee1e61bb651ed58c106361f05639`.
+- Root snapshot at the time of backend acceptance: `468e7025fa4dee1e61bb651ed58c106361f05639`; current Step 2.3 integration branch workspace root after PR #65: `af74ff2ba768efb49ef37f07a60b81a1b0bb56ca`.
 - Backend gitlink and checkout: `235173fd193ae2fb60081fa4573434f5edd506f3`, exact match.
 - Unit tests: 12 passed, 0 failed.
 - Backend 0.2.0 index: 50,471 records; 195 syntax trees included and 45 excluded.
@@ -464,7 +473,7 @@ Detailed plan: [plan-step-2.3-frontend-typescript-indexer.md](plan-step-2.3-fron
 
 Use the exact FE snapshot from the verified root workspace, not moving branch heads:
 
-- Root: `I3Solution/ERPm@468e7025fa4dee1e61bb651ed58c106361f05639`.
+- Root at Step 2.3 discovery verification: `I3Solution/ERPm@af74ff2ba768efb49ef37f07a60b81a1b0bb56ca` (after PR #65 merge).
 - FE: `ERPm-FE@62270988b42eece930c702d1272fe857d31bcbb9`.
 - Nested modules: ACC `2061e4d7424539f1fe7de920ede86a81264e9098`; CRM `9b66e321d6cff83ed703d080c3e5e19996816477`; HRM `f66e1bb61fe222684a9c63addde93c11d1559df3`; MFG `438693239d984e3c2ae060d4f24033ab41d7855d`; PM `e0d4154fede259e9c9da778e8f77aff947640e29`; PUR `c7e1c0c7f0957a91bba5e8892d1257d4640a2e33`; SCM `0661fdfb7361957b1594890d5efa7a2bc9329624`; SD `750960006dd1190682556334fdf3a64b6273aad4`; WMS `fd320c77642a0860ca8cfad25de10ea9bd1e796c`; dashboard `4380f4b433de6ec86be5b4934279af177be5dca5`.
 
@@ -476,3 +485,51 @@ Initial implementation sequence:
 5. Add deterministic fixtures and one real FE module smoke test before broadening to all modules.
 
 **Constraints:** no FE application source changes, no package upgrades in application projects, no generated index/cache commits, no claim of complete Angular runtime DI/template analysis, and no cross-layer route match based on names alone. Tooling dependencies belong to the indexer tool, isolated from application dependency manifests where practical.
+
+
+### Step 2.3 discovery closure — 2026-11-11
+
+The user verified the current workspace manifest with `erpm-index workspace status` on root `af74ff2ba768efb49ef37f07a60b81a1b0bb56ca`. It reports 12 repositories: `erpm-be`, `erpm-fe`, and ten nested FE modules. The FE root and nested module SHAs match the discovery baseline recorded in the Step 2.3 plan. Runtime manifest data remains authoritative; these SHAs are evidence, not hardcoded worker configuration.
+
+Verified frontend toolchain and project boundaries:
+- Local Node.js `22.12.0`, npm `10.9.0`; CI uses Node 22.
+- FE package manager is npm; `package-lock.json` uses lockfileVersion 3.
+- TypeScript is pinned to `5.8.3`; Angular core/router are `20.3.34`; Angular DevKit/build tooling is `20.3.42`.
+- Angular application project is `client`, source root `src`, build configuration `tsconfig.app.json`, entry `src/main.ts`.
+- Ten nested modules have no independent `package.json`, `angular.json`, `tsconfig.json`, `tsconfig.app.json` or `project.json`; they inherit the FE root TypeScript project.
+- The FE application routes include static `Routes` arrays, lazy `import()` component loading, and direct/factory-style guards.
+
+Implementation decisions:
+1. Keep the .NET CLI as manifest validator, SHA gate, cache/provenance owner and process orchestrator.
+2. Implement an isolated Node worker under `tools/frontend-code-indexer`, with a separate lockfile pinning TypeScript 5.8.3; do not modify FE application manifests or lockfiles.
+3. Use the FE root compiler configuration and `src/main.ts` as the initial application Program entry. Report the actual Program source coverage; do not claim that unreferenced TypeScript files are indexed.
+4. Attribute each source file to the longest matching `RelativePath` in the validated manifest. Use that entry's `RepositoryId` and `CommitSha`; a nested-module file must not be stamped as `erpm-fe`.
+5. Keep schema v1/v2 immutable. Introduce schema v3 and a separate typed frontend model; do not migrate backend records in Step 2.3.
+6. Keep Angular and API extractors isolated from TypeScript core. API URL observations distinguish `literal`, `interpolated` and `dynamic`; only source literals are emitted as literal paths. Never resolve environment variables or dynamic identifiers by guesswork.
+
+Representative API evidence inspected in the pinned FE source includes:
+- Core auth service: literal POST `/api/v1/auth/login` and GET `/api/v1/auth/me`.
+- Localization and notification services: environment-derived base URLs with literal suffixes and dynamic recipient/language segments.
+- CRM partner service: GET/POST/PUT/DELETE operations over a base URL and identifier templates.
+- Dashboard and SD services: environment-derived API bases, literal suffixes and dynamic URL expressions.
+
+Discovery confidence is high for the reported workspace manifest, toolchain, config and module boundaries. API extractor coverage is limited to inspected source patterns and must be expanded through fixtures and implementation. No FE application files were changed during discovery.
+
+
+### Frontend schema v3 baseline — 2026-11-11
+
+The Step 2.3 branch now contains the strict Draft 2020-12 schema at `.ai/code-index/schema/index-record-v3.schema.json`, a separate typed .NET frontend model and schema validation fixtures. v3 uses language-neutral symbol categories, explicit source offsets, typed Angular/API payloads, strict enums and per-record repository/SHA provenance. API URL classifications prevent an interpolated or dynamic expression from being mislabeled as a fully literal path. Backend v1/v2 contracts and serialization remain unchanged.
+
+
+### TypeScript frontend worker implementation — 2026-11-11
+
+The feature branch now includes the isolated TypeScript 5.8.3 worker, Node fixture tests, and .NET CLI orchestration for `index repo erpm-fe`. The worker consumes the already validated recursive workspace manifest, builds the FE application Program from `tsconfig.app.json` / `src/main.ts`, attributes source files by longest matching repository path, and writes schema v3 caches per repository/SHA. The extractor emits file, definition, import and compiler-resolved reference/call observations, plus Angular component/service/guard/route metadata and typed HttpClient API observations. CI has indexed the pinned FE application Program and queried a real CRM symbol. The real Program produced 130 Angular metadata records (63 components, 18 services, 3 guards and 46 routes) plus 34 HttpClient API observations (17 GET, 9 POST, 5 PUT, 3 DELETE), classified as 4 literal, 16 interpolated and 14 dynamic URL expressions.
+
+The code-index CI job installs the worker's independent npm lockfile and executes Node tests, .NET build/tests, pinned workspace validation, actual FE indexing and symbol/API query smoke tests. The latest branch-head workflow run #542 passed all three jobs at `1bb5bf789f62100e4d4d413a91217e5cd35a64ed`. CI indexed 102 source files from a 161-file Program and wrote 12,880 schema v3 records. Local Windows smoke verification and mixed-SHA rejection remain pending; no local result is claimed.
+
+
+### Frontend indexing and Angular/API smoke acceptance — 2026-11-11
+
+The pinned FE CI smoke run used TypeScript 5.8.3 and indexed 102 source files from a 161-file Program. It wrote 12,880 schema v3 records, attributed to the FE root plus CRM, dashboard, HRM, SD and WMS nested repositories using each exact gitlink SHA. ACC, MFG, PM, PUR and SCM did not appear in the current Program's reachable source set and were not stamped with guessed records.
+
+The code-index CI job passed worker fixtures, .NET build/tests, manifest validation, actual FE indexing and a definition-first `PartnerService` query from CRM at `services/partner.service.ts` (lines 72–177). Local Windows smoke verification and mixed-SHA rejection remain part of Step 2.3.4 before closing the phase.

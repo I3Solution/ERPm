@@ -1,0 +1,16 @@
+{
+  "name": "@erpm/frontend-code-indexer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "index": "node index.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.8.3"
+  }
+}

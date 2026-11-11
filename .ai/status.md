@@ -30,19 +30,20 @@
 ## In Progress
 
 - LD.5 BE: danh sách SD nhẹ (summary, lọc ngày, q, sort), chờ tester và merge; FE chờ khung LD.1.
-- [ ] Phase 2 Step 2.3 — Frontend TypeScript/Angular indexer.
+- [ ] Phase 2 Step 2.3 — Frontend TypeScript/Angular indexer (implementation and local/CI verification complete on `loipham/phase2-frontend-typescript-indexer`; final code review and PR/merge pending).
   - Plan: [plan-step-2.3-frontend-typescript-indexer.md](plans/plan-step-2.3-frontend-typescript-indexer.md).
-  - Scope: exact FE root and recursive module gitlink SHAs; TypeScript 5.8.3 compiler configuration; source definitions/imports/references; Angular metadata and API client HTTP literals where statically discoverable.
-  - Start with workspace/tooling discovery and a small fixture-backed vertical slice; no FE application source changes.
+  - Implemented schema v3, isolated Node worker with TypeScript 5.8.3 lockfile, .NET CLI orchestration, repository/SHA-aware caches, TypeScript definitions/imports/references, Angular component/service/guard/route metadata and HttpClient API evidence.
+  - Pinned FE CI smoke: 161 Program source files; 102 indexed source files; 12,880 records across FE root, CRM, dashboard, HRM, SD and WMS. Angular: 63 components, 18 services, 3 guards, 46 routes. API: 34 calls (17 GET, 9 POST, 5 PUT, 3 DELETE); URL evidence: 4 literal, 16 interpolated, 14 dynamic.
+  - Latest branch-head CI run #542 passed all three jobs (backend, frontend and code-index) at `1bb5bf789f62100e4d4d413a91217e5cd35a64ed`. The code-index job includes Node worker tests, .NET build/tests, pinned manifest validation, actual FE indexing and definition/API query smoke tests.
+  - Local Windows verification and PR review remain pending; no FE application files or app manifests/lockfiles were changed.
 
 ## Next Steps
 
-1. Implement Step 2.3 discovery and TypeScript indexer vertical slice on a `loipham/*` branch.
-2. Add Angular component/service/route and API client metadata extraction with explicit evidence/provenance.
-3. Run fixture tests and a real pinned FE module smoke test.
-4. Step 2.4: EF Core model and migration metadata.
-5. Step 2.5: unified query, inheritance/implementation and cross-layer tracing.
-6. Step 2.6: retrieval quality, performance and context/token evaluation on representative real tasks.
+1. Complete final code review for Step 2.3, including worker/runner edge cases and acceptance scope.
+2. Open and review the Step 2.3 implementation PR against root `master`; merge only after review and full CI pass.
+3. Step 2.4: EF Core model and migration metadata.
+4. Step 2.5: unified query, inheritance/implementation and cross-layer tracing.
+5. Step 2.6: retrieval quality, performance and context/token evaluation on representative real tasks.
 
 ## Rules
 

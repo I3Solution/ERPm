@@ -1,6 +1,6 @@
 # Step 2.3 — Frontend TypeScript/Angular Indexer
 
-> **Status:** Planned — discovery and first vertical slice next  
+> **Status:** Implementation, CI and local Windows smoke verification passed; final code review and PR/merge pending  
 > **Created:** 2026-11-11  
 > **Target repository:** `I3Solution/ERPm` umbrella; read-only indexing of pinned FE repositories  
 > **Integration branch:** `master`  
@@ -16,7 +16,7 @@ The index is a retrieval aid. FE source, package manifests, TypeScript configura
 
 Use only the snapshot below for the first implementation and smoke tests. Do not resolve nested repositories to their latest remote branches.
 
-- Umbrella root: `I3Solution/ERPm@468e7025fa4dee1e61bb651ed58c106361f05639`.
+- Umbrella root at discovery verification: `I3Solution/ERPm@af74ff2ba768efb49ef37f07a60b81a1b0bb56ca` (after PR #65 merge).
 - FE gitlink: `ERPm-FE@62270988b42eece930c702d1272fe857d31bcbb9`.
 
 Recursive FE module gitlinks observed in the user's workspace:
@@ -61,7 +61,11 @@ Do not change FE application package manifests, lockfiles, TypeScript config or 
 - Keep the extractor deterministic for a fixed repository SHA, config and indexer/schema version.
 - Reuse the common JSONL provenance contract and cache key policy from `tools/ERPm.CodeIndex` where practical.
 - Isolate frontend-specific extraction from backend Roslyn code; do not couple the indexer to FE runtime application code.
-- Choose Node/TypeScript packaging and .NET CLI orchestration only after the discovery spike confirms the least fragile local workflow. Avoid introducing a second full CLI framework prematurely.
+- Use the existing .NET CLI as orchestrator and manifest/SHA/cache/provenance owner; invoke an isolated Node worker under `tools/frontend-code-indexer`.
+- Give the worker its own `package.json` and lockfile, pinning TypeScript `5.8.3`; do not modify FE application manifests or lockfiles.
+- Pass the already validated workspace manifest from .NET to the worker; do not implement a second Git/submodule manifest parser in Node.
+- Use FE root `tsconfig.app.json` and `src/main.ts` as the initial application Program entry. Report actual Program coverage and do not claim unreferenced TypeScript files are indexed.
+- Attribute each file to the longest matching manifest `RelativePath`; emit that entry's `RepositoryId` and exact `CommitSha`. Never stamp nested-module files as FE-root records.
 
 ### 4.2 Initial record categories
 
@@ -87,8 +91,9 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 ### 4.4 API client extraction
 
 - Identify FE service/client methods that invoke Angular `HttpClient` or the project's established HTTP abstraction.
-- Capture HTTP verb and literal path/URL only when directly represented in source.
-- Preserve method source span and containing class/service symbol.
+- Capture HTTP verb and preserve the original URL expression.
+- Classify URL evidence as `literal`, `interpolated` or `dynamic`; populate `literalPath` only when a literal path is directly present in source.
+- Preserve method source span and containing class/service symbol. Do not evaluate environment variables or fabricate a fully resolved URL.
 - Do not match a FE API call to a BE endpoint by similar names alone; cross-layer matching belongs to Step 2.5 and requires route/path evidence.
 
 ## 5. Generated and excluded source policy
@@ -107,40 +112,41 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 - [x] Inspect FE root package manager and lockfile.
 - [x] Confirm TypeScript and Angular versions from the pinned FE source.
 - [x] Inspect root Angular/TypeScript compiler configuration and static route metadata.
-- [ ] Inspect Node version used by CI/local developer environment and nested-module project boundaries.
-- [ ] Document representative API client patterns and recommend the minimal indexer package/CLI integration.
+- [x] Inspect Node version used by CI/local developer environment and nested-module project boundaries.
+- [x] Document representative API client patterns and recommend the minimal indexer package/CLI integration.
+- [x] Run the existing .NET `workspace status` command and verify all 12 repository IDs, relative paths and pinned SHAs.
 
-**Exit:** a source-backed frontend tooling report with exact paths and pinned SHA; no application files changed.
+**Exit: MET (2026-11-11).** Source-backed tooling report, runtime manifest, nested repository boundaries and representative API patterns verified; no FE application files changed.
 
 ### 2.3.2 — TypeScript core indexer
 
-- [ ] Define frontend index records using the shared schema/provenance policy.
-- [ ] Load FE root and one selected module using the pinned tsconfig/compiler version.
-- [ ] Index definitions, imports and compiler-resolved references.
-- [ ] Implement deterministic exclusions and cache isolation.
-- [ ] Add fixture tests for symbols, aliases, imports, references and generated files.
-- [ ] Add CLI invocation and machine-readable output.
+- [x] Define schema v3 JSON Schema and typed .NET frontend record model; add positive/negative JSON Schema validation tests.
+- [x] Load the FE application Program from the pinned root `tsconfig.app.json` / `src/main.ts`; attribute included source files to the longest matching manifest repository path.
+- [x] Index source files, supported definitions, imports and compiler-resolved references with schema v3 records.
+- [x] Implement deterministic source exclusions and per-repository / pinned-SHA / indexer-version cache isolation.
+- [x] Add fixture tests for symbols, imports, references, nested repository attribution and generated files.
+- [x] Add CLI invocation and machine-readable JSONL output.
 
 **Exit:** fixture tests pass and a real FE symbol query returns exact source evidence and pinned SHA.
 
 ### 2.3.3 — Angular and API metadata
 
-- [ ] Extract component/service/guard metadata.
-- [ ] Extract statically declared route metadata.
-- [ ] Extract API client methods and HTTP verb/path literals.
-- [ ] Add positive/negative fixture tests for dynamic and static cases.
-- [ ] Label partial/unknown evidence instead of guessing.
+- [x] Extract component/service/guard metadata from Angular decorators and statically typed guard declarations.
+- [x] Extract statically declared route path, lazy import target and guard invocation metadata.
+- [x] Extract Angular HttpClient calls, HTTP verbs, original URL expressions and literal/interpolated/dynamic classifications.
+- [x] Add fixture tests for Angular decorators, static routes, guards, HttpClient calls and all URL evidence classes.
+- [x] Preserve unresolved import targets as partial; dynamic/interpolated API paths never receive fabricated literal paths.
 
 **Exit:** one real FE module query returns component/service/route/API client evidence with exact spans.
 
 ### 2.3.4 — Workspace smoke test and acceptance
 
-- [ ] Run tests and build in the supported local environment.
-- [ ] Index one pinned FE module, then validate FE-root integration if supported.
-- [ ] Verify zero generated/vendor/build paths in normal source results.
-- [ ] Inspect representative symbol/import/reference/component/API queries.
-- [ ] Verify mixed-SHA rejection and version-specific cache paths.
-- [ ] Record counts, diagnostics, indexing time and known limitations.
+- [x] Run tests and build in the supported local Windows environment: `npm ci`; Node worker tests 3/3; .NET build succeeded; .NET tests 18/18.
+- [x] Index the pinned FE application Program and nested repositories: local run wrote 13,140 records across six repositories; CI run indexed 102 source files from a 161-file Program and wrote 12,880 records.
+- [x] Verify generated/vendor/build exclusions through worker filtering and CI validation; local provenance audit covered all 8 cache files with zero mismatches.
+- [x] Inspect representative symbol/API queries locally (`PartnerService`, `getPartnerById`) and in CI (definition-first `PartnerService`, interpolated API query); local index output spans six repositories.
+- [x] Verify active-SHA cache isolation with a synthetic record under a fake SHA; `find symbol` did not return it. Cache paths include repository, SHA and indexer version. Old cache folders are retained but not selected.
+- [x] Record local record count (13,140), CI coverage/counts (102/161 source files; 12,880 records), provenance results (8 files, 0 errors), test counts and known Program-reachability limitation. Indexing duration and detailed diagnostics were not captured.
 
 **Exit:** a reproducible frontend index for at least one real pinned module; broader all-module indexing only after measured reliability.
 
@@ -216,3 +222,132 @@ Source inspected at `I3Solution/ERPm-FE@62270988b42eece930c702d1272fe857d31bcbb9
 5. API client patterns and nested module-specific configuration have not yet been inspected; keep these discovery items open.
 
 **Evidence paths and revisions:** all findings above derive from the exact FE files listed in the table at commit `62270988b42eece930c702d1272fe857d31bcbb9`. Confidence: high for manifest/config/route facts; Node runtime actually used in CI and module-specific project boundaries remain unverified.
+
+
+## 12. Discovery closure and implementation decisions — 2026-11-11
+
+### 12.1 Runtime workspace manifest
+
+The user ran `dotnet run --project tools/ERPm.CodeIndex -- workspace status` on root commit `af74ff2ba768efb49ef37f07a60b81a1b0bb56ca`. The command returned 12 repositories and confirmed the pinned FE root plus ten nested module revisions:
+
+| Repository | Repository ID | Relative path |
+|---|---|---|
+| Backend | `erpm-be` | `ERPm-BE` |
+| FE root | `erpm-fe` | `ERPm-FE` |
+| ACC | `erpm-fe-src-app-modules-acc` | `ERPm-FE/src/app/modules/ACC` |
+| CRM | `erpm-fe-src-app-modules-crm` | `ERPm-FE/src/app/modules/CRM` |
+| HRM | `erpm-fe-src-app-modules-hrm` | `ERPm-FE/src/app/modules/HRM` |
+| MFG | `erpm-fe-src-app-modules-mfg` | `ERPm-FE/src/app/modules/MFG` |
+| PM | `erpm-fe-src-app-modules-pm` | `ERPm-FE/src/app/modules/PM` |
+| PUR | `erpm-fe-src-app-modules-pur` | `ERPm-FE/src/app/modules/PUR` |
+| SCM | `erpm-fe-src-app-modules-scm` | `ERPm-FE/src/app/modules/SCM` |
+| SD | `erpm-fe-src-app-modules-sd` | `ERPm-FE/src/app/modules/SD` |
+| WMS | `erpm-fe-src-app-modules-wms` | `ERPm-FE/src/app/modules/WMS` |
+| Dashboard | `erpm-fe-src-app-modules-dashboard` | `ERPm-FE/src/app/modules/dashboard` |
+
+The runtime manifest is authoritative. The worker must not hardcode IDs or SHAs. Repository attribution uses longest-prefix matching against normalized `RelativePath`; nested files are assigned only to the most specific matching repository entry.
+
+### 12.2 Verified toolchain and project boundaries
+
+- Local Node.js: `22.12.0`; npm: `10.9.0`.
+- CI uses Node 22.
+- Package manager: npm; committed lockfileVersion 3.
+- TypeScript: `5.8.3`; Angular core/router: `20.3.34`; Angular DevKit/build tooling: `20.3.42`.
+- Angular workspace project: `client`; source root: `src`; application compiler config: `tsconfig.app.json`; entry: `src/main.ts`.
+- Nested modules have no independent `package.json`, `angular.json`, `tsconfig.json`, `tsconfig.app.json` or `project.json`; they inherit the FE root TypeScript project.
+- The application routes include static `Routes` arrays, lazy `import()` component loading and direct/factory-style guard declarations.
+
+### 12.3 Compiler Program coverage boundary
+
+The initial Program uses FE root `tsconfig.app.json` and its `src/main.ts` entry. Compiler import traversal includes reachable modules and resolved dependencies. It does not prove that every `.ts` file in the FE root and nested repositories is included. The indexer must report actual Program source coverage and avoid describing this as a full recursive filesystem scan. A separate discovery mode for unreferenced files may be considered later, without weakening compiler semantics.
+
+### 12.4 API evidence observed
+
+Representative inspected patterns:
+- `src/app/core/services/auth.service.ts`: literal POST `/api/v1/auth/login` and GET `/api/v1/auth/me`.
+- `localization.service.ts`: environment-derived base URL and language suffix.
+- `notification-state.service.ts`: environment-derived base URL with literal suffixes and dynamic recipient identifiers.
+- CRM `partner.service.ts`: GET/POST/PUT/DELETE operations over a base URL and identifier templates.
+- Dashboard and SD services: environment-derived API bases, literal suffixes and dynamic URL expressions.
+
+API records must preserve the original expression and distinguish `literal`, `interpolated` and `dynamic`. Only a source literal may populate `literalPath`; do not resolve environment variables or dynamic identifiers by guesswork.
+
+### 12.5 Final architecture decision
+
+1. .NET CLI remains the orchestrator and owner of manifest validation, SHA validation, cache layout and provenance.
+2. Node worker is isolated at `tools/frontend-code-indexer`, with its own package manifest and lockfile pinning TypeScript `5.8.3`.
+3. The validated workspace manifest is passed from .NET to Node; no second Git/submodule parser is introduced.
+4. TypeScript core, Angular metadata and API extraction remain separate modules.
+5. Schema v1 and v2 remain unchanged. Frontend records use a new schema v3 and a separate typed model. Backend migration is out of Step 2.3 scope.
+6. No FE application package manifest, lockfile, tsconfig, Angular config or source file is modified.
+
+**Discovery confidence:** high for runtime manifest, exact checked-out SHAs, FE toolchain, compiler configuration and nested repository boundaries. API patterns are representative observations and require fixture coverage during implementation.
+
+
+## 13. Schema v3 contract baseline — 2026-11-11
+
+Added `.ai/code-index/schema/index-record-v3.schema.json` and typed `FrontendIndexRecord`, `AngularIndexMetadata` and `ApiIndexMetadata` models.
+
+- Schema v3 is strict (`additionalProperties: false`) and independent of immutable v1/v2.
+- Common provenance includes repository ID, 40-character lowercase commit SHA, repository-relative path, indexer version and generation timestamp.
+- Source spans carry line and character offsets; unavailable positions are explicit `null`.
+- Language-neutral symbol categories replace the C#-specific v2 category enum.
+- Angular metadata and API observations use separate typed objects.
+- API URL evidence is classified as `literal`, `interpolated` or `dynamic`. Only literal URLs may populate `literalPath`; dynamic/interpolated values must leave it null.
+- Record kind controls the permitted typed payload; unknown properties and unsupported enum values are rejected.
+- Validation tests cover valid Angular/API observations and invalid URL/payload/provenance cases using JsonSchema.Net. Local package restore and test execution remain pending.
+
+
+## 14. TypeScript core worker implementation — 2026-11-11
+
+Added an isolated Node worker under `tools/frontend-code-indexer`:
+- Separate `package.json` and npm lockfile pin TypeScript exactly to 5.8.3; FE application manifests and lockfiles remain untouched.
+- Worker consumes the validated .NET workspace manifest through stdin and does not invoke Git or parse submodule status.
+- Compiler Program is created from the pinned FE root `tsconfig.app.json`, whose application entry is `src/main.ts`.
+- Source ownership is resolved using the longest matching manifest repository path. Records carry the exact SHA for that owner and repository-relative paths.
+- Initial extractors emit source-file records, supported TypeScript declarations, import edges and compiler-resolved identifier references/calls.
+- Excludes declaration files, generated suffixes/headers and common vendor/build output directories.
+- .NET CLI command `index repo erpm-fe` invokes the worker, validates emitted repository/SHA/path/version fields and writes separate schema v3 JSONL caches for each repository represented in the Program.
+- Node built-in test runner fixtures cover definition/import/reference extraction, nested module attribution, pinned SHA propagation and generated-source exclusion.
+- CI now installs the isolated worker dependencies and runs its Node tests before the existing .NET code-index build/tests.
+
+**Verification state:** implementation is committed to the feature branch. CI and local real-workspace smoke test are pending; do not mark Step 2.3.2 accepted until both pass and record counts/source samples are inspected.
+
+
+## 15. Angular and API metadata implementation — 2026-11-11
+
+The Node worker now includes isolated extractors for:
+- Angular `@Component` metadata: selector, template/template URL and statically declared styles.
+- Angular `@Injectable` metadata: `providedIn`.
+- Functional guards with explicit Angular guard function types.
+- Static `Routes` arrays: literal route path, lazy import path, compiler-resolved lazy target symbol and original guard invocation expression.
+- Angular `HttpClient` calls resolved by the TypeScript checker: HTTP method, exact source URL expression, containing method symbol and URL evidence class.
+
+URL evidence rules:
+- String literal or no-substitution template literal: `literal`, with the exact literal path.
+- Template expression with substitutions: `interpolated`, with the original expression and `literalPath: null`.
+- Identifier, property access, concatenation or other computed expression: `dynamic`, with `literalPath: null`.
+- HTTP calls are accepted only when the receiver type resolves to Angular's `HttpClient`; arbitrary objects with methods named `get`/ `post` are not treated as API clients.
+
+Fixture coverage now includes component/service decorators, functional guards, lazy route imports, guard invocation text, literal/interpolated/dynamic URLs, nested repository attribution, exact pinned SHA propagation and generated-file exclusion.
+
+### Pinned FE CI smoke evidence
+
+The code-index job completed the actual pinned FE Program smoke test and symbol queries. Latest full workflow run #542 passed backend, frontend and code-index at branch HEAD `1bb5bf789f62100e4d4d413a91217e5cd35a64ed`:
+- TypeScript compiler: 5.8.3.
+- Program source files: 161.
+- Indexed source files: 102.
+- Excluded/external/declaration source files: 59.
+- Records written: 12,880 across the FE root and five nested repositories represented in the Program.
+- FE root: 5,889 records at `62270988b42eece930c702d1272fe857d31bcbb9`.
+- CRM: 745 records at `9b66e321d6cff83ed703d080c3e5e19996816477`.
+- dashboard: 64 records at `4380f4b433de6ec86be5b4934279af177be5dca5`.
+- HRM: 1,737 records at `f66e1bb61fe222684a9c63addde93c11d1559df3`.
+- SD: 3,690 records at `750960006dd1190682556334fdf3a64b6273aad4`.
+- WMS: 755 records at `fd320c77642a0860ca8cfad25de10ea9bd1e796c`.
+
+No records were emitted for ACC, MFG, PM, PUR or SCM because their source files were not reachable from the configured FE application Program entry in this pinned snapshot. This is expected compiler coverage, not evidence that those repositories are empty or unsupported.
+
+The CI query `find symbol PartnerService` returned a definition from CRM at `services/partner.service.ts`, lines 72–177, with the exact CRM SHA. Definition records are prioritized ahead of references. The same run extracted 130 Angular metadata records (63 components, 18 services, 3 guards, 46 routes) and 34 HttpClient API observations (17 GET, 9 POST, 5 PUT, 3 DELETE). API URL evidence comprised 4 literal, 16 interpolated and 14 dynamic expressions; interpolated/dynamic records retain the original expression and have no fabricated literal path. The workflow now also queries `getPartnerById` and requires an interpolated API record.
+
+**Verification state (2026-11-11):** CI run #545 passed all three jobs (backend, frontend and code-index) at branch HEAD `184a0a4d4f32f7ed687800bf626a4be034e25bb5`. CI indexed 102 source files from 161 Program files and wrote 12,880 records. Local Windows verification passed: `npm ci`, Node tests 3/3, .NET build and tests 18/18, 12-repository manifest validation, FE indexing (13,140 records across six repositories), `PartnerService` / `getPartnerById` queries, and cache provenance audit (8 files, 0 mismatches). A synthetic fake-SHA record was not returned by the active-SHA query. The cache test demonstrates SHA-keyed isolation; old cache folders are intentionally retained. `git status --short` was clean and `.ai/code-index/cache/` was confirmed ignored. Indexing duration and detailed diagnostics were not captured. Final code review and PR/merge remain pending.

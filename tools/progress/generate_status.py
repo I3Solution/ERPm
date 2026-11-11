@@ -93,6 +93,9 @@ def parse_task(path: Path, tasks_root: Path) -> TaskRecord | None:
         elif stripped.startswith(("*", "+")):
             raise TaskRecordError(f"{source}: feature checklist must use '- [ ]' or '- [x]' items")
 
+    if status == "Done" and total > 0 and completed != total:
+        raise TaskRecordError(f"{source}: Done task has incomplete feature checklist ({completed}/{total})")
+
     remaining_lines = _section(lines, REMAINING_HEADING, source)
     evidence_lines = _section(lines, EVIDENCE_HEADING, source)
     remaining = " ".join(line.strip().lstrip("- ").strip() for line in remaining_lines if line.strip())

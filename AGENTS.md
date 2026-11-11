@@ -41,10 +41,16 @@ Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các
 
 - Step plan: `.ai/plans/plan-step-XX-*.md`.
 - Step log: `.ai/steps/step-XX-*.md`.
-- Task lẻ: `.ai/tasks/<type>-YYYYMMDD-*.md` theo `.ai/tasks/_TEMPLATE.md`.
+- Task record: `.ai/tasks/<type>-YYYYMMDD-*.md` theo `.ai/tasks/_TEMPLATE.md`. Giữ nguyên naming convention hiện có; không tự tạo hệ thống TASK ID hoặc đổi sang YAML/JSON.
 - Review: `.ai/reviews/YYYY-MM-DD-*.md`.
-- Current status: `.ai/status.md`; lịch sử dài chuyển vào `.ai/history/` sau khi lưu snapshot.
-- Khi hoàn tất, ghi rõ file thay đổi, lệnh kiểm tra, kết quả thực tế, commit/PR và việc còn lại. Không ghi PASS nếu chưa chạy kiểm tra.
+- Current status: `.ai/status.md`; đây là báo cáo tổng hợp của dự án, không phải nơi Agent cập nhật tiến độ task.
+- Quy tắc bắt buộc: mỗi Agent/developer khi nhận một task có thay đổi đáng kể đối với code, kiến trúc, cấu hình, CI/CD hoặc tài liệu dự án phải tạo/cập nhật một task record riêng ngay từ đầu công việc. Task record phải được commit trong cùng PR với thay đổi tương ứng. Nếu task tiếp tục qua nhiều PR, cập nhật record hiện có thay vì tạo record trùng lặp.
+- Dùng task record hiện có khi tiếp tục một task; không tạo file mới chỉ để né cập nhật record. Với công việc thuộc step/plan lớn, task record phải liên kết tới step/plan tương ứng.
+- Các thay đổi máy móc, typo/format thuần túy hoặc thao tác không làm thay đổi hành vi/nội dung dự án có thể miễn task record. Nếu không chắc, tạo record.
+- Agent chỉ sửa task record của công việc mình thực hiện; không sửa `.ai/status.md` trực tiếp và không sửa progress record của Agent khác nếu không được giao.
+- Trạng thái dùng đúng các giá trị trong template: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất; ghi rõ kiểm tra đã chạy, kết quả, commit/PR và việc còn lại. Không ghi PASS nếu chưa chạy kiểm tra.
+- PR validation sẽ kiểm tra task record theo rule này. Sau khi PR được merge vào `master`, automation sẽ tổng hợp các task records đã merge để cập nhật `.ai/status.md`. Task record là nguồn dữ liệu tiến độ; `.ai/status.md` là output được sinh tự động.
+- Nếu task record không hợp lệ hoặc thiếu, Agent phải bổ sung trước khi yêu cầu review/merge; không dùng status chung để thay thế task record.
 
 ## 6. Context packet trước khi code
 

@@ -167,6 +167,9 @@ export function indexWorkspace(manifest, options = {}) {
 
     collectImports(sourceFile, info, parsed.options, fileInfo, programFilesByAbsolutePath, records, generatedAtUtc);
     collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, records, generatedAtUtc);
+    collectAngularMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
+    collectRouteMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
+    collectApiCalls(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
   }
 
   records.sort((left, right) =>
@@ -284,15 +287,363 @@ function collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, re
   });
 }
 
+
+function collectAngularMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc) {
+  visit(sourceFile, node => {
+    if (ts.isClassDeclaration(node) && node.name) {
+      const componentDecorator = findDecorator(node, "Component");
+      const injectableDecorator = findDecorator(node, "Injectable");
+      const decorator = componentDecorator ?? injectableDecorator;
+      if (!decorator) {
+        return;
+      }
+
+      const symbol = checker.getSymbolAtLocation(node.name);
+      const targetSymbolId = symbol ? symbolIds.get(symbol) ?? null : null;
+      if (!targetSymbolId) {
+        return;
+      }
+
+      const metadata = getDecoratorObject(decorator);
+      const kind = componentDecorator ? "component" : "service";
+      const start = node.getStart(sourceFile);
+      const end = node.getEnd();
+      const selector = readStringProperty(metadata, "selector");
+      const template = readStringProperty(metadata, "templateUrl")
+        ?? readStringProperty(metadata, "template");
+      const styles = readStringArrayProperty(metadata, "styleUrls")
+        .concat(readStringArrayProperty(metadata, "styles"));
+
+      records.push(createRecord(info, {
+        kind: "angular",
+        symbolKind: kind,
+        symbolId: `angular:${info.owner.repositoryId}:${info.relativePath}:${start}`,
+        name: node.name.text,
+        qualifiedName: getQualifiedName(node),
+        language: extensionLanguage(sourceFile.fileName),
+        startLine: sourceFile.getLineAndCharacterOfPosition(start).line + 1,
+        endLine: sourceFile.getLineAndCharacterOfPosition(end).line + 1,
+        startOffset: start,
+        endOffset: end,
+        relation: "defines",
+        sourceSymbolId: info.symbolId,
+        targetSymbolId,
+        evidence: "verified",
+        generatedAtUtc,
+        angular: {
+          kind,
+          selector,
+          template,
+          styles,
+          providedIn: readStringProperty(metadata, "providedIn"),
+          routePath: null,
+          guardInvocation: null,
+          targetSymbolId,
+          lazyImportPath: null
+        },
+        api: null
+      }));
+      return;
+    }
+
+    if ((ts.isFunctionDeclaration(node) || ts.isVariableDeclaration(node))
+      && node.name && isGuardDeclaration(node)) {
+      const symbol = checker.getSymbolAtLocation(node.name);
+      const targetSymbolId = symbol ? symbolIds.get(symbol) ?? null : null;
+      if (!targetSymbolId) {
+        return;
+      }
+
+      const start = node.getStart(sourceFile);
+      const end = node.getEnd();
+      records.push(createRecord(info, {
+        kind: "angular",
+        symbolKind: "guard",
+        symbolId: `angular-guard:${info.owner.repositoryId}:${info.relativePath}:${start}`,
+        name: node.name.getText(sourceFile),
+        qualifiedName: getQualifiedName(node),
+        language: extensionLanguage(sourceFile.fileName),
+        startLine: sourceFile.getLineAndCharacterOfPosition(start).line + 1,
+        endLine: sourceFile.getLineAndCharacterOfPosition(end).line + 1,
+        startOffset: start,
+        endOffset: end,
+        relation: "defines",
+        sourceSymbolId: info.symbolId,
+        targetSymbolId,
+        evidence: "verified",
+        generatedAtUtc,
+        angular: {
+          kind: "guard",
+          selector: null,
+          template: null,
+          styles: [],
+          providedIn: null,
+          routePath: null,
+          guardInvocation: node.type?.getText(sourceFile) ?? null,
+          targetSymbolId,
+          lazyImportPath: null
+        },
+        api: null
+      }));
+    }
+  });
+}
+
+function collectRouteMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc) {
+  visit(sourceFile, node => {
+    if (!ts.isVariableDeclaration(node) || !node.name || !node.type
+      || !node.type.getText(sourceFile).includes("Routes")
+      || !node.initializer || !ts.isArrayLiteralExpression(node.initializer)) {
+      return;
+    }
+
+    visit(node.initializer, routeNode => {
+      if (!ts.isObjectLiteralExpression(routeNode) || !ts.isArrayLiteralExpression(routeNode.parent)) {
+        return;
+      }
+
+      const routePath = readStringProperty(routeNode, "path");
+      if (routePath === null) {
+        return;
+      }
+
+      const loadProperty = findObjectProperty(routeNode, "loadComponent")
+        ?? findObjectProperty(routeNode, "loadChildren");
+      const lazyImportPath = loadProperty
+        ? findDynamicImportPath(loadProperty.initializer, sourceFile)
+        : null;
+      const targetSymbolId = loadProperty
+        ? findLazyTargetSymbolId(loadProperty.initializer, checker, symbolIds)
+        : null;
+      const guardInvocation = ["canActivate", "canActivateChild", "canDeactivate", "canMatch"]
+        .map(name => findObjectProperty(routeNode, name))
+        .filter(Boolean)
+        .map(property => property.getText(sourceFile))
+        .join("; ") || null;
+
+      const start = routeNode.getStart(sourceFile);
+      const end = routeNode.getEnd();
+      const routeName = routePath.length > 0 ? routePath : "(root)";
+      records.push(createRecord(info, {
+        kind: "angular",
+        symbolKind: "route",
+        symbolId: `angular-route:${info.owner.repositoryId}:${info.relativePath}:${start}`,
+        name: routeName,
+        qualifiedName: `${node.name.getText(sourceFile)}.${routeName}`,
+        language: extensionLanguage(sourceFile.fileName),
+        startLine: sourceFile.getLineAndCharacterOfPosition(start).line + 1,
+        endLine: sourceFile.getLineAndCharacterOfPosition(end).line + 1,
+        startOffset: start,
+        endOffset: end,
+        relation: "declaresRoute",
+        sourceSymbolId: info.symbolId,
+        targetSymbolId,
+        evidence: "verified",
+        generatedAtUtc,
+        angular: {
+          kind: "route",
+          selector: null,
+          template: null,
+          styles: [],
+          providedIn: null,
+          routePath,
+          guardInvocation,
+          targetSymbolId,
+          lazyImportPath
+        },
+        api: null
+      }));
+    });
+  });
+}
+
+function collectApiCalls(sourceFile, info, checker, symbolIds, records, generatedAtUtc) {
+  visit(sourceFile, node => {
+    if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
+      return;
+    }
+
+    const methodName = node.expression.name.text;
+    const supportedMethods = new Set(["get", "post", "put", "patch", "delete", "head", "options", "request"]);
+    if (!supportedMethods.has(methodName) || !isAngularHttpClient(node.expression.expression, checker)) {
+      return;
+    }
+
+    let httpMethod = methodName.toUpperCase();
+    let urlArgument = node.arguments[0];
+    if (methodName === "request") {
+      const requestedMethod = node.arguments[0];
+      urlArgument = node.arguments[1];
+      httpMethod = requestedMethod && (ts.isStringLiteral(requestedMethod) || ts.isNoSubstitutionTemplateLiteral(requestedMethod))
+        ? requestedMethod.text.toUpperCase()
+        : "UNKNOWN";
+    }
+    if (!urlArgument) {
+      return;
+    }
+    if (!["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "UNKNOWN"].includes(httpMethod)) {
+      httpMethod = "UNKNOWN";
+    }
+
+    const urlKind = ts.isStringLiteral(urlArgument) || ts.isNoSubstitutionTemplateLiteral(urlArgument)
+      ? "literal"
+      : ts.isTemplateExpression(urlArgument) ? "interpolated" : "dynamic";
+    const literalPath = urlKind === "literal" && urlArgument.text.length > 0 ? urlArgument.text : null;
+    const containing = findContainingSymbolInfo(node, sourceFile, checker, symbolIds);
+    const start = node.getStart(sourceFile);
+    const end = node.getEnd();
+    const expression = urlArgument.getText(sourceFile);
+
+    records.push(createRecord(info, {
+      kind: "api",
+      symbolKind: "apiClient",
+      symbolId: `api:${info.owner.repositoryId}:${info.relativePath}:${start}`,
+      name: containing?.name ?? httpMethod,
+      qualifiedName: containing?.qualifiedName ?? null,
+      language: extensionLanguage(sourceFile.fileName),
+      startLine: sourceFile.getLineAndCharacterOfPosition(start).line + 1,
+      endLine: sourceFile.getLineAndCharacterOfPosition(end).line + 1,
+      startOffset: start,
+      endOffset: end,
+      relation: "callsApi",
+      sourceSymbolId: containing?.symbolId ?? info.symbolId,
+      targetSymbolId: null,
+      evidence: "verified",
+      generatedAtUtc,
+      angular: null,
+      api: {
+        httpMethod,
+        urlKind,
+        expression,
+        literalPath,
+        containingSymbolId: containing?.symbolId ?? null
+      }
+    }));
+  });
+}
+
+function findDecorator(node, name) {
+  const decorators = ts.canHaveDecorators(node) ? ts.getDecorators(node) ?? [] : [];
+  return decorators.find(decorator => {
+    const expression = decorator.expression;
+    return ts.isCallExpression(expression)
+      && ts.isIdentifier(expression.expression)
+      && expression.expression.text === name;
+  }) ?? null;
+}
+
+function getDecoratorObject(decorator) {
+  if (!decorator || !ts.isCallExpression(decorator.expression)) {
+    return null;
+  }
+  const argument = decorator.expression.arguments[0];
+  return argument && ts.isObjectLiteralExpression(argument) ? argument : null;
+}
+
+function findObjectProperty(object, name) {
+  if (!object) {
+    return null;
+  }
+  return object.properties.find(property =>
+    ts.isPropertyAssignment(property) && getPropertyName(property.name) === name) ?? null;
+}
+
+function getPropertyName(name) {
+  return ts.isIdentifier(name) || ts.isStringLiteral(name) ? name.text : null;
+}
+
+function readStringProperty(object, name) {
+  const property = findObjectProperty(object, name);
+  if (!property || !ts.isPropertyAssignment(property)) {
+    return null;
+  }
+  const initializer = property.initializer;
+  return ts.isStringLiteral(initializer) || ts.isNoSubstitutionTemplateLiteral(initializer)
+    ? initializer.text : null;
+}
+
+function readStringArrayProperty(object, name) {
+  const property = findObjectProperty(object, name);
+  if (!property || !ts.isPropertyAssignment(property) || !ts.isArrayLiteralExpression(property.initializer)) {
+    return [];
+  }
+  return property.initializer.elements
+    .filter(element => ts.isStringLiteral(element) || ts.isNoSubstitutionTemplateLiteral(element))
+    .map(element => element.text);
+}
+
+function isGuardDeclaration(node) {
+  return /\\bCan(?:Activate|ActivateChild|Deactivate|Match)Fn\\b/.test(node.getText());
+}
+
+function findDynamicImportPath(node, sourceFile) {
+  if (!node) {
+    return null;
+  }
+  let result = null;
+  visit(node, current => {
+    if (ts.isCallExpression(current) && current.expression.kind === ts.SyntaxKind.ImportKeyword
+      && current.arguments[0] && (ts.isStringLiteral(current.arguments[0])
+        || ts.isNoSubstitutionTemplateLiteral(current.arguments[0]))) {
+      result = current.arguments[0].text;
+    }
+  });
+  return result;
+}
+
+function findLazyTargetSymbolId(node, checker, symbolIds) {
+  if (!node) {
+    return null;
+  }
+  let result = null;
+  visit(node, current => {
+    if (!ts.isPropertyAccessExpression(current)) {
+      return;
+    }
+    let symbol = checker.getSymbolAtLocation(current.name);
+    if (symbol && (symbol.flags & ts.SymbolFlags.Alias) !== 0) {
+      try {
+        symbol = checker.getAliasedSymbol(symbol);
+      } catch {
+        return;
+      }
+    }
+    const symbolId = symbol ? symbolIds.get(symbol) : null;
+    if (symbolId) {
+      result = symbolId;
+    }
+  });
+  return result;
+}
+
+function isAngularHttpClient(receiver, checker) {
+  const type = checker.getTypeAtLocation(receiver);
+  const symbol = type.aliasSymbol ?? type.getSymbol();
+  if (!symbol || symbol.getName() !== "HttpClient") {
+    return false;
+  }
+  return (symbol.declarations ?? []).some(declaration =>
+    normalizePath(declaration.getSourceFile().fileName).toLowerCase().includes("/node_modules/@angular/common/http/"));
+}
+
 function findContainingSymbol(node, sourceFile, checker, symbolIds) {
+  return findContainingSymbolInfo(node, sourceFile, checker, symbolIds)?.symbolId ?? null;
+}
+
+function findContainingSymbolInfo(node, sourceFile, checker, symbolIds) {
   let current = node.parent;
   while (current && current !== sourceFile) {
     if (isSupportedDeclaration(current) && current.name) {
       const symbol = checker.getSymbolAtLocation(current.name);
       if (symbol) {
-        const id = symbolIds.get(symbol);
-        if (id) {
-          return id;
+        const symbolId = symbolIds.get(symbol);
+        if (symbolId) {
+          return {
+            symbolId,
+            symbolKind: classifyDeclaration(current),
+            name: current.name.getText(sourceFile),
+            qualifiedName: getQualifiedName(current)
+          };
         }
       }
     }

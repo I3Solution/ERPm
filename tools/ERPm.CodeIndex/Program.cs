@@ -9,6 +9,7 @@ ERPm Code Index
 Commands:
   workspace status
   index repo erpm-be
+  index repo erpm-fe
   find symbol <name-or-pattern>
 """;
 
@@ -51,9 +52,15 @@ catch (Exception exception)
 
 static async Task IndexRepositoryAsync(string repositoryId, WorkspaceManifest manifest)
 {
+    if (string.Equals(repositoryId, "erpm-fe", StringComparison.OrdinalIgnoreCase))
+    {
+        await FrontendWorkerRunner.IndexAsync(manifest);
+        return;
+    }
+
     if (!string.Equals(repositoryId, "erpm-be", StringComparison.OrdinalIgnoreCase))
     {
-        throw new ArgumentException("The initial vertical slice supports only 'erpm-be'.");
+        throw new ArgumentException("Supported repositories are 'erpm-be' and 'erpm-fe'.");
     }
 
     var revision = manifest.Repositories.SingleOrDefault(item => item.RepositoryId == "erpm-be")

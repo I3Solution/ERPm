@@ -44,6 +44,9 @@ export function indexWorkspace(manifest, options = {}) {
     options: parsed.options
   });
   const checker = program.getTypeChecker();
+  const programFilesByAbsolutePath = new Map(
+    program.getSourceFiles().map(sourceFile => [path.resolve(sourceFile.fileName), sourceFile])
+  );
   const sourceFiles = program.getSourceFiles()
     .filter(sourceFile => isIndexableSource(sourceFile.fileName, fePath, sourceFile.text))
     .sort((left, right) => left.fileName.localeCompare(right.fileName));
@@ -73,7 +76,7 @@ export function indexWorkspace(manifest, options = {}) {
   }
 
   const symbolIds = new Map();
-  const declarations = [];
+  const declarationsBySourceFile = new Map();
   for (const sourceFile of sourceFiles) {
     const info = fileInfo.get(sourceFile);
     if (!info) {
@@ -97,7 +100,10 @@ export function indexWorkspace(manifest, options = {}) {
       if (!symbolIds.has(symbol)) {
         symbolIds.set(symbol, symbolId);
       }
-      declarations.push({ sourceFile, node, info, symbol, symbolKind, symbolId, name });
+      if (!declarationsBySourceFile.has(sourceFile)) {
+        declarationsBySourceFile.set(sourceFile, []);
+      }
+      declarationsBySourceFile.get(sourceFile).push({ sourceFile, node, info, symbol, symbolKind, symbolId, name });
     });
   }
 
@@ -131,10 +137,7 @@ export function indexWorkspace(manifest, options = {}) {
       api: null
     }));
 
-    for (const declaration of declarations) {
-      if (declaration.sourceFile !== sourceFile) {
-        continue;
-      }
+    for (const declaration of declarationsBySourceFile.get(sourceFile) ?? []) {
 
       const start = declaration.node.getStart(sourceFile);
       const end = declaration.node.getEnd();
@@ -160,7 +163,7 @@ export function indexWorkspace(manifest, options = {}) {
       }));
     }
 
-    collectImports(sourceFile, info, program, parsed.options, fileInfo, records, generatedAtUtc);
+    collectImports(sourceFile, info, parsed.options, fileInfo, programFilesByAbsolutePath, records, generatedAtUtc);
     collectReferences(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
   }
 
@@ -184,7 +187,7 @@ export function indexWorkspace(manifest, options = {}) {
   };
 }
 
-function collectImports(sourceFile, info, program, compilerOptions, fileInfo, records, generatedAtUtc) {
+function collectImports(sourceFile, info, compilerOptions, fileInfo, programFilesByAbsolutePath, records, generatedAtUtc) {
   const host = ts.sys;
   visit(sourceFile, node => {
     if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) {
@@ -196,7 +199,7 @@ function collectImports(sourceFile, info, program, compilerOptions, fileInfo, re
     let targetSymbolId = null;
     if (resolved) {
       const resolvedPath = path.resolve(resolved.resolvedFileName);
-      const target = program.getSourceFiles().find(item => path.resolve(item.fileName) === resolvedPath);
+      const target = programFilesByAbsolutePath.get(resolvedPath);
       if (target) {
         const targetInfo = fileInfo.get(target);
         if (targetInfo) {

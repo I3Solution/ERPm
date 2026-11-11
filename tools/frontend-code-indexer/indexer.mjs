@@ -44,7 +44,7 @@ export function indexWorkspace(manifest, options = {}) {
     options: parsed.options
   });
   const checker = program.getTypeChecker();
-  const httpClientImports = collectAngularHttpClientSymbols(sourceFilesForProgram(program), checker);
+  const httpClientImports = collectAngularHttpClientSymbols(program.getSourceFiles(), checker);
   const httpClientSymbols = httpClientImports.symbols;
   const programFilesByAbsolutePath = new Map(
     program.getSourceFiles().map(sourceFile => [path.resolve(sourceFile.fileName), sourceFile])
@@ -116,8 +116,7 @@ export function indexWorkspace(manifest, options = {}) {
   const apiDetection = {
     importedHttpClientSymbols: httpClientSymbols.size,
     candidateCalls: 0,
-    matchedCalls: 0,
-    receiverTypes: {}
+    matchedCalls: 0
   };
 
   for (const sourceFile of sourceFiles) {
@@ -485,10 +484,6 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols
     apiDetection.candidateCalls++;
     const receiverType = checker.getTypeAtLocation(node.expression.expression);
     const receiverSymbol = receiverType.aliasSymbol ?? receiverType.getSymbol();
-    const receiverName = receiverSymbol
-      ? checker.getFullyQualifiedName(receiverSymbol)
-      : checker.typeToString(receiverType);
-    apiDetection.receiverTypes[receiverName] = (apiDetection.receiverTypes[receiverName] ?? 0) + 1;
     if (!isAngularHttpClient(receiverType, httpClientSymbols, httpClientImportFiles, sourceFile, checker)) {
       return;
     }
@@ -645,10 +640,6 @@ function findLazyTargetSymbolId(node, checker, symbolIds) {
   return result;
 }
 
-
-function sourceFilesForProgram(program) {
-  return program.getSourceFiles();
-}
 
 function collectAngularHttpClientSymbols(sourceFiles, checker) {
   const symbols = new Set();

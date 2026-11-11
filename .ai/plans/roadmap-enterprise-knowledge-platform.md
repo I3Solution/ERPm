@@ -228,15 +228,16 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 - [x] Implement a deterministic generator that reads eligible task records and rebuilds `.ai/status.md` from scratch.
 - [x] Add parser/unit tests for valid, malformed, legacy, multi-feature and repeated-update task records; CI verified successfully in [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834).
 - [x] Add a GitHub Actions workflow triggered when a PR is merged into `master` (bootstrap run still pending after merge).
-- [x] Serialize aggregation runs, always read latest `master`, and safely retry if `master` advances before the generated commit is pushed.
-- [x] Grant only the aggregation job `contents: write`; branch-protection compatibility still requires verification.
+- [x] Respect mandatory PR-only changes to `master`: publish the generated report through a dedicated automation branch and a bot PR; never push directly to `master`.
+- [x] Serialize aggregation runs, always read latest `master`, and use a force-with-lease update only on the workflow-owned automation branch.
+- [x] Grant only the aggregation job `contents: write` and `pull-requests: write`; generated status PRs remain subject to normal review/check rules.
 - [ ] Verify multiple sequential PRs updating the same task, concurrent merges, unchanged output, malformed records and recovery.
 
 **Operating contract:**
 
 1. Task Markdown files are the only manually maintained progress source.
 2. `.ai/status.md` is generated output. Agents and Developers are prohibited from manually creating, editing, deleting, formatting, committing or pushing it.
-3. After each merged PR into `master`, GitHub Actions reads all eligible task records from the latest `master` and regenerates the complete report. It never applies PR-only incremental updates.
+3. After each merged PR into `master`, GitHub Actions reads all eligible task records from the latest `master`, regenerates the complete report and opens/updates one dedicated bot PR. It never applies PR-only incremental updates. The report becomes the current merged snapshot after that status PR passes normal review/check requirements and merges.
 4. The report is a projection; it does not modify task records and does not independently certify the truth of their claims.
 5. Historical records without the new aggregation marker are excluded and left unchanged.
 

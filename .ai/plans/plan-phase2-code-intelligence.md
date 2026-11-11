@@ -519,3 +519,10 @@ Discovery confidence is high for the reported workspace manifest, toolchain, con
 ### Frontend schema v3 baseline — 2026-11-11
 
 The Step 2.3 branch now contains the strict Draft 2020-12 schema at `.ai/code-index/schema/index-record-v3.schema.json`, a separate typed .NET frontend model and schema validation fixtures. v3 uses language-neutral symbol categories, explicit source offsets, typed Angular/API payloads, strict enums and per-record repository/SHA provenance. API URL classifications prevent an interpolated or dynamic expression from being mislabeled as a fully literal path. Backend v1/v2 contracts and serialization remain unchanged.
+
+
+### TypeScript frontend worker implementation — 2026-11-11
+
+The feature branch now includes the isolated TypeScript 5.8.3 worker, Node fixture tests, and .NET CLI orchestration for `index repo erpm-fe`. The worker consumes the already validated recursive workspace manifest, builds the FE application Program from `tsconfig.app.json` / `src/main.ts`, attributes source files by longest matching repository path, and writes schema v3 caches per repository/SHA. The initial extractor emits file, definition, import and compiler-resolved reference/call observations. Angular/API metadata extraction remains the next step.
+
+The code-index CI job was extended to install the worker's independent npm lockfile and execute Node tests. The first fixture run exposed an incorrect test assumption about nested module-relative paths; the assertion was corrected to expect the source path relative to the module repository root. Final verification is pending on the latest branch head; no local real-workspace indexing result is claimed yet.

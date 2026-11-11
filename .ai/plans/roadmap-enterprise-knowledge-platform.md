@@ -230,3 +230,13 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 
 **Operating rule:** to understand progress, inspect the relevant task record under `.ai/tasks/`. The shared `.ai/status.md` file is a legacy snapshot and must not be updated.
 
+## 7. Decisions deliberately deferred
+
+- Final database/search/vector technology and hosting topology.
+- Dedicated graph database.
+- Embedding provider/model and re-embedding cadence.
+- Microservice boundaries and deployment count.
+- Full EF metadata extraction and broad cross-layer graph implementation.
+- Write-capable MCP tools and autonomous agent execution.
+
+These decisions require contract clarity and measurable requirements first.

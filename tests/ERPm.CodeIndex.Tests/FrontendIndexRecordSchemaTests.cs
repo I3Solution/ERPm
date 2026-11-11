@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Json.Schema;
+using ERPm.CodeIndex.Indexing;
 using Xunit;
 
 namespace ERPm.CodeIndex.Tests;
@@ -67,6 +68,33 @@ public sealed class FrontendIndexRecordSchemaTests
             "unexpectedMetadata":{}
             """).Replace(new string('a',40),"not-a-commit-sha");
         AssertInvalid(record);
+    }
+
+
+    [Fact]
+    public void Runtime_validator_accepts_a_valid_frontend_record()
+    {
+        var record = CreateRecord("""
+            "kind":"definition","symbolKind":"class","angular":null,"api":null
+            """);
+        using var document = JsonDocument.Parse(record);
+
+        FrontendIndexRecordValidator.Validate(document.RootElement, Schema, 3);
+    }
+
+    [Fact]
+    public void Runtime_validator_rejects_a_record_that_violates_schema_v3()
+    {
+        var record = CreateRecord("""
+            "kind":"definition","symbolKind":"class","angular":null,"api":null,
+            "unexpectedMetadata":{}
+            """);
+        using var document = JsonDocument.Parse(record);
+
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            FrontendIndexRecordValidator.Validate(document.RootElement, Schema, 7));
+
+        Assert.Contains("stdout line 7", exception.Message);
     }
 
     private static string CreateRecord(string specificProperties) => $$"""

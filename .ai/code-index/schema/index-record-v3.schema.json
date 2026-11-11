@@ -1,0 +1,50 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://github.com/I3Solution/ERPm/blob/master/.ai/code-index/schema/index-record-v3.schema.json",
+  "title":"ERPm Frontend Code Index Record",
+  "description":"Language-neutral frontend observation contract. Backend schema v1 and v2 remain separate and unchanged.",
+  "type":"object","additionalProperties":false,
+  "required":["schemaVersion","indexerVersion","repositoryId","commitSha","path","kind","symbolKind","symbolId","name","qualifiedName","language","startLine","endLine","startOffset","endOffset","relation","sourceSymbolId","targetSymbolId","evidence","generatedAtUtc","angular","api"],
+  "properties":{
+    "schemaVersion":{"const":3},
+    "indexerVersion":{"type":"string","minLength":1},
+    "repositoryId":{"type":"string","minLength":1},
+    "commitSha":{"type":"string","pattern":"^[0-9a-f]{40}$"},
+    "path":{"type":"string","minLength":1,"pattern":"^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+    "kind":{"type":"string","enum":["file","module","definition","reference","relationship","angular","api"]},
+    "symbolKind":{"type":"string","enum":["file","module","namespace","class","interface","enum","function","method","constructor","property","field","parameter","variable","typeParameter","component","service","guard","route","apiClient","unknown"]},
+    "symbolId":{"type":"string","minLength":1},
+    "name":{"type":"string","minLength":1},
+    "qualifiedName":{"type":["string","null"]},
+    "language":{"type":"string","enum":["typescript","html","scss","javascript"]},
+    "startLine":{"type":["integer","null"],"minimum":1},
+    "endLine":{"type":["integer","null"],"minimum":1},
+    "startOffset":{"type":["integer","null"],"minimum":0},
+    "endOffset":{"type":["integer","null"],"minimum":0},
+    "relation":{"type":["string","null"],"enum":["defines","imports","references","calls","injects","declaresRoute","loadsComponent","callsApi","contains",null]},
+    "sourceSymbolId":{"type":["string","null"]},
+    "targetSymbolId":{"type":["string","null"]},
+    "evidence":{"type":"string","enum":["verified","partial","unknown"]},
+    "generatedAtUtc":{"type":"string","format":"date-time"},
+    "angular":{"oneOf":[{"type":"null"},{"type":"object","additionalProperties":false,"required":["kind","selector","template","styles","providedIn","routePath","guardInvocation","targetSymbolId","lazyImportPath"],"properties":{
+      "kind":{"type":"string","enum":["component","service","guard","route"]},
+      "selector":{"type":["string","null"]},"template":{"type":["string","null"]},
+      "styles":{"type":"array","items":{"type":"string"}},
+      "providedIn":{"type":["string","null"]},"routePath":{"type":["string","null"]},
+      "guardInvocation":{"type":["string","null"]},"targetSymbolId":{"type":["string","null"]},
+      "lazyImportPath":{"type":["string","null"]}
+    }}]},
+    "api":{"oneOf":[{"type":"null"},{"type":"object","additionalProperties":false,"required":["httpMethod","urlKind","expression","literalPath","containingSymbolId"],"properties":{
+      "httpMethod":{"type":"string","enum":["GET","POST","PUT","PATCH","DELETE","OPTIONS","HEAD","UNKNOWN"]},
+      "urlKind":{"type":"string","enum":["literal","interpolated","dynamic"]},
+      "expression":{"type":"string","minLength":1},
+      "literalPath":{"type":["string","null"]},
+      "containingSymbolId":{"type":["string","null"]}
+    },"allOf":[{"if":{"properties":{"urlKind":{"const":"literal"}},"required":["urlKind"]},"then":{"properties":{"literalPath":{"type":"string","minLength":1}}},"else":{"properties":{"literalPath":{"type":"null"}}}}]}]}
+  },
+  "allOf":[
+    {"if":{"properties":{"kind":{"const":"angular"}},"required":["kind"]},"then":{"properties":{"angular":{"type":"object"},"api":{"type":"null"}}}},
+    {"if":{"properties":{"kind":{"const":"api"}},"required":["kind"]},"then":{"properties":{"api":{"type":"object"},"angular":{"type":"null"}}}},
+    {"if":{"properties":{"kind":{"enum":["file","module","definition","reference","relationship"]}},"required":["kind"]},"then":{"properties":{"angular":{"type":"null"},"api":{"type":"null"}}}}
+  ]
+}

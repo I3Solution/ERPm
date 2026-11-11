@@ -75,4 +75,4 @@ jobs:
       - name: Index pinned frontend application Program
         run: dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-fe
       - name: Query indexed frontend symbol
-        run: dotnet run --project tools/ERPm.CodeIndex -- find symbol PartnerService | grep -m 1 '"name":"PartnerService"'
+        run: dotnet run --project tools/ERPm.CodeIndex -- find symbol PartnerService | grep -m 1 '"kind":"definition".*"name":"PartnerService"'

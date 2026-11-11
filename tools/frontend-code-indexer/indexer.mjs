@@ -410,7 +410,7 @@ function collectRouteMetadata(sourceFile, info, checker, symbolIds, records, gen
       const loadProperty = findObjectProperty(routeNode, "loadComponent")
         ?? findObjectProperty(routeNode, "loadChildren");
       const lazyImportPath = loadProperty
-        ? findDynamicImportPath(loadProperty.initializer, sourceFile)
+        ? findDynamicImportPath(loadProperty.initializer)
         : null;
       const targetSymbolId = loadProperty
         ? findLazyTargetSymbolId(loadProperty.initializer, checker, symbolIds)
@@ -573,10 +573,10 @@ function readStringArrayProperty(object, name) {
 }
 
 function isGuardDeclaration(node) {
-  return /\\bCan(?:Activate|ActivateChild|Deactivate|Match)Fn\\b/.test(node.getText());
+  return /\bCan(?:Activate|ActivateChild|Deactivate|Match)Fn\b/.test(node.getText());
 }
 
-function findDynamicImportPath(node, sourceFile) {
+function findDynamicImportPath(node) {
   if (!node) {
     return null;
   }

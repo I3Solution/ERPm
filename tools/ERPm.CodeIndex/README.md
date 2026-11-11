@@ -18,7 +18,7 @@ Run from any directory inside the ERPm workspace:
     dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-fe
     dotnet run --project tools/ERPm.CodeIndex -- find symbol ApplicationDbContext
 
-The first vertical slice supports backend C# definitions and compiler-resolved references. The indexer loads the pinned ERPm-BE/ERPm.sln through MSBuildWorkspace. It refuses to index the backend if the checked-out commit differs from the root gitlink SHA.
+The backend vertical slice supports C# definitions and compiler-resolved references. The frontend worker uses TypeScript Compiler API 5.8.3 with the pinned ERPm-FE `tsconfig.app.json` and `src/main.ts` entry. The .NET CLI validates the recursive workspace manifest and SHA pins, then passes that manifest to the Node worker over stdin. The worker does not run Git or resolve moving branch heads.\n\nThe frontend worker indexes TypeScript/JavaScript files reachable in the application Program, attributes each file to the longest matching repository path in the manifest, and writes separate caches for each owning repository. Nested module files therefore retain their own repository ID and commit SHA. Unreferenced files outside the compiler Program are not claimed as indexed.
 
 ## Index format and provenance
 

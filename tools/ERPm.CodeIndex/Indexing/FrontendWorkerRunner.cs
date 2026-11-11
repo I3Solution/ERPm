@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using Json.Schema;
 using ERPm.CodeIndex.Models;
 using ERPm.CodeIndex.Workspace;
 
@@ -8,6 +9,7 @@ namespace ERPm.CodeIndex.Indexing;
 public static class FrontendWorkerRunner
 {
     public const string IndexerVersion = "0.1.0";
+    private const string RequiredTypeScriptVersion = "5.8.3";
 
     public static async Task IndexAsync(WorkspaceManifest manifest)
     {
@@ -19,6 +21,7 @@ public static class FrontendWorkerRunner
         var workerDirectory = Path.Combine(manifest.RootPath, "tools", "frontend-code-indexer");
         var workerPath = Path.Combine(workerDirectory, "index.mjs");
         var typescriptPackagePath = Path.Combine(workerDirectory, "node_modules", "typescript", "package.json");
+        var schemaPath = Path.Combine(manifest.RootPath, ".ai", "code-index", "schema", "index-record-v3.schema.json");
         if (!File.Exists(workerPath))
         {
             throw new FileNotFoundException("Frontend indexer worker was not found.", workerPath);
@@ -30,6 +33,24 @@ public static class FrontendWorkerRunner
                 "Frontend indexer dependencies are missing. Run 'npm ci --prefix tools/frontend-code-indexer' from the ERPm root.");
         }
 
+        using (var typescriptPackage = JsonDocument.Parse(await File.ReadAllTextAsync(typescriptPackagePath)))
+        {
+            var installedVersion = typescriptPackage.RootElement.TryGetProperty("version", out var versionElement)
+                ? versionElement.GetString()
+                : null;
+            if (!string.Equals(installedVersion, RequiredTypeScriptVersion, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException(
+                    $"Frontend indexer requires TypeScript {RequiredTypeScriptVersion}, but found '{installedVersion ?? "unknown"}'. Run 'npm ci --prefix tools/frontend-code-indexer' from the ERPm root.");
+            }
+        }
+
+        if (!File.Exists(schemaPath))
+        {
+            throw new FileNotFoundException("Frontend index record schema v3 was not found.", schemaPath);
+        }
+
+        var schema = JsonSchema.FromText(await File.ReadAllTextAsync(schemaPath));
         var startInfo = new ProcessStartInfo
         {
             FileName = "node",
@@ -74,10 +95,20 @@ public static class FrontendWorkerRunner
 
         var revisions = manifest.Repositories.ToDictionary(item => item.RepositoryId, StringComparer.Ordinal);
         var recordsByRepository = new Dictionary<string, List<FrontendIndexRecord>>(StringComparer.Ordinal);
-        foreach (var line in standardOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        var lineNumber = 0;
+        foreach (var rawLine in standardOutput.Split('\n'))
         {
-            var record = JsonSerializer.Deserialize<FrontendIndexRecord>(line.TrimEnd('\r'), JsonOptions())
-                ?? throw new InvalidOperationException("Frontend worker emitted an empty JSON record.");
+            lineNumber++;
+            var line = rawLine.TrimEnd('\r');
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            using var document = JsonDocument.Parse(line);
+            FrontendIndexRecordValidator.Validate(document.RootElement, schema, lineNumber);
+            var record = JsonSerializer.Deserialize<FrontendIndexRecord>(document.RootElement, JsonOptions())
+                ?? throw new InvalidOperationException($"Frontend worker emitted an empty JSON record at stdout line {lineNumber}.");
 
             if (record.SchemaVersion != 3 || record.IndexerVersion != IndexerVersion)
             {

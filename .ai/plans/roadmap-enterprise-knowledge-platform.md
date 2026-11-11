@@ -229,6 +229,7 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 - Do not introduce a parallel TASK-ID registry or replace Markdown records with YAML/JSON.
 
 ### Deliverables
+- [x] Implement a read-only Python task-record validator with legacy-compatible and strict modes; add unit tests and a CI job for the existing task corpus.
 
 - [x] Update `AGENTS.md` with mandatory task-record lifecycle and ownership rules.
 - [x] Document the progress workflow in `.ai/tasks/README.md`.

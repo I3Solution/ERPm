@@ -1,6 +1,6 @@
 # Task Progress Aggregation — Design
 
-> **Status:** Generator, unit tests and CI test job implemented and CI-verified on the feature branch; post-merge workflow implemented but not yet exercised on `master`.
+> **Status:** Generator, unit tests and CI test job implemented and CI-verified on the feature branch; PR-based publication workflow implemented but not yet exercised on `master`.
 > **Scope:** ERPm umbrella repository only. This is repository governance/CI automation, not part of the Enterprise Knowledge Platform runtime.
 
 ## 1. Goals
@@ -9,6 +9,7 @@
 - Provide one project-level `.ai/status.md` that updates automatically after every PR merge into `master`.
 - Support one task progressing through multiple features and multiple PRs, including repeated updates on the same feature branch.
 - Avoid manual shared-file edits, lost updates, duplicate counting and dependency on a Developer's local machine.
+- Respect the repository rule that all changes to `master` must arrive through a PR.
 
 ## 2. Source of truth and generated output
 
@@ -100,18 +101,20 @@ This is snapshot replacement, not event accumulation. Repeated workflow executio
 Implemented in `.github/workflows/aggregate-task-status.yml`.
 
 - Trigger: `pull_request_target` targeting `master`, event type `closed`, gated by `github.event.pull_request.merged == true`. Also supports `workflow_dispatch` for bootstrap/manual recovery.
-- `pull_request_target` is used so merged PRs from forks can be handled with base-repository permissions. The workflow never checks out or executes PR-head code; it checks out only trusted latest `master`.
-- Workflow-level permissions are read-only. Only the aggregation job receives `contents: write`.
-- Checkout explicitly fetches latest `master`, not the PR head and not an assumed event snapshot.
+- The workflow respects the repository's mandatory-PR rule. It never pushes to `master`.
+- It checks out trusted latest `master`, runs the generator, then publishes the report on the dedicated branch `automation/task-status-aggregation`.
+- The workflow opens a PR to `master`, or updates the existing open status PR when one is already present. A new merge into `master` refreshes that same PR from the latest master snapshot.
+- The dedicated automation branch is exclusively owned by this workflow. It uses a force-with-lease update against the previously observed branch SHA; it never force-pushes to `master`.
+- If the generated report already matches `master`, no new commit is created; any now-obsolete open status PR is closed.
+- The status PR follows normal branch protection, required checks and review rules. The workflow does not bypass or weaken them.
+- The workflow uses `pull_request_target` so merged PRs from forks can be handled with base-repository permissions. It never checks out or executes PR-head code; it checks out only trusted latest `master`.
+- Workflow-level permissions are read-only. Only the aggregation job receives `contents: write` and `pull-requests: write`.
+- The workflow listens to merged-PR events, not push events. The status PR is generated with `GITHUB_TOKEN`; GitHub does not trigger another workflow run from that token's PR events. This is safe because the report was already rebuilt from the latest master snapshot before the status PR was opened.
 - Concurrency uses one stable group with `cancel-in-progress: false`.
-- The generator runs in CI; Developers are not required to install or execute it locally.
-- The bot commits only when `.ai/status.md` changes.
-- The workflow listens to merged-PR events, not push events, so its own generated commit cannot recursively trigger aggregation.
-- Branch protection may reject direct bot pushes. The workflow does not weaken protection; if direct write is disallowed, the approved bot-PR strategy must be configured instead.
 
 ### Bootstrap behavior
 
-The first PR that introduces this workflow cannot trigger it because GitHub evaluates `pull_request_target` workflows from the base branch, where the workflow file does not exist yet. After this branch is merged, run the workflow once through `workflow_dispatch` to generate the initial report. Subsequent merged PRs trigger it automatically.
+The first PR that introduces this workflow cannot trigger it because GitHub evaluates `pull_request_target` workflows from the base branch, where the workflow file does not exist yet. After this branch is merged, run the workflow once through `workflow_dispatch`. It creates the initial status PR; the report becomes current only after that PR passes the repository's normal review/check requirements and merges.
 
 ### Race handling
 
@@ -119,9 +122,9 @@ Concurrency serializes workflow runs, but a human PR can still advance `master` 
 
 1. Fetches latest `master` before parsing.
 2. Generates from that exact checked-out tree.
-3. Attempts a normal non-force push.
-4. If the push is rejected, fetches latest `master`, regenerates and retries up to three times.
-5. Never force-pushes or overwrites a newer commit.
+3. Reads the current remote SHA of the dedicated automation branch.
+4. Pushes the refreshed branch with `--force-with-lease`; it never force-pushes `master`.
+5. If the automation branch changed concurrently, fetches latest `master`, regenerates and retries up to three times.
 
 GitHub concurrency may replace an older pending run with a newer pending run. This is safe because each executing run rebuilds from the latest `master`; the latest queued run covers all merged changes, rather than processing only its triggering PR.
 
@@ -129,9 +132,10 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 
 - Invalid opted-in task record: fail the workflow and leave the last valid `.ai/status.md` untouched.
 - Missing/legacy marker: exclude the record by design; do not rewrite it.
-- No report content change: succeed without a commit.
-- Push race: refetch/rebuild/retry; fail visibly after the retry limit.
-- Branch protection rejection: workflow fails visibly; no policy is bypassed.
+- No report content change: succeed without a commit; close an obsolete open status PR if present.
+- Automation-branch race: refetch/rebuild/retry; fail visibly after the retry limit.
+- PR creation/update permission failure: workflow fails visibly; no branch protection policy is bypassed.
+- Status PR blocked by required reviews/checks: report remains at the previous merged snapshot until the status PR is approved and merged.
 - Workflow failure must be visible in GitHub Actions. A later merged PR or manual dispatch can trigger a fresh full rebuild.
 
 ## 8. Implementation status
@@ -139,9 +143,9 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 1. Task template and Agent/Developer rules — implemented.
 2. Deterministic generator and parser tests — implemented.
 3. CI job for generator tests — implemented and verified successful in [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834) (4/4 jobs passed).
-4. Post-merge workflow and least-privilege token scope — implemented on feature branch; not yet exercised against protected `master`.
-5. End-to-end multi-PR, concurrent merge, idempotency and push-race tests — pending.
-6. Replace the frozen legacy `.ai/status.md` only after the workflow is merged and its first successful run completes.
+4. PR-based post-merge workflow — implemented on feature branch; not yet exercised on `master`.
+5. End-to-end multi-PR, concurrent merge, idempotency, malformed-record and automation-branch race tests — pending.
+6. After merge, run `workflow_dispatch` once to open the bootstrap status PR. Merge it under normal repository policy to replace the frozen legacy `.ai/status.md`.
 
 ## 9. Explicit non-goals
 
@@ -150,3 +154,4 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 - No PR validator or local generator requirement.
 - No automatic mutation of task status based on checklist percentage.
 - No automatic roadmap phase completion percentage without explicit task-to-phase mapping.
+- No direct write to protected `master`, no branch-protection bypass and no auto-merge of the generated status PR.

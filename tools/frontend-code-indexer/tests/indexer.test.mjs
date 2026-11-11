@@ -128,6 +128,7 @@ test("extracts Angular decorators, static routes, guards and HttpClient URL evid
     ].join("\\n"));
     await writeFile(path.join(src, "main.ts"), [
       "import './app.routes';",
+      "import './demo.component';",
       "import './demo.service';"
     ].join("\\n"));
 

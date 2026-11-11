@@ -41,7 +41,7 @@ The isolated worker lives in `tools/frontend-code-indexer` and has its own npm p
 
 The initial Program uses the FE root `tsconfig.app.json` and `src/main.ts`. It reports actual Program coverage and does not claim that unreferenced TypeScript files are indexed. Source ownership is resolved by the longest matching repository path in the runtime manifest.
 
-The worker excludes declaration files, generated suffixes/headers and common vendor/build output directories such as `node_modules`, `dist`, `.angular`, `coverage` and `out-tsc`.
+The worker extracts Angular decorators, static route arrays and HttpClient calls only where static/compiler evidence is available. It excludes declaration files, generated suffixes/headers and common vendor/build output directories such as `node_modules`, `dist`, `.angular`, `coverage` and `out-tsc`.
 
 ## Symbol search
 
@@ -71,7 +71,7 @@ dotnet test tests/ERPm.CodeIndex.Tests/ERPm.CodeIndex.Tests.csproj
 
 ## Current limitations
 
-- Angular component/service/guard/route metadata and API client HTTP metadata are not yet emitted by the frontend worker.
+- Advanced Angular template binding/DI graph resolution and dynamic route construction are not emitted by the frontend worker.
 - The frontend index covers only files reachable from the configured application Program; independent module files not imported by that Program are not included.
 - Backend Roslyn workspace diagnostics may indicate partial project loading; dynamic/reflection calls are not represented.
 - The index is a retrieval aid, not a complete runtime call graph or a substitute for source inspection.

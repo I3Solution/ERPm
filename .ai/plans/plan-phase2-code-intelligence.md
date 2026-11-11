@@ -523,6 +523,13 @@ The Step 2.3 branch now contains the strict Draft 2020-12 schema at `.ai/code-in
 
 ### TypeScript frontend worker implementation — 2026-11-11
 
-The feature branch now includes the isolated TypeScript 5.8.3 worker, Node fixture tests, and .NET CLI orchestration for `index repo erpm-fe`. The worker consumes the already validated recursive workspace manifest, builds the FE application Program from `tsconfig.app.json` / `src/main.ts`, attributes source files by longest matching repository path, and writes schema v3 caches per repository/SHA. The initial extractor emits file, definition, import and compiler-resolved reference/call observations. Angular/API metadata extraction remains the next step.
+The feature branch now includes the isolated TypeScript 5.8.3 worker, Node fixture tests, and .NET CLI orchestration for `index repo erpm-fe`. The worker consumes the already validated recursive workspace manifest, builds the FE application Program from `tsconfig.app.json` / `src/main.ts`, attributes source files by longest matching repository path, and writes schema v3 caches per repository/SHA. The extractor emits file, definition, import and compiler-resolved reference/call observations, plus Angular component/service/guard/route metadata and typed HttpClient API observations. CI has indexed the pinned FE application Program and queried a real CRM symbol.
 
 The code-index CI job was extended to install the worker's independent npm lockfile and execute Node tests. The first fixture run exposed an incorrect test assumption about nested module-relative paths; the assertion was corrected to expect the source path relative to the module repository root. Final verification is pending on the latest branch head; no local real-workspace indexing result is claimed yet.
+
+
+### Frontend indexing and Angular/API smoke acceptance — 2026-11-11
+
+The pinned FE CI smoke run used TypeScript 5.8.3 and indexed 102 source files from a 161-file Program. It wrote 12,846 schema v3 records, attributed to the FE root plus CRM, dashboard, HRM, SD and WMS nested repositories using each exact gitlink SHA. ACC, MFG, PM, PUR and SCM did not appear in the current Program's reachable source set and were not stamped with guessed records.
+
+The code-index CI job passed worker fixtures, .NET build/tests, manifest validation, actual FE indexing and a definition-first `PartnerService` query from CRM at `services/partner.service.ts` (lines 72–177). Local Windows smoke verification and mixed-SHA rejection remain part of Step 2.3.4 before closing the phase.

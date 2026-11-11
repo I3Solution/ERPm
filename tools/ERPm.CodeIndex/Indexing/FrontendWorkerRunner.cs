@@ -11,8 +11,10 @@ public static class FrontendWorkerRunner
 
     public static async Task IndexAsync(WorkspaceManifest manifest)
     {
-        var frontend = manifest.Repositories.SingleOrDefault(item => item.RepositoryId == "erpm-fe")
-            ?? throw new InvalidOperationException("ERPm-FE was not found in the recursive submodule manifest.");
+        if (!manifest.Repositories.Any(item => item.RepositoryId == "erpm-fe"))
+        {
+            throw new InvalidOperationException("ERPm-FE was not found in the recursive submodule manifest.");
+        }
 
         var workerDirectory = Path.Combine(manifest.RootPath, "tools", "frontend-code-indexer");
         var workerPath = Path.Combine(workerDirectory, "index.mjs");

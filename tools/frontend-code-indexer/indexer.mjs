@@ -523,7 +523,10 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, records, generate
 }
 
 function findDecorator(node, name) {
-  const decorators = ts.getDecorators(node) ?? (node.modifiers ?? []).filter(ts.isDecorator);
+  const decorators = [
+    ...(ts.getDecorators(node) ?? []),
+    ...(node.modifiers ?? []).filter(modifier => ts.isDecorator(modifier))
+  ];
   return decorators.find(decorator => {
     const expression = decorator.expression;
     return ts.isCallExpression(expression)

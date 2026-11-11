@@ -1,6 +1,6 @@
 # Phase 2 — Code Intelligence & Dependency Indexing
 
-> **Status:** Step 2.2 backend quality accepted; Step 2.3 frontend vertical slice next  
+> **Status:** Step 2.2 backend quality accepted; Step 2.3 frontend implementation and verification complete on feature branch; final review/PR pending  
 > **Created:** 2026-11-10  
 > **Owner:** ERPm Context Engineering  
 > **Target repository:** `I3Solution/ERPm` (umbrella), with read-only indexing of pinned child repositories  
@@ -236,13 +236,13 @@ The CLI must support machine-readable JSON output for agent consumption and conc
 ### Step 2.3 — Frontend TypeScript/Angular vertical slice
 
 - [x] Complete pinned FE tooling, compiler configuration, CI/runtime and nested repository-boundary discovery.
-- [ ] Introduce schema v3 and a typed frontend record model; preserve backend schema v2 unchanged.
-- [ ] Add an isolated Node worker pinned to TypeScript 5.8.3 with its own package manifest and lockfile.
-- [ ] Use FE root `tsconfig.app.json` and `src/main.ts` as the initial compiler Program entry; report actual Program coverage rather than claiming every repository TypeScript file is included.
-- [ ] Attribute every source file to the longest matching repository root from the validated recursive manifest, using that repository's exact SHA.
-- [ ] Index TypeScript definitions, imports and compiler-resolved references.
-- [ ] Add isolated Angular component/service/guard/route and API HTTP observations with explicit evidence and URL classification.
-- [ ] Add fixture tests, mixed-revision/attribution tests and one real FE module smoke test.
+- [x] Introduce schema v3 and a typed frontend record model; preserve backend schema v2 unchanged.
+- [x] Add an isolated Node worker pinned to TypeScript 5.8.3 with its own package manifest and lockfile.
+- [x] Use FE root `tsconfig.app.json` and `src/main.ts` as the initial compiler Program entry; report actual Program coverage rather than claiming every repository TypeScript file is included.
+- [x] Attribute every source file to the longest matching repository root from the validated recursive manifest, using that repository's exact SHA.
+- [x] Index TypeScript definitions, imports and compiler-resolved references.
+- [x] Add isolated Angular component/service/guard/route and API HTTP observations with explicit evidence and URL classification.
+- [x] Add fixture tests, repository/SHA provenance checks and real FE Program smoke tests in CI and the local Windows workspace.
 
 **Exit:** a developer can query a real Angular symbol/import/API client and receive exact source evidence, repository identity, pinned SHA and schema-v3 provenance.
 

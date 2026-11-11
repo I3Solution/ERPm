@@ -104,6 +104,11 @@ class GenerateStatusTests(unittest.TestCase):
         with self.assertRaisesRegex(TaskRecordError, "unsupported status"):
             load_tasks(self.tasks)
 
+    def test_done_task_with_incomplete_features_is_rejected(self) -> None:
+        self.write_task("incomplete-done.md", task_text(status="Done", features=(True, False)))
+        with self.assertRaisesRegex(TaskRecordError, "Done task has incomplete feature checklist"):
+            load_tasks(self.tasks)
+
     def test_task_without_features_is_not_reported_as_zero_percent(self) -> None:
         self.write_task("no-features.md", task_text(features=()))
         record = load_tasks(self.tasks)[0]

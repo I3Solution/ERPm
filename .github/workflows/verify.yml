@@ -59,6 +59,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install frontend indexer dependencies
+        run: npm ci --prefix tools/frontend-code-indexer
+      - name: Test frontend indexer worker
+        run: npm test --prefix tools/frontend-code-indexer
       - name: Build code index CLI
         run: dotnet build tools/ERPm.CodeIndex/ERPm.CodeIndex.csproj
       - name: Run code index unit tests

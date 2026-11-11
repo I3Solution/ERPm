@@ -109,7 +109,8 @@ Implemented in `.github/workflows/aggregate-task-status.yml`.
 - The status PR follows normal branch protection, required checks and review rules. The workflow does not bypass or weaken them.
 - The workflow uses `pull_request_target` so merged PRs from forks can be handled with base-repository permissions. It never checks out or executes PR-head code; it checks out only trusted latest `master`.
 - Workflow-level permissions are read-only. Only the aggregation job receives `contents: write` and `pull-requests: write`.
-- The workflow listens to merged-PR events, not push events. The status PR is generated with `GITHUB_TOKEN`; GitHub does not trigger another workflow run from that token's PR events. This is safe because the report was already rebuilt from the latest master snapshot before the status PR was opened.
+- The workflow listens to merged-PR events, not push events. It uses the optional repository secret `STATUS_AGGREGATION_TOKEN` for checkout, branch push and PR operations when configured; otherwise it falls back to `GITHUB_TOKEN`.
+- A PR created with `GITHUB_TOKEN` does not trigger the normal `pull_request` CI workflows. If repository rules require CI checks on the generated status PR, configure `STATUS_AGGREGATION_TOKEN` with an approved PAT/GitHub App token that has contents-write and pull-requests-write access. The token's PR event can then trigger the regular verification workflow. Do not weaken required checks to accommodate the bot.
 - Concurrency uses one stable group with `cancel-in-progress: false`.
 
 ### Bootstrap behavior
@@ -135,6 +136,7 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 - No report content change: succeed without a commit; close an obsolete open status PR if present.
 - Automation-branch race: refetch/rebuild/retry; fail visibly after the retry limit.
 - PR creation/update permission failure: workflow fails visibly; no branch protection policy is bypassed.
+- If `STATUS_AGGREGATION_TOKEN` is not configured, the fallback `GITHUB_TOKEN` can create the PR but will not trigger normal PR CI workflows. If those checks are required, the status PR remains blocked until an approved token is configured; do not bypass the checks.
 - Status PR blocked by required reviews/checks: report remains at the previous merged snapshot until the status PR is approved and merged.
 - Workflow failure must be visible in GitHub Actions. A later merged PR or manual dispatch can trigger a fresh full rebuild.
 

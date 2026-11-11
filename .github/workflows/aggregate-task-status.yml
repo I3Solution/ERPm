@@ -46,8 +46,7 @@ jobs:
             git fetch origin master
             git checkout -B status-aggregation origin/master
 
-            source_sha="$(git rev-parse HEAD)"
-            python tools/progress/generate_status.py --source-sha "${source_sha}"
+            python tools/progress/generate_status.py
 
             if git diff --quiet -- .ai/status.md; then
               echo "Task status report is already up to date."
@@ -58,7 +57,7 @@ jobs:
             git commit -m "[docs] Regenerate aggregated task status"
 
             if git push origin HEAD:refs/heads/master; then
-              echo "Published task status for source ${source_sha}."
+              echo "Published the rebuilt task status report."
               exit 0
             fi
 

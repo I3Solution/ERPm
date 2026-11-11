@@ -98,3 +98,12 @@ See [the platform roadmap](plans/roadmap-enterprise-knowledge-platform.md) for p
 - Preserve the user's local `global.json` changes; do not modify or reset them.
 - Never commit generated index/cache files.
 - Index Git sources at exact revisions; never silently mix SHAs.
+
+
+## Project progress governance
+
+- Agreed direction: each developer/Agent maintains an individual Markdown task record under `.ai/tasks/`, using the existing `<type>-YYYYMMDD-*.md` naming convention and `_TEMPLATE.md`.
+- `AGENTS.md` is the shared rule entry point; meaningful tasks must create/update their own record and include it in the same PR as the work.
+- `.ai/status.md` is intended to become generated output from task records merged into root `master`; Agents must not edit it directly.
+- PR validation and post-merge status aggregation are planned work, not implemented yet. Until automation is delivered, follow the task-record rules and update the status snapshot through the existing documented workflow.
+- Design details: [Enterprise Knowledge Platform Architecture](architecture/enterprise-knowledge-platform.md), section 16; [Roadmap](plans/roadmap-enterprise-knowledge-platform.md), section 6.

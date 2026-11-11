@@ -1,6 +1,6 @@
 # Task Progress Aggregation — Design
 
-> **Status:** Design approved for implementation planning; generator and workflow are not implemented yet.
+> **Status:** Generator and unit tests implemented on the feature branch; post-merge workflow is pending.
 > **Scope:** ERPm umbrella repository only. This is repository governance/CI automation, not part of the Enterprise Knowledge Platform runtime.
 
 ## 1. Goals
@@ -56,20 +56,21 @@ Every run performs a full rebuild:
 1. Read all Markdown task files under `.ai/tasks/` from latest `master`.
 2. Ignore records without the exact `Progress aggregation: v1` marker.
 3. Parse and validate every opted-in record.
-4. Extract filename, title, owner, status, related plan/PR references, update date, feature checklist counts and verification summary.
+4. Extract filename, title, owner, status, feature checklist counts, remaining work and evidence summary.
 5. Calculate feature progress as completed checklist items / total checklist items. Keep task status independent from this percentage.
-6. Sort records deterministically (for example: Blocked, Doing, Todo, Done; then filename).
+6. Sort records deterministically: Blocked, Doing, Todo, Done; then filename.
 7. Render the complete report in memory.
 8. Compare with current `.ai/status.md`; write only if content differs.
 
-The report should include:
-- generated source commit SHA and generation time;
+The report includes:
+- source commit SHA (no wall-clock generation timestamp, so identical source input produces identical output);
 - task counts grouped by status;
 - feature completion totals for records with tracked features;
 - task table with status, feature progress, owner and record link;
 - blocked tasks and remaining work;
-- verification/evidence links where available;
-- parser/contract warnings, if any.
+- verification/evidence summaries.
+
+Malformed opted-in records fail generation; they are not silently converted into warnings or omitted.
 
 Do not calculate roadmap phase percentages from raw task counts. A task may cover multiple phases and task sizes are not comparable. Phase rollups require an explicit future mapping contract.
 
@@ -127,8 +128,8 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 ## 8. Implementation sequence
 
 1. Finalize task template and Agent/Developer rules.
-2. Implement generator and parser tests.
-3. Add workflow and least-privilege write identity.
+2. Implement generator and parser tests. **Implemented on feature branch.**
+3. Add workflow and least-privilege write identity. Pending.
 4. Test sequential multi-PR updates to one task, multiple tasks, concurrent merges, legacy records, malformed records, idempotency and push-race recovery.
 5. Enable generated ownership of `.ai/status.md` after the first successful workflow run.
 

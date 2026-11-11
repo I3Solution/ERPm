@@ -1,6 +1,6 @@
 # Step 2.3 — Frontend TypeScript/Angular Indexer
 
-> **Status:** TypeScript core + Angular/API extractors implemented; CI real-workspace smoke passed; local verification pending  
+> **Status:** TypeScript core + Angular/API extractors implemented; latest branch-head CI passed; local Windows verification pending  
 > **Created:** 2026-11-11  
 > **Target repository:** `I3Solution/ERPm` umbrella; read-only indexing of pinned FE repositories  
 > **Integration branch:** `master`  
@@ -333,7 +333,7 @@ Fixture coverage now includes component/service decorators, functional guards, l
 
 ### Pinned FE CI smoke evidence
 
-The code-index job completed the actual pinned FE Program smoke test and symbol query:
+The code-index job completed the actual pinned FE Program smoke test and symbol queries. Latest full workflow run #542 passed backend, frontend and code-index at branch HEAD `1bb5bf789f62100e4d4d413a91217e5cd35a64ed`:
 - TypeScript compiler: 5.8.3.
 - Program source files: 161.
 - Indexed source files: 102.
@@ -350,4 +350,4 @@ No records were emitted for ACC, MFG, PM, PUR or SCM because their source files 
 
 The CI query `find symbol PartnerService` returned a definition from CRM at `services/partner.service.ts`, lines 72–177, with the exact CRM SHA. Definition records are prioritized ahead of references. The same run extracted 130 Angular metadata records (63 components, 18 services, 3 guards, 46 routes) and 34 HttpClient API observations (17 GET, 9 POST, 5 PUT, 3 DELETE). API URL evidence comprised 4 literal, 16 interpolated and 14 dynamic expressions; interpolated/dynamic records retain the original expression and have no fabricated literal path. The workflow now also queries `getPartnerById` and requires an interpolated API record.
 
-**Verification state:** fixture tests, .NET build/tests, manifest validation, actual FE indexing and symbol query passed in the code-index CI job. Full workflow backend/frontend jobs are tracked separately. Local Windows smoke verification and mixed-SHA rejection remain pending before Step 2.3.4 acceptance.
+**Verification state (2026-11-11):** Node fixture tests, .NET build/tests, manifest validation, actual FE Program indexing, definition-first symbol query and interpolated-API query passed in code-index CI. Full workflow run #542 passed all three jobs (backend, frontend and code-index) at branch HEAD `1bb5bf789f62100e4d4d413a91217e5cd35a64ed`. CI indexed 102 source files from 161 Program files and wrote 12,880 records. Local Windows smoke verification, cache inspection and mixed-SHA rejection remain pending before Step 2.3.4 acceptance.

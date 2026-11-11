@@ -52,6 +52,7 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - Sau khi merge workflow, chạy `workflow_dispatch` một lần để tạo bootstrap status PR.
 - Merge bootstrap status PR theo quy trình review/check bình thường để thay thế frozen legacy `.ai/status.md`.
 - Kiểm thử multi-PR cùng task, nhiều feature, malformed records, idempotency, automation-branch race và việc cập nhật cùng một status PR.
+- Xác nhận branch protection có yêu cầu CI checks hay không. Nếu có, cấu hình secret `STATUS_AGGREGATION_TOKEN` bằng credential/App token được phê duyệt để CI PR được kích hoạt.
 - Nếu repository policy không cho phép bot token tạo branch/PR, cần cấu hình credential/app được phê duyệt; không nới lỏng branch protection.
 
 ## 7. Evidence và cập nhật

@@ -226,7 +226,7 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 - [x] A task that spans multiple PRs reuses the same record and updates its feature checklist and evidence.
 - [x] Add the aggregation marker and feature/milestone checklist to the task template.
 - [x] Implement a deterministic generator that reads eligible task records and rebuilds `.ai/status.md` from scratch.
-- [x] Add parser/unit tests for valid, malformed, legacy, multi-feature and repeated-update task records; CI execution result is pending.
+- [x] Add parser/unit tests for valid, malformed, legacy, multi-feature and repeated-update task records; CI verified successfully in [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834).
 - [x] Add a GitHub Actions workflow triggered when a PR is merged into `master` (bootstrap run still pending after merge).
 - [x] Serialize aggregation runs, always read latest `master`, and safely retry if `master` advances before the generated commit is pushed.
 - [x] Grant only the aggregation job `contents: write`; branch-protection compatibility still requires verification.

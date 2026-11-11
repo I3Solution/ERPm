@@ -3,7 +3,8 @@
 > **Loại:** bug | change | refactor | db | spike
 > **Ngày tạo:** YYYY-MM-DD · **Người làm:** ... · **Người yêu cầu:** ...
 > **Trạng thái:** Todo | Doing | Blocked | Done
-> **Liên quan:** step / plan / issue / commit (BE, FE, root)
+> **Liên quan:** step / plan / issue / commit / PR (BE, FE, root)
+> **Phạm vi:** repo/module/file chính bị ảnh hưởng
 
 ## 1. Mô tả
 - bug: hiện tượng, cách tái hiện, môi trường.
@@ -24,3 +25,9 @@
 
 ## 5. Việc còn lại
 - Việc chưa xong, đang chờ ai / việc gì. Ghi "Không" nếu đã xong hết.
+
+## 6. Evidence và cập nhật
+- Commit / PR đã merge:
+- CI / workflow run và kết quả:
+- Ngày cập nhật cuối: YYYY-MM-DD
+- Ghi rõ phần nào đã xác minh, phần nào mới chỉ được triển khai hoặc đang chờ xác minh.

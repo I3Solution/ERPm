@@ -73,9 +73,8 @@ def validate_task(path: Path, task_root: Path) -> list[str]:
 
     for label in REQUIRED_METADATA:
         if not re.search(
-            rf"^\s*>\s*\*\*{re.escape(label)}:\*\*\s*\S",
+            rf"\*\*{re.escape(label)}:\*\*\s*\S",
             content,
-            re.MULTILINE,
         ):
             errors.append(f"{path}: missing or empty metadata '**{label}:**'")
 

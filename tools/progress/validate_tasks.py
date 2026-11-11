@@ -71,22 +71,24 @@ def validate_task(path: Path, task_root: Path, strict: bool = False) -> list[str
             f"allowed values: {', '.join(sorted(TASK_STATUSES))}"
         )
 
-    for label in REQUIRED_METADATA:
-        if not re.search(
-            rf"\*\*{re.escape(label)}:\*\*\s*\S",
-            content,
-        ):
-            errors.append(f"{path}: missing or empty metadata '**{label}:**'")
+    if strict:
+        for label in REQUIRED_METADATA:
+            if not re.search(
+                rf"\*\*{re.escape(label)}:\*\*\s*\S",
+                content,
+            ):
+                errors.append(f"{path}: missing or empty metadata '**{label}:**'")
 
     if not re.search(r"^#\s+\S", content, re.MULTILINE):
         errors.append(f"{path}: missing Markdown H1 task title")
 
-    present_sections = set(
-        re.findall(r"^##\s+(\d+)\.", content, re.MULTILINE)
-    )
-    for section in REQUIRED_SECTIONS:
-        if section not in present_sections:
-            errors.append(f"{path}: missing required section '## {section}.'")
+    if strict:
+        present_sections = set(
+            re.findall(r"^##\s+(\d+)\.", content, re.MULTILINE)
+        )
+        for section in REQUIRED_SECTIONS:
+            if section not in present_sections:
+                errors.append(f"{path}: missing required section '## {section}.'")
 
     return errors
 

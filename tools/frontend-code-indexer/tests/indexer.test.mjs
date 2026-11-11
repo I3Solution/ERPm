@@ -143,7 +143,10 @@ test("extracts Angular decorators, static routes, guards and HttpClient URL evid
     const guard = angularRecords.find(record => record.angular?.kind === "guard");
     const route = angularRecords.find(record => record.angular?.kind === "route");
 
-    assert.equal(component?.angular?.selector, "app-demo");
+    assert.ok(result.records.some(record => record.kind === "definition" && record.name === "DemoComponent"),
+      JSON.stringify({ diagnostics: result.diagnostics, angularRecords }));
+    assert.ok(component, JSON.stringify({ diagnostics: result.diagnostics, angularRecords }));
+    assert.equal(component.angular.selector, "app-demo");
     assert.equal(component?.angular?.template, "./demo.component.html");
     assert.deepEqual(component?.angular?.styles, ["./demo.component.scss"]);
     assert.equal(service?.angular?.providedIn, "root");

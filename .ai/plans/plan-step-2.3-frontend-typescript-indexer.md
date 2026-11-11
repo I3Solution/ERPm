@@ -338,16 +338,16 @@ The code-index job completed the actual pinned FE Program smoke test and symbol 
 - Program source files: 161.
 - Indexed source files: 102.
 - Excluded/external/declaration source files: 59.
-- Records written: 12,846 across the FE root and five nested repositories represented in the Program.
-- FE root: 5,879 records at `62270988b42eece930c702d1272fe857d31bcbb9`.
-- CRM: 735 records at `9b66e321d6cff83ed703d080c3e5e19996816477`.
-- dashboard: 63 records at `4380f4b433de6ec86be5b4934279af177be5dca5`.
+- Records written: 12,880 across the FE root and five nested repositories represented in the Program.
+- FE root: 5,889 records at `62270988b42eece930c702d1272fe857d31bcbb9`.
+- CRM: 745 records at `9b66e321d6cff83ed703d080c3e5e19996816477`.
+- dashboard: 64 records at `4380f4b433de6ec86be5b4934279af177be5dca5`.
 - HRM: 1,737 records at `f66e1bb61fe222684a9c63addde93c11d1559df3`.
-- SD: 3,688 records at `750960006dd1190682556334fdf3a64b6273aad4`.
-- WMS: 744 records at `fd320c77642a0860ca8cfad25de10ea9bd1e796c`.
+- SD: 3,690 records at `750960006dd1190682556334fdf3a64b6273aad4`.
+- WMS: 755 records at `fd320c77642a0860ca8cfad25de10ea9bd1e796c`.
 
 No records were emitted for ACC, MFG, PM, PUR or SCM because their source files were not reachable from the configured FE application Program entry in this pinned snapshot. This is expected compiler coverage, not evidence that those repositories are empty or unsupported.
 
-The CI query `find symbol PartnerService` returned a definition from CRM at `services/partner.service.ts`, lines 72–177, with the exact CRM SHA. Definition records are prioritized ahead of references.
+The CI query `find symbol PartnerService` returned a definition from CRM at `services/partner.service.ts`, lines 72–177, with the exact CRM SHA. Definition records are prioritized ahead of references. The same run extracted 130 Angular metadata records (63 components, 18 services, 3 guards, 46 routes) and 34 HttpClient API observations (17 GET, 9 POST, 5 PUT, 3 DELETE). API URL evidence comprised 4 literal, 16 interpolated and 14 dynamic expressions; interpolated/dynamic records retain the original expression and have no fabricated literal path. The workflow now also queries `getPartnerById` and requires an interpolated API record.
 
 **Verification state:** fixture tests, .NET build/tests, manifest validation, actual FE indexing and symbol query passed in the code-index CI job. Full workflow backend/frontend jobs are tracked separately. Local Windows smoke verification and mixed-SHA rejection remain pending before Step 2.3.4 acceptance.

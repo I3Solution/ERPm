@@ -73,6 +73,8 @@ class GenerateStatusTests(unittest.TestCase):
         records = load_tasks(self.tasks)
         self.assertEqual([record.path for record in records], ["tasks/task-a.md"])
         self.assertEqual(records[0].path, "tasks/task-a.md")
+        self.assertEqual(records[0].owner, "Agent A")
+        self.assertIn("](tasks/task-a.md)", render_report(records))
 
     def test_multiple_pr_snapshots_rebuild_latest_feature_progress(self) -> None:
         path = self.write_task("change-20261111-task-a.md", task_text(features=(True, False)))

@@ -22,6 +22,7 @@
 - [ ] Feature 2 — mô tả kết quả có thể xác minh.
 
 Chỉ đặt checklist feature/milestone trong mục này. Giữ các mục đã hoàn thành; không xóa feature chỉ để làm thay đổi tỷ lệ tiến độ. Có thể bổ sung feature khi scope task thực sự mở rộng.
+Nếu trạng thái task là `Done`, tất cả feature checklist có theo dõi phải được đánh dấu hoàn thành.
 
 ## 4. Cách làm
 - File đã tạo / sửa.

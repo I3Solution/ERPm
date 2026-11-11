@@ -16,7 +16,7 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - Mỗi lần chạy phải đọc toàn bộ task records đủ điều kiện trên latest `master`, không cộng dồn dữ liệu PR.
 - Task cũ không có marker mới được giữ nguyên và loại khỏi aggregation.
 - Generator chỉ đưa dữ liệu task vào report; không thêm source commit SHA hoặc timestamp khiến PR không đổi task vẫn tạo commit.
-- Repository bắt buộc mọi thay đổi vào `master) phải thông qua PR; workflow không được push trực tiếp hoặc bypass branch protection.
+- Repository bắt buộc mọi thay đổi vào `master` phải thông qua PR; workflow không được push trực tiếp hoặc bypass branch protection.
 - Workflow xuất bản report qua branch automation chuyên dụng và một PR bot; PR này vẫn chịu toàn bộ review/check policy như PR thông thường.
 
 ## 3. Features / Milestones

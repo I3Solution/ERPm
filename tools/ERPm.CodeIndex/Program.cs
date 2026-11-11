@@ -105,39 +105,74 @@ static async Task IndexRepositoryAsync(string repositoryId, WorkspaceManifest ma
 
 static void FindSymbols(WorkspaceManifest manifest, string pattern)
 {
-    var backend = manifest.Repositories.SingleOrDefault(item => item.RepositoryId == "erpm-be")
-        ?? throw new InvalidOperationException("ERPm-BE was not found in the recursive submodule manifest.");
-
-    var cacheRoot = Path.Combine(
-        manifest.RootPath,
-        ".ai",
-        "code-index",
-        "cache",
-        backend.RepositoryId,
-        backend.CommitSha);
-    if (!Directory.Exists(cacheRoot))
+    var matchCount = 0;
+    var backend = manifest.Repositories.SingleOrDefault(item => item.RepositoryId == "erpm-be");
+    if (backend is not null)
     {
-        throw new DirectoryNotFoundException("No current backend index exists. Run 'index repo erpm-be' first.");
+        var backendIndexPath = Path.Combine(
+            manifest.RootPath,
+            ".ai",
+            "code-index",
+            "cache",
+            backend.RepositoryId,
+            backend.CommitSha,
+            BackendRoslynIndexer.IndexerVersion,
+            "symbols.jsonl");
+
+        if (File.Exists(backendIndexPath))
+        {
+            var backendMatches = File.ReadLines(backendIndexPath)
+                .Select(line => JsonSerializer.Deserialize<IndexRecord>(line, JsonOptions()))
+                .Where(record => record is not null
+                    && (record.Name.Contains(pattern, StringComparison.OrdinalIgnoreCase)
+                        || record.QualifiedName?.Contains(pattern, StringComparison.OrdinalIgnoreCase) == true))
+                .Take(100);
+
+            foreach (var match in backendMatches)
+            {
+                Console.WriteLine(JsonSerializer.Serialize(match, JsonOptions()));
+                matchCount++;
+            }
+        }
     }
 
-    var currentIndexPath = Path.Combine(cacheRoot, BackendRoslynIndexer.IndexerVersion, "symbols.jsonl");
-    if (!File.Exists(currentIndexPath))
+    foreach (var frontend in manifest.Repositories
+        .Where(item => item.RepositoryId == "erpm-fe"
+            || item.RepositoryId.StartsWith("erpm-fe-", StringComparison.Ordinal))
+        .OrderBy(item => item.RepositoryId, StringComparer.Ordinal))
     {
-        throw new FileNotFoundException(
-            $"No backend index for indexer {BackendRoslynIndexer.IndexerVersion} exists. Run 'index repo erpm-be' first.",
-            currentIndexPath);
+        var frontendIndexPath = Path.Combine(
+            manifest.RootPath,
+            ".ai",
+            "code-index",
+            "cache",
+            frontend.RepositoryId,
+            frontend.CommitSha,
+            FrontendWorkerRunner.IndexerVersion,
+            "symbols.jsonl");
+
+        if (!File.Exists(frontendIndexPath))
+        {
+            continue;
+        }
+
+        var frontendMatches = File.ReadLines(frontendIndexPath)
+            .Select(line => JsonSerializer.Deserialize<FrontendIndexRecord>(line, JsonOptions()))
+            .Where(record => record is not null
+                && (record.Name.Contains(pattern, StringComparison.OrdinalIgnoreCase)
+                    || record.QualifiedName?.Contains(pattern, StringComparison.OrdinalIgnoreCase) == true))
+            .Take(100);
+
+        foreach (var match in frontendMatches)
+        {
+            Console.WriteLine(JsonSerializer.Serialize(match, JsonOptions()));
+            matchCount++;
+        }
     }
 
-    var matches = File.ReadLines(currentIndexPath)
-        .Select(line => JsonSerializer.Deserialize<IndexRecord>(line, JsonOptions()))
-        .Where(record => record is not null
-            && record.Name.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-        .Take(100)
-        .ToArray();
-
-    foreach (var match in matches)
+    if (matchCount == 0)
     {
-        Console.WriteLine(JsonSerializer.Serialize(match, JsonOptions()));
+        Console.Error.WriteLine($"No indexed symbols matched '{pattern}'. Index the relevant repository first.");
     }
 }
 

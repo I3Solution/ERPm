@@ -117,6 +117,7 @@ test("extracts Angular decorators, static routes, guards and HttpClient URL evid
       "  load() { return this.http.get('/api/v1/items'); }",
       "  loadById(id: number) { return this.http.get(`${this.apiUrl}/${id}`); }",
       "  save(payload: unknown) { return this.http.post(this.apiUrl, payload); }",
+      "  empty() { return this.http.get(''); }",
       "}"
     ].join("\n"));
     await writeFile(path.join(src, "app.routes.ts"), [
@@ -162,6 +163,9 @@ test("extracts Angular decorators, static routes, guards and HttpClient URL evid
       && record.api.urlKind === "interpolated" && record.api.literalPath === null));
     assert.ok(apiRecords.some(record => record.api?.httpMethod === "POST"
       && record.api.urlKind === "dynamic" && record.api.literalPath === null));
+    assert.ok(apiRecords.some(record => record.api?.httpMethod === "GET"
+      && record.api.urlKind === "dynamic" && record.api.literalPath === null
+      && record.api.expression === "''"));
   } finally {
     await rm(root, { recursive: true, force: true });
   }

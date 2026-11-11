@@ -483,7 +483,6 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols
 
     apiDetection.candidateCalls++;
     const receiverType = checker.getTypeAtLocation(node.expression.expression);
-    const receiverSymbol = receiverType.aliasSymbol ?? receiverType.getSymbol();
     if (!isAngularHttpClient(receiverType, httpClientSymbols, httpClientImportFiles, sourceFile, checker)) {
       return;
     }

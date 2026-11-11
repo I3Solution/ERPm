@@ -214,7 +214,7 @@ The CLI must support machine-readable JSON output for agent consumption and conc
 
 ### Step 2.1 — Contract and CLI skeleton
 
-- [ ] Define versioned JSONL record schema and stable ID rules.
+- [x] Define versioned JSONL record schemas and stable ID rules (v1/v2 immutable; frontend v3 introduced in Step 2.3).
 - [ ] Define workspace manifest format including root and recursive gitlink SHAs.
 - [ ] Add local cache policy and ensure generated artifacts are not committed.
 - [ ] Create CLI skeleton with `workspace status`, `index` and `find` command contracts.
@@ -514,3 +514,8 @@ Representative API evidence inspected in the pinned FE source includes:
 - Dashboard and SD services: environment-derived API bases, literal suffixes and dynamic URL expressions.
 
 Discovery confidence is high for the reported workspace manifest, toolchain, config and module boundaries. API extractor coverage is limited to inspected source patterns and must be expanded through fixtures and implementation. No FE application files were changed during discovery.
+
+
+### Frontend schema v3 baseline — 2026-11-11
+
+The Step 2.3 branch now contains the strict Draft 2020-12 schema at `.ai/code-index/schema/index-record-v3.schema.json`, a separate typed .NET frontend model and schema validation fixtures. v3 uses language-neutral symbol categories, explicit source offsets, typed Angular/API payloads, strict enums and per-record repository/SHA provenance. API URL classifications prevent an interpolated or dynamic expression from being mislabeled as a fully literal path. Backend v1/v2 contracts and serialization remain unchanged.

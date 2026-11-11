@@ -22,7 +22,7 @@ dotnet run --project tools/ERPm.CodeIndex -- find symbol PartnerService
 
 The CLI validates the recursive submodule manifest before dispatching commands. The backend indexer loads the pinned `ERPm-BE/ERPm.sln` through MSBuildWorkspace and indexes C# definitions and compiler-resolved references.
 
-The frontend worker uses TypeScript Compiler API 5.8.3 with the pinned ERPm-FE `tsconfig.app.json` and `src/main.ts` entry. The .NET CLI passes the already validated workspace manifest to the Node worker over stdin. The worker does not run Git or parse submodule status.
+The frontend worker uses TypeScript Compiler API 5.8.3 with the pinned ERPm-FE `tsconfig.app.json` and `src/main.ts` entry. The .NET CLI verifies that the installed TypeScript package is exactly 5.8.3, loads schema v3, and validates every JSONL record against that schema before any cache is written. The CLI passes the already validated workspace manifest to the Node worker over stdin. The worker does not run Git or parse submodule status.
 
 The frontend worker indexes TypeScript/JavaScript files reachable in the application Program, attributes each file to the longest matching repository path in the manifest, and writes separate caches for each owning repository. Nested module files therefore retain their own repository ID and commit SHA. Unreferenced files outside the compiler Program are not claimed as indexed.
 

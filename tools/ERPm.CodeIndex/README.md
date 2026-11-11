@@ -14,6 +14,8 @@ Run from any directory inside the ERPm workspace:
 
     dotnet run --project tools/ERPm.CodeIndex -- workspace status
     dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-be
+    npm ci --prefix tools/frontend-code-indexer
+    dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-fe
     dotnet run --project tools/ERPm.CodeIndex -- find symbol ApplicationDbContext
 
 The first vertical slice supports backend C# definitions and compiler-resolved references. The indexer loads the pinned ERPm-BE/ERPm.sln through MSBuildWorkspace. It refuses to index the backend if the checked-out commit differs from the root gitlink SHA.

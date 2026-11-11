@@ -251,3 +251,37 @@ The architecture is ready for implementation planning when:
 - Every returned item can be traced to an authorized source revision and location.
 - Context Packet format and retrieval evaluation criteria are defined.
 - The first vertical slice can be implemented without ERPm-specific assumptions in the platform core.
+
+
+## 16. Project progress governance and status aggregation
+
+The umbrella repository uses task records as the source of truth for implementation progress. This governance mechanism is repository-level and supports multiple developers and AI agents working concurrently.
+
+### 16.1 Task record source of truth
+
+- Keep the existing Markdown convention: `.ai/tasks/<type>-YYYYMMDD-*.md`, based on `.ai/tasks/_TEMPLATE.md`.
+- Do not introduce a second task ID scheme or replace the existing task records with YAML/JSON.
+- Each independently assigned meaningful task has its own task record. Reuse the same record when a task spans multiple PRs.
+- A task record links to its related step plan, roadmap, issue, commits and PRs where applicable.
+- Task records are committed in the same PR as the work they describe.
+
+### 16.2 Ownership and concurrency
+
+- The developer/agent performing the task owns updates to that task record.
+- Different tasks use different files, avoiding a shared progress file as a concurrent write hotspot.
+- Agents must not edit `.ai/status.md` directly or overwrite another task's record without an explicit handoff.
+- Trivial typo/format-only changes and mechanical edits with no meaningful project impact may be exempt; uncertain cases should create a record.
+
+### 16.3 Validation and aggregation
+
+- Pull-request validation checks that meaningful changes include a valid task record and that the record follows the existing template, naming and status conventions.
+- Validation should inspect the PR diff and allow documented exemptions; it must not require a new task record for every generated file or mechanical change.
+- After a PR is merged into root `master`, a serialized/reconciled aggregation workflow reads task records from the latest `master`, then regenerates `.ai/status.md`.
+- The generator derives task completion from the task record plus merge/verification evidence. A self-declared `Done` without appropriate evidence must not be represented as verified project completion.
+- The generated status is deterministic and idempotent: identical source records produce identical output, and no commit/PR is created when output is unchanged.
+- The aggregation workflow must avoid concurrent lost updates and must not push directly to protected `master`. The initial safe publication mechanism is a generated artifact; if the canonical file is to be committed, use a bot-created PR or another reviewed integration path.
+- The generated report should retain links back to task records and relevant evidence so readers can audit every summarized status.
+
+### 16.4 Source-of-truth boundary
+
+Task Markdown records are authoritative for task scope, description, progress notes and verification claims. GitHub PR/commit/CI metadata is authoritative for merge and workflow state. `.ai/status.md` is a derived project snapshot, not an independently maintained record.

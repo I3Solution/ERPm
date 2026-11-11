@@ -23,8 +23,8 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - [x] Thiết kế trigger, concurrency, latest-master checkout và safe push retry.
 - [x] Implement deterministic Python generator, validation và atomic output write.
 - [x] Bổ sung unit tests và CI job cho generator.
-- [ ] Implement post-merge GitHub Actions workflow và quyền ghi tối thiểu.
-- [ ] Verify CI, multi-PR/multi-feature, idempotency, malformed records và push-race behavior.
+- [x] Implement post-merge GitHub Actions workflow với quyền ghi giới hạn ở aggregation job.
+- [ ] Verify CI, bootstrap, multi-PR/multi-feature, idempotency, malformed records và push-race behavior trên master.
 
 ## 4. Cách làm
 - Cập nhật quy tắc trong `AGENTS.md` và `.ai/tasks/README.md`.
@@ -33,21 +33,23 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - Tạo `tools/progress/generate_status.py` để đọc toàn bộ task record đủ điều kiện và rebuild báo cáo.
 - Tạo `tests/progress/test_generate_status.py` với unittest.
 - Bổ sung job `task-progress` vào `.github/workflows/verify.yml`.
-- Chưa chỉnh `.ai/status.md`; file lịch sử chỉ được chuyển sang generated output sau khi workflow chạy thành công.
+- Tạo `.github/workflows/aggregate-task-status.yml` dùng `pull_request_target` merged-only, checkout latest `master`, rebuild và push retry.
+- Chưa chỉnh `.ai/status.md`; file lịch sử chỉ được thay thế sau khi workflow được merge và chạy thành công.
 
 ## 5. Kiểm tra
 - Đã rà soát contract parser với task template và task record hiện tại.
-- Unit tests đã được thêm nhưng chưa có kết quả CI xác nhận trong báo cáo này.
-- Chưa có post-merge aggregation workflow; chưa xác minh runtime write vào `master`.
+- Unit tests đã được thêm vào CI job; chưa xác minh kết quả CI.
+- Workflow chỉ checkout trusted latest `master`, không checkout/execute PR head.
+- Chưa xác minh quyền direct push của GitHub Actions đối với branch protection trên `master`.
 
 ## 6. Việc còn lại
-- Implement post-merge workflow, checkout latest master, rebuild và safe push retry.
-- Kiểm tra branch protection / quyền ghi của GitHub Actions trước khi bật direct push.
-- Chạy CI và xử lý mọi lỗi được báo cáo.
+- Xác minh CI job generator tests.
+- Sau khi merge workflow, chạy `workflow_dispatch` một lần để bootstrap report.
+- Xác minh branch protection và quyền ghi; nếu direct push bị chặn, chuyển sang bot PR theo chính sách repository.
 - Kiểm thử multi-PR cùng task, nhiều feature, malformed records, idempotency và race.
 
 ## 7. Evidence và cập nhật
 - Commit / PR đã merge: Chưa có.
-- CI / workflow run và kết quả: Chờ CI xác nhận.
+- CI / workflow run và kết quả: Chờ xác nhận.
 - Ngày cập nhật cuối: 2026-11-11
-- Generator và unit tests đã được thêm trên feature branch; chưa tạo PR hoặc merge.
+- Generator, unit tests, CI job và post-merge workflow đã được thêm trên feature branch; chưa tạo PR hoặc merge.

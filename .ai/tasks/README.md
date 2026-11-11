@@ -43,3 +43,21 @@ A task record must describe scope, implementation, checks actually run, their ac
 - The initial publication target is a GitHub Actions artifact. Committing `.ai/status.md` later must use a bot PR/reviewed path, never a direct bot push to protected `master`.
 
 Until the validator and aggregator workflows are implemented, follow these rules manually; do not assume automation is already active.
+
+## Validator
+
+Run the repository-wide compatibility check:
+
+```bash
+python tools/progress/validate_tasks.py
+```
+
+This mode validates the existing filename convention, task type, status and title while accepting historical metadata layouts already present in the repository.
+
+For a new or updated task record, run strict validation:
+
+```bash
+python tools/progress/validate_tasks.py --strict .ai/tasks/change-YYYYMMDD-short-description.md
+```
+
+Strict mode requires the current template metadata and numbered sections 1–5. The validator is read-only: it reports problems and never rewrites task records. Historical records are not bulk-migrated merely to satisfy the new template.

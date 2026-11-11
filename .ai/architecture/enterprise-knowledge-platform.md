@@ -253,35 +253,28 @@ The architecture is ready for implementation planning when:
 - The first vertical slice can be implemented without ERPm-specific assumptions in the platform core.
 
 
-## 16. Project progress governance and status aggregation
+## 16. Task-level progress governance
 
-The umbrella repository uses task records as the source of truth for implementation progress. This governance mechanism is repository-level and supports multiple developers and AI agents working concurrently.
+Progress is tracked independently per task to avoid concurrent updates to a shared status file in a multi-developer and multi-agent repository.
 
-### 16.1 Task record source of truth
+### 16.1 Task record is the status
 
-- Keep the existing Markdown convention: `.ai/tasks/<type>-YYYYMMDD-*.md`, based on `.ai/tasks/_TEMPLATE.md`.
-- Do not introduce a second task ID scheme or replace the existing task records with YAML/JSON.
-- Each independently assigned meaningful task has its own task record. Reuse the same record when a task spans multiple PRs.
-- A task record links to its related step plan, roadmap, issue, commits and PRs where applicable.
-- Task records are committed in the same PR as the work they describe.
+- Each meaningful task has its own Markdown record at `.ai/tasks/<type>-YYYYMMDD-*.md`.
+- The record contains the task's status (`Todo`, `Doing`, `Blocked`, `Done`), progress, verification evidence and remaining work.
+- The existing Markdown template and naming convention remain in place; no parallel TASK-ID registry or YAML/JSON status store is introduced.
+- The Agent/developer assigned to a task owns that task record and updates only that record.
+- A task spanning multiple PRs continues to use the same record.
 
-### 16.2 Ownership and concurrency
+### 16.2 Shared status file is prohibited
 
-- The developer/agent performing the task owns updates to that task record.
-- Different tasks use different files, avoiding a shared progress file as a concurrent write hotspot.
-- Agents must not edit `.ai/status.md` directly or overwrite another task's record without an explicit handoff.
-- Trivial typo/format-only changes and mechanical edits with no meaningful project impact may be exempt; uncertain cases should create a record.
+- Agents and automation must not create, edit, update or regenerate `.ai/status.md`.
+- `.ai/status.md` is a legacy historical snapshot, not a live project status source.
+- Agents must not read it to determine current task progress. Read the relevant task record instead.
+- Do not build a status generator, post-merge aggregator or shared status workflow unless a new project decision explicitly authorizes it.
 
-### 16.3 Validation and aggregation
+### 16.3 Historical task records
 
-- Pull-request validation checks that meaningful changes include a valid task record and that the record follows the existing template, naming and status conventions.
-- Validation should inspect the PR diff and allow documented exemptions; it must not require a new task record for every generated file or mechanical change.
-- After a PR is merged into root `master`, a serialized/reconciled aggregation workflow reads task records from the latest `master`, then regenerates `.ai/status.md`.
-- The generator derives task completion from the task record plus merge/verification evidence. A self-declared `Done` without appropriate evidence must not be represented as verified project completion.
-- The generated status is deterministic and idempotent: identical source records produce identical output, and no commit/PR is created when output is unchanged.
-- The aggregation workflow must avoid concurrent lost updates and must not push directly to protected `master`. The initial safe publication mechanism is a generated artifact; if the canonical file is to be committed, use a bot-created PR or another reviewed integration path.
-- The generated report should retain links back to task records and relevant evidence so readers can audit every summarized status.
+- Task records created before this rule are left unchanged.
+- Historical records are out of scope for migration, backfill, validation and normalization.
+- Apply the current task-record rules to new tasks going forward.
 
-### 16.4 Source-of-truth boundary
-
-Task Markdown records are authoritative for task scope, description, progress notes and verification claims. GitHub PR/commit/CI metadata is authoritative for merge and workflow state. `.ai/status.md` is a derived project snapshot, not an independently maintained record.

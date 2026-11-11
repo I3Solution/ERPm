@@ -489,10 +489,11 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, records, generate
       httpMethod = "UNKNOWN";
     }
 
-    const urlKind = ts.isStringLiteral(urlArgument) || ts.isNoSubstitutionTemplateLiteral(urlArgument)
-      ? "literal"
+    const isLiteralUrl = ts.isStringLiteral(urlArgument) || ts.isNoSubstitutionTemplateLiteral(urlArgument);
+    const urlKind = isLiteralUrl
+      ? (urlArgument.text.length > 0 ? "literal" : "dynamic")
       : ts.isTemplateExpression(urlArgument) ? "interpolated" : "dynamic";
-    const literalPath = urlKind === "literal" && urlArgument.text.length > 0 ? urlArgument.text : null;
+    const literalPath = urlKind === "literal" ? urlArgument.text : null;
     const containing = findContainingSymbolInfo(node, sourceFile, checker, symbolIds);
     const start = node.getStart(sourceFile);
     const end = node.getEnd();

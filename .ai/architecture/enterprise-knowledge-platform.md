@@ -253,28 +253,35 @@ The architecture is ready for implementation planning when:
 - The first vertical slice can be implemented without ERPm-specific assumptions in the platform core.
 
 
-## 16. Task-level progress governance
+## 16. Task progress aggregation and governance
 
-Progress is tracked independently per task to avoid concurrent updates to a shared status file in a multi-developer and multi-agent repository.
+Task records remain the source of truth. `.ai/status.md` is a generated, read-only projection for project-level visibility.
 
-### 16.1 Task record is the status
+### 16.1 Ownership
 
-- Each meaningful task has its own Markdown record at `.ai/tasks/<type>-YYYYMMDD-*.md`.
-- The record contains the task's status (`Todo`, `Doing`, `Blocked`, `Done`), progress, verification evidence and remaining work.
-- The existing Markdown template and naming convention remain in place; no parallel TASK-ID registry or YAML/JSON status store is introduced.
-- The Agent/developer assigned to a task owns that task record and updates only that record.
-- A task spanning multiple PRs continues to use the same record.
+- Each meaningful task has one Markdown record at `.ai/tasks/<type>-YYYYMMDD-*.md`.
+- The assigned Agent/developer owns and updates only that task record.
+- A task spanning multiple PRs or feature increments keeps the same record and filename.
+- The task record's status, feature checklist and verification evidence are authoritative. The report never writes back to task records.
 
-### 16.2 Shared status file is prohibited
+### 16.2 Generated report
 
-- Agents and automation must not create, edit, update or regenerate `.ai/status.md`.
-- `.ai/status.md` is a legacy historical snapshot, not a live project status source.
-- Agents must not read it to determine current task progress. Read the relevant task record instead.
-- Do not build a status generator, post-merge aggregator or shared status workflow unless a new project decision explicitly authorizes it.
+- Only the authorized GitHub Actions workflow may write `.ai/status.md`.
+- Agents and Developers must never manually create, edit, delete, format, commit or push this file.
+- A successful PR merge into `master` triggers a full rebuild from all eligible task records on the latest `master`.
+- The generator is deterministic and idempotent: identical task inputs produce identical report content; no commit is created when content is unchanged.
+- The report shows task-level status and feature checklist completion separately. It must not infer a task's status from a percentage or infer roadmap phase completion from task counts.
+- Historical task records without the current aggregation marker are excluded; no migration or retrospective normalization is required.
 
-### 16.3 Historical task records
+### 16.3 Multi-PR behavior
 
-- Task records created before this rule are left unchanged.
-- Historical records are out of scope for migration, backfill, validation and normalization.
-- Apply the current task-record rules to new tasks going forward.
+The generator treats the latest task file on `master` as a complete snapshot, not a delta. For example, PR 1 may merge Feature 1 as complete and Feature 2 as pending; PR 2 may later update the same record to show both complete. The second run reads the latest record and rebuilds the report as 2/2. It does not add 1/2 to the previous report or skip the task because it was already processed.
+
+### 16.4 Failure and concurrency
+
+- Workflow runs are serialized with a stable concurrency group and must not cancel the currently running aggregation.
+- Every run checks out/fetches the latest `master`, not the PR head or a stale merge snapshot.
+- Before writing, the workflow must handle a concurrently advanced `master` with a safe fetch/rebuild/push retry; never force-push.
+- If a marked task record is invalid, generation fails and leaves the last valid report unchanged. Do not silently omit malformed new records.
+- The workflow requires an explicitly authorized write identity and repository permission to update `master`. If branch protection disallows direct automation commits, use an approved bot-PR strategy rather than weakening protection implicitly.
 

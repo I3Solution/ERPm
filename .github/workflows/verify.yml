@@ -72,3 +72,5 @@ jobs:
         run: dotnet test tests/ERPm.CodeIndex.Tests/ERPm.CodeIndex.Tests.csproj
       - name: Validate pinned workspace manifest
         run: dotnet run --project tools/ERPm.CodeIndex -- workspace status
+      - name: Index pinned frontend application Program
+        run: dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-fe

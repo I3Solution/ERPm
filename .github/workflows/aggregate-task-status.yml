@@ -1,0 +1,69 @@
+name: Aggregate Task Status
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: task-status-aggregation-master
+  cancel-in-progress: false
+
+jobs:
+  aggregate:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout latest master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Rebuild and publish task status
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          for attempt in 1 2 3; do
+            echo "Aggregation attempt ${attempt}/3"
+            git fetch origin master
+            git checkout -B status-aggregation origin/master
+
+            source_sha="$(git rev-parse HEAD)"
+            python tools/progress/generate_status.py --source-sha "${source_sha}"
+
+            if git diff --quiet -- .ai/status.md; then
+              echo "Task status report is already up to date."
+              exit 0
+            fi
+
+            git add .ai/status.md
+            git commit -m "[docs] Regenerate aggregated task status"
+
+            if git push origin HEAD:refs/heads/master; then
+              echo "Published task status for source ${source_sha}."
+              exit 0
+            fi
+
+            echo "Push failed; refreshing master and rebuilding before retry."
+          done
+
+          echo "Unable to publish task status after 3 attempts." >&2
+          exit 1

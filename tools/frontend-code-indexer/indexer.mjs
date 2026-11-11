@@ -383,7 +383,7 @@ function collectAngularMetadata(sourceFile, info, checker, symbolIds, records, g
           styles: [],
           providedIn: null,
           routePath: null,
-          guardInvocation: node.type?.getText(sourceFile) ?? null,
+          guardInvocation: null,
           targetSymbolId,
           lazyImportPath: null
         },

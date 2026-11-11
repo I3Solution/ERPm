@@ -48,7 +48,7 @@ class ValidateTaskTests(unittest.TestCase):
 
     def test_accepts_valid_task_and_status_note(self):
         path = self.write_task()
-        self.assertEqual([], validate_task(path, self.task_root))
+        self.assertEqual([], validate_task(path, self.task_root, strict=True))
 
     def test_rejects_invalid_filename(self):
         path = self.write_task("bug-20261340-Bad_Name.md")
@@ -67,13 +67,20 @@ class ValidateTaskTests(unittest.TestCase):
 
     def test_rejects_missing_required_section(self):
         path = self.write_task(content=VALID_TASK.replace("## 4. Kiểm tra", "## Kiểm tra"))
-        errors = validate_task(path, self.task_root)
+        errors = validate_task(path, self.task_root, strict=True)
         self.assertTrue(any("## 4." in error for error in errors))
 
-    def test_rejects_missing_metadata(self):
+    def test_rejects_missing_metadata_in_strict_mode(self):
         path = self.write_task(content=VALID_TASK.replace("> **Ngày tạo:** 2026-11-11 · ", ""))
-        errors = validate_task(path, self.task_root)
+        errors = validate_task(path, self.task_root, strict=True)
         self.assertTrue(any("Ngày tạo" in error for error in errors))
+
+    def test_legacy_mode_allows_historical_section_variations(self):
+        legacy = VALID_TASK.replace("## 4. Kiểm tra", "## Kiểm tra").replace(
+            "## 5. Việc còn lại", "## Việc còn lại"
+        )
+        path = self.write_task(content=legacy)
+        self.assertEqual([], validate_task(path, self.task_root))
 
 
 if __name__ == "__main__":

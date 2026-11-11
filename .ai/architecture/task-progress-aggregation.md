@@ -63,7 +63,7 @@ Every run performs a full rebuild:
 8. Compare with current `.ai/status.md`; write only if content differs.
 
 The report includes:
-- source commit SHA (no wall-clock generation timestamp, so identical source input produces identical output);
+- no wall-clock timestamp or unrelated master commit SHA; output changes only when rendered task data changes;
 - task counts grouped by status;
 - feature completion totals for records with tracked features;
 - task table with status, feature progress, owner and record link;

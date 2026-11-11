@@ -29,6 +29,7 @@ Ghi trạng thái ngay trong task record bằng một trong các giá trị:
 - `Doing`: đang thực hiện.
 - `Blocked`: đang bị chặn.
 - `Done`: hoàn tất phần việc và đã ghi bằng chứng kiểm tra thực tế.
+- Nếu task có feature checklist, chỉ được dùng `Done` khi tất cả feature trong checklist đã được đánh dấu hoàn thành.
 
 Task record cần nêu rõ phạm vi, tiến độ/các thay đổi, kiểm tra đã chạy và kết quả, việc còn lại, commit/PR/CI liên quan nếu có. Không ghi PASS nếu chưa chạy kiểm tra.
 

@@ -126,6 +126,9 @@ static void FindSymbols(WorkspaceManifest manifest, string pattern)
                 .Where(record => record is not null
                     && (record.Name.Contains(pattern, StringComparison.OrdinalIgnoreCase)
                         || record.QualifiedName?.Contains(pattern, StringComparison.OrdinalIgnoreCase) == true))
+                .OrderBy(record => record!.Kind == "definition" ? 0 : 1)
+                .ThenBy(record => record!.Path, StringComparer.Ordinal)
+                .ThenBy(record => record!.StartLine)
                 .Take(100);
 
             foreach (var match in backendMatches)
@@ -161,6 +164,9 @@ static void FindSymbols(WorkspaceManifest manifest, string pattern)
             .Where(record => record is not null
                 && (record.Name.Contains(pattern, StringComparison.OrdinalIgnoreCase)
                     || record.QualifiedName?.Contains(pattern, StringComparison.OrdinalIgnoreCase) == true))
+            .OrderBy(record => record!.Kind == "definition" ? 0 : 1)
+            .ThenBy(record => record!.Path, StringComparer.Ordinal)
+            .ThenBy(record => record!.StartLine)
             .Take(100);
 
         foreach (var match in frontendMatches)

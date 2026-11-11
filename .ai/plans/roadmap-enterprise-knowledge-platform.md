@@ -217,18 +217,30 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 7. A client requesting another revision cannot accidentally receive records from the first revision.
 8. A second sample workspace can be registered without ERPm-specific code in the platform core.
 
-## 6. Cross-cutting rule — Task-level progress ownership
+## 6. Cross-cutting capability — Automated task progress report
 
-**Goal:** keep task progress independent so concurrent developers and Agents never contend over a shared status file.
+**Goal:** keep task-level ownership independent while maintaining one continuously refreshed project status report without requiring any Developer to edit a shared file.
 
-- [x] Keep the existing Markdown task-record convention and template.
-- [x] Require each new meaningful task to maintain its own status and progress in its task record.
-- [x] Assign ownership of each task record to the Agent/developer performing that task.
-- [x] Prohibit Agents and automation from editing or regenerating `.ai/status.md`.
-- [x] Leave historical task records unchanged; no migration or retrospective validation.
-- [x] Do not implement a shared status generator, aggregator or PR-validation workflow.
+- [x] Keep the existing Markdown task-record naming convention.
+- [x] Each Agent/developer owns only the task record for their assigned work.
+- [x] A task that spans multiple PRs reuses the same record and updates its feature checklist and evidence.
+- [ ] Add the aggregation marker and feature/milestone checklist to the task template.
+- [ ] Implement a deterministic generator that reads eligible task records and rebuilds `.ai/status.md` from scratch.
+- [ ] Add parser/unit tests for valid, malformed, legacy, multi-feature and repeated-update task records.
+- [ ] Add a GitHub Actions workflow triggered when a PR is merged into `master`.
+- [ ] Serialize aggregation runs, always read latest `master`, and safely retry if `master` advances before the generated commit is pushed.
+- [ ] Grant only the workflow identity the write permission needed for the generated report; preserve branch protection policy.
+- [ ] Verify multiple sequential PRs updating the same task, concurrent merges, unchanged output, malformed records and recovery.
 
-**Operating rule:** to understand progress, inspect the relevant task record under `.ai/tasks/`. The shared `.ai/status.md` file is a legacy snapshot and must not be updated.
+**Operating contract:**
+
+1. Task Markdown files are the only manually maintained progress source.
+2. `.ai/status.md` is generated output. Agents and Developers are prohibited from manually creating, editing, deleting, formatting, committing or pushing it.
+3. After each merged PR into `master`, GitHub Actions reads all eligible task records from the latest `master` and regenerates the complete report. It never applies PR-only incremental updates.
+4. The report is a projection; it does not modify task records and does not independently certify the truth of their claims.
+5. Historical records without the new aggregation marker are excluded and left unchanged.
+
+See [Task Progress Aggregation Design](../architecture/task-progress-aggregation.md) for the implementation contract. This capability is repository workflow automation, not part of the Enterprise Knowledge Platform runtime.
 
 ## 7. Decisions deliberately deferred
 

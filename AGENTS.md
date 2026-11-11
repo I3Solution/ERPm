@@ -46,7 +46,7 @@ Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các
 - Nếu một task tiếp tục qua nhiều PR hoặc nhiều feature trên cùng branch, luôn cập nhật **cùng task record**, không tạo record trùng lặp. Giữ danh sách feature/milestone trong mục checklist của template; đánh dấu từng feature khi hoàn thành.
 - Mỗi Agent chỉ cập nhật task record của công việc mình phụ trách; không sửa record của Agent khác nếu không có bàn giao rõ ràng.
 - Các thay đổi typo/format thuần túy hoặc thao tác máy móc không làm thay đổi hành vi/nội dung có thể miễn task record. Nếu không chắc, tạo record.
-- Trạng thái task dùng đúng: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất và có verification evidence. Không ghi PASS nếu chưa chạy kiểm tra.
+- Trạng thái task dùng đúng: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất, có verification evidence và tất cả feature checklist có theo dõi đã được đánh dấu hoàn thành. Không ghi PASS nếu chưa chạy kiểm tra.
 
 ### Quy tắc bắt buộc đối với `.ai/status.md`
 

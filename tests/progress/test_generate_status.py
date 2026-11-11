@@ -78,7 +78,7 @@ class GenerateStatusTests(unittest.TestCase):
         path = self.write_task("change-20261111-task-a.md", task_text(features=(True, False)))
         first = load_tasks(self.tasks)
         self.assertEqual((first[0].completed_features, first[0].total_features), (1, 2))
-        first_report = render_report(first, "merge-sha-1")
+        first_report = render_report(first)
         self.assertIn("1/2 (50%)", first_report)
 
         # PR 2 updates the same task record with the complete latest checklist.
@@ -86,7 +86,7 @@ class GenerateStatusTests(unittest.TestCase):
         second = load_tasks(self.tasks)
         self.assertEqual(len(second), 1)
         self.assertEqual((second[0].completed_features, second[0].total_features), (2, 2))
-        second_report = render_report(second, "merge-sha-2")
+        second_report = render_report(second)
         self.assertIn("2/2 (100%)", second_report)
         self.assertNotIn("1/2 (50%)", second_report)
         self.assertIn("| Done |", second_report)
@@ -106,7 +106,7 @@ class GenerateStatusTests(unittest.TestCase):
         self.write_task("no-features.md", task_text(features=()))
         record = load_tasks(self.tasks)[0]
         self.assertEqual(record.progress, "Not tracked")
-        report = render_report([record], "sha")
+        report = render_report([record])
         self.assertIn("Feature completion: **Not tracked**", report)
 
     def test_output_write_is_idempotent(self) -> None:

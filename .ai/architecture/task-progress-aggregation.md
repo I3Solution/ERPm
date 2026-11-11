@@ -1,6 +1,6 @@
 # Task Progress Aggregation — Design
 
-> **Status:** Generator and unit tests implemented on the feature branch; post-merge workflow is pending.
+> **Status:** Generator, unit tests and CI test job implemented on the feature branch; post-merge workflow implemented but not yet exercised on `master`.
 > **Scope:** ERPm umbrella repository only. This is repository governance/CI automation, not part of the Enterprise Knowledge Platform runtime.
 
 ## 1. Goals
@@ -94,26 +94,33 @@ The next aggregation reads the latest full task record and reports 2/2. It does 
 
 This is snapshot replacement, not event accumulation. Repeated workflow execution against the same `master` state produces the same output.
 
-## 6. GitHub Actions workflow contract
+## 6. GitHub Actions workflow
 
-- Trigger: `pull_request` targeting `master`, event type `closed`, gated by `github.event.pull_request.merged == true`. This covers every merged PR, even when a particular PR does not modify a task file.
-- Permissions: read-only by default; grant `contents: write` only to the aggregation job.
-- Checkout: explicitly fetch/check out the latest `master`, not the PR head and not an assumed event snapshot.
-- Concurrency: one stable group for this repository/status report, with `cancel-in-progress: false`.
-- Generator: run in CI; Developers are not required to install or execute it locally.
-- Commit: use a dedicated automation identity and a clear generated-report commit message. Do not create a commit when output is unchanged.
-- Trigger loop: the generated commit must not recursively start another aggregation run. The workflow is triggered by merged-PR events, not generic pushes.
-- Branch protection: direct bot writes require explicit repository policy/permissions. If direct writes are disallowed, use an approved bot PR/auto-merge strategy; do not silently weaken branch protection.
+Implemented in `.github/workflows/aggregate-task-status.yml`.
+
+- Trigger: `pull_request_target` targeting `master`, event type `closed`, gated by `github.event.pull_request.merged == true`. Also supports `workflow_dispatch` for bootstrap/manual recovery.
+- `pull_request_target` is used so merged PRs from forks can be handled with base-repository permissions. The workflow never checks out or executes PR-head code; it checks out only trusted latest `master`.
+- Workflow-level permissions are read-only. Only the aggregation job receives `contents: write`.
+- Checkout explicitly fetches latest `master`, not the PR head and not an assumed event snapshot.
+- Concurrency uses one stable group with `cancel-in-progress: false`.
+- The generator runs in CI; Developers are not required to install or execute it locally.
+- The bot commits only when `.ai/status.md` changes.
+- The workflow listens to merged-PR events, not push events, so its own generated commit cannot recursively trigger aggregation.
+- Branch protection may reject direct bot pushes. The workflow does not weaken protection; if direct write is disallowed, the approved bot-PR strategy must be configured instead.
+
+### Bootstrap behavior
+
+The first PR that introduces this workflow cannot trigger it because GitHub evaluates `pull_request_target` workflows from the base branch, where the workflow file does not exist yet. After this branch is merged, run the workflow once through `workflow_dispatch` to generate the initial report. Subsequent merged PRs trigger it automatically.
 
 ### Race handling
 
-Concurrency serializes workflow runs, but a human PR can still advance `master` while a run is generating. Therefore the implementation must:
+Concurrency serializes workflow runs, but a human PR can still advance `master` while a run is generating. Therefore the workflow:
 
-1. Fetch latest `master` before parsing.
-2. Generate from that exact checked-out tree.
-3. Attempt a normal non-force push.
-4. If the push is rejected because `master` advanced, fetch latest `master`, regenerate and retry a bounded number of times.
-5. Never force-push or overwrite a newer commit.
+1. Fetches latest `master` before parsing.
+2. Generates from that exact checked-out tree.
+3. Attempts a normal non-force push.
+4. If the push is rejected, fetches latest `master`, regenerates and retries up to three times.
+5. Never force-pushes or overwrites a newer commit.
 
 GitHub concurrency may replace an older pending run with a newer pending run. This is safe because each executing run rebuilds from the latest `master`; the latest queued run covers all merged changes, rather than processing only its triggering PR.
 
@@ -123,15 +130,17 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 - Missing/legacy marker: exclude the record by design; do not rewrite it.
 - No report content change: succeed without a commit.
 - Push race: refetch/rebuild/retry; fail visibly after the retry limit.
-- Workflow failure must be visible in GitHub Actions. A later merged PR can trigger a fresh full rebuild; a manual recovery mechanism may be added only if needed.
+- Branch protection rejection: workflow fails visibly; no policy is bypassed.
+- Workflow failure must be visible in GitHub Actions. A later merged PR or manual dispatch can trigger a fresh full rebuild.
 
-## 8. Implementation sequence
+## 8. Implementation status
 
-1. Finalize task template and Agent/Developer rules.
-2. Implement generator and parser tests. **Implemented on feature branch.**
-3. Add workflow and least-privilege write identity. Pending.
-4. Test sequential multi-PR updates to one task, multiple tasks, concurrent merges, legacy records, malformed records, idempotency and push-race recovery.
-5. Enable generated ownership of `.ai/status.md` after the first successful workflow run.
+1. Task template and Agent/Developer rules — implemented.
+2. Deterministic generator and parser tests — implemented.
+3. CI job for generator tests — implemented; CI result pending verification.
+4. Post-merge workflow and least-privilege token scope — implemented on feature branch; not yet exercised against protected `master`.
+5. End-to-end multi-PR, concurrent merge, idempotency and push-race tests — pending.
+6. Replace the frozen legacy `.ai/status.md` only after the workflow is merged and its first successful run completes.
 
 ## 9. Explicit non-goals
 

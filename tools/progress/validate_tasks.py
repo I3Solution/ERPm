@@ -12,14 +12,14 @@ from pathlib import Path
 TASK_TYPES = {"bug", "change", "refactor", "db", "spike"}
 TASK_STATUSES = {"Todo", "Doing", "Blocked", "Done"}
 FILENAME_RE = re.compile(
-    r"^(?P<type>bug|change|refactor|db|spike)-(?P<date>\\d{8})-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)\\.md$"
+    r"^(?P<type>bug|change|refactor|db|spike)-(?P<date>\d{8})-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)\.md$"
 )
 STATUS_RE = re.compile(
-    r"^\\s*>\\s*\\*\\*Trạng thái:\\*\\*\\s*(?P<status>Todo|Doing|Blocked|Done)(?=\\s|$|[([])",
+    r"^\s*>\s*\*\*Trạng thái:\*\*\s*(?P<status>Todo|Doing|Blocked|Done)(?=\s|$|[([])",
     re.MULTILINE,
 )
-TYPE_RE = re.compile(r"^\\s*>\\s*\\*\\*Loại:\\*\\*\\s*(?P<type>[a-z]+)\\s*$", re.MULTILINE)
-DATE_RE = re.compile(r"^\\s*>\\s*\\*\\*Ngày tạo:\\*\\*\\s*(?P<date>\\d{4}-\\d{2}-\\d{2})", re.MULTILINE)
+TYPE_RE = re.compile(r"^\s*>\s*\*\*Loại:\*\*\s*(?P<type>[a-z]+)\s*$", re.MULTILINE)
+DATE_RE = re.compile(r"^\s*>\s*\*\*Ngày tạo:\*\*\s*(?P<date>\d{4}-\d{2}-\d{2})", re.MULTILINE)
 REQUIRED_METADATA = ("Ngày tạo", "Người làm", "Người yêu cầu", "Trạng thái", "Liên quan")
 REQUIRED_SECTIONS = ("1", "2", "3", "4", "5")
 
@@ -73,17 +73,17 @@ def validate_task(path: Path, task_root: Path) -> list[str]:
 
     for label in REQUIRED_METADATA:
         if not re.search(
-            rf"^\\s*>\\s*\\*\\*{re.escape(label)}:\\*\\*\\s*\\S",
+            rf"^\s*>\s*\*\*{re.escape(label)}:\*\*\s*\S",
             content,
             re.MULTILINE,
         ):
             errors.append(f"{path}: missing or empty metadata '**{label}:**'")
 
-    if not re.search(r"^#\\s+\\S", content, re.MULTILINE):
+    if not re.search(r"^#\s+\S", content, re.MULTILINE):
         errors.append(f"{path}: missing Markdown H1 task title")
 
     present_sections = set(
-        re.findall(r"^##\\s+(\\d+)\\.", content, re.MULTILINE)
+        re.findall(r"^##\s+(\d+)\.", content, re.MULTILINE)
     )
     for section in REQUIRED_SECTIONS:
         if section not in present_sections:

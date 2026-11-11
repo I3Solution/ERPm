@@ -217,53 +217,16 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 7. A client requesting another revision cannot accidentally receive records from the first revision.
 8. A second sample workspace can be registered without ERPm-specific code in the platform core.
 
-## 6. Cross-cutting work — Task Progress and Status Automation
+## 6. Cross-cutting rule — Task-level progress ownership
 
-**Goal:** make project progress reliable in a multi-developer, multi-agent repository without a single shared file being edited by everyone.
+**Goal:** keep task progress independent so concurrent developers and Agents never contend over a shared status file.
 
-### Existing conventions to preserve
+- [x] Keep the existing Markdown task-record convention and template.
+- [x] Require each new meaningful task to maintain its own status and progress in its task record.
+- [x] Assign ownership of each task record to the Agent/developer performing that task.
+- [x] Prohibit Agents and automation from editing or regenerating `.ai/status.md`.
+- [x] Leave historical task records unchanged; no migration or retrospective validation.
+- [x] Do not implement a shared status generator, aggregator or PR-validation workflow.
 
-- Task records remain Markdown files at `.ai/tasks/<type>-YYYYMMDD-*.md`.
-- The existing task types and status values in `.ai/tasks/_TEMPLATE.md` remain authoritative.
-- `AGENTS.md` is the common entry-point rule for all agents; task-record creation/update is mandatory for meaningful project work.
-- Do not introduce a parallel TASK-ID registry or replace Markdown records with YAML/JSON.
+**Operating rule:** to understand progress, inspect the relevant task record under `.ai/tasks/`. The shared `.ai/status.md` file is a legacy snapshot and must not be updated.
 
-### Deliverables
-- [x] Implement a read-only Python task-record validator with legacy-compatible and strict modes; add unit tests and a CI job for the existing task corpus.
-
-- [x] Update `AGENTS.md` with mandatory task-record lifecycle and ownership rules.
-- [x] Document the progress workflow in `.ai/tasks/README.md`.
-- [ ] Add PR validation for task-record presence, naming, template structure and allowed status values, with explicit exemptions for trivial/mechanical changes.
-- [ ] Implement a deterministic status generator that reads merged task records and preserves links/evidence.
-- [ ] Add a post-merge workflow on root `master` to regenerate the project status from the latest merged state.
-- [ ] Serialize or reconcile concurrent aggregation runs to prevent lost updates.
-- [ ] Publish generated status safely: initially as a workflow artifact; if committing `.ai/status.md`, use a bot PR rather than direct writes to protected `master`.
-- [ ] Add tests for missing records, malformed records, concurrent merges, duplicate task records and no-op generation.
-
-### Exit criteria
-
-- A meaningful task PR without a valid task record fails validation.
-- Independent tasks can merge without editing a shared progress file.
-- A merged task record appears in the generated project status with traceable evidence.
-- A task is not reported as verified complete solely because its author wrote `Done`.
-- Re-running aggregation on unchanged `master` produces no content change or unnecessary update.
-
-### Implementation order
-
-1. Finalize the task-record rule and README/template guidance.
-2. Build and test the validator against existing task records.
-3. Build the deterministic generator and verify it against current `.ai/tasks/`.
-4. Add PR validation workflow.
-5. Add post-merge aggregation workflow and artifact publication.
-6. Only after proving safe behavior, decide whether to publish `.ai/status.md` through a bot PR.
-
-## 7. Decisions deliberately deferred
-
-- Final database/search/vector technology and hosting topology.
-- Dedicated graph database.
-- Embedding provider/model and re-embedding cadence.
-- Microservice boundaries and deployment count.
-- Full EF metadata extraction and broad cross-layer graph implementation.
-- Write-capable MCP tools and autonomous agent execution.
-
-These decisions require contract clarity and measurable requirements first.

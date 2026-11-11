@@ -649,14 +649,17 @@ function collectAngularHttpClientSymbols(sourceFiles, checker) {
         if (importedName !== "HttpClient") {
           continue;
         }
-        const alias = checker.getSymbolAtLocation(specifier.name);
-        if (!alias) {
+        const importedSymbol = checker.getSymbolAtLocation(specifier.name);
+        if (!importedSymbol) {
           continue;
         }
-        try {
-          symbols.add(checker.getAliasedSymbol(alias));
-        } catch {
-          // Keep unresolved imports out of the trusted HttpClient symbol set.
+        symbols.add(importedSymbol);
+        if ((importedSymbol.flags & ts.SymbolFlags.Alias) !== 0) {
+          try {
+            symbols.add(checker.getAliasedSymbol(importedSymbol));
+          } catch {
+            // Keep unresolved aliases out of the trusted HttpClient symbol set.
+          }
         }
       }
     });

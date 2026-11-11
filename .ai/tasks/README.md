@@ -32,9 +32,15 @@ Ghi trạng thái ngay trong task record bằng một trong các giá trị:
 
 Task record cần nêu rõ phạm vi, tiến độ/các thay đổi, kiểm tra đã chạy và kết quả, việc còn lại, commit/PR/CI liên quan nếu có. Không ghi PASS nếu chưa chạy kiểm tra.
 
-## Không sử dụng status chung
+## Shared status report
 
-- Không tạo, sửa, cập nhật hoặc tự động sinh nội dung vào `.ai/status.md`.
-- `.ai/status.md` là snapshot lịch sử/legacy, không phải nguồn trạng thái hiện hành.
-- Không có status generator, PR validator hoặc workflow tổng hợp trạng thái chung trong quy trình này.
-- Muốn biết tiến độ, mở task record tương ứng trong `.ai/tasks/`.
+`.ai/status.md` is a generated report, not a source of task data.
+
+- Agents and Developers must never create, edit, delete, reformat, commit or push manual changes to `.ai/status.md`.
+- Only the authorized GitHub Actions workflow may update it after a PR is merged into `master`.
+- Every aggregation run reads all eligible task records from the latest `master` and rebuilds the complete report. It never applies incremental PR-only updates.
+- A task spanning multiple PRs keeps the same Markdown record. Update that record's feature checklist, status and evidence as work progresses; the next merge causes the report to be rebuilt from the latest snapshot.
+- New records opt into aggregation using the exact marker and feature checklist in `_TEMPLATE.md`. Historical records without the marker remain untouched and are excluded; no backfill or migration is performed.
+- If a marked record is malformed, generation fails without replacing the last valid report.
+
+See [the aggregation design](../architecture/task-progress-aggregation.md) for workflow, parsing and concurrency details.

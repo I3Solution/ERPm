@@ -138,7 +138,7 @@ export function indexWorkspace(manifest, options = {}) {
 
       const start = declaration.node.getStart(sourceFile);
       const end = declaration.node.getEnd();
-      const qualifiedName = checker.getFullyQualifiedName(declaration.symbol);
+      const qualifiedName = getQualifiedName(declaration.node);
       records.push(createRecord(info, {
         kind: "definition",
         symbolKind: declaration.symbolKind,
@@ -160,7 +160,7 @@ export function indexWorkspace(manifest, options = {}) {
       }));
     }
 
-    collectImports(sourceFile, info, program, parsed.options, records, generatedAtUtc);
+    collectImports(sourceFile, info, program, parsed.options, fileInfo, records, generatedAtUtc);
     collectReferences(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
   }
 
@@ -184,7 +184,7 @@ export function indexWorkspace(manifest, options = {}) {
   };
 }
 
-function collectImports(sourceFile, info, program, compilerOptions, records, generatedAtUtc) {
+function collectImports(sourceFile, info, program, compilerOptions, fileInfo, records, generatedAtUtc) {
   const host = ts.sys;
   visit(sourceFile, node => {
     if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) {
@@ -198,7 +198,7 @@ function collectImports(sourceFile, info, program, compilerOptions, records, gen
       const resolvedPath = path.resolve(resolved.resolvedFileName);
       const target = program.getSourceFiles().find(item => path.resolve(item.fileName) === resolvedPath);
       if (target) {
-        const targetInfo = infoForSource(target, program);
+        const targetInfo = fileInfo.get(target);
         if (targetInfo) {
           targetSymbolId = targetInfo.symbolId;
         }
@@ -229,15 +229,6 @@ function collectImports(sourceFile, info, program, compilerOptions, records, gen
   });
 }
 
-function infoForSource(sourceFile, program) {
-  const sourcePath = path.resolve(sourceFile.fileName);
-  const feRoot = path.resolve(program.getCurrentDirectory(), "ERPm-FE");
-  const relative = normalizePath(path.relative(feRoot, sourcePath));
-  if (relative.startsWith("../") || path.isAbsolute(relative)) {
-    return null;
-  }
-  return { relative };
-}
 
 function collectReferences(sourceFile, info, checker, symbolIds, records, generatedAtUtc) {
   visit(sourceFile, node => {
@@ -353,6 +344,19 @@ function classifyDeclaration(node) {
   if (ts.isTypeParameterDeclaration(node)) return "typeParameter";
   if (ts.isModuleDeclaration(node)) return "namespace";
   return "unknown";
+}
+
+
+function getQualifiedName(node) {
+  const parts = [];
+  let current = node;
+  while (current && !ts.isSourceFile(current)) {
+    if (current.name && ts.isIdentifier(current.name)) {
+      parts.unshift(current.name.text);
+    }
+    current = current.parent;
+  }
+  return parts.join(".");
 }
 
 function createSymbolId(repositoryId, relativePath, kind, start, name) {

@@ -30,7 +30,7 @@
 ## In Progress
 
 - LD.5 BE: danh sách SD nhẹ (summary, lọc ngày, q, sort), chờ tester và merge; FE chờ khung LD.1.
-- [ ] Phase 2 Step 2.3 — Frontend TypeScript/Angular indexer (implementation on `loipham/phase2-frontend-typescript-indexer`; not merged yet).
+- [ ] Phase 2 Step 2.3 — Frontend TypeScript/Angular indexer (implementation and local/CI verification complete on `loipham/phase2-frontend-typescript-indexer`; final code review and PR/merge pending).
   - Plan: [plan-step-2.3-frontend-typescript-indexer.md](plans/plan-step-2.3-frontend-typescript-indexer.md).
   - Implemented schema v3, isolated Node worker with TypeScript 5.8.3 lockfile, .NET CLI orchestration, repository/SHA-aware caches, TypeScript definitions/imports/references, Angular component/service/guard/route metadata and HttpClient API evidence.
   - Pinned FE CI smoke: 161 Program source files; 102 indexed source files; 12,880 records across FE root, CRM, dashboard, HRM, SD and WMS. Angular: 63 components, 18 services, 3 guards, 46 routes. API: 34 calls (17 GET, 9 POST, 5 PUT, 3 DELETE); URL evidence: 4 literal, 16 interpolated, 14 dynamic.
@@ -39,8 +39,8 @@
 
 ## Next Steps
 
-1. Complete local Windows verification for Step 2.3: restore worker dependencies, run tests/build, index the pinned FE Program, inspect symbol/API queries and confirm cache SHA isolation.
-2. Open and review the Step 2.3 implementation PR against root `master`; merge only after local verification and full CI pass.
+1. Complete final code review for Step 2.3, including worker/runner edge cases and acceptance scope.
+2. Open and review the Step 2.3 implementation PR against root `master`; merge only after review and full CI pass.
 3. Step 2.4: EF Core model and migration metadata.
 4. Step 2.5: unified query, inheritance/implementation and cross-layer tracing.
 5. Step 2.6: retrieval quality, performance and context/token evaluation on representative real tasks.

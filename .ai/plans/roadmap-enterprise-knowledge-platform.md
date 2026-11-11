@@ -231,6 +231,7 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 - [x] Respect mandatory PR-only changes to `master`: publish the generated report through a dedicated automation branch and a bot PR; never push directly to `master`.
 - [x] Serialize aggregation runs, always read latest `master`, and use a force-with-lease update only on the workflow-owned automation branch.
 - [x] Grant only the aggregation job `contents: write` and `pull-requests: write`; generated status PRs remain subject to normal review/check rules.
+- [x] Support an approved `STATUS_AGGREGATION_TOKEN` so required PR CI workflows can run; the default `GITHUB_TOKEN` fallback does not trigger normal PR workflows.
 - [ ] Verify multiple sequential PRs updating the same task, concurrent merges, unchanged output, malformed records and recovery.
 
 **Operating contract:**

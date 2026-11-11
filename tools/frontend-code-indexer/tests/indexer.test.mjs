@@ -35,7 +35,7 @@ test("indexes compiler-resolved definitions, imports and references with nested 
     const crmRecords = result.records.filter(record => record.repositoryId === "erpm-fe-src-app-modules-crm");
     assert.ok(crmRecords.length > 0);
     assert.ok(crmRecords.every(record => record.commitSha === "b".repeat(40)));
-    assert.ok(crmRecords.every(record => record.path.startsWith("src/")));
+    assert.ok(crmRecords.every(record => record.path === "partner.service.ts"));
     assert.equal(result.diagnostics.indexedSourceFiles, 2);
   } finally {
     await rm(root, { recursive: true, force: true });

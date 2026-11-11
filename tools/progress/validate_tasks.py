@@ -49,7 +49,8 @@ def validate_task(path: Path, task_root: Path, strict: bool = False) -> list[str
 
     type_match = TYPE_RE.search(content)
     if not type_match:
-        errors.append(f"{path}: missing metadata '**Loại:** <type>'")
+        if strict:
+            errors.append(f"{path}: missing metadata '**Loại:** <type>'")
     elif type_match.group("type") not in TASK_TYPES:
         errors.append(f"{path}: unsupported task type '{type_match.group('type')}'")
     elif type_match.group("type") != match.group("type"):

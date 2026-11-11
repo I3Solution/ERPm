@@ -187,7 +187,11 @@ export function indexWorkspace(manifest, options = {}) {
       tsVersion: ts.version,
       programSourceFiles: program.getSourceFiles().length,
       indexedSourceFiles: fileInfo.size,
-      excludedOrExternalSourceFiles: program.getSourceFiles().length - fileInfo.size
+      excludedOrExternalSourceFiles: program.getSourceFiles().length - fileInfo.size,
+      recordCountsByKind: countBy(records, record => record.kind),
+      angularKinds: countBy(records.filter(record => record.angular), record => record.angular.kind),
+      apiMethods: countBy(records.filter(record => record.api), record => record.api.httpMethod),
+      apiUrlKinds: countBy(records.filter(record => record.api), record => record.api.urlKind)
     }
   };
 }
@@ -771,6 +775,14 @@ function normalizePath(value) {
 function visit(node, callback) {
   callback(node);
   ts.forEachChild(node, child => visit(child, callback));
+}
+
+function countBy(items, selector) {
+  return items.reduce((counts, item) => {
+    const key = selector(item);
+    counts[key] = (counts[key] ?? 0) + 1;
+    return counts;
+  }, {});
 }
 
 function formatDiagnostic(diagnostic) {

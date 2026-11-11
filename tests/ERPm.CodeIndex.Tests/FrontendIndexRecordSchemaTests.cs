@@ -86,8 +86,8 @@ public sealed class FrontendIndexRecordSchemaTests
 
     private static void AssertValid(string json)
     {
-        var result=Schema.Evaluate(JsonDocument.Parse(json).RootElement);
-        Assert.True(result.IsValid,string.Join(Environment.NewLine,result.Errors?.Select(item=>item.Value) ?? []));
+        var result=Schema.Evaluate(JsonDocument.Parse(json).RootElement, new EvaluationOptions { RequireFormatValidation = true });
+        Assert.True(result.IsValid);
     }
 
     private static void AssertInvalid(string json)

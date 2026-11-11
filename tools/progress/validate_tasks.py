@@ -24,7 +24,7 @@ REQUIRED_METADATA = ("Ngày tạo", "Người làm", "Người yêu cầu", "Tr�
 REQUIRED_SECTIONS = ("1", "2", "3", "4", "5")
 
 
-def validate_task(path: Path, task_root: Path) -> list[str]:
+def validate_task(path: Path, task_root: Path, strict: bool = False) -> list[str]:
     errors: list[str] = []
     name = path.name
     match = FILENAME_RE.fullmatch(name)
@@ -104,6 +104,11 @@ def collect_task_files(task_root: Path, explicit_paths: list[str]) -> list[Path]
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="repository root")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="require all current template metadata and sections (use for new/updated task records)",
+    )
     parser.add_argument("paths", nargs="*", help="optional task files to validate")
     args = parser.parse_args()
 
@@ -120,7 +125,7 @@ def main() -> int:
         if path.name in {"README.md", "_TEMPLATE.md"}:
             continue
         checked += 1
-        errors.extend(validate_task(path, task_root))
+        errors.extend(validate_task(path, task_root, strict=args.strict))
 
     if errors:
         print(f"Task progress validation failed: {len(errors)} error(s) across {checked} file(s).")

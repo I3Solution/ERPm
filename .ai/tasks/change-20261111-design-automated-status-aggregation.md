@@ -24,7 +24,8 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - [x] Implement deterministic Python generator, validation, atomic output write và consistency check cho task `Done`.
 - [x] Bổ sung unit tests và CI job cho generator.
 - [x] Implement post-merge GitHub Actions workflow với quyền ghi giới hạn ở aggregation job.
-- [ ] Verify CI, bootstrap, multi-PR/multi-feature, idempotency, malformed records và push-race behavior trên master.
+- [x] Verify CI job generator tests trên feature branch.
+- [ ] Verify bootstrap, multi-PR/multi-feature, idempotency, malformed records và push-race behavior trên master.
 
 ## 4. Cách làm
 - Cập nhật quy tắc trong `AGENTS.md` và `.ai/tasks/README.md`.
@@ -38,18 +39,18 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 
 ## 5. Kiểm tra
 - Đã rà soát contract parser với task template và task record hiện tại.
-- Unit tests đã được thêm vào CI job; chưa xác minh kết quả CI.
+- CI run #631 (`42993219834`) trên commit `17917e7de29633c3226b27317eebf96045df97e6` thành công; cả 4 jobs `backend`, `frontend`, `code-index`, `task-progress` đều `success`. Job `task-progress` xác nhận bước `python -m unittest discover -s tests/progress -v` thành công.
 - Workflow chỉ checkout trusted latest `master`, không checkout/execute PR head.
 - Chưa xác minh quyền direct push của GitHub Actions đối với branch protection trên `master`.
 
 ## 6. Việc còn lại
-- Xác minh CI job generator tests.
+- CI job generator tests đã xác minh thành công (run #631).
 - Sau khi merge workflow, chạy `workflow_dispatch` một lần để bootstrap report.
 - Xác minh branch protection và quyền ghi; nếu direct push bị chặn, chuyển sang bot PR theo chính sách repository.
 - Kiểm thử multi-PR cùng task, nhiều feature, malformed records, idempotency và race.
 
 ## 7. Evidence và cập nhật
 - Commit / PR đã merge: Chưa có.
-- CI / workflow run và kết quả: Chờ xác nhận.
+- CI: [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834) — success; 4/4 jobs pass, bao gồm `task-progress`.
 - Ngày cập nhật cuối: 2026-11-11
 - Generator, unit tests, CI job và post-merge workflow đã được thêm trên feature branch; chưa tạo PR hoặc merge.

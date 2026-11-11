@@ -44,7 +44,8 @@ export function indexWorkspace(manifest, options = {}) {
     options: parsed.options
   });
   const checker = program.getTypeChecker();
-  const httpClientSymbols = collectAngularHttpClientSymbols(sourceFilesForProgram(program), checker);
+  const httpClientImports = collectAngularHttpClientSymbols(sourceFilesForProgram(program), checker);
+  const httpClientSymbols = httpClientImports.symbols;
   const programFilesByAbsolutePath = new Map(
     program.getSourceFiles().map(sourceFile => [path.resolve(sourceFile.fileName), sourceFile])
   );
@@ -176,7 +177,7 @@ export function indexWorkspace(manifest, options = {}) {
     collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, records, generatedAtUtc);
     collectAngularMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
     collectRouteMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
-    collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, apiDetection, records, generatedAtUtc);
+    collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, httpClientImports.sourceFiles, apiDetection, records, generatedAtUtc);
   }
 
   records.sort((left, right) =>
@@ -469,7 +470,7 @@ function collectRouteMetadata(sourceFile, info, checker, symbolIds, records, gen
   });
 }
 
-function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, apiDetection, records, generatedAtUtc) {
+function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, httpClientImportFiles, apiDetection, records, generatedAtUtc) {
   visit(sourceFile, node => {
     if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
       return;
@@ -488,7 +489,7 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols
       ? checker.getFullyQualifiedName(receiverSymbol)
       : checker.typeToString(receiverType);
     apiDetection.receiverTypes[receiverName] = (apiDetection.receiverTypes[receiverName] ?? 0) + 1;
-    if (!isAngularHttpClient(receiverType, httpClientSymbols, checker)) {
+    if (!isAngularHttpClient(receiverType, httpClientSymbols, httpClientImportFiles, sourceFile, checker)) {
       return;
     }
     apiDetection.matchedCalls++;
@@ -651,6 +652,7 @@ function sourceFilesForProgram(program) {
 
 function collectAngularHttpClientSymbols(sourceFiles, checker) {
   const symbols = new Set();
+  const sourceFilesWithAngularHttpClientImport = new Set();
   for (const sourceFile of sourceFiles) {
     visit(sourceFile, node => {
       if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)
@@ -668,6 +670,7 @@ function collectAngularHttpClientSymbols(sourceFiles, checker) {
         if (importedName !== "HttpClient") {
           continue;
         }
+        sourceFilesWithAngularHttpClientImport.add(sourceFile);
         const importedSymbol = checker.getSymbolAtLocation(specifier.name);
         if (!importedSymbol) {
           continue;
@@ -691,11 +694,15 @@ function collectAngularHttpClientSymbols(sourceFiles, checker) {
       }
     });
   }
-  return symbols;
+  return { symbols, sourceFiles: sourceFilesWithAngularHttpClientImport };
 }
 
-function isAngularHttpClient(type, httpClientSymbols, checker) {
+function isAngularHttpClient(type, httpClientSymbols, httpClientImportFiles, sourceFile, checker) {
   const candidates = [type.aliasSymbol, type.getSymbol()].filter(Boolean);
+  const receiverSymbol = candidates[0];
+  if (receiverSymbol?.getName() === "HttpClient" && httpClientImportFiles.has(sourceFile)) {
+    return true;
+  }
   return candidates.some(symbol => {
     let currentSymbol = symbol;
     for (let depth = 0; depth < 8 && currentSymbol; depth++) {

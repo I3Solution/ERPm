@@ -40,17 +40,25 @@ Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các
 
 - Step plan: `.ai/plans/plan-step-XX-*.md`.
 - Step log: `.ai/steps/step-XX-*.md`.
-- Task record: `.ai/tasks/<type>-YYYYMMDD-*.md` theo `.ai/tasks/_TEMPLATE.md`. Giữ nguyên naming convention hiện có; không tự tạo hệ thống TASK ID hoặc đổi sang YAML/JSON.
+- Task record: `.ai/tasks/<type>-YYYYMMDD-*.md` theo `.ai/tasks/_TEMPLATE.md`. Giữ nguyên naming convention hiện có; không tự tạo TASK ID hoặc đổi sang YAML/JSON.
 - Review: `.ai/reviews/YYYY-MM-DD-*.md`.
-- Task status: ghi trực tiếp trong task record riêng tại `.ai/tasks/`; không có file trạng thái chung cần duy trì.
-- Quy tắc bắt buộc: mỗi Agent/developer khi nhận một task có thay đổi đáng kể đối với code, kiến trúc, cấu hình, CI/CD hoặc tài liệu dự án phải tạo/cập nhật một task record riêng ngay từ đầu công việc. Task record phải được commit trong cùng PR với thay đổi tương ứng. Nếu task tiếp tục qua nhiều PR, cập nhật record hiện có thay vì tạo record trùng lặp.
-- Dùng task record hiện có khi tiếp tục một task; không tạo file mới chỉ để né cập nhật record. Với công việc thuộc step/plan lớn, task record phải liên kết tới step/plan tương ứng.
-- Các thay đổi máy móc, typo/format thuần túy hoặc thao tác không làm thay đổi hành vi/nội dung dự án có thể miễn task record. Nếu không chắc, tạo record.
-- Agent chỉ sửa task record của công việc mình thực hiện; không sửa progress record của Agent khác nếu không được giao.
-- **CẤM** tạo mới, chỉnh sửa, cập nhật hoặc tự động sinh nội dung vào `.ai/status.md`. File này là snapshot lịch sử/legacy, không phải nguồn trạng thái hiện hành. Không đọc file này để xác định tiến độ task; hãy đọc task record tương ứng.
-- Trạng thái dùng đúng các giá trị trong template: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất; ghi rõ kiểm tra đã chạy, kết quả, commit/PR và việc còn lại. Không ghi PASS nếu chưa chạy kiểm tra.
-- Không xây dựng PR validator, status generator hoặc post-merge workflow để tổng hợp trạng thái vào `.ai/status.md` trừ khi có yêu cầu mới được phê duyệt riêng. Task record là nguồn trạng thái duy nhất ở cấp task.
-- Task cũ trước khi quy tắc này được áp dụng được giữ nguyên và bỏ qua; không migration, không ép chuẩn hóa, không validate hồi tố. Với task mới, Agent tạo/cập nhật task record riêng theo template hiện tại.
+- Mỗi Agent/developer khi nhận task có thay đổi đáng kể về code, kiến trúc, cấu hình, CI/CD hoặc tài liệu phải tạo/cập nhật task record riêng ngay từ đầu. Task record phải được đưa vào PR có thay đổi tiến độ tương ứng.
+- Nếu một task tiếp tục qua nhiều PR hoặc nhiều feature trên cùng branch, luôn cập nhật **cùng task record**, không tạo record trùng lặp. Giữ danh sách feature/milestone trong mục checklist của template; đánh dấu từng feature khi hoàn thành.
+- Mỗi Agent chỉ cập nhật task record của công việc mình phụ trách; không sửa record của Agent khác nếu không có bàn giao rõ ràng.
+- Các thay đổi typo/format thuần túy hoặc thao tác máy móc không làm thay đổi hành vi/nội dung có thể miễn task record. Nếu không chắc, tạo record.
+- Trạng thái task dùng đúng: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất và có verification evidence. Không ghi PASS nếu chưa chạy kiểm tra.
+
+### Quy tắc bắt buộc đối với `.ai/status.md`
+
+- `.ai/status.md` là **generated output**, không phải task record và không phải nơi nhập dữ liệu.
+- **CẤM Agent/Developer tạo, sửa, xóa, format, commit hoặc push thay đổi thủ công vào `.ai/status.md`**. Quy tắc này áp dụng cả khi task có nội dung liên quan đến tiến độ/status.
+- Chỉ workflow GitHub Actions được ủy quyền mới có quyền sinh/cập nhật file này sau khi PR được merge vào `master`.
+- Khi cần thay đổi nội dung báo cáo, hãy cập nhật task record hoặc generator/template nguồn; không chỉnh trực tiếp output.
+- Mỗi lần PR merge vào `master`, workflow phải đọc lại toàn bộ task records đủ điều kiện trên **latest `master`** và generate lại toàn bộ `.ai/status.md`. Không cộng dồn patch của PR, không dựa trên nội dung status cũ.
+- Một task đi qua nhiều PR phải giữ nguyên filename/record. Báo cáo phản ánh snapshot mới nhất của record sau mỗi lần merge.
+- Task records lịch sử không có marker aggregation của template mới được bỏ qua; không migration, backfill hoặc validate hồi tố.
+- Không thêm PR validator hoặc yêu cầu Developer chạy generator local. Việc tổng hợp và ghi file là trách nhiệm của GitHub Actions.
+- Nếu generator phát hiện task record mới có marker nhưng sai contract, workflow phải fail an toàn và giữ nguyên status report hiện tại; không âm thầm bỏ qua record lỗi rồi xuất báo cáo thiếu dữ liệu.
 
 ## 6. Context packet trước khi code
 

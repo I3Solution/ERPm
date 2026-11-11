@@ -4,62 +4,74 @@ Local-first code intelligence CLI for the ERPm umbrella workspace.
 
 ## Prerequisites
 
-- The .NET SDK version pinned by the umbrella repository global.json.
-- Git.
+- The .NET SDK version pinned by the umbrella repository `global.json`.
+- Git and Node.js 22 or later.
 - ERPm umbrella repository with recursive submodules checked out at their pinned revisions.
 
-## Initial commands
+## Commands
 
 Run from any directory inside the ERPm workspace:
 
-    dotnet run --project tools/ERPm.CodeIndex -- workspace status
-    dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-be
-    npm ci --prefix tools/frontend-code-indexer
-    dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-fe
-    dotnet run --project tools/ERPm.CodeIndex -- find symbol ApplicationDbContext
+```powershell
+dotnet run --project tools/ERPm.CodeIndex -- workspace status
+dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-be
+npm.cmd ci --prefix tools/frontend-code-indexer
+dotnet run --project tools/ERPm.CodeIndex -- index repo erpm-fe
+dotnet run --project tools/ERPm.CodeIndex -- find symbol PartnerService
+```
 
-The backend vertical slice supports C# definitions and compiler-resolved references. The frontend worker uses TypeScript Compiler API 5.8.3 with the pinned ERPm-FE `tsconfig.app.json` and `src/main.ts` entry. The .NET CLI validates the recursive workspace manifest and SHA pins, then passes that manifest to the Node worker over stdin. The worker does not run Git or resolve moving branch heads.\n\nThe frontend worker indexes TypeScript/JavaScript files reachable in the application Program, attributes each file to the longest matching repository path in the manifest, and writes separate caches for each owning repository. Nested module files therefore retain their own repository ID and commit SHA. Unreferenced files outside the compiler Program are not claimed as indexed.
+The CLI validates the recursive submodule manifest before dispatching commands. The backend indexer loads the pinned `ERPm-BE/ERPm.sln` through MSBuildWorkspace and indexes C# definitions and compiler-resolved references.
+
+The frontend worker uses TypeScript Compiler API 5.8.3 with the pinned ERPm-FE `tsconfig.app.json` and `src/main.ts` entry. The .NET CLI passes the already validated workspace manifest to the Node worker over stdin. The worker does not run Git or parse submodule status.
+
+The frontend worker indexes TypeScript/JavaScript files reachable in the application Program, attributes each file to the longest matching repository path in the manifest, and writes separate caches for each owning repository. Nested module files therefore retain their own repository ID and commit SHA. Unreferenced files outside the compiler Program are not claimed as indexed.
 
 ## Index format and provenance
 
-Each JSONL record contains:
+- Backend indexer 0.2.0 writes schema v2 records. Schema v1 remains immutable as a historical baseline.
+- Frontend indexer 0.1.0 writes schema v3 records using the language-neutral frontend contract.
+- Every record carries its schema/indexer version, repository ID, exact source commit SHA, repository-relative path, source span, symbol identity, evidence and generation timestamp.
+- Generated JSONL files are written under `.ai/code-index/cache/` and must not be committed. Cache paths are isolated by repository ID, exact SHA and indexer version.
 
-- Schema and indexer versions.
-- Repository ID and exact source commit SHA.
-- Repository-relative source path and line span.
-- Record kind and Roslyn symbol kind (namespace, type, method, field, property, event, parameter, local, type parameter or other).
-- Stable Roslyn symbol ID, name and fully-qualified display name.
-- Typed relationship, source symbol ID/kind, target symbol ID, evidence status and generation timestamp.
+Schema v3 has typed Angular and API payloads. The initial TypeScript core currently emits file, definition, import and compiler-resolved reference/call observations; Angular and API metadata extraction is the next implementation step.
 
-Indexer 0.2.0 writes schema v2 records to a separate cache directory. The previous 0.1.0/schema v1 cache is intentionally preserved as a comparison baseline. Generated JSONL files are written under .ai/code-index/cache/ and must not be committed.
+## Frontend worker
+
+The isolated worker lives in `tools/frontend-code-indexer` and has its own npm package manifest and lockfile. TypeScript is pinned exactly to 5.8.3; no FE application package manifest or lockfile is changed. Run `npm ci --prefix tools/frontend-code-indexer` before invoking `index repo erpm-fe`.
+
+The initial Program uses the FE root `tsconfig.app.json` and `src/main.ts`. It reports actual Program coverage and does not claim that unreferenced TypeScript files are indexed. Source ownership is resolved by the longest matching repository path in the runtime manifest.
+
+The worker excludes declaration files, generated suffixes/headers and common vendor/build output directories such as `node_modules`, `dist`, `.angular`, `coverage` and `out-tsc`.
+
+## Symbol search
+
+`find symbol <name-or-pattern>` searches the current backend and frontend cache versions. It skips repositories that do not yet have a current index.
 
 ## Generated-source inclusion policy
 
-The normal source index excludes:
+The backend source index excludes `obj/`, `bin/`, generated suffixes and files with the standard `<auto-generated` header. A handwritten `*.Designer.cs` file without an auto-generated marker remains included.
 
-- Any source file whose repository-relative path contains an `obj/` or `bin/` segment (case-insensitive).
-- Files ending in `.g.cs`, `.g.i.cs` or `.generated.cs` (case-insensitive).
-- Files whose first 2 KiB contain the standard `<auto-generated` marker, including generated designer files.
-- Source files outside the backend repository root, because they cannot be represented as trustworthy repository-relative paths.
-
-A handwritten `*.Designer.cs` file without an auto-generated marker remains included. Excluded and included syntax-tree counts are printed during indexing.
+The frontend source index excludes declaration files, generated suffixes/headers and common build/vendor directory segments. Exclusion rules are path- and header-based; broad filename fragments are not used to infer generated ownership.
 
 ## Relationship semantics
 
-- `calls` is emitted for compiler-resolved invocation targets and explicit/implicit object creation.
-- `references` is emitted for other compiler-resolved simple-name references, including namespace imports and type/member usages.
-- Namespace references retain namespace source context. Field and auto-property backing-field symbols retain their actual Roslyn identity.
-- Source and target symbol categories are recorded independently.
-- This is a compiler-resolved syntax index, not a complete runtime call graph. Dynamic dispatch, reflection and runtime behavior are not resolved.
+- Backend `calls` are emitted for compiler-resolved invocation targets and explicit/implicit object creation. Other compiler-resolved references remain `references`.
+- Frontend `imports` connect source-file observations to locally resolved source files when the TypeScript resolver supplies evidence.
+- Frontend `calls` and `references` are emitted only when the TypeScript checker resolves a symbol that belongs to the indexed Program.
+- Dynamic dispatch, reflection, runtime behavior and unresolved symbols are not inferred.
 
 ## Build and tests
 
-    dotnet build tools/ERPm.CodeIndex/ERPm.CodeIndex.csproj
-    dotnet test tests/ERPm.CodeIndex.Tests/ERPm.CodeIndex.Tests.csproj
+```powershell
+npm.cmd ci --prefix tools/frontend-code-indexer
+npm.cmd test --prefix tools/frontend-code-indexer
+dotnet build tools/ERPm.CodeIndex/ERPm.CodeIndex.csproj
+dotnet test tests/ERPm.CodeIndex.Tests/ERPm.CodeIndex.Tests.csproj
+```
 
 ## Current limitations
 
-- The first implementation indexes the backend only.
-- Roslyn workspace diagnostics are reported to stderr; projects that fail to compile may be partially indexed.
-- Overload resolution is based on Roslyn semantic symbols; dynamic/reflection calls are not represented.
-- The initial CLI is intentionally small; cross-layer traces, frontend and EF metadata are later Phase 2 steps.
+- Angular component/service/guard/route metadata and API client HTTP metadata are not yet emitted by the frontend worker.
+- The frontend index covers only files reachable from the configured application Program; independent module files not imported by that Program are not included.
+- Backend Roslyn workspace diagnostics may indicate partial project loading; dynamic/reflection calls are not represented.
+- The index is a retrieval aid, not a complete runtime call graph or a substitute for source inspection.

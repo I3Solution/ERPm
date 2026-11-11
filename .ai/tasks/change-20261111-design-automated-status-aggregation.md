@@ -21,7 +21,7 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - [x] Chốt mô hình snapshot rebuild và semantics cho task qua nhiều PR.
 - [x] Thiết kế task metadata marker và feature checklist.
 - [x] Thiết kế trigger, concurrency, latest-master checkout và safe push retry.
-- [x] Implement deterministic Python generator, validation và atomic output write.
+- [x] Implement deterministic Python generator, validation, atomic output write và consistency check cho task `Done`.
 - [x] Bổ sung unit tests và CI job cho generator.
 - [x] Implement post-merge GitHub Actions workflow với quyền ghi giới hạn ở aggregation job.
 - [ ] Verify CI, bootstrap, multi-PR/multi-feature, idempotency, malformed records và push-race behavior trên master.

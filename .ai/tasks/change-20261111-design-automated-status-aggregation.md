@@ -26,7 +26,7 @@ Thiết kế cơ chế tự động tái tạo `.ai/status.md` sau mỗi PR merg
 - Cập nhật quy tắc trong `AGENTS.md` và `.ai/tasks/README.md`.
 - Bổ sung aggregation marker và feature checklist vào task template.
 - Ghi thiết kế chi tiết trong `.ai/architecture/task-progress-aggregation.md`.
-- Cập nhật roadmap và trạng thái hiện tại để phản ánh automation chưa được triển khai.
+- Cập nhật roadmap và governance để ghi rõ automation chưa được triển khai; giữ nguyên `.ai/status.md` legacy cho đến khi workflow được triển khai.
 
 ## 5. Kiểm tra
 - Đã kiểm tra nội dung hiện có của AGENTS.md, task README/template, architecture, roadmap, status.md và workflow CI trên feature branch.

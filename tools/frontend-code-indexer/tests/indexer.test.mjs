@@ -29,7 +29,8 @@ test("indexes compiler-resolved definitions, imports and references with nested 
     };
 
     const result = indexWorkspace(manifest);
-    assert.ok(result.records.some(record => record.kind === "definition" && record.name === "PartnerService"));
+    assert.ok(result.records.some(record => record.kind === "definition" && record.name === "PartnerService" && record.symbolKind === "class"));
+    assert.ok(result.records.some(record => record.kind === "reference" && record.name === "PartnerService" && record.symbolKind === "class"));
     assert.ok(result.records.some(record => record.relation === "imports" && record.targetSymbolId?.includes("erpm-fe-src-app-modules-crm")));
     assert.ok(result.records.some(record => record.relation === "calls" && record.name === "load"));
     const crmRecords = result.records.filter(record => record.repositoryId === "erpm-fe-src-app-modules-crm");

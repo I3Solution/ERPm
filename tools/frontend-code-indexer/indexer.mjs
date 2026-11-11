@@ -112,6 +112,12 @@ export function indexWorkspace(manifest, options = {}) {
 
   const generatedAtUtc = new Date().toISOString();
   const records = [];
+  const apiDetection = {
+    importedHttpClientSymbols: httpClientSymbols.size,
+    candidateCalls: 0,
+    matchedCalls: 0,
+    receiverTypes: {}
+  };
 
   for (const sourceFile of sourceFiles) {
     const info = fileInfo.get(sourceFile);
@@ -170,7 +176,7 @@ export function indexWorkspace(manifest, options = {}) {
     collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, records, generatedAtUtc);
     collectAngularMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
     collectRouteMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
-    collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, records, generatedAtUtc);
+    collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, apiDetection, records, generatedAtUtc);
   }
 
   records.sort((left, right) =>
@@ -192,7 +198,8 @@ export function indexWorkspace(manifest, options = {}) {
       recordCountsByKind: countBy(records, record => record.kind),
       angularKinds: countBy(records.filter(record => record.angular), record => record.angular.kind),
       apiMethods: countBy(records.filter(record => record.api), record => record.api.httpMethod),
-      apiUrlKinds: countBy(records.filter(record => record.api), record => record.api.urlKind)
+      apiUrlKinds: countBy(records.filter(record => record.api), record => record.api.urlKind),
+      apiDetection
     }
   };
 }
@@ -462,7 +469,7 @@ function collectRouteMetadata(sourceFile, info, checker, symbolIds, records, gen
   });
 }
 
-function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, records, generatedAtUtc) {
+function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, apiDetection, records, generatedAtUtc) {
   visit(sourceFile, node => {
     if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
       return;
@@ -470,9 +477,21 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols
 
     const methodName = node.expression.name.text;
     const supportedMethods = new Set(["get", "post", "put", "patch", "delete", "head", "options", "request"]);
-    if (!supportedMethods.has(methodName) || !isAngularHttpClient(node.expression.expression, checker, httpClientSymbols)) {
+    if (!supportedMethods.has(methodName)) {
       return;
     }
+
+    apiDetection.candidateCalls++;
+    const receiverType = checker.getTypeAtLocation(node.expression.expression);
+    const receiverSymbol = receiverType.aliasSymbol ?? receiverType.getSymbol();
+    const receiverName = receiverSymbol
+      ? checker.getFullyQualifiedName(receiverSymbol)
+      : checker.typeToString(receiverType);
+    apiDetection.receiverTypes[receiverName] = (apiDetection.receiverTypes[receiverName] ?? 0) + 1;
+    if (!isAngularHttpClient(receiverType, httpClientSymbols)) {
+      return;
+    }
+    apiDetection.matchedCalls++;
 
     let httpMethod = methodName.toUpperCase();
     let urlArgument = node.arguments[0];
@@ -667,8 +686,7 @@ function collectAngularHttpClientSymbols(sourceFiles, checker) {
   return symbols;
 }
 
-function isAngularHttpClient(receiver, checker, httpClientSymbols) {
-  const type = checker.getTypeAtLocation(receiver);
+function isAngularHttpClient(type, httpClientSymbols) {
   const symbols = [type.aliasSymbol, type.getSymbol()].filter(Boolean);
   return symbols.some(symbol => httpClientSymbols.has(symbol));
 }

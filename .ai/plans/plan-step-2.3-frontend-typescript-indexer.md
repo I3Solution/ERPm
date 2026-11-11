@@ -120,7 +120,7 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 
 ### 2.3.2 — TypeScript core indexer
 
-- [ ] Define frontend index records using the shared schema/provenance policy.
+- [x] Define schema v3 JSON Schema and typed .NET frontend record model; add positive/negative JSON Schema validation tests.
 - [ ] Load FE root and one selected module using the pinned tsconfig/compiler version.
 - [ ] Index definitions, imports and compiler-resolved references.
 - [ ] Implement deterministic exclusions and cache isolation.
@@ -282,3 +282,17 @@ API records must preserve the original expression and distinguish `literal`, `in
 6. No FE application package manifest, lockfile, tsconfig, Angular config or source file is modified.
 
 **Discovery confidence:** high for runtime manifest, exact checked-out SHAs, FE toolchain, compiler configuration and nested repository boundaries. API patterns are representative observations and require fixture coverage during implementation.
+
+
+## 13. Schema v3 contract baseline — 2026-11-11
+
+Added `.ai/code-index/schema/index-record-v3.schema.json` and typed `FrontendIndexRecord`, `AngularIndexMetadata` and `ApiIndexMetadata` models.
+
+- Schema v3 is strict (`additionalProperties: false`) and independent of immutable v1/v2.
+- Common provenance includes repository ID, 40-character lowercase commit SHA, repository-relative path, indexer version and generation timestamp.
+- Source spans carry line and character offsets; unavailable positions are explicit `null`.
+- Language-neutral symbol categories replace the C#-specific v2 category enum.
+- Angular metadata and API observations use separate typed objects.
+- API URL evidence is classified as `literal`, `interpolated` or `dynamic`. Only literal URLs may populate `literalPath`; dynamic/interpolated values must leave it null.
+- Record kind controls the permitted typed payload; unknown properties and unsupported enum values are rejected.
+- Validation tests cover valid Angular/API observations and invalid URL/payload/provenance cases using JsonSchema.Net. Local package restore and test execution remain pending.

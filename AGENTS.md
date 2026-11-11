@@ -6,7 +6,6 @@ Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các
 
 1. Xác định repository hiện tại, branch, HEAD và trạng thái working tree.
 2. Đọc [workspace map](.ai/context/README.md) và [context policy](.ai/context/context-policy.md).
-3. Đọc [current status](.ai/status.md) để biết trạng thái hiện hành.
 4. Dựa vào task để chọn đúng domain/repository. Chỉ đọc phần liên quan trong `PROJECT_MASTER.md`, roadmap, plan, task và source code.
 5. Trước khi sửa code, lập danh sách scope dự kiến và xác nhận các dependency trực tiếp. Mở rộng phạm vi khi có bằng chứng kỹ thuật.
 
@@ -43,14 +42,15 @@ Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các
 - Step log: `.ai/steps/step-XX-*.md`.
 - Task record: `.ai/tasks/<type>-YYYYMMDD-*.md` theo `.ai/tasks/_TEMPLATE.md`. Giữ nguyên naming convention hiện có; không tự tạo hệ thống TASK ID hoặc đổi sang YAML/JSON.
 - Review: `.ai/reviews/YYYY-MM-DD-*.md`.
-- Current status: `.ai/status.md`; đây là báo cáo tổng hợp của dự án, không phải nơi Agent cập nhật tiến độ task.
+- Task status: ghi trực tiếp trong task record riêng tại `.ai/tasks/`; không có file trạng thái chung cần duy trì.
 - Quy tắc bắt buộc: mỗi Agent/developer khi nhận một task có thay đổi đáng kể đối với code, kiến trúc, cấu hình, CI/CD hoặc tài liệu dự án phải tạo/cập nhật một task record riêng ngay từ đầu công việc. Task record phải được commit trong cùng PR với thay đổi tương ứng. Nếu task tiếp tục qua nhiều PR, cập nhật record hiện có thay vì tạo record trùng lặp.
 - Dùng task record hiện có khi tiếp tục một task; không tạo file mới chỉ để né cập nhật record. Với công việc thuộc step/plan lớn, task record phải liên kết tới step/plan tương ứng.
 - Các thay đổi máy móc, typo/format thuần túy hoặc thao tác không làm thay đổi hành vi/nội dung dự án có thể miễn task record. Nếu không chắc, tạo record.
-- Agent chỉ sửa task record của công việc mình thực hiện; không sửa `.ai/status.md` trực tiếp và không sửa progress record của Agent khác nếu không được giao.
+- Agent chỉ sửa task record của công việc mình thực hiện; không sửa progress record của Agent khác nếu không được giao.
+- **CẤM** tạo mới, chỉnh sửa, cập nhật hoặc tự động sinh nội dung vào `.ai/status.md`. File này là snapshot lịch sử/legacy, không phải nguồn trạng thái hiện hành. Không đọc file này để xác định tiến độ task; hãy đọc task record tương ứng.
 - Trạng thái dùng đúng các giá trị trong template: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất; ghi rõ kiểm tra đã chạy, kết quả, commit/PR và việc còn lại. Không ghi PASS nếu chưa chạy kiểm tra.
-- PR validation sẽ kiểm tra task record theo rule này. Sau khi PR được merge vào `master`, automation sẽ tổng hợp các task records đã merge để cập nhật `.ai/status.md`. Task record là nguồn dữ liệu tiến độ; `.ai/status.md` là output được sinh tự động.
-- Nếu task record không hợp lệ hoặc thiếu, Agent phải bổ sung trước khi yêu cầu review/merge; không dùng status chung để thay thế task record.
+- Không xây dựng PR validator, status generator hoặc post-merge workflow để tổng hợp trạng thái vào `.ai/status.md` trừ khi có yêu cầu mới được phê duyệt riêng. Task record là nguồn trạng thái duy nhất ở cấp task.
+- Task cũ trước khi quy tắc này được áp dụng được giữ nguyên và bỏ qua; không migration, không ép chuẩn hóa, không validate hồi tố. Với task mới, Agent tạo/cập nhật task record riêng theo template hiện tại.
 
 ## 6. Context packet trước khi code
 

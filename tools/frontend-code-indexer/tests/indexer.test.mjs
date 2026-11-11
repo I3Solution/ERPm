@@ -91,22 +91,22 @@ test("extracts Angular decorators, static routes, guards and HttpClient URL evid
     await writeFile(path.join(angularCore, "index.d.ts"), [
       "export declare function Component(metadata: any): ClassDecorator;",
       "export declare function Injectable(metadata?: any): ClassDecorator;"
-    ].join("\\n"));
+    ].join("\n"));
     await writeFile(path.join(angularHttp, "index.d.ts"), [
       "export declare class HttpClient {",
       "  get<T = unknown>(url: string): unknown;",
       "  post<T = unknown>(url: string, body: unknown): unknown;",
       "}"
-    ].join("\\n"));
+    ].join("\n"));
     await writeFile(path.join(src, "router-types.ts"), [
       "export type Routes = any[];",
       "export type CanActivateFn = () => boolean;"
-    ].join("\\n"));
+    ].join("\n"));
     await writeFile(path.join(src, "demo.component.ts"), [
       "import { Component } from '@angular/core';",
       "@Component({ selector: 'app-demo', templateUrl: './demo.component.html', styleUrls: ['./demo.component.scss'] })",
       "export class DemoComponent {}"
-    ].join("\\n"));
+    ].join("\n"));
     await writeFile(path.join(src, "demo.service.ts"), [
       "import { Injectable } from '@angular/core';",
       "import { HttpClient } from '@angular/common/http';",
@@ -118,19 +118,19 @@ test("extracts Angular decorators, static routes, guards and HttpClient URL evid
       "  loadById(id: number) { return this.http.get(`${this.apiUrl}/${id}`); }",
       "  save(payload: unknown) { return this.http.post(this.apiUrl, payload); }",
       "}"
-    ].join("\\n"));
+    ].join("\n"));
     await writeFile(path.join(src, "app.routes.ts"), [
       "import { Routes, CanActivateFn } from './router-types';",
       "const guard: CanActivateFn = () => true;",
       "export const routes: Routes = [",
       "  { path: 'demo', loadComponent: () => import('./demo.component').then(m => m.DemoComponent), canActivate: [guard] }",
       "];"
-    ].join("\\n"));
+    ].join("\n"));
     await writeFile(path.join(src, "main.ts"), [
       "import './app.routes';",
       "import './demo.component';",
       "import './demo.service';"
-    ].join("\\n"));
+    ].join("\n"));
 
     const manifest = {
       rootPath: root,

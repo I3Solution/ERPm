@@ -44,6 +44,7 @@ export function indexWorkspace(manifest, options = {}) {
     options: parsed.options
   });
   const checker = program.getTypeChecker();
+  const httpClientSymbols = collectAngularHttpClientSymbols(sourceFilesForProgram(program), checker);
   const programFilesByAbsolutePath = new Map(
     program.getSourceFiles().map(sourceFile => [path.resolve(sourceFile.fileName), sourceFile])
   );
@@ -169,7 +170,7 @@ export function indexWorkspace(manifest, options = {}) {
     collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, records, generatedAtUtc);
     collectAngularMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
     collectRouteMetadata(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
-    collectApiCalls(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
+    collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, records, generatedAtUtc);
   }
 
   records.sort((left, right) =>
@@ -461,7 +462,7 @@ function collectRouteMetadata(sourceFile, info, checker, symbolIds, records, gen
   });
 }
 
-function collectApiCalls(sourceFile, info, checker, symbolIds, records, generatedAtUtc) {
+function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols, records, generatedAtUtc) {
   visit(sourceFile, node => {
     if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
       return;
@@ -469,7 +470,7 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, records, generate
 
     const methodName = node.expression.name.text;
     const supportedMethods = new Set(["get", "post", "put", "patch", "delete", "head", "options", "request"]);
-    if (!supportedMethods.has(methodName) || !isAngularHttpClient(node.expression.expression, checker)) {
+    if (!supportedMethods.has(methodName) || !isAngularHttpClient(node.expression.expression, checker, httpClientSymbols)) {
       return;
     }
 
@@ -624,14 +625,49 @@ function findLazyTargetSymbolId(node, checker, symbolIds) {
   return result;
 }
 
-function isAngularHttpClient(receiver, checker) {
-  const type = checker.getTypeAtLocation(receiver);
-  const symbol = type.aliasSymbol ?? type.getSymbol();
-  if (!symbol || symbol.getName() !== "HttpClient") {
-    return false;
+
+function sourceFilesForProgram(program) {
+  return program.getSourceFiles();
+}
+
+function collectAngularHttpClientSymbols(sourceFiles, checker) {
+  const symbols = new Set();
+  for (const sourceFile of sourceFiles) {
+    visit(sourceFile, node => {
+      if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)
+        || node.moduleSpecifier.text !== "@angular/common/http") {
+        return;
+      }
+
+      const bindings = node.importClause?.namedBindings;
+      if (!bindings || !ts.isNamedImports(bindings)) {
+        return;
+      }
+
+      for (const specifier of bindings.elements) {
+        const importedName = specifier.propertyName?.text ?? specifier.name.text;
+        if (importedName !== "HttpClient") {
+          continue;
+        }
+        const alias = checker.getSymbolAtLocation(specifier.name);
+        if (!alias) {
+          continue;
+        }
+        try {
+          symbols.add(checker.getAliasedSymbol(alias));
+        } catch {
+          // Keep unresolved imports out of the trusted HttpClient symbol set.
+        }
+      }
+    });
   }
-  return (symbol.declarations ?? []).some(declaration =>
-    normalizePath(declaration.getSourceFile().fileName).toLowerCase().includes("/node_modules/@angular/common/http/"));
+  return symbols;
+}
+
+function isAngularHttpClient(receiver, checker, httpClientSymbols) {
+  const type = checker.getTypeAtLocation(receiver);
+  const symbols = [type.aliasSymbol, type.getSymbol()].filter(Boolean);
+  return symbols.some(symbol => httpClientSymbols.has(symbol));
 }
 
 function findContainingSymbol(node, sourceFile, checker, symbolIds) {

@@ -76,6 +76,7 @@ export function indexWorkspace(manifest, options = {}) {
   }
 
   const symbolIds = new Map();
+  const symbolKinds = new Map();
   const declarationsBySourceFile = new Map();
   for (const sourceFile of sourceFiles) {
     const info = fileInfo.get(sourceFile);
@@ -99,6 +100,7 @@ export function indexWorkspace(manifest, options = {}) {
       const symbolId = createSymbolId(info.owner.repositoryId, info.relativePath, symbolKind, startOffset, name);
       if (!symbolIds.has(symbol)) {
         symbolIds.set(symbol, symbolId);
+        symbolKinds.set(symbol, symbolKind);
       }
       if (!declarationsBySourceFile.has(sourceFile)) {
         declarationsBySourceFile.set(sourceFile, []);
@@ -164,7 +166,7 @@ export function indexWorkspace(manifest, options = {}) {
     }
 
     collectImports(sourceFile, info, parsed.options, fileInfo, programFilesByAbsolutePath, records, generatedAtUtc);
-    collectReferences(sourceFile, info, checker, symbolIds, records, generatedAtUtc);
+    collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, records, generatedAtUtc);
   }
 
   records.sort((left, right) =>
@@ -233,7 +235,7 @@ function collectImports(sourceFile, info, compilerOptions, fileInfo, programFile
 }
 
 
-function collectReferences(sourceFile, info, checker, symbolIds, records, generatedAtUtc) {
+function collectReferences(sourceFile, info, checker, symbolIds, symbolKinds, records, generatedAtUtc) {
   visit(sourceFile, node => {
     if (!ts.isIdentifier(node) || isDeclarationName(node) || isImportOrExportName(node)) {
       return;
@@ -262,7 +264,7 @@ function collectReferences(sourceFile, info, checker, symbolIds, records, genera
     const relation = isCallTarget(node) ? "calls" : "references";
     records.push(createRecord(info, {
       kind: "reference",
-      symbolKind: "unknown",
+      symbolKind: symbolKinds.get(symbol) ?? "unknown",
       symbolId: `ref:${info.owner.repositoryId}:${info.relativePath}:${start}`,
       name: node.text,
       qualifiedName: null,

@@ -1,10 +1,12 @@
 # Phase 2 — Code Intelligence & Dependency Indexing
 
-> **Status:** Step 2.2 backend quality accepted; Step 2.3 frontend implementation and verification complete on feature branch; final review/PR pending  
+> **Status:** Initial backend/frontend code-indexing foundation merged (PR #66); remaining EF/cross-layer/evaluation work deferred to the reusable Enterprise Knowledge Platform roadmap  
 > **Created:** 2026-11-10  
 > **Owner:** ERPm Context Engineering  
 > **Target repository:** `I3Solution/ERPm` (umbrella), with read-only indexing of pinned child repositories  
 > **Integration branch:** `master`
+
+> **Scope clarification (2026-11-11):** This document records the original ERPm-focused Phase 2 implementation. Its `local-first` wording describes the first validation/developer workflow, not the target architecture of the overall product. The accepted product direction is now a reusable, multi-workspace Enterprise Knowledge Platform with centralized ingestion and shared retrieval. See [platform architecture](../architecture/enterprise-knowledge-platform.md) and [platform roadmap](roadmap-enterprise-knowledge-platform.md). Existing indexers are retained as source-specific extractors; local cache remains useful for development but is not the shared knowledge source of truth.
 
 ## 1. Objective
 
@@ -533,3 +535,49 @@ The code-index CI job installs the worker's independent npm lockfile and execute
 The pinned FE CI smoke run used TypeScript 5.8.3 and indexed 102 source files from a 161-file Program. It wrote 12,880 schema v3 records, attributed to the FE root plus CRM, dashboard, HRM, SD and WMS nested repositories using each exact gitlink SHA. ACC, MFG, PM, PUR and SCM did not appear in the current Program's reachable source set and were not stamped with guessed records.
 
 The code-index CI job passed worker fixtures, .NET build/tests, manifest validation, actual FE indexing and a definition-first `PartnerService` query from CRM at `services/partner.service.ts` (lines 72–177). Local Windows smoke verification and mixed-SHA rejection remain part of Step 2.3.4 before closing the phase.
+
+
+## 19. Phase 2 implementation checkpoint and platform transition — 2026-11-11
+
+### Step 2.3 final status
+
+The frontend TypeScript/Angular indexer was merged through [PR #66](https://github.com/I3Solution/ERPm/pull/66) into root `master`.
+
+- Merge commit: `72c12421ae8bc6b09b9c326c52cd11d8bece6a64`.
+- Latest recorded branch-head CI run #553 passed all jobs at `a2a94c7bf63471861ba5e256a12af4e769104911`; the user confirmed all CI checks were green before merge.
+- CI indexed 12,880 schema-v3 records from 102 source files in a 161-file TypeScript Program across the FE root, CRM, dashboard, HRM, SD and WMS.
+- User-reported local FE indexing produced 13,140 records across six repositories. This is a distinct local result; no controlled CI/local count comparison is claimed.
+- The user also reported a fake-SHA cache-isolation probe returned no result and cleaned up its synthetic cache entry.
+- The earlier statements in this plan that local Windows verification, final review or PR/merge were pending are historical checkpoints and are superseded by this section and the current [status snapshot](../status.md).
+
+### Phase 2 outcome
+
+The initial Code Intelligence foundation is integrated:
+- Recursive workspace manifest and exact gitlink SHA validation.
+- Backend Roslyn indexer with schema v2.
+- Frontend TypeScript/Angular worker with schema v3.
+- Versioned JSONL records and local cache isolation by repository, SHA and indexer/schema version.
+- CLI orchestration and CI validation/query smoke tests.
+
+This does **not** mean the broader code intelligence vision is complete. EF metadata extraction, migration indexing, unified cross-layer relationships, multi-hop retrieval and retrieval/context evaluation were not implemented as part of the merged PR #66 deliverable.
+
+### Reclassification of remaining work
+
+The following original Phase 2 items are deferred and will be reconsidered within the reusable platform roadmap:
+- EF Core model and migration metadata extraction → platform Code/Database knowledge ingestion.
+- Unified API/DTO/EF relationships → canonical relationship contract and structured retrieval.
+- Multi-hop query and retrieval quality → Hybrid RAG and retrieval evaluation.
+- Context/token evaluation and Context Packet → Context Engine and evaluation phases.
+
+Do not start these items as isolated ERPm-only features before the platform contracts and workspace boundaries are defined.
+
+### Target architecture transition
+
+The local CLI/indexers remain valuable implementation assets, but the target platform requires:
+1. Central ingestion triggered by source revision changes.
+2. A versioned, project-neutral knowledge/evidence/relationship contract.
+3. Central storage and a shared workspace-scoped Retrieval API.
+4. Developer-local cache as an optional acceleration/offline layer, not the shared source of truth.
+5. Hybrid retrieval and Context Packet generation above the centralized knowledge stores.
+
+The next work is Phase 0 of the [Reusable Enterprise Knowledge Platform roadmap](roadmap-enterprise-knowledge-platform.md), not another indexer feature or a new PR for EF metadata.

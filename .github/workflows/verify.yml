@@ -78,3 +78,13 @@ jobs:
         run: dotnet run --project tools/ERPm.CodeIndex -- find symbol PartnerService | grep -m 1 '"kind":"definition".*"name":"PartnerService"'
       - name: Query indexed frontend API evidence
         run: dotnet run --project tools/ERPm.CodeIndex -- find symbol getPartnerById | grep -m 1 '"kind":"api".*"urlKind":"interpolated"'
+
+  task-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test task status generator
+        run: python -m unittest discover -s tests/progress -v

@@ -15,7 +15,7 @@ Thiết kế và triển khai cơ chế tự động tái tạo `.ai/status.md` 
 - `.ai/status.md` là generated output do GitHub Actions sở hữu.
 - Mỗi lần chạy phải đọc toàn bộ task record đủ điều kiện trên latest `master`, không cộng dồn dữ liệu PR.
 - Task cũ không có marker mới được giữ nguyên và loại khỏi aggregation.
-- Generator dùng output xác định theo source SHA; không thêm timestamp hiện tại gây thay đổi giả.
+- Generator chỉ đưa dữ liệu task vào report; không thêm source commit SHA hoặc timestamp khiến PR không đổi task vẫn tạo commit status.
 
 ## 3. Features / Milestones
 - [x] Chốt mô hình snapshot rebuild và semantics cho task qua nhiều PR.

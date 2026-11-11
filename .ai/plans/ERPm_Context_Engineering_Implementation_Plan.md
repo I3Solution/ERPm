@@ -1257,3 +1257,26 @@ The initial backend indexer is operational for the tested workspace and symbol q
 ### Safety and evidence
 
 The existing `0.1.0` index cache is the comparison baseline and must not be deleted or overwritten. No application source changes, submodule gitlink changes, production database access, or `global.json` changes are part of this quality follow-up. The real re-index comparison and fixture tests remain pending.
+
+
+---
+
+## 20. Phase 2 progress update — 2026-11-11
+
+### Step 2.2 — Backend Roslyn indexer quality
+
+**Accepted after CI and real-workspace verification.**
+
+- PR #60 implementation and PR #61 documentation follow-up are merged.
+- User-run tests: 12 passed, 0 failed.
+- User-run 0.2.0 index against the exact root-pinned backend SHA `235173fd193ae2fb60081fa4573434f5edd506f3`: 50,471 records; 195 syntax trees included; 45 excluded; no `obj/bin` path records.
+- Representative call/reference samples and `BaseCrudController` symbol lookup were inspected.
+- The 0.1.0 baseline is from a different Backend SHA; raw record counts are not a controlled A/B comparison.
+- Dedicated inheritance/implementation edges remain a Step 2.5 follow-up.
+
+### Next: Step 2.3 — Frontend TypeScript/Angular indexer
+
+- Detailed plan: [plan-step-2.3-frontend-typescript-indexer.md](plan-step-2.3-frontend-typescript-indexer.md).
+- Use exact root snapshot `468e7025fa4dee1e61bb651ed58c106361f05639`, FE gitlink `62270988b42eece930c702d1272fe857d31bcbb9`, and the recursive module SHAs recorded in the Phase 2 plan.
+- Begin with FE tooling/configuration discovery and a fixture-backed TypeScript Compiler API slice using TypeScript 5.8.3.
+- Keep Angular metadata extraction isolated; do not modify FE application dependencies or source.

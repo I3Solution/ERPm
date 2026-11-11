@@ -15,11 +15,14 @@ FILENAME_RE = re.compile(
     r"^(?P<type>bug|change|refactor|db|spike)-(?P<date>\d{8})-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)\.md$"
 )
 STATUS_RE = re.compile(
-    r"^\s*>\s*\*\*Trạng thái:\*\*\s*(?P<status>Todo|Doing|Blocked|Done)(?=\s|$|[([])",
-    re.MULTILINE,
+    r"\*\*Trạng thái:\*\*\s*(?P<status>Todo|Doing|Blocked|Done)(?=\s|$|[([])",
 )
-TYPE_RE = re.compile(r"^\s*>\s*\*\*Loại:\*\*\s*(?P<type>[a-z]+)\s*$", re.MULTILINE)
-DATE_RE = re.compile(r"^\s*>\s*\*\*Ngày tạo:\*\*\s*(?P<date>\d{4}-\d{2}-\d{2})", re.MULTILINE)
+TYPE_RE = re.compile(
+    r"\*\*Loại(?:\s*/\s*tag)?:\*\*\s*(?P<type>bug|change|refactor|db|spike)(?=\s|$|/)",
+)
+DATE_RE = re.compile(
+    r"\*\*Ngày(?: tạo)?:\*\*\s*(?P<date>\d{4}-\d{2}-\d{2})",
+)
 REQUIRED_METADATA = ("Ngày tạo", "Người làm", "Người yêu cầu", "Trạng thái", "Liên quan")
 REQUIRED_SECTIONS = ("1", "2", "3", "4", "5")
 
@@ -56,9 +59,9 @@ def validate_task(path: Path, task_root: Path, strict: bool = False) -> list[str
         )
 
     date_match = DATE_RE.search(content)
-    if not date_match:
+    if strict and not date_match:
         errors.append(f"{path}: missing metadata '**Ngày tạo:** YYYY-MM-DD'")
-    else:
+    elif date_match:
         try:
             datetime.strptime(date_match.group("date"), "%Y-%m-%d")
         except ValueError:

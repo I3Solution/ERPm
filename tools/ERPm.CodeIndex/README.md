@@ -33,7 +33,7 @@ The frontend worker indexes TypeScript/JavaScript files reachable in the applica
 - Every record carries its schema/indexer version, repository ID, exact source commit SHA, repository-relative path, source span, symbol identity, evidence and generation timestamp.
 - Generated JSONL files are written under `.ai/code-index/cache/` and must not be committed. Cache paths are isolated by repository ID, exact SHA and indexer version.
 
-Schema v3 has typed Angular and API payloads. The initial TypeScript core currently emits file, definition, import and compiler-resolved reference/call observations; Angular and API metadata extraction is the next implementation step.
+Schema v3 has typed Angular and API payloads. The worker emits file, definition, import and compiler-resolved reference/call observations, plus Angular component/service/guard/route metadata and typed HttpClient API observations.
 
 ## Frontend worker
 

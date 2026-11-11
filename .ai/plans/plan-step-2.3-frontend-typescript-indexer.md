@@ -1,6 +1,6 @@
 # Step 2.3 — Frontend TypeScript/Angular Indexer
 
-> **Status:** TypeScript core + Angular/API extractors implemented; latest branch-head CI passed; local Windows verification pending  
+> **Status:** Implementation, CI and local Windows smoke verification passed; final code review and PR/merge pending  
 > **Created:** 2026-11-11  
 > **Target repository:** `I3Solution/ERPm` umbrella; read-only indexing of pinned FE repositories  
 > **Integration branch:** `master`  
@@ -141,12 +141,12 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 
 ### 2.3.4 — Workspace smoke test and acceptance
 
-- [ ] Run tests and build in the supported local environment.
-- [ ] Index one pinned FE module, then validate FE-root integration if supported.
-- [ ] Verify zero generated/vendor/build paths in normal source results.
-- [ ] Inspect representative symbol/import/reference/component/API queries.
-- [ ] Verify mixed-SHA rejection and version-specific cache paths.
-- [ ] Record counts, diagnostics, indexing time and known limitations.
+- [x] Run tests and build in the supported local Windows environment: `npm ci`; Node worker tests 3/3; .NET build succeeded; .NET tests 18/18.
+- [x] Index the pinned FE application Program and nested repositories: local run wrote 13,140 records across six repositories; CI run indexed 102 source files from a 161-file Program and wrote 12,880 records.
+- [x] Verify generated/vendor/build exclusions through worker filtering and CI validation; local provenance audit covered all 8 cache files with zero mismatches.
+- [x] Inspect representative symbol/API queries locally (`PartnerService`, `getPartnerById`) and in CI (definition-first `PartnerService`, interpolated API query); local index output spans six repositories.
+- [x] Verify active-SHA cache isolation with a synthetic record under a fake SHA; `find symbol` did not return it. Cache paths include repository, SHA and indexer version. Old cache folders are retained but not selected.
+- [x] Record local record count (13,140), CI coverage/counts (102/161 source files; 12,880 records), provenance results (8 files, 0 errors), test counts and known Program-reachability limitation. Indexing duration and detailed diagnostics were not captured.
 
 **Exit:** a reproducible frontend index for at least one real pinned module; broader all-module indexing only after measured reliability.
 
@@ -350,4 +350,4 @@ No records were emitted for ACC, MFG, PM, PUR or SCM because their source files 
 
 The CI query `find symbol PartnerService` returned a definition from CRM at `services/partner.service.ts`, lines 72–177, with the exact CRM SHA. Definition records are prioritized ahead of references. The same run extracted 130 Angular metadata records (63 components, 18 services, 3 guards, 46 routes) and 34 HttpClient API observations (17 GET, 9 POST, 5 PUT, 3 DELETE). API URL evidence comprised 4 literal, 16 interpolated and 14 dynamic expressions; interpolated/dynamic records retain the original expression and have no fabricated literal path. The workflow now also queries `getPartnerById` and requires an interpolated API record.
 
-**Verification state (2026-11-11):** Node fixture tests, .NET build/tests, manifest validation, actual FE Program indexing, definition-first symbol query and interpolated-API query passed in code-index CI. Full workflow run #542 passed all three jobs (backend, frontend and code-index) at branch HEAD `1bb5bf789f62100e4d4d413a91217e5cd35a64ed`. CI indexed 102 source files from 161 Program files and wrote 12,880 records. Local Windows smoke verification, cache inspection and mixed-SHA rejection remain pending before Step 2.3.4 acceptance.
+**Verification state (2026-11-11):** CI run #545 passed all three jobs (backend, frontend and code-index) at branch HEAD `184a0a4d4f32f7ed687800bf626a4be034e25bb5`. CI indexed 102 source files from 161 Program files and wrote 12,880 records. Local Windows verification passed: `npm ci`, Node tests 3/3, .NET build and tests 18/18, 12-repository manifest validation, FE indexing (13,140 records across six repositories), `PartnerService` / `getPartnerById` queries, and cache provenance audit (8 files, 0 mismatches). A synthetic fake-SHA record was not returned by the active-SHA query. The cache test demonstrates SHA-keyed isolation; old cache folders are intentionally retained. `git status --short` was clean and `.ai/code-index/cache/` was confirmed ignored. Indexing duration and detailed diagnostics were not captured. Final code review and PR/merge remain pending.

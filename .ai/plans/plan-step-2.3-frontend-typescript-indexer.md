@@ -1,6 +1,6 @@
 # Step 2.3 — Frontend TypeScript/Angular Indexer
 
-> **Status:** Discovery closed; schema v3 and implementation next  
+> **Status:** TypeScript core + Angular/API extractors implemented; CI real-workspace smoke passed; local verification pending  
 > **Created:** 2026-11-11  
 > **Target repository:** `I3Solution/ERPm` umbrella; read-only indexing of pinned FE repositories  
 > **Integration branch:** `master`  
@@ -124,18 +124,18 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 - [x] Load the FE application Program from the pinned root `tsconfig.app.json` / `src/main.ts`; attribute included source files to the longest matching manifest repository path.
 - [x] Index source files, supported definitions, imports and compiler-resolved references with schema v3 records.
 - [x] Implement deterministic source exclusions and per-repository / pinned-SHA / indexer-version cache isolation.
-- [ ] Add fixture tests for symbols, aliases, imports, references and generated files.
-- [ ] Add CLI invocation and machine-readable output.
+- [x] Add fixture tests for symbols, imports, references, nested repository attribution and generated files.
+- [x] Add CLI invocation and machine-readable JSONL output.
 
 **Exit:** fixture tests pass and a real FE symbol query returns exact source evidence and pinned SHA.
 
 ### 2.3.3 — Angular and API metadata
 
-- [ ] Extract component/service/guard metadata.
-- [ ] Extract statically declared route metadata.
-- [ ] Extract API client methods and HTTP verb/path literals.
-- [ ] Add positive/negative fixture tests for dynamic and static cases.
-- [ ] Label partial/unknown evidence instead of guessing.
+- [x] Extract component/service/guard metadata from Angular decorators and statically typed guard declarations.
+- [x] Extract statically declared route path, lazy import target and guard invocation metadata.
+- [x] Extract Angular HttpClient calls, HTTP verbs, original URL expressions and literal/interpolated/dynamic classifications.
+- [x] Add fixture tests for Angular decorators, static routes, guards, HttpClient calls and all URL evidence classes.
+- [x] Preserve unresolved import targets as partial; dynamic/interpolated API paths never receive fabricated literal paths.
 
 **Exit:** one real FE module query returns component/service/route/API client evidence with exact spans.
 
@@ -312,3 +312,42 @@ Added an isolated Node worker under `tools/frontend-code-indexer`:
 - CI now installs the isolated worker dependencies and runs its Node tests before the existing .NET code-index build/tests.
 
 **Verification state:** implementation is committed to the feature branch. CI and local real-workspace smoke test are pending; do not mark Step 2.3.2 accepted until both pass and record counts/source samples are inspected.
+
+
+## 15. Angular and API metadata implementation — 2026-11-11
+
+The Node worker now includes isolated extractors for:
+- Angular `@Component` metadata: selector, template/template URL and statically declared styles.
+- Angular `@Injectable` metadata: `providedIn`.
+- Functional guards with explicit Angular guard function types.
+- Static `Routes` arrays: literal route path, lazy import path, compiler-resolved lazy target symbol and original guard invocation expression.
+- Angular `HttpClient` calls resolved by the TypeScript checker: HTTP method, exact source URL expression, containing method symbol and URL evidence class.
+
+URL evidence rules:
+- String literal or no-substitution template literal: `literal`, with the exact literal path.
+- Template expression with substitutions: `interpolated`, with the original expression and `literalPath: null`.
+- Identifier, property access, concatenation or other computed expression: `dynamic`, with `literalPath: null`.
+- HTTP calls are accepted only when the receiver type resolves to Angular's `HttpClient`; arbitrary objects with methods named `get`/ `post` are not treated as API clients.
+
+Fixture coverage now includes component/service decorators, functional guards, lazy route imports, guard invocation text, literal/interpolated/dynamic URLs, nested repository attribution, exact pinned SHA propagation and generated-file exclusion.
+
+### Pinned FE CI smoke evidence
+
+The code-index job completed the actual pinned FE Program smoke test and symbol query:
+- TypeScript compiler: 5.8.3.
+- Program source files: 161.
+- Indexed source files: 102.
+- Excluded/external/declaration source files: 59.
+- Records written: 12,846 across the FE root and five nested repositories represented in the Program.
+- FE root: 5,879 records at `62270988b42eece930c702d1272fe857d31bcbb9`.
+- CRM: 735 records at `9b66e321d6cff83ed703d080c3e5e19996816477`.
+- dashboard: 63 records at `4380f4b433de6ec86be5b4934279af177be5dca5`.
+- HRM: 1,737 records at `f66e1bb61fe222684a9c63addde93c11d1559df3`.
+- SD: 3,688 records at `750960006dd1190682556334fdf3a64b6273aad4`.
+- WMS: 744 records at `fd320c77642a0860ca8cfad25de10ea9bd1e796c`.
+
+No records were emitted for ACC, MFG, PM, PUR or SCM because their source files were not reachable from the configured FE application Program entry in this pinned snapshot. This is expected compiler coverage, not evidence that those repositories are empty or unsupported.
+
+The CI query `find symbol PartnerService` returned a definition from CRM at `services/partner.service.ts`, lines 72–177, with the exact CRM SHA. Definition records are prioritized ahead of references.
+
+**Verification state:** fixture tests, .NET build/tests, manifest validation, actual FE indexing and symbol query passed in the code-index CI job. Full workflow backend/frontend jobs are tracked separately. Local Windows smoke verification and mixed-SHA rejection remain pending before Step 2.3.4 acceptance.

@@ -1,4 +1,4 @@
-> **GENERATED REPORT TARGET — AUTOMATION PENDING:** This file is not manually editable. Until the status aggregation workflow is implemented and merged, the content below is a historical snapshot and must not be treated as live progress. After implementation, only the authorized GitHub Actions workflow may replace this file from eligible task records on the latest `master`.
+> **LEGACY / FROZEN:** This file is a historical snapshot only. Do not update it, use it as live task status, or regenerate it. Current progress belongs in each task record under `.ai/tasks/`.
 
 # ERPm / Enterprise Knowledge Platform — Current Status
 

@@ -68,7 +68,7 @@ def parse_task(path: Path, tasks_root: Path) -> TaskRecord | None:
     if MARKER not in lines:
         return None
 
-    source = path.relative_to(tasks_root.parent).as_posix()
+    source = path.relative_to(tasks_root.parent.parent).as_posix()
     title = _single_match(r"^#\s+\[[^\]]+\]\s+(.+?)\s*$", text, "task title", source)
     owner = _single_match(r"^\s*>.*\*\*Người làm:\*\*\s*(.+?)(?:\s*·\s*\*\*Người yêu cầu:\*\*.*)?\s*$", text, "task owner", source)
     status = _single_match(r"^\s*>\s*\*\*Trạng thái:\*\*\s*(\S+)\s*$", text, "task status", source)

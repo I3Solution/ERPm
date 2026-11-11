@@ -103,12 +103,12 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 
 ### 2.3.1 — Workspace and tooling discovery
 
-- [ ] Verify root and recursive FE gitlink SHAs.
-- [ ] Inspect Node/package manager/lockfile/CI constraints.
-- [ ] Confirm TypeScript and Angular versions from the pinned FE source.
-- [ ] Map tsconfig and nested-module project boundaries.
-- [ ] Document API client and Angular metadata patterns.
-- [ ] Recommend a minimal indexer package/CLI integration.
+- [x] Verify root and recursive FE gitlink SHAs.
+- [x] Inspect FE root package manager and lockfile.
+- [x] Confirm TypeScript and Angular versions from the pinned FE source.
+- [x] Inspect root Angular/TypeScript compiler configuration and static route metadata.
+- [ ] Inspect Node version used by CI/local developer environment and nested-module project boundaries.
+- [ ] Document representative API client patterns and recommend the minimal indexer package/CLI integration.
 
 **Exit:** a source-backed frontend tooling report with exact paths and pinned SHA; no application files changed.
 
@@ -183,3 +183,36 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 - Root and recursive FE SHAs above were supplied by the user's `git rev-parse`, `git ls-tree` and `git submodule status --recursive` output on 2026-11-11.
 - Confidence: high for the reported Git snapshot; package/toolchain facts remain to be verified directly from the pinned FE manifests.
 - Retrieval reason: establish a reproducible, revision-safe starting point for the frontend indexer.
+
+
+## 11. Discovery findings — pinned FE snapshot (2026-11-11)
+
+Source inspected at `I3Solution/ERPm-FE@62270988b42eece930c702d1272fe857d31bcbb9`:
+
+| File | Verified finding |
+|---|---|
+| `package.json` | npm scripts; Angular dependencies declared at `^20.3.34`; TypeScript declared as `~5.8.3` |
+| `package-lock.json` | npm lockfileVersion 3; exact TypeScript `5.8.3`; exact Angular core/router `20.3.34`; Angular DevKit/build tooling `20.3.42` |
+| `angular.json` | Angular application project `client`; sourceRoot `src`; build uses `tsconfig.app.json`; output `dist/client`; Karma tests use `tsconfig.spec.json` |
+| `tsconfig.json` | strict TypeScript; ES2022 target/module; `moduleResolution: bundler`; decorators enabled; strict Angular injection/template checks |
+| `tsconfig.app.json` | extends root tsconfig; app entry file `src/main.ts`; declaration include `src/**/*.d.ts` |
+| `tsconfig.spec.json` | extends root tsconfig; includes `src/**/*.spec.ts` and declarations |
+| `src/app/app.routes.ts` | static `Routes` array; many `loadComponent: () => import(...).then(...)` lazy route declarations; guards include direct references and factory-style calls |
+| `src/app/app.config.ts` | `provideRouter(routes)`, `provideHttpClient(withInterceptors(...))`, Ionic provider setup |
+
+### Toolchain constraints
+
+- Package manager is npm; lockfile is committed.
+- The lockfile's Angular 20.3.34 packages declare Node engine support `^20.19.0 || ^22.12.0 || >=24.0.0`. Verify the actual CI/local Node version before executing npm commands.
+- No `.nvmrc` or `.node-version` file was found at the FE root.
+- The TypeScript compiler version is pinned by the lockfile at 5.8.3. The indexer must use this version rather than an independently upgraded global compiler.
+
+### Architectural implications
+
+1. The app compiler configuration is rooted at `tsconfig.app.json` and the program starts from `src/main.ts`; compiler import traversal should be used rather than scanning every `.ts` file indiscriminately.
+2. Lazy route components are represented by dynamic `import()` expressions in a static route array. This is a tractable first Angular route-extraction fixture and can retain the import path and resolved component symbol.
+3. The root FE repository contains nested Git submodules under `src/app/modules`. A TypeScript Program may resolve files across those nested roots; each emitted record must be assigned to its owning repository root and exact gitlink SHA, not stamped with the FE root SHA indiscriminately.
+4. Route guards can be direct references or factory-style calls (for example permission guards). Preserve the syntactic form and only emit a resolved dependency when the checker supports it.
+5. API client patterns and nested module-specific configuration have not yet been inspected; keep these discovery items open.
+
+**Evidence paths and revisions:** all findings above derive from the exact FE files listed in the table at commit `62270988b42eece930c702d1272fe857d31bcbb9`. Confidence: high for manifest/config/route facts; Node runtime actually used in CI and module-specific project boundaries remain unverified.

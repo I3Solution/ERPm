@@ -121,9 +121,9 @@ Use typed relation values such as `defines`, `imports`, `references`, `injects`,
 ### 2.3.2 — TypeScript core indexer
 
 - [x] Define schema v3 JSON Schema and typed .NET frontend record model; add positive/negative JSON Schema validation tests.
-- [ ] Load FE root and one selected module using the pinned tsconfig/compiler version.
-- [ ] Index definitions, imports and compiler-resolved references.
-- [ ] Implement deterministic exclusions and cache isolation.
+- [x] Load the FE application Program from the pinned root `tsconfig.app.json` / `src/main.ts`; attribute included source files to the longest matching manifest repository path.
+- [x] Index source files, supported definitions, imports and compiler-resolved references with schema v3 records.
+- [x] Implement deterministic source exclusions and per-repository / pinned-SHA / indexer-version cache isolation.
 - [ ] Add fixture tests for symbols, aliases, imports, references and generated files.
 - [ ] Add CLI invocation and machine-readable output.
 
@@ -296,3 +296,19 @@ Added `.ai/code-index/schema/index-record-v3.schema.json` and typed `FrontendInd
 - API URL evidence is classified as `literal`, `interpolated` or `dynamic`. Only literal URLs may populate `literalPath`; dynamic/interpolated values must leave it null.
 - Record kind controls the permitted typed payload; unknown properties and unsupported enum values are rejected.
 - Validation tests cover valid Angular/API observations and invalid URL/payload/provenance cases using JsonSchema.Net. Local package restore and test execution remain pending.
+
+
+## 14. TypeScript core worker implementation — 2026-11-11
+
+Added an isolated Node worker under `tools/frontend-code-indexer`:
+- Separate `package.json` and npm lockfile pin TypeScript exactly to 5.8.3; FE application manifests and lockfiles remain untouched.
+- Worker consumes the validated .NET workspace manifest through stdin and does not invoke Git or parse submodule status.
+- Compiler Program is created from the pinned FE root `tsconfig.app.json`, whose application entry is `src/main.ts`.
+- Source ownership is resolved using the longest matching manifest repository path. Records carry the exact SHA for that owner and repository-relative paths.
+- Initial extractors emit source-file records, supported TypeScript declarations, import edges and compiler-resolved identifier references/calls.
+- Excludes declaration files, generated suffixes/headers and common vendor/build output directories.
+- .NET CLI command `index repo erpm-fe` invokes the worker, validates emitted repository/SHA/path/version fields and writes separate schema v3 JSONL caches for each repository represented in the Program.
+- Node built-in test runner fixtures cover definition/import/reference extraction, nested module attribution, pinned SHA propagation and generated-source exclusion.
+- CI now installs the isolated worker dependencies and runs its Node tests before the existing .NET code-index build/tests.
+
+**Verification state:** implementation is committed to the feature branch. CI and local real-workspace smoke test are pending; do not mark Step 2.3.2 accepted until both pass and record counts/source samples are inspected.

@@ -1,6 +1,6 @@
 # Task Progress Aggregation — Design
 
-> **Status:** Generator, unit tests and CI test job implemented on the feature branch; post-merge workflow implemented but not yet exercised on `master`.
+> **Status:** Generator, unit tests and CI test job implemented and CI-verified on the feature branch; post-merge workflow implemented but not yet exercised on `master`.
 > **Scope:** ERPm umbrella repository only. This is repository governance/CI automation, not part of the Enterprise Knowledge Platform runtime.
 
 ## 1. Goals
@@ -138,7 +138,7 @@ GitHub concurrency may replace an older pending run with a newer pending run. Th
 
 1. Task template and Agent/Developer rules — implemented.
 2. Deterministic generator and parser tests — implemented.
-3. CI job for generator tests — implemented; CI result pending verification.
+3. CI job for generator tests — implemented and verified successful in [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834) (4/4 jobs passed).
 4. Post-merge workflow and least-privilege token scope — implemented on feature branch; not yet exercised against protected `master`.
 5. End-to-end multi-PR, concurrent merge, idempotency and push-race tests — pending.
 6. Replace the frozen legacy `.ai/status.md` only after the workflow is merged and its first successful run completes.

@@ -46,6 +46,7 @@ Rules:
 - A task spanning PRs reuses the same file. Each merged PR carries the latest complete snapshot of that file.
 - Historical records without the marker are excluded without migration or backfill.
 - A marked record missing required fields, containing an unknown status or malformed feature checklist is an error. The generator must fail before replacing the report.
+- A task marked `Done` must have every tracked feature checked. A task with no feature checklist may still be `Done`, but its feature progress remains `Not tracked`.
 
 A task with no feature checklist items has progress `Not tracked`; it must not be reported as 0% or 100%.
 

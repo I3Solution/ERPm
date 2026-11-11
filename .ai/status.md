@@ -34,7 +34,7 @@
   - Plan: [plan-step-2.3-frontend-typescript-indexer.md](plans/plan-step-2.3-frontend-typescript-indexer.md).
   - Implemented schema v3, isolated Node worker with TypeScript 5.8.3 lockfile, .NET CLI orchestration, repository/SHA-aware caches, TypeScript definitions/imports/references, Angular component/service/guard/route metadata and HttpClient API evidence.
   - Pinned FE CI smoke: 161 Program source files; 102 indexed source files; 12,880 records across FE root, CRM, dashboard, HRM, SD and WMS. Angular: 63 components, 18 services, 3 guards, 46 routes. API: 34 calls (17 GET, 9 POST, 5 PUT, 3 DELETE); URL evidence: 4 literal, 16 interpolated, 14 dynamic.
-  - CI run #533 code-index and frontend jobs passed, including actual FE indexing and definition/API query smoke tests; backend job was still running at the time of this status update.
+  - CI run #533 passed all three jobs (backend, frontend and code-index), including actual FE indexing plus definition and interpolated-API query smoke tests.
   - Local Windows verification and PR review remain pending; no FE application files or app manifests/lockfiles were changed.
 
 ## Next Steps

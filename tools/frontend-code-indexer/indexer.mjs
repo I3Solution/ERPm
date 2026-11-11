@@ -488,7 +488,7 @@ function collectApiCalls(sourceFile, info, checker, symbolIds, httpClientSymbols
       ? checker.getFullyQualifiedName(receiverSymbol)
       : checker.typeToString(receiverType);
     apiDetection.receiverTypes[receiverName] = (apiDetection.receiverTypes[receiverName] ?? 0) + 1;
-    if (!isAngularHttpClient(receiverType, httpClientSymbols)) {
+    if (!isAngularHttpClient(receiverType, httpClientSymbols, checker)) {
       return;
     }
     apiDetection.matchedCalls++;
@@ -672,12 +672,20 @@ function collectAngularHttpClientSymbols(sourceFiles, checker) {
         if (!importedSymbol) {
           continue;
         }
-        symbols.add(importedSymbol);
-        if ((importedSymbol.flags & ts.SymbolFlags.Alias) !== 0) {
+        let currentSymbol = importedSymbol;
+        for (let depth = 0; depth < 8 && currentSymbol; depth++) {
+          symbols.add(currentSymbol);
+          if ((currentSymbol.flags & ts.SymbolFlags.Alias) === 0) {
+            break;
+          }
           try {
-            symbols.add(checker.getAliasedSymbol(importedSymbol));
+            const resolvedSymbol = checker.getAliasedSymbol(currentSymbol);
+            if (resolvedSymbol === currentSymbol) {
+              break;
+            }
+            currentSymbol = resolvedSymbol;
           } catch {
-            // Keep unresolved aliases out of the trusted HttpClient symbol set.
+            break;
           }
         }
       }
@@ -686,9 +694,29 @@ function collectAngularHttpClientSymbols(sourceFiles, checker) {
   return symbols;
 }
 
-function isAngularHttpClient(type, httpClientSymbols) {
-  const symbols = [type.aliasSymbol, type.getSymbol()].filter(Boolean);
-  return symbols.some(symbol => httpClientSymbols.has(symbol));
+function isAngularHttpClient(type, httpClientSymbols, checker) {
+  const candidates = [type.aliasSymbol, type.getSymbol()].filter(Boolean);
+  return candidates.some(symbol => {
+    let currentSymbol = symbol;
+    for (let depth = 0; depth < 8 && currentSymbol; depth++) {
+      if (httpClientSymbols.has(currentSymbol)) {
+        return true;
+      }
+      if ((currentSymbol.flags & ts.SymbolFlags.Alias) === 0) {
+        break;
+      }
+      try {
+        const nextSymbol = checker.getAliasedSymbol(currentSymbol);
+        if (nextSymbol === currentSymbol) {
+          break;
+        }
+        currentSymbol = nextSymbol;
+      } catch {
+        break;
+      }
+    }
+    return false;
+  });
 }
 
 function findContainingSymbol(node, sourceFile, checker, symbolIds) {

@@ -2,7 +2,7 @@
 
 > **Loại:** change  
 > **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
-> **Trạng thái:** Doing  
+> **Trạng thái:** Completed — logical decisions accepted  
 > **Progress aggregation:** v1  
 > **Liên quan:** .ai/architecture/workspace-boundary.md, .ai/architecture/canonical-knowledge-contract.md, .ai/architecture/ingestion-pipeline.md  
 > **Phạm vi:** Root repository — logical storage architecture
@@ -29,7 +29,8 @@ Không chọn vendor, tạo physical schema/migration hoặc triển khai storag
 - [x] Xác định trách nhiệm Control Plane, Artifact Store, Canonical Store và Search Projection Store.
 - [x] Đề xuất publication catalog/manifest, read path, staging và cache isolation.
 - [x] Đề xuất retention/deletion/recovery và security requirements.
-- [ ] Review và chốt deployment consolidation, source snapshot retention, legal deletion và storage benchmark.
+- [x] Review và ghi nhận default cho deployment consolidation, Git snapshot/archive, retention policy, projection adapters và benchmark scenario.
+- [ ] Thực thi benchmark hai Workspace và chốt các ngưỡng định lượng.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -37,7 +38,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 - Dựa trên Workspace Boundary, Canonical Knowledge Contract và Ingestion Pipeline đã được review ở mức nguyên tắc.
 - Tạo .ai/architecture/storage-boundary.md.
-- Cập nhật architecture và roadmap để liên kết Storage Boundary proposal.
+- Cập nhật architecture và roadmap để liên kết Storage Boundary và ghi nhận các quyết định đã được user chấp thuận.
 - Không chọn công nghệ hoặc thay đổi runtime code.
 - Không sửa .ai/status.md.
 
@@ -50,13 +51,14 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- Review các quyết định trong mục 16 của storage-boundary.md.
-- Lập benchmark tối thiểu với hai Workspace, ACL tách biệt, ingestion lỗi, out-of-order revision và projection rebuild.
-- Sau khi chốt, tạo technology ADR và triển khai vertical slice theo modular architecture.
+- Tạo benchmark corpus và thực thi kịch bản tối thiểu với hai Workspace, ACL tách biệt, cùng content hash, ingestion lỗi, out-of-order revision, projection failure/rebuild và stale cache.
+- Chốt retention/legal deletion theo từng deployment trước production.
+- Tạo technology ADR dựa trên kết quả benchmark; chưa chọn vendor hoặc physical topology trong task thiết kế logic này.
 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - Tài liệu chính: .ai/architecture/storage-boundary.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Đã draft logical storage boundaries; vendor selection và implementation còn mở.
+- Đã ghi nhận năm quyết định logical storage được user chấp thuận ngày 2026-11-12.
+- Chưa chạy benchmark thực tế; vendor selection, retention duration/legal deletion và physical deployment còn mở.

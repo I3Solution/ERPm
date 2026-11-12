@@ -330,7 +330,7 @@ These remain contract/technology ADR work. JSON Schema validation is not runtime
 
 The [Search Projection Lifecycle](projection-lifecycle.md) defines ProjectionProfile, ProjectionRun, ProjectionManifest and per-SourceRevision ProjectionStatus. This section binds those contracts to Retrieval v1.
 
-For each requested `full_text` or `vector` method, `methodReports[].revisionStates` contains exactly one readiness entry for every selected SourceRevision. An entry is `available` only when a committed ProjectionManifest matches the selected PublicationManifest, SourceRevision, profile ID/version and definition fingerprint. A stale manifest is not a fallback.
+For each requested `full_text` or `vector` method, `methodReports[].revisionStates` contains exactly one readiness entry for every selected SourceRevision. An entry is `available` only when a committed ProjectionManifest matches the selected PublicationManifest ID, SourceRevision, profile ID/version and definition fingerprint. The report carries both the ProjectionManifest ID and source PublicationManifest ID. A stale manifest is not a fallback.
 
 Method report aggregation:
 

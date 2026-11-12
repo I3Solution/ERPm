@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:retrieval-result:1.0",
+  "title": "Enterprise Knowledge Platform Retrieval Result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "requestId",
+    "resultId",
+    "outcome",
+    "scope",
+    "revisionPolicy",
+    "selectedRevisions",
+    "methodReports",
+    "results",
+    "ranking",
+    "diagnostics"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.retrieval-result"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resultId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "enum": [
+        "complete",
+        "partial",
+        "empty"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId",
+        "policyFingerprint"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "sourceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "policyFingerprint": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "revisionPolicy": {
+      "enum": [
+        "active",
+        "pinned"
+      ]
+    },
+    "selectedRevisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/revisionRef"
+      }
+    },
+    "methodReports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "state",
+          "required",
+          "ran"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "structured",
+              "full_text",
+              "vector"
+            ]
+          },
+          "state": {
+            "enum": [
+              "available",
+              "pending",
+              "building",
+              "failed",
+              "stale",
+              "unsupported"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "ran": {
+            "type": "boolean"
+          },
+          "projectionVersion": {
+            "type": "string"
+          },
+          "coverage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/revisionRef"
+            }
+          },
+          "unavailableReason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/knowledgeResult"
+      }
+    },
+    "ranking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policyVersion",
+        "tieBreaker"
+      ],
+      "properties": {
+        "policyVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tieBreaker": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hasMore"
+      ],
+      "properties": {
+        "hasMore": {
+          "type": "boolean"
+        },
+        "nextCursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "severity"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "revisionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "sourceRevisionId",
+        "revisionKey",
+        "publicationManifestId"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revisionKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publicationManifestId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "sourceId",
+        "sourceRevisionId",
+        "locator"
+      ],
+      "properties": {
+        "evidenceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "contentHash": {
+          "type": "string"
+        },
+        "excerpt": {
+          "type": "string"
+        }
+      }
+    },
+    "knowledgeResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recordId",
+        "recordKind",
+        "payloadType",
+        "payloadVersion",
+        "scope",
+        "source",
+        "claim",
+        "evidence",
+        "retrievalProvenance"
+      ],
+      "properties": {
+        "recordId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payloadType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payloadVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logicalKey": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tenantId",
+            "workspaceId"
+          ],
+          "properties": {
+            "tenantId": {
+              "type": "string"
+            },
+            "workspaceId": {
+              "type": "string"
+            },
+            "projectId": {
+              "type": "string"
+            }
+          }
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sourceId",
+            "sourceRevisionId",
+            "revisionKey"
+          ],
+          "properties": {
+            "sourceId": {
+              "type": "string"
+            },
+            "sourceRevisionId": {
+              "type": "string"
+            },
+            "revisionKey": {
+              "type": "string"
+            },
+            "publicationManifestId": {
+              "type": "string"
+            }
+          }
+        },
+        "claim": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "verification"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "source_observation",
+                "deterministic_extraction",
+                "human_assertion",
+                "model_inference"
+              ]
+            },
+            "verification": {
+              "enum": [
+                "verified",
+                "partial",
+                "unknown"
+              ]
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "retrievalProvenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "methods",
+            "relationExpanded"
+          ],
+          "properties": {
+            "methods": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "structured",
+                      "full_text",
+                      "vector"
+                    ]
+                  },
+                  "score": {
+                    "type": "number"
+                  },
+                  "rank": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            },
+            "relationExpanded": {
+              "type": "boolean"
+            },
+            "relationId": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -271,3 +271,40 @@ Rules:
 7. **Conflicts and gaps:** represent unavailable methods, omissions, truncation, conflicts and uncertainty explicitly; never disguise them as complete context.
 
 These decisions freeze the semantic defaults for v1. The machine-readable ContextPacket and ContextProfile schemas, protocol adapter mappings and evaluation fixtures remain follow-up work. Do not choose an LLM or implement prompt rendering from this document alone.
+
+
+## 15. Machine-readable schema v1
+
+Initial JSON Schema Draft 2020-12 artifacts:
+
+- [ContextPacket v1](../schemas/context-packet-v1.schema.json)
+- [ContextProfile v1](../schemas/context-profile-v1.schema.json)
+
+The schemas formalize the accepted semantic contract without selecting a transport protocol, model vendor or runtime implementation. They define the ready-to-deliver packet envelope, source revision manifest references, budget/tokenizer metadata, completeness diagnostics, typed item variants, trust labels, evidence references and the profile-controlled item/selection/budget/lifecycle limits.
+
+### 15.1 Cross-field invariants
+
+JSON Schema validates shape and local constraints. The platform must additionally enforce:
+
+1. `scope.workspaceId` and every referenced SourceRevision/Evidence must resolve to the same authorized Workspace; each Project/Source selector can only narrow effective access.
+2. `audience.principalId` is bound to the authenticated principal; it is not a bearer token or a substitute for authorization.
+3. Every factual item has Evidence whose `sourceRevisionId` is included in `retrievalProvenance.selectedRevisions`; locators and content hashes must match the captured source.
+4. Every `verified_relation` is resolved, verified and authorized at both endpoints; relation evidence must support the predicate.
+5. Every `generated_summary` has `derived_content_untrusted` trust, references existing input item/evidence IDs and does not upgrade claim verification.
+6. `budget.usedTokens + budget.reservedTokens <= budget.maxTokens`; exact/estimated counting semantics must match the tokenizer metadata.
+7. Item counts in `completeness` match the actual included/omitted/truncated manifest. An insufficient build does not emit a normal ready packet.
+8. `expiresAtUtc` is later than `createdAtUtc`; authorization is revalidated immediately before delivery.
+9. When an item is truncated, its retained source range and omitted range are explicit; mandatory provenance, trust and security metadata remain intact.
+10. The consumer adapter preserves every item discriminator, trust label, Evidence reference, revision identity and limitation notice.
+
+The schema's `$id` values use stable URNs until the platform publishes a governed schema registry URI. Schema validation does not replace authorization, provenance verification, policy evaluation or token accounting.
+
+### 15.2 Deliberately not frozen
+
+- JSON vs Protobuf as the runtime transport encoding.
+- Canonical ID encoding and exact cross-contract reference formats.
+- A globally governed schema registry and compatibility tooling.
+- Model-specific tokenizer packages and estimator implementation.
+- Adapter-specific rendering and prompt framing.
+
+These require the platform-wide contract and technology ADR work; do not infer them from the JSON Schema files.

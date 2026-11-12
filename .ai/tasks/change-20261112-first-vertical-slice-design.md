@@ -9,13 +9,14 @@
 
 ## 1. Mô tả
 
-Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: registered Git Source → exact SourceRevision capture → existing backend/frontend extractors → Canonical Knowledge adapter → validation → atomic publication → structured retrieval. ERPm chỉ là pilot; không thay đổi contract hiện tại hoặc rewrite indexers.
+Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: one registered Git Source (initially ERPm-BE) → exact SourceRevision capture → backend Roslyn extractor host → Canonical Knowledge adapter → validation → atomic publication → structured retrieval. ERPm chỉ là pilot; không thay đổi contract hiện tại hoặc rewrite indexers.
 
 ## 2. Phân tích
 
 - Go là ngôn ngữ Core đã được chấp thuận; triển khai ban đầu theo modular monolith.
 - Python chưa cần cho deterministic code extraction; chỉ thêm khi có AI/ML workload cụ thể.
-- Existing Roslyn và TypeScript extractors giữ nguyên; transport/invocation phải được xác minh từ source trước khi thiết kế adapter runtime.
+- Existing Roslyn và TypeScript extractors giữ nguyên; first slice giới hạn một SourceRevision từ backend để tuân thủ ingestion v1 single-source batch. Frontend/submodule extraction là follow-up riêng.
+- Backend CLI hiện hard-code ERPm workspace/submodule/cache; cần external .NET host/protocol tổng quát nhưng không thay đổi Roslyn analysis semantics.
 - Slice phải chứng minh Workspace isolation, revision provenance, whole-revision publication và evidence retrieval.
 - Không triển khai vector search, public SDK, MCP write tools hoặc microservices trong slice đầu.
 
@@ -26,6 +27,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Ghi nhận discovery gates cho extractor invocation, immutable capture, submodule mapping và storage commit.
 - [x] Inspect actual backend/frontend extractor entry points and record current invocation/runtime constraints.
 - [ ] Select and specify a reusable external adapter host/protocol without changing extractor analysis semantics.
+- [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
 - [ ] Implement the approved vertical slice incrementally in Go.
 
@@ -45,7 +47,8 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 
 ## 6. Việc còn lại
 
-- Source inspection completed for current CLI/worker boundaries; design an external adapter protocol/bridge that removes ERPm hard-coded workspace/cache assumptions before runtime.
+- Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
+- First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
 - Validate immutable snapshot and submodule handling with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
 - Chờ user review slice boundary trước khi tạo Go runtime foundation.

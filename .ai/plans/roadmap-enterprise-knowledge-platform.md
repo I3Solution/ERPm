@@ -65,6 +65,7 @@ Verification evidence must remain distinct:
 Deliverables:
 - [ ] Platform context and bounded-context diagram.
 - [ ] Tenant/workspace/project/source hierarchy and isolation rules.
+  - Draft proposal: [Workspace Boundary](../architecture/workspace-boundary.md); pending review and approval.
 - [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision contracts.
 - [ ] Connector vs extractor vs processor responsibilities.
 - [ ] Control plane, artifact store, structured store and search plane responsibilities.
@@ -194,7 +195,7 @@ Deliverables:
 
 Do not begin another indexer feature or create a PR for EF metadata yet. First complete Phase 0 in this order:
 
-1. **Workspace boundary:** define Tenant, Workspace, Project, Source and authorization semantics.
+1. **Workspace boundary:** define Tenant, Workspace, Project, Source and authorization semantics. A draft is available in [Workspace Boundary](../architecture/workspace-boundary.md); review it before treating the model as accepted.
 2. **Canonical knowledge contract:** define common envelope plus typed payloads for code, documents and database knowledge.
 3. **Revision/provenance:** define Git commit, document version/content hash and extractor/schema version behavior.
 4. **Storage boundary:** decide control plane, artifact storage, structured store and search plane responsibilities.
@@ -219,6 +220,8 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 
 ## 6. Cross-cutting capability — Automated task progress report
 
+**Execution status (2026-11-12): PAUSED.** The workflow `.github/workflows/aggregate-task-status.yml` was removed from `master` in PR #69. The generator, tests and design documents remain for possible future work; no automatic aggregation is currently active.
+
 **Goal:** keep task-level ownership independent while maintaining one continuously refreshed project status report without requiring any Developer to edit a shared file.
 
 - [x] Keep the existing Markdown task-record naming convention.
@@ -227,14 +230,14 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 - [x] Add the aggregation marker and feature/milestone checklist to the task template.
 - [x] Implement a deterministic generator that reads eligible task records and rebuilds `.ai/status.md` from scratch.
 - [x] Add parser/unit tests for valid, malformed, legacy, multi-feature and repeated-update task records; CI verified successfully in [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834).
-- [x] Add a GitHub Actions workflow triggered when a PR is merged into `master` (bootstrap run still pending after merge).
+- [x] Implement the GitHub Actions workflow definition; intentionally disabled/removed in PR #69 pending a future redesign.
 - [x] Respect mandatory PR-only changes to `master`: publish the generated report through a dedicated automation branch and a bot PR; never push directly to `master`.
 - [x] Serialize aggregation runs, always read latest `master`, and use a force-with-lease update only on the workflow-owned automation branch.
 - [x] Grant only the aggregation job `contents: write` and `pull-requests: write`; generated status PRs remain subject to normal review/check rules.
 - [x] Support an approved `STATUS_AGGREGATION_TOKEN` so required PR CI workflows can run; the default `GITHUB_TOKEN` fallback does not trigger normal PR workflows.
 - [ ] Verify multiple sequential PRs updating the same task, concurrent merges, unchanged output, malformed records and recovery.
 
-**Operating contract:**
+**Target operating contract if the feature is resumed after redesign:**
 
 1. Task Markdown files are the only manually maintained progress source.
 2. `.ai/status.md` is generated output. Agents and Developers are prohibited from manually creating, editing, deleting, formatting, committing or pushing it.

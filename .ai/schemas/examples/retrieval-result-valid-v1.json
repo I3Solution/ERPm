@@ -31,21 +31,67 @@
       "kind": "structured",
       "state": "available",
       "required": true,
-      "ran": true
+      "ran": true,
+      "coverage": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "publicationManifestId": "manifest-a"
+        }
+      ]
     },
     {
       "kind": "full_text",
       "state": "available",
       "required": false,
       "ran": true,
-      "projectionVersion": "fts-v1"
+      "projectionVersion": "fts-v1",
+      "revisionStates": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "state": "available",
+          "projectionManifestId": "projection-manifest-fts-a",
+          "profileVersion": "1.0",
+          "definitionFingerprint": "sha256:fts-definition",
+          "projectionVersion": "fts-v1"
+        }
+      ],
+      "coverage": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "publicationManifestId": "manifest-a"
+        }
+      ]
     },
     {
       "kind": "vector",
       "state": "available",
       "required": false,
       "ran": true,
-      "projectionVersion": "embedding-v1"
+      "projectionVersion": "embedding-v1",
+      "revisionStates": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "state": "available",
+          "projectionManifestId": "projection-manifest-vector-a",
+          "profileVersion": "1.0",
+          "definitionFingerprint": "sha256:vector-definition",
+          "projectionVersion": "embedding-v1"
+        }
+      ],
+      "coverage": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "publicationManifestId": "manifest-a"
+        }
+      ]
     }
   ],
   "results": [

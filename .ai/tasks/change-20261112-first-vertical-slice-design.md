@@ -27,7 +27,9 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Ghi nhận discovery gates cho extractor invocation, immutable capture, submodule mapping và storage commit.
 - [x] Inspect actual backend/frontend extractor entry points and record current invocation/runtime constraints.
 - [x] Draft backend extractor-host process protocol v1: bounded JSON stdin request, immutable JSONL + result manifest artifacts, independent Go-side hash/schema/lineage verification.
-- [ ] Review/approve host protocol and validate .NET/MSBuild deployment feasibility.
+- [x] Inspect pinned ERPm-BE Git tree and SDK prerequisites: one root solution, no nested gitlinks, .NET SDK 10.0.403 pinned.
+- [x] Draft immutable Git capture and isolated writable build-workspace policy; captured snapshot remains read-only.
+- [ ] Review/approve host protocol and validate .NET/MSBuild deployment feasibility with an executable feasibility probe.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
 - [ ] Implement the approved vertical slice incrementally in Go.
@@ -44,13 +46,15 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - Đối chiếu flow với Canonical Knowledge, Code Index Adapter, Ingestion, Storage, Retrieval, Projection và Workspace contracts.
 - Acceptance scenarios bao gồm tối thiểu hai Workspaces, exact SHA, failed stage, retry, out-of-order revision, ACL revoke và equivalent evidence.
 - Source inspection evidence: backend is a .NET 10 library invoked by a hard-coded ERPm CLI and writes local JSONL cache; frontend worker consumes a manifest on stdin and emits JSONL on stdout, but current runner performs validation/cache writing and frontend Program root is tied to erpm-fe.
+- Pinned ERPm-BE commit `235173fd193ae2fb60081fa4573434f5edd506f3` has root `ERPm.sln`, no nested gitlinks, no .gitattributes and pins .NET SDK 10.0.403 (`rollForward: latestPatch`).
+- `BackendRoslynIndexer` currently accumulates records in memory and stamps `GeneratedAtUtc`; output artifact hashes therefore bind one invocation and are not deterministic across retries. Canonical identity must exclude this timestamp.
 - No runtime build/test was run; no runtime implementation exists.
 
 ## 6. Việc còn lại
 
 - Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Proposed host protocol is documented in section 9; it preserves existing Roslyn analysis and schema while returning run-scoped immutable artifacts. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
-- Validate immutable snapshot and submodule handling with a focused feasibility spike.
+- Validate capture manifest/materialization parity, read-only snapshot behavior and MSBuild writable workspace with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
 - Chờ user review slice boundary and host protocol before creating Go runtime foundation.
 

@@ -10,6 +10,7 @@ Commands:
   workspace status
   index repo erpm-be
   index repo erpm-fe
+  extractor-host
   find symbol <name-or-pattern>
 """;
 
@@ -21,8 +22,19 @@ if (args.Length == 0)
 
 try
 {
-    var manifest = new WorkspaceManifestReader().Read();
     var command = args[0].ToLowerInvariant();
+
+    // The host is intentionally independent from the legacy umbrella workspace manifest.
+    if (command == "extractor-host" && args.Length == 1)
+    {
+        Environment.ExitCode = await ExtractorHostCommand.RunAsync(
+            Console.OpenStandardInput(),
+            Console.Out,
+            Console.Error);
+        return;
+    }
+
+    var manifest = new WorkspaceManifestReader().Read();
 
     switch (command)
     {

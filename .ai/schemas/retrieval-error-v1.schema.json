@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:retrieval-error:1.0",
+  "title": "Enterprise Knowledge Platform Retrieval Error v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "requestId",
+    "outcome",
+    "error"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.retrieval-error"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "outcome": {
+      "const": "failed"
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "category",
+        "message",
+        "retryable"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "invalid_request",
+            "unauthenticated",
+            "forbidden_or_unavailable_scope",
+            "revision_not_selectable",
+            "required_method_unavailable",
+            "cursor_invalid_or_expired",
+            "resource_limit_exceeded",
+            "internal_failure"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "details": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

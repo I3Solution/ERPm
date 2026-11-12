@@ -444,5 +444,274 @@ class CanonicalCodePayloadSchemaTests(unittest.TestCase):
             validate_schema(payload, SCHEMAS / "payloads" / "code-api-observation-v1.schema.json")
 
 
+
+def validate_stage_attempt_semantics(attempt: dict) -> list[str]:
+    errors: list[str] = []
+    state = attempt["state"]
+    diagnostics = attempt.get("diagnostics", [])
+
+    if state in {"succeeded", "succeeded_with_warnings"}:
+        output = attempt["outputManifest"]
+        checkpoint = attempt["checkpoint"]
+        if checkpoint["inputFingerprint"] != attempt["inputFingerprint"]:
+            errors.append("checkpoint input fingerprint differs from stage attempt input")
+        if checkpoint["outputManifestId"] != output["manifestId"]:
+            errors.append("checkpoint references a different output manifest")
+        if checkpoint["outputContentHash"] != output["contentHash"]:
+            errors.append("checkpoint output hash differs from output manifest")
+
+    if state == "retry_wait" and not any(
+        item["retryable"] and item["classification"] == "transient"
+        for item in diagnostics
+    ):
+        errors.append("retry_wait requires at least one transient retryable diagnostic")
+
+    for diagnostic in diagnostics:
+        if diagnostic["classification"] == "permanent" and diagnostic["retryable"]:
+            errors.append("permanent diagnostics cannot be retryable")
+
+    return errors
+
+
+def validate_extraction_manifest_semantics(manifest: dict) -> list[str]:
+    errors: list[str] = []
+    artifact_count = sum(item["observationCount"] for item in manifest["observationArtifacts"])
+    if artifact_count != manifest["observationCount"]:
+        errors.append("observation count differs from extraction artifact counts")
+
+    for coverage in manifest["coverage"]:
+        expected = coverage["numerator"] / coverage["denominator"]
+        if abs(expected - coverage["ratio"]) > 0.000001:
+            errors.append(f"{coverage['metric']}: coverage ratio does not match numerator/denominator")
+        if coverage["numerator"] > coverage["denominator"]:
+            errors.append(f"{coverage['metric']}: numerator exceeds denominator")
+
+    return errors
+
+
+def validate_normalization_manifest_semantics(manifest: dict) -> list[str]:
+    errors: list[str] = []
+    record_count = sum(item["recordCount"] for item in manifest["knowledgeRecordArtifacts"])
+    evidence_count = sum(item["evidenceCount"] for item in manifest["evidenceArtifacts"])
+    relation_count = sum(item["relationCount"] for item in manifest["relationArtifacts"])
+    if record_count != manifest["counts"]["knowledgeRecords"]:
+        errors.append("KnowledgeRecord count differs from normalization artifact counts")
+    if evidence_count != manifest["counts"]["evidence"]:
+        errors.append("Evidence count differs from normalization artifact counts")
+    if relation_count != manifest["counts"]["relations"]:
+        errors.append("Relation count differs from normalization artifact counts")
+    payload_count = sum(item["count"] for item in manifest["payloadCounts"])
+    if payload_count != manifest["counts"]["knowledgeRecords"]:
+        errors.append("payload counts do not add up to total KnowledgeRecords")
+    return errors
+
+
+def validate_validation_report_semantics(report: dict, normalization: dict) -> list[str]:
+    errors: list[str] = []
+    counts = report["counts"]
+    expected = normalization["counts"]
+
+    pairs = (
+        ("acceptedRecords", "rejectedRecords", "knowledgeRecords"),
+        ("acceptedEvidence", "rejectedEvidence", "evidence"),
+        ("acceptedRelations", "rejectedRelations", "relations"),
+    )
+    for accepted_key, rejected_key, expected_key in pairs:
+        if counts[accepted_key] + counts[rejected_key] != expected[expected_key]:
+            errors.append(f"{accepted_key}/{rejected_key} do not reconcile to normalized {expected_key}")
+
+    severities = {item["severity"] for item in report["violations"]}
+    failed_metrics = [item for item in report["completenessEvaluations"] if not item["passed"]]
+    for metric in report["completenessEvaluations"]:
+        if abs(metric["actualRatio"] - metric["numerator"] / metric["denominator"]) > 0.000001:
+            errors.append(f"{metric['metric']}: validation ratio does not match numerator/denominator")
+        if metric["passed"] != (metric["actualRatio"] >= metric["minimumRatio"]):
+            errors.append(f"{metric['metric']}: pass state differs from configured minimum ratio")
+
+    if report["outcome"] == "passed":
+        if severities.intersection({"warning", "error", "fatal"}) or failed_metrics:
+            errors.append("passed validation cannot contain warnings, errors or failed completeness metrics")
+    elif report["outcome"] == "passed_with_warnings":
+        if "warning" not in severities or severities.intersection({"error", "fatal"}) or failed_metrics:
+            errors.append("passed_with_warnings requires warnings only and passing completeness metrics")
+    elif report["outcome"] == "blocked":
+        if not severities.intersection({"error", "fatal"}) and not failed_metrics:
+            errors.append("blocked validation requires an error, fatal violation or failed completeness metric")
+        if report["publicationEligible"]:
+            errors.append("blocked validation cannot be publication eligible")
+
+    return errors
+
+
+def validate_ingestion_manifest_lineage(
+    capture: dict,
+    extraction: dict,
+    processing: dict,
+    normalization: dict,
+    validation: dict,
+) -> list[str]:
+    errors: list[str] = []
+    manifests = [capture, extraction, processing, normalization, validation]
+    for manifest in manifests:
+        if manifest["runId"] != capture["runId"]:
+            errors.append(f"{manifest['manifestId']}: runId differs across stage manifests")
+        if manifest["scope"] != capture["scope"]:
+            errors.append(f"{manifest['manifestId']}: Workspace scope differs across stage manifests")
+        if manifest["sourceId"] != capture["sourceId"]:
+            errors.append(f"{manifest['manifestId']}: sourceId differs across stage manifests")
+        revision_id = (
+            manifest["sourceRevision"]["sourceRevisionId"]
+            if "sourceRevision" in manifest
+            else manifest["sourceRevisionId"]
+        )
+        if revision_id != capture["sourceRevision"]["sourceRevisionId"]:
+            errors.append(f"{manifest['manifestId']}: SourceRevision differs across stage manifests")
+
+    if extraction["inputCaptureManifest"]["manifestId"] != capture["manifestId"]:
+        errors.append("Extractor input does not reference the Connector capture manifest")
+    if processing["inputManifest"]["manifestId"] != extraction["manifestId"]:
+        errors.append("Processor input does not reference the Extraction manifest")
+    if normalization["inputExtractionManifest"]["manifestId"] != extraction["manifestId"]:
+        errors.append("Normalizer input does not reference the Extraction manifest")
+    if not any(
+        item["manifestId"] == processing["manifestId"]
+        for item in normalization["inputProcessingManifests"]
+    ):
+        errors.append("Normalizer input does not include the configured Processor output")
+    if validation["inputNormalizationManifest"]["manifestId"] != normalization["manifestId"]:
+        errors.append("Validator input does not reference the Normalization manifest")
+
+    return errors
+
+
+class IngestionStageContractSchemaTests(unittest.TestCase):
+    def test_valid_stage_invocation_fixture(self):
+        invocation = load_json(EXAMPLES / "ingestion-stage-invocation-valid-v1.json")
+        validate_schema(invocation, SCHEMAS / "ingestion-stage-invocation-v1.schema.json")
+
+    def test_stage_invocation_rejects_wrong_output_contract(self):
+        invocation = load_json(EXAMPLES / "ingestion-stage-invocation-valid-v1.json")
+        invocation["stage"] = "publisher.publish"
+        with self.assertRaises(ValidationError):
+            validate_schema(invocation, SCHEMAS / "ingestion-stage-invocation-v1.schema.json")
+
+    def test_valid_stage_attempt_fixture(self):
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        validate_schema(attempt, SCHEMAS / "ingestion-stage-attempt-v1.schema.json")
+        self.assertEqual([], validate_stage_attempt_semantics(attempt))
+
+    def test_successful_stage_attempt_requires_durable_output_checkpoint(self):
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        attempt.pop("checkpoint")
+        with self.assertRaises(ValidationError):
+            validate_schema(attempt, SCHEMAS / "ingestion-stage-attempt-v1.schema.json")
+
+    def test_checkpoint_must_match_stage_input_and_output_hash(self):
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        attempt["checkpoint"]["outputContentHash"] = "sha256:other"
+        self.assertIn(
+            "checkpoint output hash differs from output manifest",
+            validate_stage_attempt_semantics(attempt),
+        )
+
+    def test_retry_wait_requires_transient_retryable_diagnostic(self):
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        attempt["state"] = "retry_wait"
+        attempt["diagnostics"] = [{
+            "code": "SCHEMA_INVALID",
+            "severity": "error",
+            "category": "schema",
+            "classification": "permanent",
+            "retryable": True,
+            "summary": "The source record failed schema validation."
+        }]
+        attempt["nextRetryAtUtc"] = "2026-11-12T04:05:00Z"
+        self.assertIn(
+            "retry_wait requires at least one transient retryable diagnostic",
+            validate_stage_attempt_semantics(attempt),
+        )
+        self.assertIn(
+            "permanent diagnostics cannot be retryable",
+            validate_stage_attempt_semantics(attempt),
+        )
+
+    def test_valid_source_capture_manifest(self):
+        manifest = load_json(EXAMPLES / "source-capture-manifest-valid-v1.json")
+        validate_schema(manifest, SCHEMAS / "source-capture-manifest-v1.schema.json")
+
+    def test_capture_manifest_rejects_unverified_snapshot(self):
+        manifest = load_json(EXAMPLES / "source-capture-manifest-valid-v1.json")
+        manifest["snapshotConsistency"]["state"] = "inconsistent"
+        with self.assertRaises(ValidationError):
+            validate_schema(manifest, SCHEMAS / "source-capture-manifest-v1.schema.json")
+
+    def test_valid_extraction_manifest_and_coverage(self):
+        manifest = load_json(EXAMPLES / "extraction-manifest-valid-v1.json")
+        validate_schema(manifest, SCHEMAS / "extraction-manifest-v1.schema.json")
+        self.assertEqual([], validate_extraction_manifest_semantics(manifest))
+
+    def test_extraction_manifest_rejects_aggregate_count_mismatch(self):
+        manifest = load_json(EXAMPLES / "extraction-manifest-valid-v1.json")
+        manifest["observationCount"] += 1
+        self.assertIn(
+            "observation count differs from extraction artifact counts",
+            validate_extraction_manifest_semantics(manifest),
+        )
+
+    def test_valid_processing_manifest(self):
+        manifest = load_json(EXAMPLES / "processing-manifest-valid-v1.json")
+        validate_schema(manifest, SCHEMAS / "processing-manifest-v1.schema.json")
+
+    def test_processing_outputs_require_parent_artifact_lineage(self):
+        manifest = load_json(EXAMPLES / "processing-manifest-valid-v1.json")
+        manifest["outputArtifacts"][0].pop("parentArtifactIds")
+        with self.assertRaises(ValidationError):
+            validate_schema(manifest, SCHEMAS / "processing-manifest-v1.schema.json")
+
+    def test_valid_normalization_manifest_and_counts(self):
+        manifest = load_json(EXAMPLES / "normalization-manifest-valid-v1.json")
+        validate_schema(manifest, SCHEMAS / "normalization-manifest-v1.schema.json")
+        self.assertEqual([], validate_normalization_manifest_semantics(manifest))
+
+    def test_normalization_rejects_payload_count_mismatch(self):
+        manifest = load_json(EXAMPLES / "normalization-manifest-valid-v1.json")
+        manifest["payloadCounts"][0]["count"] += 1
+        self.assertIn(
+            "payload counts do not add up to total KnowledgeRecords",
+            validate_normalization_manifest_semantics(manifest),
+        )
+
+    def test_valid_validation_report_and_reconciliation(self):
+        report = load_json(EXAMPLES / "validation-report-valid-v1.json")
+        normalization = load_json(EXAMPLES / "normalization-manifest-valid-v1.json")
+        validate_schema(report, SCHEMAS / "validation-report-v1.schema.json")
+        self.assertEqual([], validate_validation_report_semantics(report, normalization))
+
+    def test_blocked_validation_cannot_be_publication_eligible(self):
+        report = load_json(EXAMPLES / "validation-report-valid-v1.json")
+        report["outcome"] = "blocked"
+        report["publicationEligible"] = True
+        with self.assertRaises(ValidationError):
+            validate_schema(report, SCHEMAS / "validation-report-v1.schema.json")
+
+    def test_stage_manifests_preserve_run_workspace_source_and_revision_lineage(self):
+        capture = load_json(EXAMPLES / "source-capture-manifest-valid-v1.json")
+        extraction = load_json(EXAMPLES / "extraction-manifest-valid-v1.json")
+        processing = load_json(EXAMPLES / "processing-manifest-valid-v1.json")
+        normalization = load_json(EXAMPLES / "normalization-manifest-valid-v1.json")
+        validation = load_json(EXAMPLES / "validation-report-valid-v1.json")
+        self.assertEqual(
+            [],
+            validate_ingestion_manifest_lineage(capture, extraction, processing, normalization, validation),
+        )
+
+    def test_ingestion_run_stage_event_can_reference_durable_attempt(self):
+        run = load_json(EXAMPLES / "ingestion-run-valid-v1.json")
+        validate_schema(run, SCHEMAS / "ingestion-run-v1.schema.json")
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        self.assertEqual(run["runId"], attempt["runId"])
+        self.assertEqual(run["stageEvents"][0]["stageAttemptId"], attempt["attemptId"])
+
+
 if __name__ == "__main__":
     unittest.main()

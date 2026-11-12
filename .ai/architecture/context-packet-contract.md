@@ -270,7 +270,7 @@ Rules:
 6. **Expiry/revocation:** use a short configurable TTL, bind the packet to its principal/audience and revalidate authorization before delivery. Do not promise recall of content already delivered to an external recipient.
 7. **Conflicts and gaps:** represent unavailable methods, omissions, truncation, conflicts and uncertainty explicitly; never disguise them as complete context.
 
-These decisions freeze the semantic defaults for v1. The machine-readable ContextPacket and ContextProfile schemas, protocol adapter mappings and evaluation fixtures remain follow-up work. Do not choose an LLM or implement prompt rendering from this document alone.
+These decisions freeze the semantic defaults for v1. Initial machine-readable ContextPacket and ContextProfile JSON Schemas and validation fixtures are maintained under `../schemas/`; protocol adapter mappings, broader evaluation fixtures and runtime implementation remain follow-up work. Do not choose an LLM or implement prompt rendering from this document alone.
 
 
 ## 15. Machine-readable schema v1

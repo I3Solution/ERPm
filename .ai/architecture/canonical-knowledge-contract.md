@@ -388,20 +388,19 @@ The platform owner explicitly accepted these decisions on 2026-11-12:
 
 These are accepted architecture decisions. They do not approve physical DDL, API routes, machine-readable schema requiredness, payload details beyond the listed initial scope, or production implementation.
 
-## 15. Remaining decisions to review before implementation
+## 15. Remaining decisions before runtime implementation
 
-1. Exact wire-level required/optional envelope fields and ID encoding.
-2. The complete payload schemas for the four initial code types.
-3. How retention interacts with legal deletion, source revocation and artifact storage.
-4. Exact canonical identity/key derivation rules for each code payload type.
+The five core v1 architecture decisions in section 14 have been accepted. The first four Code payload schemas and the source-index mapping/identity rules are now documented in section 17 and the [Code Index Adapter Contract](code-index-adapter-contract.md).
 
-1. Is the proposed envelope split into KnowledgeRecord, Evidence, KnowledgeRelation and SourceRevision accepted?
-2. Should logicalKey be mandatory for all record types, or optional for content chunks/observations without stable identity?
-3. Which initial payload types are required for the first vertical slice (recommended: code.file, code.symbol, code.reference_observation, code.api_observation)?
-4. Should derived cross-source records be permitted in v1 when every evidence item is inside the same Workspace, or deferred until after single-source ingestion is stable?
-5. What retention policy should apply to old extractor/payload versions after reprocessing?
+The following remain open and must not be guessed by an adapter or storage implementation:
 
-The contract is a proposal until these choices are reviewed. Physical database DDL, REST/MCP routes and a full domain schema registry are out of scope for this document.
+1. Final byte-level ID encoding, database uniqueness constraints and schema registry URI.
+2. Exact compiler-semantic identity extraction for source symbols where the current indexer contract does not distinguish a stable compiler key from a display-name fallback.
+3. Retention, legal deletion, source revocation and artifact lifecycle behavior.
+4. Runtime adapter implementation, including durable preservation of unsupported observations and operational coverage reporting.
+5. Physical DDL, database vendor and deployment topology.
+
+These are implementation/technology decisions, not reasons to weaken the accepted workspace, evidence, revision or identity invariants.
 
 
 ## 16. Initial machine-readable schemas v1
@@ -413,7 +412,7 @@ Initial JSON Schema Draft 2020-12 artifacts:
 - [KnowledgeRelation v1](../schemas/knowledge-relation-v1.schema.json)
 - [SourceRevision v1](../schemas/source-revision-v1.schema.json)
 
-These schemas formalize the shared envelope and ownership/provenance structures for the first four accepted code payload types. The `payload.data` object remains typed by `payload.type` and `payload.version`; its detailed per-type fields are intentionally not frozen in this initial envelope schema.
+These schemas formalize the shared envelope and ownership/provenance structures. The initial envelope schema keeps `payload.data` generic; the four type-specific payload schemas are linked in section 17 and validated by CI.
 
 ### 16.1 Cross-record invariants
 
@@ -432,10 +431,38 @@ The platform validator must enforce relationships that a single-object JSON Sche
 
 ### 16.2 Deliberately not frozen
 
-- Detailed fields and validation semantics for each code payload's `data`.
-- Per-payload logical identity derivation and uniqueness scope.
-- Final ID encoding, schema registry URI and compatibility tooling.
+- Final byte-level logical-key encoding and database uniqueness constraints.
+- Extraction of compiler-semantic identity where the source indexer does not expose an unambiguous stable key.
 - Retention/deletion implementation and legal-hold behavior.
-- Physical DDL and database vendor.
+- Physical DDL, database vendor and deployment topology.
 
-The initial schemas do not alter or replace existing backend code-index v1/v2 or frontend code-index v3 source contracts.
+The Canonical and payload schemas do not alter or replace existing backend code-index v1/v2 or frontend code-index v3 source contracts.
+
+
+## 17. Initial Code payload schemas and adapter mapping
+
+The four accepted v1 payload types now have dedicated JSON Schema Draft 2020-12 contracts:
+
+- [code.file v1](../schemas/payloads/code-file-v1.schema.json)
+- [code.symbol v1](../schemas/payloads/code-symbol-v1.schema.json)
+- [code.reference_observation v1](../schemas/payloads/code-reference-observation-v1.schema.json)
+- [code.api_observation v1](../schemas/payloads/code-api-observation-v1.schema.json)
+
+Valid payload examples live under `../schemas/examples/` and are validated by the `context-contracts` CI job.
+
+### 17.1 Identity summary
+
+| Payload | logicalKey policy | Identity rule |
+|---|---|---|
+| `code.file` | Required | Source + normalized repository-relative path; a rename/move starts a new identity unless a separately evidenced rename relation is later introduced |
+| `code.symbol` | Conditional | Required only with a collision-free compiler-semantic key proven stable across revisions; otherwise explicitly revision-local and omitted |
+| `code.reference_observation` | Omitted | An occurrence tied to one SourceRevision and Evidence locator |
+| `code.api_observation` | Omitted | An API call occurrence tied to one SourceRevision and Evidence locator |
+
+The `code.symbol.data.identity` object declares `stable/compiler_semantic_key` or `revision_local/source_locator`. Stable identity requires an envelope `logicalKey`; revision-local identity forbids it. The current frontend v3 `symbolId` includes path and start offset and therefore cannot be used as a cross-revision logical key. A source-native symbol ID whose stability is ambiguous must also remain revision-local.
+
+### 17.2 Adapter contract
+
+The [Code Index Adapter Contract](code-index-adapter-contract.md) defines the mapping from backend source schemas v1/v2 and frontend source schema v3 into these payloads. It also specifies trusted source/revision binding, Evidence mapping, conservative relation promotion, and explicit handling for source kinds outside the accepted v1 payload set.
+
+This is a design contract, not an implemented runtime adapter. Existing code-index schemas, serializers and local caches remain unchanged. Angular metadata and backend project/dependency rows are explicitly reported as unsupported by the initial four payload types; they must be preserved for reprocessing and cannot be silently dropped or coerced into another payload.

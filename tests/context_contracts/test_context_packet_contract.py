@@ -257,5 +257,49 @@ class CanonicalKnowledgeSchemaTests(unittest.TestCase):
             validate_schema(revision, SCHEMAS / "source-revision-v1.schema.json")
 
 
+def validate_canonical_record_semantics(record: dict, evidence_items: list[dict]) -> list[str]:
+    errors: list[str] = []
+    if record["classification"]["recordType"] != record["payload"]["type"]:
+        errors.append("classification recordType must equal payload type")
+    by_id = {item["evidenceId"]: item for item in evidence_items}
+    for evidence_id in record["evidenceIds"]:
+        evidence = by_id.get(evidence_id)
+        if evidence is None:
+            errors.append(f"missing Evidence {evidence_id}")
+            continue
+        if evidence["scope"]["tenantId"] != record["scope"]["tenantId"] or evidence["scope"]["workspaceId"] != record["scope"]["workspaceId"]:
+            errors.append(f"Evidence {evidence_id} is outside the record Workspace")
+        if evidence["sourceRevisionId"] not in record["provenance"].get("inputSourceRevisionIds", []):
+            errors.append(f"Evidence {evidence_id} revision is absent from record provenance")
+    return errors
+
+
+class CanonicalCrossRecordInvariantTests(unittest.TestCase):
+    def test_record_evidence_workspace_and_revision_lineage(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        evidence = load_json(EXAMPLES / "evidence-valid-v1.json")
+        self.assertEqual([], validate_canonical_record_semantics(record, [evidence]))
+
+    def test_record_rejects_evidence_from_another_workspace(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        evidence = load_json(EXAMPLES / "evidence-valid-v1.json")
+        evidence["scope"]["workspaceId"] = "workspace-b"
+        self.assertTrue(any("outside the record Workspace" in error
+                            for error in validate_canonical_record_semantics(record, [evidence])))
+
+    def test_record_rejects_evidence_from_unlisted_revision(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        evidence = load_json(EXAMPLES / "evidence-valid-v1.json")
+        evidence["sourceRevisionId"] = "revision-other"
+        self.assertTrue(any("absent from record provenance" in error
+                            for error in validate_canonical_record_semantics(record, [evidence])))
+
+    def test_record_rejects_payload_discriminator_mismatch(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        record["payload"]["type"] = "code.symbol"
+        self.assertIn("classification recordType must equal payload type",
+                      validate_canonical_record_semantics(record, []))
+
+
 if __name__ == "__main__":
     unittest.main()

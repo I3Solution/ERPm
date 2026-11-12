@@ -4,7 +4,6 @@
     "version": "1.0"
   },
   "recordId": "record-code-symbol-001",
-  "logicalKey": "workspace-a:source-a:code.symbol:ExampleService",
   "scope": {
     "tenantId": "tenant-a",
     "workspaceId": "workspace-a",
@@ -12,14 +11,14 @@
   },
   "classification": {
     "domain": "code",
-    "recordType": "code.symbol"
+    "recordType": "code.reference_observation"
   },
   "claim": {
     "kind": "deterministic_extraction",
     "verification": "verified"
   },
   "payload": {
-    "type": "code.symbol",
+    "type": "code.reference_observation",
     "version": "1.0",
     "data": {
       "name": "ExampleService",

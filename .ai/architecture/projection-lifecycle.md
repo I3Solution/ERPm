@@ -135,7 +135,7 @@ A failed rebuild must not replace a still-compatible ready manifest with an inel
 
 Retrieval selects canonical SourceRevisions first, then resolves projection readiness against those exact revisions. It never selects a projection and infers which canonical revision it represents.
 
-For each requested `full_text` or `vector` method, the result reports one revision state for every selected SourceRevision:
+For each requested `full_text` or `vector` method, the result reports one revision state for every selected SourceRevision. An available entry includes the selected `sourcePublicationManifestId`, `projectionManifestId`, profile ID/version, definition fingerprint and projection version. The source publication ID must equal the `publicationManifestId` in the request's resolved `selectedRevisions` entry.
 
 - `available`: exact compatible ready manifest exists.
 - `pending`, `building`, `failed`, `stale` or `unsupported`: no eligible manifest exists for that revision.

@@ -321,21 +321,6 @@
               "state"
             ]
           }
-        },
-        "not": {
-          "properties": {
-            "latestProjectionRun": {
-              "properties": {
-                "state": {
-                  "enum": [
-                    "failed",
-                    "canceled",
-                    "superseded"
-                  ]
-                }
-              }
-            }
-          }
         }
       }
     },

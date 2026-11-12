@@ -124,7 +124,8 @@
               "building",
               "failed",
               "stale",
-              "unsupported"
+              "unsupported",
+              "partial"
             ]
           },
           "required": {
@@ -144,8 +145,130 @@
           },
           "unavailableReason": {
             "type": "string"
+          },
+          "revisionStates": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "sourceId",
+                "sourceRevisionId",
+                "state"
+              ],
+              "properties": {
+                "sourceId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourceRevisionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "enum": [
+                    "available",
+                    "pending",
+                    "building",
+                    "failed",
+                    "stale",
+                    "unsupported"
+                  ]
+                },
+                "projectionManifestId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "profileVersion": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "definitionFingerprint": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "projectionVersion": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "unavailableReason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "state": {
+                        "const": "available"
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ]
+                  },
+                  "then": {
+                    "required": [
+                      "projectionManifestId",
+                      "profileVersion",
+                      "definitionFingerprint",
+                      "projectionVersion"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "state": {
+                        "enum": [
+                          "pending",
+                          "building",
+                          "failed",
+                          "stale",
+                          "unsupported"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "state"
+                    ]
+                  },
+                  "then": {
+                    "not": {
+                      "required": [
+                        "projectionManifestId"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "full_text",
+                    "vector"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ]
+            },
+            "then": {
+              "required": [
+                "revisionStates"
+              ]
+            }
+          }
+        ]
       }
     },
     "results": {

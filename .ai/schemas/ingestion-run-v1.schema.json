@@ -269,6 +269,10 @@
             "type": "integer",
             "minimum": 1
           },
+          "stageAttemptId": {
+            "type": "string",
+            "minLength": 1
+          },
           "diagnosticCodes": {
             "type": "array",
             "items": {

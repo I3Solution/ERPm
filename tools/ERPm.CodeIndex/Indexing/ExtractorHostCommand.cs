@@ -46,7 +46,7 @@ public static class ExtractorHostCommand
                 foreach (var record in records)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await writer.WriteLineAsync(JsonSerializer.Serialize(record, JsonOptions));
+                    await writer.WriteLineAsync(ExtractorHostProtocol.SerializeRecord(record));
                 }
 
                 await writer.FlushAsync(cancellationToken);

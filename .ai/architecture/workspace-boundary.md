@@ -302,11 +302,46 @@ The proposed baseline is intentionally conservative. Review these decisions expl
 
 Until reviewed, these remaining items are proposals rather than final implementation requirements.
 
-## 16. Out of scope
+## 16. Proposed v1 authorization capability matrix
+
+The role names below are convenience bundles over action permissions. Runtime authorization must evaluate the requested action against the principal, resource scope and effective policy; it must not authorize solely because a role name appears in a token or request.
+
+| Role | Proposed capabilities | Explicitly not implied |
+|---|---|---|
+| `tenant_admin` | `tenant.manage`, create/suspend workspaces, tenant identity and policy administration | `knowledge.read`, `retrieval.query`, `context.generate` |
+| `workspace_owner` | `workspace.manage`, manage workspace administrators/members, approve source and workspace policy changes | Content read unless separately granted |
+| `workspace_admin` | `workspace.members.manage`, `source.manage`, `ingestion.policy.manage`, `audit.read` | Content read or unrestricted ingestion execution |
+| `workspace_contributor` | `ingestion.run` for explicitly approved sources and operations | Read/query access unless separately granted |
+| `workspace_reader` | `knowledge.read`, `retrieval.query`, `context.generate` within effective workspace scope | Workspace/source/ACL administration |
+| `project_admin` | `project.manage`, `project.members.manage`, project-local source configuration | Content read unless separately granted |
+| `project_contributor` | `ingestion.run` for explicitly approved project sources | Read/query access unless separately granted |
+| `project_reader` | `knowledge.read`, `retrieval.query`, `context.generate` for that project and policy-approved shared sources | Sibling project access or workspace administration |
+
+### 16.1 Effective grant rules
+
+1. Grants are action-specific and scoped to a resource. A role bundle expands to named actions; it is not a global capability.
+2. Tenant administration does not imply Workspace membership or content access. Workspace/Project administration does not imply content read.
+3. Workspace grants flow only to resources that are not explicitly restricted. A restricted Project requires an explicit Project grant even when the principal has a Workspace role.
+4. Project grants apply only to that Project and cannot widen access beyond the containing Workspace.
+5. Workspace-shared Sources/Knowledge may participate in Project-scoped retrieval only when the Workspace policy explicitly allows it and the caller has the required read action.
+6. Source-level policy can further restrict an existing grant; it cannot grant access beyond Workspace/Project authorization.
+7. Explicit deny overrides allow. Revocation takes effect before cached or projected content is returned; authorization-sensitive cursors and caches must be revalidated against the current policy version.
+8. Service accounts and agents receive explicit, least-privilege action grants scoped to the exact Workspace/Project/Source. They do not inherit a human's permissions merely because they act on that user's behalf.
+9. Emergency/break-glass content access is not part of ordinary administrative roles. If introduced, it must be time-bounded, reason-coded, separately authorized and audited.
+
+### 16.2 Source access-mode rules
+
+- `workspace_managed`: content access is governed by the platform's Workspace/Project policy after the source owner explicitly approves the source for ingestion.
+- `mirror_upstream`: the platform must enforce the upstream user's/group's effective access on every retrieval. Connector service credentials are ingestion credentials, not proof of end-user authorization.
+- If a trustworthy upstream identity/ACL mapping is unavailable, `mirror_upstream` content remains unavailable to general retrieval. It may only be exposed under a separately approved restricted audience policy; otherwise ingestion/publication is blocked.
+
+This matrix is a proposed minimum vocabulary for review, not an approved final permission matrix or a complete policy language. It deliberately separates administration, ingestion and content access.
+
+## 17. Out of scope
 
 - Physical database schema and migrations.
 - Exact REST/gRPC/MCP API routes.
-- Complete role-permission matrix and policy language.
+- Final exhaustive role-permission matrix and machine-evaluable policy language.
 - Cross-tenant or cross-workspace sharing/federation.
 - User provisioning/SCIM and identity-provider integration implementation.
 - Connector-specific ACL synchronization implementation.

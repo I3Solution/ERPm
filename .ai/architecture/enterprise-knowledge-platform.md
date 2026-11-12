@@ -138,7 +138,7 @@ Keep logical storage responsibilities separate even if the first deployment uses
 
 The detailed logical ownership, publication-consistency and retention boundaries are defined in [Storage Boundary](storage-boundary.md). The accepted v1 default is one relational deployment for Control Plane + Canonical Knowledge Store with separate logical modules/schemas; full-text and vector remain separate logical adapters and may share a search engine only after benchmark validation. Git sources retain exact SHA/hash provenance, with immutable archive capture when replay or retention policy requires it.
 
-A prior technology direction discussed for evaluation is PostgreSQL for control metadata, OpenSearch for full-text/vector search, Haystack for retrieval pipelines, and Go for MCP services. Treat these as candidate/previously discussed choices, not final locked decisions. Validate operational fit, deployment constraints, connector needs and retrieval benchmarks before committing.
+The accepted implementation-language direction is Go for the Core Platform, Python for the specialized AI/ML Runtime, and language-neutral versioned contracts/API/MCP for multilingual extensions. Start with a Go modular monolith; do not create one service per logical module. Existing Roslyn and TypeScript indexers remain source-specific extractors behind adapters. See [Technology Strategy](technology-strategy.md) for language boundaries, future repository layout and validation gates. Database, artifact, search/vector vendors and physical deployment topology remain open for benchmark/ADR; do not treat earlier PostgreSQL/OpenSearch/Haystack discussions as selected technologies.
 
 ## 8. Ingestion lifecycle and freshness
 

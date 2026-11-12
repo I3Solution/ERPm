@@ -61,8 +61,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 ## 6. Việc còn lại
 
 - Chuẩn hóa contracts machine-readable cho stage inputs/outputs, IngestionRun và attempt/stage history.
-- Hoàn thiện remaining details cho projection lifecycle, completeness metrics, webhook security và manifest protocol.
-- Hoàn thiện webhook authentication/replay protection, completeness metrics và revision manifest protocol.
+- Hoàn thiện remaining details cho projection lifecycle, completeness metrics, webhook authentication/replay protection và revision manifest protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
 
@@ -72,4 +71,4 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - CI: Chưa có kết luận PASS tổng thể cho PR tại lần cập nhật này.
 - Tài liệu chính: .ai/architecture/ingestion-pipeline.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Đã draft kiến trúc ingestion; approval và implementation còn mở.
+- Sáu quyết định Ingestion v1 đã được user chấp thuận; các operational details và implementation còn mở.

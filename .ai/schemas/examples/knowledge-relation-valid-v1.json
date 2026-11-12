@@ -1,0 +1,19 @@
+{
+  "relationId": "relation-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceRecordId": "record-a",
+  "predicate": "code.calls",
+  "targetRecordId": "record-b",
+  "assertion": {
+    "kind": "deterministic_extraction",
+    "verification": "verified"
+  },
+  "evidenceIds": [
+    "evidence-001"
+  ],
+  "producerVersion": "1.0"
+}

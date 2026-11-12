@@ -31,8 +31,8 @@ public sealed class ExtractorHostProtocolTests : IDisposable
             "C#", 1, 5, null, null, null, null, "verified", DateTimeOffset.UtcNow);
 
         var serialized = ExtractorHostProtocol.SerializeRecord(record);
-        Assert.DoesNotContain("\\n", serialized);
-        Assert.DoesNotContain("\\r", serialized);
+        Assert.DoesNotContain("\n", serialized);
+        Assert.DoesNotContain("\r", serialized);
         using var document = JsonDocument.Parse(serialized);
 
         Assert.True(document.RootElement.TryGetProperty("schemaVersion", out _));

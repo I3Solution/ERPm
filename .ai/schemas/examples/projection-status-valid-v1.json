@@ -10,10 +10,10 @@
     "projectId": "project-a"
   },
   "sourceId": "source-a",
-  "sourceRevisionId": "revision-a",
+  "sourceRevisionId": "revision-001",
   "sourcePublication": {
-    "manifestId": "publication-manifest-a",
-    "contentHash": "sha256:publication"
+    "manifestId": "manifest-001",
+    "contentHash": "sha256:manifest"
   },
   "projectionKind": "vector",
   "desiredProfile": {
@@ -26,8 +26,8 @@
   "projectionManifest": {
     "manifestId": "projection-manifest-001",
     "contentHash": "sha256:projection-manifest",
-    "sourceRevisionId": "revision-a",
-    "sourcePublicationManifestId": "publication-manifest-a",
+    "sourceRevisionId": "revision-001",
+    "sourcePublicationManifestId": "manifest-001",
     "profileId": "code-vector-default",
     "profileVersion": "1.0",
     "definitionFingerprint": "sha256:vector-projection-definition",

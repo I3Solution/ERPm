@@ -460,6 +460,12 @@ def validate_stage_attempt_semantics(attempt: dict) -> list[str]:
         if checkpoint["outputContentHash"] != output["contentHash"]:
             errors.append("checkpoint output hash differs from output manifest")
 
+    severities = {item["severity"] for item in diagnostics}
+    if state == "succeeded" and severities.intersection({"warning", "error", "fatal"}):
+        errors.append("succeeded stage attempt cannot contain warning/error/fatal diagnostics")
+    if state == "succeeded_with_warnings" and "warning" not in severities:
+        errors.append("succeeded_with_warnings requires at least one warning diagnostic")
+
     if state == "retry_wait" and not any(
         item["retryable"] and item["classification"] == "transient"
         for item in diagnostics
@@ -603,6 +609,20 @@ class IngestionStageContractSchemaTests(unittest.TestCase):
     def test_successful_stage_attempt_requires_durable_output_checkpoint(self):
         attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
         attempt.pop("checkpoint")
+        with self.assertRaises(ValidationError):
+            validate_schema(attempt, SCHEMAS / "ingestion-stage-attempt-v1.schema.json")
+
+    def test_stage_attempt_rejects_output_manifest_for_wrong_stage(self):
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        attempt["stage"] = "normalizer.normalize"
+        with self.assertRaises(ValidationError):
+            validate_schema(attempt, SCHEMAS / "ingestion-stage-attempt-v1.schema.json")
+
+    def test_optional_processor_skip_requires_diagnostic(self):
+        attempt = load_json(EXAMPLES / "ingestion-stage-attempt-valid-v1.json")
+        attempt["state"] = "skipped"
+        attempt["skipReason"] = "optional_stage_failure"
+        attempt["completedAtUtc"] = "2026-11-12T04:04:00Z"
         with self.assertRaises(ValidationError):
             validate_schema(attempt, SCHEMAS / "ingestion-stage-attempt-v1.schema.json")
 

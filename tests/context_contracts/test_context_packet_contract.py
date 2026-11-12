@@ -215,5 +215,47 @@ class RetrievalContractSchemaTests(unittest.TestCase):
         validate_schema(error, SCHEMAS / "retrieval-error-v1.schema.json")
 
 
+class CanonicalKnowledgeSchemaTests(unittest.TestCase):
+    def test_valid_knowledge_record_fixture(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        validate_schema(record, SCHEMAS / "knowledge-record-v1.schema.json")
+        self.assertEqual(record["classification"]["recordType"], record["payload"]["type"])
+
+    def test_logical_key_is_optional_for_observations_without_stable_identity(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        record.pop("logicalKey")
+        validate_schema(record, SCHEMAS / "knowledge-record-v1.schema.json")
+
+    def test_record_rejects_missing_evidence(self):
+        record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        record["evidenceIds"] = []
+        with self.assertRaises(ValidationError):
+            validate_schema(record, SCHEMAS / "knowledge-record-v1.schema.json")
+
+    def test_valid_evidence_fixture(self):
+        evidence = load_json(EXAMPLES / "evidence-valid-v1.json")
+        validate_schema(evidence, SCHEMAS / "evidence-v1.schema.json")
+
+    def test_valid_relation_fixture(self):
+        relation = load_json(EXAMPLES / "knowledge-relation-valid-v1.json")
+        validate_schema(relation, SCHEMAS / "knowledge-relation-v1.schema.json")
+
+    def test_relation_rejects_unverified_edge(self):
+        relation = load_json(EXAMPLES / "knowledge-relation-valid-v1.json")
+        relation["assertion"]["verification"] = "partial"
+        with self.assertRaises(ValidationError):
+            validate_schema(relation, SCHEMAS / "knowledge-relation-v1.schema.json")
+
+    def test_valid_source_revision_fixture(self):
+        revision = load_json(EXAMPLES / "source-revision-valid-v1.json")
+        validate_schema(revision, SCHEMAS / "source-revision-v1.schema.json")
+
+    def test_source_revision_requires_exact_revision_key(self):
+        revision = load_json(EXAMPLES / "source-revision-valid-v1.json")
+        revision.pop("revisionKey")
+        with self.assertRaises(ValidationError):
+            validate_schema(revision, SCHEMAS / "source-revision-v1.schema.json")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,6 @@
 # Workspace Boundary — Proposed Design
 
-> **Status:** Proposed for review; not yet an implementation contract  
+> **Status:** Core isolation boundary accepted by the user on 2026-11-12; detailed identity/ACL/lifecycle choices remain proposed  
 > **Date:** 2026-11-12  
 > **Scope:** Tenant, Workspace, Project, Source ownership, authorization and isolation  
 > **Pilot:** ERPm is a validation workspace/source set, not a platform boundary
@@ -278,21 +278,31 @@ Before implementing runtime authorization, the design and later tests must cover
 11. A cross-workspace Context Packet is rejected unless a future explicit federation contract authorizes each scope.
 12. Cache keys and storage paths cannot collide across tenants or workspaces.
 
-## 14. Decisions to review before treating this as an accepted contract
+## 14. Accepted boundary decision
+
+The following core principle was explicitly accepted by the platform owner on 2026-11-12:
+
+- **Knowledge Workspace is the primary data-isolation boundary.**
+- **Project is an optional narrower authorization boundary inside one Workspace.**
+- Project permissions cannot widen access beyond the containing Workspace.
+- Cross-workspace knowledge access remains denied by default.
+
+This acceptance settles the platform's primary workspace/project boundary. It does not approve every role name, Tenant deployment assumption, upstream ACL strategy, ID format or lifecycle state below.
+
+## 15. Remaining decisions to review before implementation
 
 The proposed baseline is intentionally conservative. Review these decisions explicitly:
 
 1. Is Tenant always an organization boundary, including single-organization/self-hosted deployments?
-2. Is Knowledge Workspace the mandatory security boundary, with Project as an optional narrower boundary?
-3. Should workspace-level grants see all non-restricted projects, while project-only grants see only their project plus approved workspace-shared knowledge?
-4. Should workspace-shared sources be available inside project-scoped retrieval by default, subject to policy?
-5. Which first-pilot sources require `mirror_upstream` ACL enforcement versus `workspace_managed` access?
-6. Which identity provider/group model must be supported in the first implementation?
-7. Is UUIDv7 acceptable as the default platform ID, or should the ID format remain unspecified until technology selection?
+2. Should workspace-level grants see all non-restricted projects, while project-only grants see only their project plus approved workspace-shared knowledge?
+3. Should workspace-shared sources be available inside project-scoped retrieval by default, subject to policy?
+4. Which first-pilot sources require `mirror_upstream` ACL enforcement versus `workspace_managed` access?
+5. Which identity provider/group model must be supported in the first implementation?
+6. Is UUIDv7 acceptable as the default platform ID, or should the ID format remain unspecified until technology selection?
 
-Until reviewed, these are proposals rather than final implementation requirements.
+Until reviewed, these remaining items are proposals rather than final implementation requirements.
 
-## 15. Out of scope
+## 16. Out of scope
 
 - Physical database schema and migrations.
 - Exact REST/gRPC/MCP API routes.

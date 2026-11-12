@@ -155,7 +155,9 @@
               "required": [
                 "sourceId",
                 "sourceRevisionId",
-                "state"
+                "state",
+                "profileId",
+                "sourcePublicationManifestId"
               ],
               "properties": {
                 "sourceId": {
@@ -193,6 +195,14 @@
                   "minLength": 1
                 },
                 "unavailableReason": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "profileId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sourcePublicationManifestId": {
                   "type": "string",
                   "minLength": 1
                 }

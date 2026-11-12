@@ -31,7 +31,9 @@ Thiết kế phải hỗ trợ Workspace isolation, provenance, immutable source
 - [x] Chốt payload v1 ban đầu: code.file, code.symbol, code.reference_observation, code.api_observation.
 - [x] Hoãn cross-source derived records; v1 tập trung single-source ingestion.
 - [x] Chốt không ghi đè lịch sử extraction/payload; retention duration và deletion obligations vẫn cần thiết kế.
-- [ ] Chốt wire-level schema, payload details và identity derivation rules.
+- [x] Tạo JSON Schema Draft 2020-12 cho KnowledgeRecord, Evidence, KnowledgeRelation và SourceRevision envelope.
+- [x] Thêm valid fixtures và automated schema validation vào CI.
+- [ ] Chốt payload-specific data schemas và identity derivation rules.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -46,12 +48,14 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 - Đối chiếu required fields và enums của backend v1/v2 và frontend v3.
 - Kiểm tra thiết kế giữ exact source revision, repository-relative paths, evidence state và frontend typed Angular/API payload.
-- Chưa có machine-readable schema hoặc automated tests; đây là design proposal.
+- Initial JSON Schema envelope và valid fixtures đã được thêm; automated schema validation dùng chung CI job, kết quả đang chờ.
+- Payload-specific data semantics và cross-record runtime validator chưa được triển khai.
 - Chưa chốt physical storage, ID encoding hay role/ACL implementation.
 
 ## 6. Việc còn lại
 
-- Thiết kế machine-readable schema/fixtures và adapter contract cho 4 code payload đầu tiên.
+- Hoàn thiện chi tiết payload-specific schemas và identity policy cho bốn code payload.
+- Thiết kế adapter mapping từ code-index v1/v2/v3 sang canonical envelope.
 - Đồng bộ contract với [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - Tiếp tục review các quyết định wire-level, ID/identity derivation và retention/deletion.
 - Kết nối contract với Connector/Extractor/Normalizer/Ingestion design; không migrate cache cũ hoặc thêm document/database extractors trước khi contract implementation được duyệt.
@@ -62,4 +66,4 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - CI / workflow run và kết quả: CI tổng thể của PR đang chạy tại lần cập nhật cuối; chưa có kết luận PASS.
 - Tài liệu chính: .ai/architecture/canonical-knowledge-contract.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- User đã chấp thuận 5 quyết định v1 ngày 2026-11-12. Contract draft và pipeline design đang được chuẩn bị để review; implementation còn mở.
+- User đã chấp thuận 5 quyết định v1 ngày 2026-11-12. Initial envelope schemas và validation fixtures đã được thêm; CI chưa xác nhận kết quả ở lần cập nhật này. Payload details, adapter và runtime implementation còn mở.

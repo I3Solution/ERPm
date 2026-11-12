@@ -63,14 +63,15 @@ with open(request_path, "w", encoding="utf-8") as stream:
     json.dump(request, stream)
 PY
 
+pushd "$execution" >/dev/null
 DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet run --no-build \
   --project "$repo_root/tools/ERPm.CodeIndex" -- extractor-host < "$request_file"
+popd >/dev/null
 
 python3 - "$output" "$commit_sha" "$snapshot_before" "$snapshot" <<'PY'
 import hashlib
 import json
 import pathlib
-import subprocess
 import sys
 
 output, commit_sha, snapshot_before, snapshot = sys.argv[1:]

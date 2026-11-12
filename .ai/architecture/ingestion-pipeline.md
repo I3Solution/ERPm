@@ -431,26 +431,33 @@ These decisions constrain the logical lifecycle but do not select a queue, datab
 
 ## 16. Remaining design details
 
-1. Define the exact child attempt/stage record contract and retry/cancellation rules under the single IngestionRun aggregate.
+1. Review and approve the proposed stage I/O, child attempt and retry/cancellation semantics in section 18 before runtime implementation.
 2. Define projection-specific schema, freshness/version compatibility and retrieval behavior when a projection is pending, failed or stale.
-3. Define source-profile completeness metrics and per-payload required/optional classification.
+3. Define the source-family metric vocabulary, thresholds and required/optional payload classification beyond the generic counters in section 18.
 4. Define webhook authentication, replay protection, deduplication and authorization semantics.
 5. Define large-revision staging and manifest commit protocol for the chosen storage technology.
 
 These details must be resolved before runtime implementation. No vendor, queue or physical database schema is selected by this document.
 
 
-## 16. Initial machine-readable schemas v1
+## 17. Initial machine-readable schemas v1
 
 Initial JSON Schema Draft 2020-12 artifacts:
 
 - [IngestionProfile v1](../schemas/ingestion-profile-v1.schema.json)
 - [IngestionRun v1](../schemas/ingestion-run-v1.schema.json)
+- [IngestionStageInvocation v1](../schemas/ingestion-stage-invocation-v1.schema.json)
+- [IngestionStageAttempt v1](../schemas/ingestion-stage-attempt-v1.schema.json)
+- [SourceCaptureManifest v1](../schemas/source-capture-manifest-v1.schema.json)
+- [ExtractionManifest v1](../schemas/extraction-manifest-v1.schema.json)
+- [ProcessingManifest v1](../schemas/processing-manifest-v1.schema.json)
+- [NormalizationManifest v1](../schemas/normalization-manifest-v1.schema.json)
+- [ValidationReport v1](../schemas/validation-report-v1.schema.json)
 - [PublicationManifest v1](../schemas/publication-manifest-v1.schema.json)
 
 These schemas encode the accepted v1 lifecycle choices: one durable IngestionRun identity, manual/webhook triggers only, profile-controlled component versions and completeness policy, retryable stage history, and publication manifest scoped to one complete SourceRevision. They do not define a separate IngestionRequest entity.
 
-### 16.1 Cross-field and lifecycle invariants
+### 17.1 Cross-field and lifecycle invariants
 
 The Orchestrator/Validator/Publisher must additionally enforce:
 
@@ -467,7 +474,7 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 11. A newer desired revision cannot be overwritten by an older run completing later; active-pointer changes require a concurrency-safe generation/CAS check.
 12. Webhook authentication, signature validation and replay protection are enforced before creating/advancing a run; raw secrets never enter run records.
 
-### 16.2 Deliberately not frozen
+### 17.2 Deliberately not frozen
 
 - Queue/broker, worker runtime and scheduling technology.
 - Exact webhook signature scheme and replay-window storage.
@@ -477,3 +484,144 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 - Physical transaction/compare-and-swap implementation.
 
 The schemas are logical contracts and do not authorize a runtime or deployment choice.
+
+
+## 18. Proposed Stage I/O, attempt, checkpoint and retry contracts v1
+
+> **Status:** Machine-readable design draft added on 2026-11-12; detailed stage semantics are proposed for review and are not yet marked user-approved.  
+> **Boundary:** Logical contracts only. No worker, queue, API, database table or vendor-specific implementation is introduced.
+
+### 18.1 Stage graph and invocation boundary
+
+The component execution graph is:
+
+```text
+Connector.Capture
+       |
+       v
+Extractor.Extract
+       |
+       v
+Processor.Process (zero or more, ordered by profile)
+       |
+       v
+Normalizer.Normalize
+       |
+       v
+Validator.Validate
+       |
+       v
+Publisher.Publish
+       |
+       v
+PublicationManifest (canonical revision ready)
+       |
+       +----> asynchronous Search Projection jobs (outside this stage chain)
+```
+
+Orchestrator states `authorizing` and `resolving_revision` are preflight/control-plane transitions, not component stage invocations. A stage invocation is created only after the platform has resolved the registered Source, trusted Workspace scope, effective profile version and exact immutable SourceRevision selector. The connector then captures the already resolved revision; it cannot replace it with a different branch head or source.
+
+The `IngestionRun` remains the aggregate root. `IngestionStageInvocation` is the immutable instruction/input contract for one component attempt. `IngestionStageAttempt` is the child operational record for that attempt and records its state, diagnostics and durable output checkpoint. Each Run `stageEvents[]` summary may reference the child record through `stageAttemptId`; the Run does not duplicate the complete attempt payload.
+
+### 18.2 Common input and output envelope
+
+Every component receives an `IngestionStageInvocation` containing:
+
+- `runId`, `invocationId`, trusted Tenant/Workspace/Project scope, registered `sourceId` and exact `sourceRevisionId/revisionKind/revisionKey`.
+- The pinned IngestionProfile ID/version and selected component type/version. Processor invocations also include their zero-based profile order.
+- Immutable input artifact references (zero for a capture stage that reads the registered Source directly), each with artifact ID, role, opaque storage reference, media type, content hash and byte length.
+- `inputFingerprint`, `idempotencyKey`, expected output contract and deadline.
+- An optional prior checkpoint reference only when resuming the same logical stage work.
+
+The expected output contract is discriminator-bound to the stage; e.g. an extractor invocation cannot declare a Publisher manifest output. Component configuration is resolved from the trusted profile/secret broker. Secret values, tokens and credentials never appear in invocation, attempt, manifest or diagnostic payloads.
+
+Every attempt returns a stage-specific immutable manifest (or the existing PublicationManifest for Publisher) and an `IngestionStageAttempt` result. The attempt records the output manifest reference and content hash. Large content stays in artifacts; manifests carry bounded metadata and references rather than embedding source/document/code bodies.
+
+### 18.3 Stage input/output contracts
+
+| Stage | Required input | Output contract | Required behavior |
+|---|---|---|---|
+| Connector.Capture | Trusted Source registration/profile, resolved SourceRevision, approved connector configuration reference | [SourceCaptureManifest](../schemas/source-capture-manifest-v1.schema.json) | Capture a consistent immutable snapshot; report exact revision key, content hash, artifact refs and consistency strategy. No Tenant/Workspace assignment from connector data. |
+| Extractor.Extract | SourceCaptureManifest and its immutable captured artifacts | [ExtractionManifest](../schemas/extraction-manifest-v1.schema.json) | Emit source-native observations as artifacts; report observation counts, unsupported counts, coverage metrics and omission report. Preserve source locators and evidence quality. |
+| Processor.Process | ExtractionManifest or immediately preceding ProcessingManifest plus its artifacts | [ProcessingManifest](../schemas/processing-manifest-v1.schema.json) | Optional ordered transform; every output artifact declares parent artifact IDs; preserve source revision and parent lineage. |
+| Normalizer.Normalize | ExtractionManifest plus zero or more ordered ProcessingManifests selected by the orchestrator | [NormalizationManifest](../schemas/normalization-manifest-v1.schema.json) | Emit canonical KnowledgeRecord, Evidence and only already-resolved/evidence-backed KnowledgeRelation artifacts; report payload versions, counts, unsupported and omitted observations. |
+| Validator.Validate | NormalizationManifest, referenced canonical staging artifacts and trusted Source/Project/SourceRevision/ACL metadata | [ValidationReport](../schemas/validation-report-v1.schema.json) | Validate schemas, ownership, source revision, evidence, identity, relation endpoints, counts and profile completeness. Do not mutate normalized artifacts. |
+| Publisher.Publish | Publication-eligible ValidationReport and its exact NormalizationManifest/staging artifacts | [PublicationManifest](../schemas/publication-manifest-v1.schema.json) | Publish the complete SourceRevision atomically; update readiness/active pointer only through the concurrency-safe publication transition. |
+
+The Publisher is not permitted to accept a blocked ValidationReport or reconstruct missing normalized data. A `passed_with_warnings` report may publish only when every required metric passes and every warning is permitted by the pinned IngestionProfile. A run becomes `succeeded` or `succeeded_with_warnings` only after the PublicationManifest and ready-state transition commit.
+
+### 18.4 Manifest lineage and artifact rules
+
+All stage manifests carry the same `runId`, Tenant/Workspace/Project scope, `sourceId` and `sourceRevisionId`. The SourceCaptureManifest carries the full resolved revision identity and capture content hash. Every downstream manifest must reference the prior stage manifest ID and content hash; its artifacts must remain tied to that same source revision.
+
+Artifact references are immutable and include:
+
+- A platform artifact ID and opaque storage reference.
+- Media type, content hash and byte length.
+- A role/type that identifies the artifact's contract (snapshot, observations, processed observations, KnowledgeRecord, Evidence or Relation set).
+
+The artifact storage reference is not a public URL or authorization grant. Artifact access is checked against the owning Workspace/Source ACL at read time. Hash and byte length are verified before a checkpoint can be reused. Raw snapshots and unsupported source rows remain preserved according to the source/retention policy; omission reports make unsupported or dropped content explicit.
+
+### 18.5 Child attempt and checkpoint semantics
+
+- Each component execution has a unique `attemptId` and `invocationId`. `attemptNumber` is stage-local and increases only when that same logical stage work is retried. The Run's `attemptCount/retryCount` remain aggregate summary counters.
+- Attempt states are `started`, `succeeded`, `succeeded_with_warnings`, `failed`, `retry_wait`, `skipped` or `canceled`. A terminal failed attempt is retained; a retry creates a new child attempt rather than rewriting the prior attempt's history.
+- A checkpoint is committed only after the output manifest and every referenced artifact have been durably stored, content-hashed and verified. A successful attempt must reference both its output manifest and checkpoint.
+- Checkpoint reuse requires the same `runId`, SourceRevision, profile version, component type/version, stage, processor ordinal (when relevant) and `inputFingerprint`. A mismatch invalidates that checkpoint and all downstream outputs that depend on it.
+- The stage idempotency key is derived from the logical Run key, stage, component/version, ordered input content hashes, profile version and processor ordinal. Attempt number is deliberately excluded so a retry represents the same logical work; `attemptId` remains unique.
+- A crash before checkpoint commit leaves output artifacts uncommitted and invisible; they are not a safe resume point and may be cleaned under retention policy.
+
+### 18.6 Retry, optional processor, cancellation and supersession
+
+**Retry classification**
+
+| Class | Examples | Behavior |
+|---|---|---|
+| Transient | Network interruption, rate limiting, temporary upstream/storage unavailability, worker interruption, safely repeatable timeout | Retry with bounded backoff, respecting profile `maxAttempts` and `maxBackoffSeconds`; reuse only a verified matching checkpoint |
+| Permanent | Authentication/authorization denial, Workspace ownership mismatch, wrong SourceRevision, inconsistent snapshot, unsupported/invalid schema, invalid provenance/identity, required completeness failure, policy denial | Do not retry automatically; require corrected credentials/configuration/source or a new Run |
+| Not applicable | Explicit cancellation, skipped optional stage, superseded Run | Do not schedule retry |
+
+A timeout is transient only when repeating the stage is safe under the same idempotency key. Every retry stores a diagnostic with stable code, category, transient/permanent classification, retryable flag and sanitized summary. Never persist secrets, raw tokens or arbitrary source content in diagnostics.
+
+**Optional Processor**
+
+- If no Processor is configured, the orchestrator records `skipped/not_configured` in the Run summary and does not create a worker invocation.
+- A configured Processor with `required: true` blocks publication after permanent failure or exhausted retries.
+- A configured Processor with `required: false` may be skipped after failure only when the profile permits optional warnings, all required completeness thresholds pass, and the Normalizer contract declares it can consume the upstream input without that Processor. Otherwise the failure is effectively required and blocks publication.
+- A skipped Processor must be visible in Run diagnostics and coverage/omission reporting. It cannot silently pass through as if it succeeded.
+
+**Cancellation and supersession**
+
+- Cancellation stops new stage invocations and requests cooperative cancellation of active work. Uncheckpointed artifacts remain invisible.
+- Cancellation and Publisher commit must be serialized: if publication committed first, the Run is successful; if cancellation wins before commit, no new active pointer is advanced.
+- A superseded Run may finish non-publishing work for diagnostics, but the Publisher must reject an outdated desired-revision generation. An older SourceRevision must never replace a newer active pointer.
+- Failed, canceled or superseded Runs cannot create a published partial-revision manifest.
+
+### 18.7 Cross-stage invariants and validation
+
+The CI schema/semantic tests now cover the following design invariants:
+
+1. Stage name and expected output contract must match.
+2. A successful attempt has an output manifest and durable checkpoint; checkpoint input fingerprint, manifest ID and output hash match the attempt.
+3. `retry_wait` requires at least one transient retryable diagnostic; permanent errors cannot be flagged retryable.
+4. Every capture/extraction/processing/normalization/validation manifest has matching Run, Workspace, Source and SourceRevision lineage.
+5. Extraction aggregate observation count equals the artifact counts; coverage ratios reconcile with numerator/denominator.
+6. Processor output artifacts declare parent artifact IDs and `lineagePreserved: true`.
+7. Normalization aggregate record/evidence/relation counts reconcile with their artifact counts and payload counts.
+8. Validation accepted + rejected counts reconcile to the NormalizationManifest; completeness pass flags reconcile to configured minimum ratios.
+9. A blocked ValidationReport is never publication-eligible. `passed_with_warnings` requires warnings only and passing required completeness metrics.
+10. Run stage summaries can reference child StageAttempt records without creating a separate IngestionRequest entity.
+
+These tests validate contract behavior; runtime authorization, storage durability, hash verification, atomic publication and cancellation races still require integration tests in a later implementation phase.
+
+### 18.8 Remaining decisions
+
+The schemas intentionally leave these items open:
+
+- Per-source metric vocabulary, required/optional item classification and how an extractor estimates the denominator.
+- Webhook signature scheme, replay store and event deduplication.
+- Exact artifact chunking, retention and manifest commit protocol for the selected storage technology.
+- Search projection manifest/version schemas and how Retrieval advertises projection readiness.
+- Whether and how multiple Processor outputs may branch instead of remaining a strictly ordered chain.
+
+No queue, orchestration engine, storage vendor, REST route or worker deployment is selected by this stage-contract draft.

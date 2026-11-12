@@ -31,7 +31,8 @@ Không triển khai LLM prompt, model/tokenizer runtime, API/MCP adapter hoặc 
 - [x] Xác định selection, deduplication, conflict, token budget và completeness semantics.
 - [x] Xác định lifecycle, authorization freshness, expiry, cache/retention và acceptance scenarios.
 - [x] Review và chốt bảy default ở mục 14 của context-packet-contract.md ngày 2026-11-12.
-- [ ] Chuyển contract thành machine-readable schema, ContextProfile schema và adapter mappings.
+- [x] Tạo JSON Schema Draft 2020-12 cho ContextPacket v1 và ContextProfile v1.
+- [ ] Định nghĩa adapter mappings và automated schema/semantic validation fixtures.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -53,7 +54,8 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- Định nghĩa JSON Schema/Protobuf (chọn sau trong technology/protocol ADR) cho ContextPacket và ContextProfile.
+- Hoàn thiện adapter mappings cho Query API/MCP/IDE clients.
+- Tạo automated schema validation và semantic fixtures; chọn JSON/Protobuf trong protocol ADR.
 - Định nghĩa adapter mapping cho Query API/MCP/IDE clients mà không mất trust/provenance metadata.
 - Thiết kế evaluation dataset cho evidence coverage, token efficiency, omission rate và prompt-injection containment.
 

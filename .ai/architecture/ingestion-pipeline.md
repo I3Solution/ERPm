@@ -68,7 +68,7 @@ Source registration / webhook / schedule / manual trigger
                          v
                Retrieval / Search projections
 
-Search projection building is a separate asynchronous lifecycle after canonical publication. A SourceRevision becomes knowledge-ready for structured retrieval when its canonical publication manifest is committed; full-text/vector availability is reported independently by each projection.
+Search projection building is a separate asynchronous lifecycle after canonical publication. A SourceRevision becomes knowledge-ready for structured retrieval when its canonical publication manifest is committed; full-text/vector availability is reported independently by each projection. See [Search Projection Lifecycle](projection-lifecycle.md) for profile, run, manifest, status and per-revision retrieval contracts.
 
 ## 3. Component responsibility boundaries
 
@@ -480,7 +480,7 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 - Exact webhook signature scheme and replay-window storage.
 - Physical chunking format, artifact retention and large-revision staging manifest implementation.
 - Completeness metric vocabulary and per-source thresholds beyond the generic manifest counters.
-- Projection schema/version registry and reindex orchestration.
+- Projection rebuild orchestration, incremental update/delete protocol and schema/model version migration tooling.
 - Storage-specific transaction/compare-and-swap implementation.
 
 The schemas are logical contracts and do not authorize a runtime or deployment choice.
@@ -622,7 +622,7 @@ The schemas intentionally leave these items open:
 - Per-source metric vocabulary, required/optional item classification and how an extractor estimates the denominator.
 - Webhook signature scheme, replay store and event deduplication.
 - Exact artifact chunking, retention and manifest commit protocol for the selected storage technology.
-- Search projection manifest/version schemas and how Retrieval advertises projection readiness.
+- Projection queue/build orchestration, incremental update/delete protocol and reindex/compaction operations; logical schemas and per-revision Retrieval readiness are defined in [Search Projection Lifecycle](projection-lifecycle.md).
 - Whether and how multiple Processor outputs may branch instead of remaining a strictly ordered chain.
 
 No queue, orchestration engine, storage vendor, REST route or worker deployment is selected by this stage-contract draft.

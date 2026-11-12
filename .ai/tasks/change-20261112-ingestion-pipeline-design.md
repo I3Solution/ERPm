@@ -46,7 +46,9 @@ Chưa triển khai runtime worker, queue, database schema hoặc API.
 - [ ] User review/approval cho các chi tiết stage I/O, attempt và retry/cancellation semantics.
 - [x] Hoàn thành projection profile/run/manifest/status schemas và Retrieval readiness theo từng SourceRevision ở task [Projection Lifecycle](change-20261112-projection-lifecycle-design.md).
 - [x] Draft source-family completeness metric vocabulary, numerator/denominator semantics, empty-source handling and publication gates in section 19; thresholds and schema evolution remain for review.
-- [ ] Chốt webhook security và large-revision manifest protocol.
+- [x] Draft webhook signature verification, source-bound authorization, durable replay/deduplication, secret rotation and dispatch recovery requirements in section 20.
+- [ ] Review/approve provider-neutral webhook security baseline and choose provider-specific signature adapters.
+- [ ] Chốt large-revision manifest protocol.
 - [ ] Review/approve source-family completeness vocabulary and decide whether metric schema v1 needs per-metric thresholds and denominator provenance.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
@@ -75,7 +77,8 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 - User review/approval cho stage I/O, attempt, retry, cancellation và optional Processor semantics (proposed design draft).
 - Source-family completeness metric vocabulary is drafted in section 19. Per-source thresholds, denominator provenance and schema evolution remain open.
-- Hoàn thiện webhook authentication/replay protection và large-revision commit protocol.
+- Webhook authentication/replay protection baseline is drafted in section 20; provider-specific verifier formats and operational retention remain open.
+- Hoàn thiện large-revision commit protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
 

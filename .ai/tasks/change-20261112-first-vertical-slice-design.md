@@ -52,7 +52,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 
 ## 6. Việc còn lại
 
-- Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Proposed host protocol is documented in section 9; it preserves existing Roslyn analysis and schema while returning run-scoped immutable artifacts. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
+- Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Proposed host protocol is documented in section 10; it preserves existing Roslyn analysis and schema while returning run-scoped immutable artifacts. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
 - Validate capture manifest/materialization parity, read-only snapshot behavior and MSBuild writable workspace with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
@@ -61,6 +61,6 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
-- CI baseline: [Run #1013](https://github.com/I3Solution/ERPm/actions/runs/43179810828), 5/5 jobs passed trước khi bổ sung slice design.
+- CI baseline: [Run #1044](https://github.com/I3Solution/ERPm/actions/runs/43181828139), 5/5 jobs passed for commit `763d62ab26951708506a7823ccea51fc71e75967`; later snapshot-design commits are awaiting their own CI.
 - Ngày cập nhật cuối: 2026-11-12.
 - Đây là design proposal; chưa có runtime implementation hoặc runtime verification.

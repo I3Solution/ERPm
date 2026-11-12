@@ -486,6 +486,77 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 The schemas are logical contracts and do not authorize a runtime or deployment choice.
 
 
+## 21. Proposed large-SourceRevision staging and commit protocol
+
+> **Status:** Storage-independent logical protocol proposal; physical transaction, object-store and partition implementation remain for the Storage/Technology ADR.
+> **Invariant:** Chunking is an implementation detail. The publication unit remains the complete SourceRevision.
+
+### 21.1 Revision staging namespace
+
+Every ingestion Run writes into an isolated, non-queryable staging namespace scoped by the immutable tuple:
+
+`Tenant + Workspace + Source + SourceRevision + IngestionRun + pipeline fingerprint`.
+
+A staging namespace is never addressable through normal Retrieval. It is not a temporary alias for the active revision.
+
+Large inputs may be processed as deterministic chunks/partitions. Each chunk output is immutable and records:
+
+- stable chunk/partition ID and deterministic ordering key;
+- exact Run, SourceRevision, stage invocation and input fingerprint;
+- input item range or source-native item-key boundaries;
+- output artifact references, content hashes, byte lengths and item counts;
+- producer component type/version and output contract version;
+- completion state and any bounded diagnostics.
+
+Chunk identity must be derived from stable input identity and the pinned pipeline definition, not from worker arrival order. Repeating the same chunk with the same input fingerprint and output hash is idempotent. Reusing the same chunk identity with different input/output hashes is an integrity conflict and blocks publication.
+
+### 21.2 Revision staging manifest
+
+After all expected chunks are complete, the orchestrator assembles an immutable revision staging manifest that contains:
+
+- exact Tenant/Workspace/Source/SourceRevision and IngestionRun identity;
+- capture, extraction, processing and normalization manifest references/hashes;
+- the complete ordered set of required chunk/partition manifest IDs and hashes;
+- expected, completed, excluded-by-policy and failed item counts by declared unit;
+- aggregate artifact byte/item counts and a deterministic root content hash;
+- completeness metric evaluations and explicit omission classifications;
+- pinned pipeline/profile/component versions.
+
+The manifest is complete only when every required partition is present exactly once, every referenced artifact is durable and hash-verified, all aggregate counts reconcile, and all required completeness rules pass. Optional omissions remain explicit; they are never represented as missing partitions.
+
+### 21.3 Validation and publication barrier
+
+1. Validator reads the immutable staging manifest and its referenced artifacts by streaming or bounded batches; it does not require the entire revision in memory.
+2. Validator confirms scope/revision lineage, chunk-set completeness, unique partition identities, content hashes, payload schemas, Evidence locators, count reconciliation and source-profile completeness.
+3. Validator emits one ValidationReport bound to the exact staging/NormalizationManifest IDs and hashes.
+4. Publisher accepts only a publication-eligible ValidationReport and its exact NormalizationManifest/staging lineage.
+5. Publisher commits one PublicationManifest for the entire SourceRevision. The PublicationManifest references the complete input manifests and aggregate root hash; no per-chunk artifact is independently query-visible.
+6. A concurrency-safe commit transition publishes the manifest and advances the canonical readiness/active-revision pointer only if the Run still owns the desired revision generation.
+
+The commit transition is the sole visibility barrier. Before it, the entire staged revision is invisible. After it, the entire revision is available to structured Retrieval. Search projections begin independently from the committed PublicationManifest.
+
+### 21.4 Recovery, retries and cleanup
+
+- A worker may resume only a chunk whose input fingerprint, source revision, component version and checkpoint hash match exactly.
+- Completed chunks are immutable; retries do not rewrite them in place.
+- Missing or corrupt chunks are rebuilt under a new attempt and verified before the final manifest is assembled.
+- A conflicting duplicate chunk, changed source snapshot, changed profile/component version or incomplete required partition set invalidates the current staging attempt and blocks publication.
+- If the process crashes before the commit barrier, the previous published revision remains active and the incomplete staging namespace remains non-queryable.
+- If the commit succeeds but acknowledgement is lost, retry resolves the same commit identity and returns the already committed PublicationManifest; it must not publish a second generation.
+- Orphaned staging artifacts are cleaned only after a policy-defined safety/retention interval and after confirming that no committed manifest references them.
+- A newer desired SourceRevision prevents an older Run from advancing the active pointer even if the older Run finishes later.
+
+### 21.5 Physical storage decisions deliberately deferred
+
+The protocol does not choose:
+- object-store multipart upload, database staging tables or filesystem layout;
+- chunk size, partitioning strategy or parallelism limits;
+- whether manifest artifacts use a flat list, tree or Merkle structure;
+- transaction/outbox/CAS implementation across the canonical metadata store and artifact store;
+- exact orphan cleanup and staging retention durations.
+
+Those choices must preserve the logical visibility barrier and be benchmarked against very large revisions, partial worker failure, concurrent revisions and storage outages.
+
 ## 20. Proposed webhook authentication and replay protection
 
 > **Status:** Security baseline proposal for review; provider-specific signature formats and deployment controls remain open.

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:payload:code.reference_observation:1.0",
+  "title": "Enterprise Knowledge Platform code.reference_observation payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "version", "data"],
+  "properties": {
+    "type": { "const": "code.reference_observation" },
+    "version": { "const": "1.0" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRecordKind",
+        "name",
+        "qualifiedName",
+        "language",
+        "targetSymbolKind",
+        "sourceSymbolId",
+        "sourceSymbolKind",
+        "targetSymbolId",
+        "relation",
+        "targetResolution"
+      ],
+      "properties": {
+        "sourceRecordKind": { "enum": ["reference", "relationship"] },
+        "name": { "type": "string", "minLength": 1 },
+        "qualifiedName": { "type": ["string", "null"] },
+        "language": { "type": "string", "minLength": 1 },
+        "targetSymbolKind": { "type": ["string", "null"] },
+        "sourceSymbolId": { "type": ["string", "null"] },
+        "sourceSymbolKind": { "type": ["string", "null"] },
+        "targetSymbolId": { "type": ["string", "null"] },
+        "relation": { "type": ["string", "null"] },
+        "targetResolution": { "enum": ["resolved", "unresolved"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "targetResolution": { "const": "resolved" } },
+            "required": ["targetResolution"]
+          },
+          "then": {
+            "properties": {
+              "targetSymbolId": { "type": "string", "minLength": 1 }
+            }
+          },
+          "else": {
+            "properties": { "targetSymbolId": { "type": "null" } }
+          }
+        }
+      ]
+    }
+  }
+}

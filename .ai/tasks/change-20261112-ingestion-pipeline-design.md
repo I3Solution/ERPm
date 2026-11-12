@@ -45,7 +45,9 @@ Chưa triển khai runtime worker, queue, database schema hoặc API.
 - [x] Thêm CI schema/semantic tests cho stage contract, manifest lineage, aggregate counts, completeness ratios và retry/checkpoint invariants.
 - [ ] User review/approval cho các chi tiết stage I/O, attempt và retry/cancellation semantics.
 - [x] Hoàn thành projection profile/run/manifest/status schemas và Retrieval readiness theo từng SourceRevision ở task [Projection Lifecycle](change-20261112-projection-lifecycle-design.md).
-- [ ] Chốt source-specific completeness vocabulary, webhook security và large-revision manifest protocol.
+- [x] Draft source-family completeness metric vocabulary, numerator/denominator semantics, empty-source handling and publication gates in section 19; thresholds and schema evolution remain for review.
+- [ ] Chốt webhook security và large-revision manifest protocol.
+- [ ] Review/approve source-family completeness vocabulary and decide whether metric schema v1 needs per-metric thresholds and denominator provenance.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -72,7 +74,8 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 ## 6. Việc còn lại
 
 - User review/approval cho stage I/O, attempt, retry, cancellation và optional Processor semantics (proposed design draft).
-- Hoàn thiện source-family completeness metrics, webhook authentication/replay protection và large-revision commit protocol.
+- Source-family completeness metric vocabulary is drafted in section 19. Per-source thresholds, denominator provenance and schema evolution remain open.
+- Hoàn thiện webhook authentication/replay protection và large-revision commit protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
 

@@ -1,6 +1,6 @@
 # Connector, Extractor, Normalizer and Ingestion Lifecycle — Proposed v1
 
-> **Status:** Draft for architecture review  
+> **Status:** Core v1 ingestion decisions accepted by the user on 2026-11-12; implementation contracts remain to be specified and tested  
 > **Date:** 2026-11-12  
 > **Depends on:** Accepted Workspace isolation boundary and accepted Canonical Knowledge Contract v1 design decisions  
 > **Scope:** Responsibilities, contracts, lifecycle, idempotency, publication and failure semantics  
@@ -415,13 +415,25 @@ Document, Database and Business connectors can be added after the v1 contracts a
 11. A revoked Source or Workspace prevents new ingestion and retrieval according to the revocation policy.
 12. A completed run with permitted warnings is distinguishable from a failed run and exposes the exact warnings/coverage.
 
-## 15. Decisions to review
+## 15. Accepted v1 ingestion decisions
 
-1. Is the proposed Connector / Extractor / optional Processor / Normalizer / Validator / Publisher / Orchestrator separation accepted?
-2. Should IngestionRun itself represent the durable requested job plus execution, or should v1 distinguish a durable IngestionRequest from one or more execution attempts?
-3. Should search/vector projection be a mandatory pre-publication stage for the first vertical slice, or can canonical structured retrieval be ready first with search projections following?
-4. Should v1 publication atomicity be per SourceRevision, as proposed, or is a smaller independently visible unit required for very large sources?
-5. Which trigger types are required in the first slice: manual only, webhook, or schedule as well?
-6. What is the acceptable policy for a source revision with optional but incomplete extraction: publish with warnings or keep the previous active revision?
+The platform owner explicitly accepted the following decisions on 2026-11-12:
 
-Until reviewed, these are proposals rather than implementation requirements. No vendor, queue, database or deployment technology is selected by this document.
+1. **IngestionRun identity:** one durable `IngestionRun` represents the requested ingestion work and owns its lifecycle, retry attempts and stage history. V1 does not introduce a separate first-class `IngestionRequest` entity. Individual attempts/stage executions may be recorded as child operational entries for diagnostics and recovery.
+2. **Canonical publication vs search projections:** publishing canonical records, evidence and relations makes a SourceRevision knowledge-ready for structured retrieval. Full-text/vector projections have their own asynchronous lifecycle and statuses (`pending`, `building`, `ready`, `failed`, `stale`); their delay/failure does not roll back canonical publication. Retrieval capabilities must disclose which projections are ready and must never treat missing projection results as evidence that no knowledge exists.
+3. **Atomicity unit:** publication is atomic for the entire SourceRevision. Large inputs may be written in chunks to staging, but no part is query-visible until the complete revision's publication manifest and readiness pointer are committed.
+4. **V1 triggers:** support authorized manual triggers and webhooks. Scheduled ingestion is deferred until usage and operational needs justify it.
+5. **Optional partial extraction:** an otherwise valid SourceRevision may publish with warnings when only optional items/stages are incomplete and the source's explicit completeness thresholds are met. The run must report omissions, counts and coverage.
+6. **Required data/stage failure:** missing mandatory data, failed required stages, invalid ownership/provenance/schema, or a completeness threshold violation blocks publication of the new revision. The last successfully published revision remains available under source policy.
+
+These decisions constrain the logical lifecycle but do not select a queue, database, search engine or deployment topology.
+
+## 16. Remaining design details
+
+1. Define the exact child attempt/stage record contract and retry/cancellation rules under the single IngestionRun aggregate.
+2. Define projection-specific schema, freshness/version compatibility and retrieval behavior when a projection is pending, failed or stale.
+3. Define source-profile completeness metrics and per-payload required/optional classification.
+4. Define webhook authentication, replay protection, deduplication and authorization semantics.
+5. Define large-revision staging and manifest commit protocol for the chosen storage technology.
+
+These details must be resolved before runtime implementation. No vendor, queue or physical database schema is selected by this document.

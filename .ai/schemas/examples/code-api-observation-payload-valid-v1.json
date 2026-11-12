@@ -1,0 +1,13 @@
+{
+  "type": "code.api_observation",
+  "version": "1.0",
+  "data": {
+    "httpMethod": "GET",
+    "urlKind": "interpolated",
+    "expression": "`/api/orders/${id}`",
+    "literalPath": null,
+    "containingSymbolId": "ts:erpm-fe:method:src/app/orders.service.ts:240:getOrder",
+    "sourceObservationId": "api:erpm-fe:src/app/orders.service.ts:240",
+    "language": "typescript"
+  }
+}

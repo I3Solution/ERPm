@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:projection-profile:1.0",
+  "title": "Enterprise Knowledge Platform ProjectionProfile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "profileId", "version", "projectionKind", "builder",
+    "sourceSelection", "configuration", "buildPolicy"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "ekp.projection-profile" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "profileId": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "projectionKind": { "enum": ["full_text", "vector"] },
+    "builder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "version", "outputContract"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "outputContract": { "type": "string", "minLength": 1 }
+      }
+    },
+    "sourceSelection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonicalContractVersion", "payloadTypes"],
+      "properties": {
+        "canonicalContractVersion": { "type": "string", "minLength": 1 },
+        "payloadTypes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "versions"],
+            "properties": {
+              "type": { "type": "string", "minLength": 1 },
+              "versions": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["configRef", "configFingerprint", "configContract"],
+      "properties": {
+        "configRef": { "type": "string", "minLength": 1 },
+        "configFingerprint": { "type": "string", "minLength": 1 },
+        "configContract": { "type": "string", "minLength": 1 }
+      }
+    },
+    "buildPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxAttempts", "minimumIndexedRatio", "allowSkippedItems", "rebuildMode"],
+      "properties": {
+        "maxAttempts": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "minimumIndexedRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "allowSkippedItems": { "type": "boolean" },
+        "rebuildMode": { "enum": ["full", "incremental"] }
+      }
+    },
+    "definitionFingerprint": { "type": "string", "minLength": 1 }
+  }
+}

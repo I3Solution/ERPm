@@ -82,7 +82,8 @@ Platform
         └── Access policies
 ```
 
-The exact Tenant/Workspace/Project hierarchy is a design baseline and must be validated against the intended deployment model before implementation.
+The core isolation decision is accepted: Knowledge Workspace is the primary data boundary; Project can only narrow access within that Workspace. Detailed role, identity, upstream ACL and lifecycle decisions remain under review. See [Workspace Boundary](workspace-boundary.md).
+
 
 Detailed ownership, retrieval scope, role inheritance and source ACL proposals are documented in [Workspace Boundary](workspace-boundary.md). That document is pending review and is not yet an implementation contract.
 
@@ -125,6 +126,8 @@ The common envelope should support, at minimum:
 - Authorization: security labels/ACL metadata needed to enforce source access during retrieval.
 
 The contract must distinguish source facts from inferred/enriched facts. Name similarity alone is not proof of a relationship. Existing index schemas v1/v2/v3 remain historical, versioned contracts; do not silently reinterpret them as the future platform-wide contract.
+
+The proposed common envelope, Evidence, KnowledgeRelation, SourceRevision and typed payload model is specified separately in [Canonical Knowledge Contract](canonical-knowledge-contract.md). That document is a draft pending review; it does not yet authorize database/API implementation.
 
 ## 7. Central storage responsibilities
 

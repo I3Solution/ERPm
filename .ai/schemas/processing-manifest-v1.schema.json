@@ -65,7 +65,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["artifactId", "storageRef", "mediaType", "contentHash", "byteLength", "itemCount"],
+        "required": ["artifactId", "storageRef", "mediaType", "contentHash", "byteLength", "itemCount", "parentArtifactIds"],
         "properties": {
           "artifactId": { "type": "string", "minLength": 1 },
           "storageRef": { "type": "string", "minLength": 1 },

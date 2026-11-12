@@ -2,7 +2,7 @@
 
 > **Loại:** change  
 > **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
-> **Trạng thái:** Doing  
+> **Trạng thái:** Doing — payload schemas and adapter contract added; CI verification pending  
 > **Progress aggregation:** v1  
 > **Liên quan:** .ai/architecture/workspace-boundary.md, .ai/architecture/enterprise-knowledge-platform.md, Phase 0 roadmap  
 > **Phạm vi:** Root repository — platform knowledge/evidence/relation contract
@@ -33,7 +33,9 @@ Thiết kế phải hỗ trợ Workspace isolation, provenance, immutable source
 - [x] Chốt không ghi đè lịch sử extraction/payload; retention duration và deletion obligations vẫn cần thiết kế.
 - [x] Tạo JSON Schema Draft 2020-12 cho KnowledgeRecord, Evidence, KnowledgeRelation và SourceRevision envelope.
 - [x] Thêm valid fixtures và automated schema validation vào CI.
-- [ ] Chốt payload-specific data schemas và identity derivation rules.
+- [x] Tạo bốn payload-specific JSON Schemas Draft 2020-12 và valid fixtures cho `code.file`, `code.symbol`, `code.reference_observation`, `code.api_observation`.
+- [x] Chốt identity policy theo từng payload, gồm quy tắc `logicalKey` conditional cho `code.symbol`.
+- [x] Định nghĩa adapter mapping từ backend v1/v2 và frontend v3 sang Canonical Knowledge, bao gồm unsupported-kind reporting.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -47,15 +49,16 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 ## 5. Kiểm tra
 
 - Đối chiếu required fields và enums của backend v1/v2 và frontend v3.
-- Kiểm tra thiết kế giữ exact source revision, repository-relative paths, evidence state và frontend typed Angular/API payload.
+- Kiểm tra thiết kế giữ exact source revision, repository-relative paths, evidence state và frontend typed Angular/API observation.
+- Thêm payload-schema tests, invalid discriminator/resolution tests và `logicalKey` semantic tests; kết quả CI cho commit mới đang chờ.
 - Initial JSON Schema envelope và valid fixtures đã được thêm; automated schema validation dùng chung CI job, kết quả đang chờ.
 - Payload-specific data semantics và cross-record runtime validator chưa được triển khai.
 - Chưa chốt physical storage, ID encoding hay role/ACL implementation.
 
 ## 6. Việc còn lại
 
-- Hoàn thiện chi tiết payload-specific schemas và identity policy cho bốn code payload.
-- Thiết kế adapter mapping từ code-index v1/v2/v3 sang canonical envelope.
+- Chờ CI xác nhận bộ payload-schema/identity tests mới.
+- Review adapter mapping contract trước khi triển khai runtime adapter trong Phase 2.
 - Đồng bộ contract với [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - Tiếp tục review các quyết định wire-level, ID/identity derivation và retention/deletion.
 - Kết nối contract với Connector/Extractor/Normalizer/Ingestion design; không migrate cache cũ hoặc thêm document/database extractors trước khi contract implementation được duyệt.

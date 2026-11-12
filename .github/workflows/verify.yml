@@ -68,8 +68,14 @@ jobs:
         run: npm test --prefix tools/frontend-code-indexer
       - name: Build code index CLI
         run: dotnet build tools/ERPm.CodeIndex/ERPm.CodeIndex.csproj
+      - name: Install ERPm-BE pinned SDK for extractor host
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.403
       - name: Run code index unit tests
         run: dotnet test tests/ERPm.CodeIndex.Tests/ERPm.CodeIndex.Tests.csproj
+      - name: Smoke test managed extractor against immutable ERPm-BE snapshot
+        run: bash tests/ERPm.CodeIndex.Tests/extractor-host-smoke.sh
       - name: Validate pinned workspace manifest
         run: dotnet run --project tools/ERPm.CodeIndex -- workspace status
       - name: Index pinned frontend application Program

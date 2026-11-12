@@ -292,7 +292,8 @@
         "source",
         "claim",
         "evidence",
-        "retrievalProvenance"
+        "retrievalProvenance",
+        "payload"
       ],
       "properties": {
         "recordId": {

@@ -1,6 +1,6 @@
 # ADR — Technology Strategy for Enterprise Knowledge Platform
 
-> **Status:** Proposed — requires platform-owner approval before runtime scaffolding
+> **Status:** Accepted direction — runtime implementation remains gated by vertical-slice design and benchmark
 > **Date:** 2026-11-12
 > **Scope:** Independent reusable Enterprise Knowledge Platform; ERPm is a pilot Workspace, not the product boundary
 
@@ -170,6 +170,6 @@ Costs/risks: multiple toolchains and conformance matrices, process/container iso
 
 ## 13. Decision status
 
-This ADR recommends Go for Core, Python for specialized AI/ML and language-neutral multilingual extensions. It is **not yet a final user-approved technology lock**.
+This ADR records the direction accepted by the platform owner on 2026-11-12: Go for Core, Python for specialized AI/ML and language-neutral multilingual extensions. Runtime implementation details, numeric benchmark targets and extension execution protocol still require validation.
 
-Approval should confirm Go as Core language, Python as specialized runtime, multilingual process-isolated extensions, modular monolith as initial deployment shape, unchanged language-neutral contracts, and deferred runtime scaffolding until the first vertical-slice design is approved.
+Accepted direction: Go is the primary Core language; Python is the specialized AI/ML Runtime; extensions remain multilingual and isolated from the Core process; the initial Core deployment is a modular monolith; existing language-neutral contracts remain unchanged; runtime scaffolding is deferred until the first vertical-slice design is approved.

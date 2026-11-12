@@ -48,7 +48,8 @@ Chưa triển khai runtime worker, queue, database schema hoặc API.
 - [x] Draft source-family completeness metric vocabulary, numerator/denominator semantics, empty-source handling and publication gates in section 19; thresholds and schema evolution remain for review.
 - [x] Draft webhook signature verification, source-bound authorization, durable replay/deduplication, secret rotation and dispatch recovery requirements in section 20.
 - [ ] Review/approve provider-neutral webhook security baseline and choose provider-specific signature adapters.
-- [ ] Chốt large-revision manifest protocol.
+- [x] Draft storage-independent large-SourceRevision staging, chunk-manifest reconciliation, publication barrier, retry/recovery and orphan-cleanup protocol in section 21.
+- [ ] Review/approve logical staging/commit protocol and validate its physical mapping in the Storage/Technology ADR.
 - [ ] Review/approve source-family completeness vocabulary and decide whether metric schema v1 needs per-metric thresholds and denominator provenance.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
@@ -78,7 +79,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - User review/approval cho stage I/O, attempt, retry, cancellation và optional Processor semantics (proposed design draft).
 - Source-family completeness metric vocabulary is drafted in section 19. Per-source thresholds, denominator provenance and schema evolution remain open.
 - Webhook authentication/replay protection baseline is drafted in section 20; provider-specific verifier formats and operational retention remain open.
-- Hoàn thiện large-revision commit protocol.
+- Large-revision staging/commit protocol is drafted in section 21; physical transaction/outbox/CAS and artifact-store mapping remain for Storage/Technology ADR.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
 

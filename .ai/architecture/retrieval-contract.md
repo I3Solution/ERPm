@@ -324,3 +324,29 @@ JSON Schema validates shape and local constraints. The platform must additionall
 - Canonical ID encoding and schema registry governance.
 
 These remain contract/technology ADR work. JSON Schema validation is not runtime authorization or a substitute for two-Workspace integration tests.
+
+
+## 17. Projection-aware retrieval readiness
+
+The [Search Projection Lifecycle](projection-lifecycle.md) defines ProjectionProfile, ProjectionRun, ProjectionManifest and per-SourceRevision ProjectionStatus. This section binds those contracts to Retrieval v1.
+
+For each requested `full_text` or `vector` method, `methodReports[].revisionStates` contains exactly one readiness entry for every selected SourceRevision. An entry is `available` only when a committed ProjectionManifest matches the selected PublicationManifest, SourceRevision, profile ID/version and definition fingerprint. A stale manifest is not a fallback.
+
+Method report aggregation:
+
+- `available`: every selected SourceRevision has a compatible ready projection.
+- `partial`: selected revisions have heterogeneous readiness states; the `coverage` array lists only ready revisions.
+- A common unavailable state (`pending`, `building`, `failed`, `stale` or `unsupported`) is reported when no selected revision is ready and all have that state.
+- `ran` is true only when the method executed against at least one ready revision.
+
+Required/optional behavior:
+
+1. A required projection must be ready for every selected SourceRevision. Otherwise return Retrieval Error category `required_method_unavailable`; do not return Empty or a successful Partial result.
+2. An optional projection can run against its ready revision subset. Missing revisions are reported; do not silently substitute another SourceRevision.
+3. A required method's availability is checked per selected revision, not merely by whether one search request returned some candidates.
+4. Structured Retrieval remains available from committed canonical publication while full-text/vector methods are pending, building, failed or stale.
+5. A missing result from a pending/failed/stale projection is not evidence that canonical knowledge does not exist.
+
+The result's `methodReports` include profile/version/fingerprint and ProjectionManifest references for each available revision. Pagination/caching fingerprints include the ProjectionManifest IDs and projection versions actually used. ACL and selected publication state are revalidated before candidate content is returned.
+
+The Retrieval v1 valid result fixture and semantic tests now exercise per-revision projection coverage, stale optional projection behavior and required projection failure semantics. These changes preserve the accepted one-Workspace and active/pinned revision rules; they do not select a search engine or embedding provider.

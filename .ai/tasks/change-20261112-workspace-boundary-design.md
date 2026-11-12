@@ -25,7 +25,8 @@ Thiết kế phải phân biệt rõ khái niệm Knowledge Workspace của nề
 - [x] Rà soát metadata hiện tại và phân biệt Agent Workspace Context với Knowledge Workspace.
 - [x] Đề xuất hierarchy, ownership và quan hệ Tenant → Workspace → Project → Source.
 - [x] Đề xuất identity, authorization inheritance, source ACL mode và isolation requirements.
-- [ ] Review và chốt các quyết định mở trong tài liệu Workspace Boundary.
+- [x] Chốt nguyên tắc chính: Knowledge Workspace là ranh giới cô lập dữ liệu; Project chỉ thu hẹp quyền bên trong Workspace.
+- [ ] Review và chốt các quyết định chi tiết còn mở về Tenant, quyền kế thừa, source ACL, identity và lifecycle.
 
 Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -40,7 +41,8 @@ Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope t
 
 - Đã đối chiếu thuật ngữ và metadata workspace hiện có với bootstrap/context policy.
 - Chưa chạy build hoặc automated tests vì task chỉ tạo tài liệu kiến trúc.
-- Chưa có phê duyệt cho các quyết định trong mục 14 của tài liệu; không coi proposal là contract đã chốt.
+- User đã chấp thuận nguyên tắc cô lập Workspace/Project ngày 2026-11-12.
+- Các quyết định chi tiết về Tenant, role inheritance, source ACL, identity và lifecycle vẫn đang ở trạng thái proposal.
 
 ## 6. Việc còn lại
 

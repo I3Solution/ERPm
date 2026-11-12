@@ -146,5 +146,68 @@ class ContextProfileSchemaTests(unittest.TestCase):
             validate_schema(profile, SCHEMAS / "context-profile-v1.schema.json")
 
 
+def validate_retrieval_result_semantics(result: dict) -> list[str]:
+    errors: list[str] = []
+    selected = {
+        (revision["sourceId"], revision["sourceRevisionId"])
+        for revision in result["selectedRevisions"]
+    }
+    if result["outcome"] == "empty" and result["results"]:
+        errors.append("empty outcome cannot contain results")
+    if result["outcome"] == "partial" and not result["results"]:
+        errors.append("partial outcome requires at least one usable result")
+    if result["outcome"] == "complete":
+        if any(report["required"] and not report["ran"] for report in result["methodReports"]):
+            errors.append("complete outcome requires every required method to have run")
+    if result.get("pagination", {}).get("hasMore") and not result["pagination"].get("nextCursor"):
+        errors.append("hasMore requires a continuation cursor")
+    for item in result["results"]:
+        if item["scope"]["workspaceId"] != result["scope"]["workspaceId"]:
+            errors.append(f"{item['recordId']}: result Workspace differs from response Workspace")
+        source_key = (item["source"]["sourceId"], item["source"]["sourceRevisionId"])
+        if source_key not in selected:
+            errors.append(f"{item['recordId']}: record revision is absent from selected revision manifest")
+        if not item["evidence"]:
+            errors.append(f"{item['recordId']}: result has no Evidence")
+        for evidence in item["evidence"]:
+            if (evidence["sourceId"], evidence["sourceRevisionId"]) != source_key:
+                errors.append(f"{item['recordId']}: Evidence does not match record SourceRevision")
+    return errors
+
+
+class RetrievalContractSchemaTests(unittest.TestCase):
+    def test_valid_request_fixture(self):
+        request = load_json(EXAMPLES / "retrieval-request-valid-v1.json")
+        validate_schema(request, SCHEMAS / "retrieval-request-v1.schema.json")
+
+    def test_pinned_request_requires_revision(self):
+        request = load_json(EXAMPLES / "retrieval-request-valid-v1.json")
+        request["revisionPolicy"] = {"mode": "pinned", "revisions": []}
+        with self.assertRaises(ValidationError):
+            validate_schema(request, SCHEMAS / "retrieval-request-v1.schema.json")
+
+    def test_valid_result_fixture(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        validate_schema(result, SCHEMAS / "retrieval-result-v1.schema.json")
+        self.assertEqual([], validate_retrieval_result_semantics(result))
+
+    def test_result_rejects_evidence_from_another_revision(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        result["results"][0]["evidence"][0]["sourceRevisionId"] = "revision-other"
+        self.assertTrue(any("Evidence does not match" in error
+                            for error in validate_retrieval_result_semantics(result)))
+
+    def test_partial_result_requires_usable_results(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        result["outcome"] = "partial"
+        result["results"] = []
+        self.assertIn("partial outcome requires at least one usable result",
+                      validate_retrieval_result_semantics(result))
+
+    def test_valid_error_fixture(self):
+        error = load_json(EXAMPLES / "retrieval-error-valid-v1.json")
+        validate_schema(error, SCHEMAS / "retrieval-error-v1.schema.json")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -136,11 +136,15 @@ Keep logical storage responsibilities separate even if the first deployment uses
 - **Search plane:** full-text and vector representations with workspace, revision and ACL filters.
 - **Relationship retrieval:** initially may use relational/structured edges; introduce a dedicated graph database only when measured query needs justify it.
 
+The detailed logical ownership, publication-consistency and retention boundaries are proposed in [Storage Boundary](storage-boundary.md). This is a logical separation only: v1 may consolidate Control Plane and Canonical Knowledge Store in one relational technology if benchmarks and isolation controls support it.
+
 A prior technology direction discussed for evaluation is PostgreSQL for control metadata, OpenSearch for full-text/vector search, Haystack for retrieval pipelines, and Go for MCP services. Treat these as candidate/previously discussed choices, not final locked decisions. Validate operational fit, deployment constraints, connector needs and retrieval benchmarks before committing.
 
 ## 8. Ingestion lifecycle and freshness
 
 The high-level lifecycle is discovery → immutable snapshot capture → extraction → optional processing → normalization → validation → staging → publication/readiness. Detailed run states, retry/checkpoint semantics, idempotency, freshness pointers and atomic visibility are proposed in [Connector and Ingestion Pipeline](ingestion-pipeline.md).
+
+Canonical publication is atomic per complete SourceRevision. Full-text/vector projections have separate asynchronous readiness; their failure does not roll back canonical structured knowledge. See [Storage Boundary](storage-boundary.md).
 
 For Git sources, index an exact commit SHA, not a moving branch name. Branches are pointers to revisions. A query must resolve to an explicit indexed revision or a documented default revision; records from different SHAs must never be silently mixed.
 

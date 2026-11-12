@@ -336,5 +336,113 @@ class IngestionContractSchemaTests(unittest.TestCase):
             validate_schema(manifest, SCHEMAS / "publication-manifest-v1.schema.json")
 
 
+
+def validate_code_logical_identity(
+    payload: dict,
+    logical_key: str | None,
+) -> list[str]:
+    errors: list[str] = []
+    payload_type = payload["type"]
+    identity = payload.get("data", {}).get("identity", {})
+
+    if payload_type == "code.file":
+        if not logical_key:
+            errors.append("code.file requires a source-scoped logicalKey")
+    elif payload_type == "code.symbol":
+        stability = identity.get("stability")
+        if stability == "stable" and not logical_key:
+            errors.append("stable code.symbol identity requires logicalKey")
+        elif stability == "revision_local" and logical_key:
+            errors.append("revision-local code.symbol must omit logicalKey")
+    elif payload_type in {"code.reference_observation", "code.api_observation"}:
+        if logical_key:
+            errors.append(f"{payload_type} must omit logicalKey")
+    return errors
+
+
+class CanonicalCodePayloadSchemaTests(unittest.TestCase):
+    PAYLOAD_CASES = (
+        ("code.file", "code-file-payload-valid-v1.json", "code-file-v1.schema.json"),
+        ("code.symbol", "code-symbol-payload-valid-v1.json", "code-symbol-v1.schema.json"),
+        (
+            "code.reference_observation",
+            "code-reference-observation-payload-valid-v1.json",
+            "code-reference-observation-v1.schema.json",
+        ),
+        (
+            "code.api_observation",
+            "code-api-observation-payload-valid-v1.json",
+            "code-api-observation-v1.schema.json",
+        ),
+    )
+
+    def test_valid_payload_fixtures(self):
+        for expected_type, fixture_name, schema_name in self.PAYLOAD_CASES:
+            with self.subTest(payload_type=expected_type):
+                payload = load_json(EXAMPLES / fixture_name)
+                validate_schema(payload, SCHEMAS / "payloads" / schema_name)
+                self.assertEqual(expected_type, payload["type"])
+                self.assertEqual("1.0", payload["version"])
+
+    def test_code_file_requires_logical_key(self):
+        payload = load_json(EXAMPLES / "code-file-payload-valid-v1.json")
+        self.assertEqual([], validate_code_logical_identity(payload, "code.file:[source,path]"))
+        self.assertIn(
+            "code.file requires a source-scoped logicalKey",
+            validate_code_logical_identity(payload, None),
+        )
+
+    def test_code_symbol_identity_is_conditional(self):
+        payload = load_json(EXAMPLES / "code-symbol-payload-valid-v1.json")
+        self.assertEqual([], validate_code_logical_identity(payload, None))
+
+        payload["data"]["identity"] = {
+            "stability": "stable",
+            "strategy": "compiler_semantic_key",
+        }
+        self.assertIn(
+            "stable code.symbol identity requires logicalKey",
+            validate_code_logical_identity(payload, None),
+        )
+        self.assertEqual(
+            [],
+            validate_code_logical_identity(payload, "code.symbol:[source,semantic-key]"),
+        )
+
+        payload["data"]["identity"] = {
+            "stability": "revision_local",
+            "strategy": "source_locator",
+        }
+        self.assertIn(
+            "revision-local code.symbol must omit logicalKey",
+            validate_code_logical_identity(payload, "code.symbol:[source,offset]"),
+        )
+
+    def test_observation_payloads_must_omit_logical_key(self):
+        for fixture_name, _schema_name in (
+            ("code-reference-observation-payload-valid-v1.json", "code-reference-observation-v1.schema.json"),
+            ("code-api-observation-payload-valid-v1.json", "code-api-observation-v1.schema.json"),
+        ):
+            with self.subTest(fixture=fixture_name):
+                payload = load_json(EXAMPLES / fixture_name)
+                self.assertEqual([], validate_code_logical_identity(payload, None))
+                self.assertTrue(validate_code_logical_identity(payload, "not-a-stable-identity"))
+
+    def test_reference_observation_rejects_inconsistent_target_resolution(self):
+        payload = load_json(EXAMPLES / "code-reference-observation-payload-valid-v1.json")
+        payload["data"]["targetResolution"] = "resolved"
+        with self.assertRaises(ValidationError):
+            validate_schema(
+                payload,
+                SCHEMAS / "payloads" / "code-reference-observation-v1.schema.json",
+            )
+
+    def test_api_payload_requires_literal_path_only_for_literal_urls(self):
+        payload = load_json(EXAMPLES / "code-api-observation-payload-valid-v1.json")
+        payload["data"]["urlKind"] = "literal"
+        with self.assertRaises(ValidationError):
+            validate_schema(payload, SCHEMAS / "payloads" / "code-api-observation-v1.schema.json")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -153,7 +153,7 @@
     {
       "if": { "properties": { "state": { "const": "canceled" } }, "required": ["state"] },
       "then": { "required": ["completedAtUtc"] }
-    }
+    },
     {
       "if": { "properties": { "stage": { "const": "connector.capture" } }, "required": ["stage"] },
       "then": {

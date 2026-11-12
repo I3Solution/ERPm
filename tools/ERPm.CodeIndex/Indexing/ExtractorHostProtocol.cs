@@ -31,7 +31,10 @@ public static class ExtractorHostProtocol
         RequireValue(request.SourceId, nameof(request.SourceId));
         RequireValue(request.SourceRevisionId, nameof(request.SourceRevisionId));
         RequireValue(request.RepositoryId, nameof(request.RepositoryId));
-        RequireValue(request.TreeId, nameof(request.TreeId));
+        if (!IsHex(request.TreeId, 40))
+        {
+            throw new InvalidDataException("treeId must be a full 40-character Git object ID.");
+        }
         RequireValue(request.CaptureManifestId, nameof(request.CaptureManifestId));
         RequireValue(request.ExtractorId, nameof(request.ExtractorId));
         RequireValue(request.ExtractorVersion, nameof(request.ExtractorVersion));
@@ -85,6 +88,11 @@ public static class ExtractorHostProtocol
         IReadOnlyList<string>? diagnostics = null,
         CancellationToken cancellationToken = default)
     {
+        if (recordCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(recordCount));
+        }
+
         var fullArtifactPath = Path.GetFullPath(artifactPath);
         var expectedPath = Path.GetFullPath(Path.Combine(request.OutputDirectory, ArtifactFileName));
         if (!string.Equals(fullArtifactPath, expectedPath, PathComparison))

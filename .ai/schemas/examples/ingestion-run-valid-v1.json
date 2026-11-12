@@ -48,7 +48,8 @@
       "state": "succeeded",
       "startedAtUtc": "2026-11-12T03:01:00Z",
       "completedAtUtc": "2026-11-12T03:02:00Z",
-      "attempt": 1
+      "attempt": 1,
+      "stageAttemptId": "attempt-extract-001"
     }
   ],
   "createdAtUtc": "2026-11-12T03:00:00Z",

@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:ingestion-run:1.0",
+  "title": "Enterprise Knowledge Platform IngestionRun v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "runId",
+    "logicalRunKey",
+    "scope",
+    "sourceId",
+    "ingestionProfile",
+    "trigger",
+    "state",
+    "pipelineVersions",
+    "attemptCount",
+    "createdAtUtc",
+    "updatedAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.ingestion-run"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "logicalRunKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revisionKind",
+        "revisionKey"
+      ],
+      "properties": {
+        "sourceRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revisionKind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revisionKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "ingestionProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileId",
+        "version"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "requestedAtUtc"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "manual",
+            "webhook"
+          ]
+        },
+        "requestedAtUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "requestedByPrincipalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "webhookEventRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "idempotencyKey": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "state": {
+      "enum": [
+        "queued",
+        "authorizing",
+        "resolving_revision",
+        "capturing",
+        "extracting",
+        "processing",
+        "normalizing",
+        "validating",
+        "staging",
+        "publishing",
+        "retry_wait",
+        "succeeded",
+        "succeeded_with_warnings",
+        "failed",
+        "canceled",
+        "superseded"
+      ]
+    },
+    "pipelineVersions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connector",
+        "extractor",
+        "normalizer",
+        "canonicalContractVersion",
+        "profileVersion"
+      ],
+      "properties": {
+        "connector": {
+          "type": "string",
+          "minLength": 1
+        },
+        "extractor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "processors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "normalizer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonicalContractVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payloadSchemaVersions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "attemptCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retryCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stageEvents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stage",
+          "state",
+          "startedAtUtc"
+        ],
+        "properties": {
+          "stage": {
+            "enum": [
+              "authorizing",
+              "resolving_revision",
+              "capturing",
+              "extracting",
+              "processing",
+              "normalizing",
+              "validating",
+              "staging",
+              "publishing"
+            ]
+          },
+          "state": {
+            "enum": [
+              "started",
+              "succeeded",
+              "succeeded_with_warnings",
+              "failed",
+              "skipped",
+              "retry_wait"
+            ]
+          },
+          "startedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "diagnosticCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "createdAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -286,3 +286,41 @@ The accepted semantics do not yet define wire-level schemas or authorize runtime
 - Machine-readable acceptance fixtures and integration tests against two isolated Workspaces.
 
 After these are specified, define protocol adapters. Do not implement an API or select a search engine from this semantic contract alone.
+
+
+## 16. Machine-readable schemas v1
+
+Initial JSON Schema Draft 2020-12 artifacts:
+
+- [Retrieval Request v1](../schemas/retrieval-request-v1.schema.json)
+- [Retrieval Result v1](../schemas/retrieval-result-v1.schema.json)
+- [Retrieval Error v1](../schemas/retrieval-error-v1.schema.json)
+
+The request schema defines one-Workspace selectors, text/typed query intent, active or pinned revision policy, requested methods with required/optional semantics, one-hop relation expansion and bounded query limits. The result schema carries resolved scope/policy fingerprint, selected published revisions, per-method readiness/coverage, evidence-backed KnowledgeRecord results, ranking version, pagination and safe diagnostics. The error schema keeps failed requests distinct from Empty results.
+
+### 16.1 Cross-field invariants
+
+JSON Schema validates shape and local constraints. The platform must additionally enforce:
+
+1. Authenticated principal, Tenant and effective grants are resolved by trusted middleware; caller request fields are selectors, not authorization claims.
+2. Project/Source selectors must belong to the selected Workspace and only narrow server-resolved grants.
+3. Pinned revisions must be published and belong to the selected Workspace/Source; active mode resolves only the active published revision for each source.
+4. A successful outcome (complete, partial or empty) requires every requested required method to have run successfully against compatible data. A required-method failure uses the Retrieval Error contract.
+5. Partial requires at least one usable result and an optional capability/source gap; Empty means all required methods ran and no authorized matching records were found.
+6. Every result Workspace matches the response Workspace; every record revision appears in selectedRevisions.
+7. Every result has at least one authorized Evidence reference matching the record's Source and exact SourceRevision.
+8. A relation-expanded result includes a resolved verified relation and authorized Evidence for both endpoints; expansion never bypasses Project/Source restrictions.
+9. `maxResults` cannot exceed `maxCandidates`; method kinds are unique per request and resource ceilings are enforced server-side.
+10. `hasMore=true` requires an opaque cursor bound to principal, effective scope, policy, selected revision manifests and ranking/projection versions.
+11. Diagnostics, counts, snippets and identifiers must not disclose inaccessible resources.
+12. Cached results are revalidated against current authorization and publication state before exposure.
+
+### 16.2 Deliberately not frozen
+
+- Opaque cursor encoding/signing/encryption and storage.
+- Exact payload-specific filter field catalogs and operator compatibility.
+- Ranking/score normalization policy and evaluation thresholds.
+- HTTP/OpenAPI, MCP and internal RPC wire bindings.
+- Canonical ID encoding and schema registry governance.
+
+These remain contract/technology ADR work. JSON Schema validation is not runtime authorization or a substitute for two-Workspace integration tests.

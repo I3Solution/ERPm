@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:publication-manifest:1.0",
+  "title": "Enterprise Knowledge Platform PublicationManifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestId",
+    "scope",
+    "sourceId",
+    "sourceRevisionId",
+    "runId",
+    "status",
+    "counts",
+    "contentHash",
+    "publishedAtUtc"
+  ],
+  "properties": {
+    "manifestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRevisionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "const": "published"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "knowledgeRecords",
+        "evidence",
+        "relations"
+      ],
+      "properties": {
+        "knowledgeRecords": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "relations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "contentHash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stageOutputHashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "previousActiveRevisionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "activePointerGeneration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "publishedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

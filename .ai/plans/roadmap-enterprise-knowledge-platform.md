@@ -87,7 +87,8 @@ Deliverables:
   - Seven Retrieval v1 semantic defaults and seven Context Packet v1 semantic defaults were accepted on 2026-11-12. See [Retrieval Contract](../architecture/retrieval-contract.md) and [Context Packet Contract](../architecture/context-packet-contract.md).
   - Retrieval Request/Result/Error and Context Packet/Profile schemas, valid examples and CI semantic tests now exist. Protocol mappings, cursor signing and runtime implementation remain open.
 - [ ] Security/ACL and provenance requirements.
-- [ ] Technology decision records with benchmark/operational rationale.
+- [x] Record accepted Core/AI-ML/extension language direction in [Technology Strategy](../architecture/technology-strategy.md): Go Core, Python AI/ML Runtime, multilingual extensions, modular monolith first.
+- [ ] Complete technology benchmark/operational rationale for database, artifact, search/vector providers and runtime workload targets.
 
 **Exit criteria:** contracts are reviewable, versioned and testable; the first vertical slice can be implemented without ERPm-specific assumptions in the core.
 
@@ -217,8 +218,8 @@ Do not begin another indexer feature or create a PR for EF metadata yet. First c
 5. **Storage boundary:** logical defaults are accepted in [Storage Boundary](../architecture/storage-boundary.md); build the two-Workspace benchmark and defer vendor/physical-topology decisions to technology ADRs.
 6. **Retrieval contract:** seven semantic defaults are accepted in [Retrieval Contract](../architecture/retrieval-contract.md); define machine-readable fields, errors, cursor semantics, protocol mapping and two-Workspace acceptance fixtures.
 7. **Context Packet:** semantic defaults are accepted in the [Context Packet Contract](../architecture/context-packet-contract.md); initial JSON Schema Draft 2020-12 files, valid examples and schema/semantic CI tests now exist for ContextPacket and ContextProfile. Adapter mappings and broader evaluation fixtures remain open.
-8. **Remaining contract schemas and adapters:** ProjectionProfile/Run/Manifest/Status and per-revision Retrieval readiness schemas are now drafted in [Search Projection Lifecycle](../architecture/projection-lifecycle.md); wait for CI and review semantics. Complete remaining security/protocol details and implement/verify runtime adapters and projection builders in Phase 2/3. Canonical Code payload schemas and source-index mapping design have passed CI on PR #70.
-9. **Technology ADRs:** record the current direction for evaluation—Go as the primary Core Platform implementation candidate, Python for AI/ML runtime, and language-neutral API/MCP/contracts for multilingual extensions—then validate candidates against the contracts and a small benchmark. Do not rewrite existing contracts or create runtime scaffolding before the ADR and vertical-slice boundary are agreed.
+8. **Remaining contract schemas and adapters:** ProjectionProfile/Run/Manifest/Status and per-revision Retrieval readiness schemas are documented in [Search Projection Lifecycle](../architecture/projection-lifecycle.md); [CI Run #1013](https://github.com/I3Solution/ERPm/actions/runs/43179810828) passed all five jobs. Complete remaining security/protocol details and implement/verify runtime adapters and projection builders in Phase 2/3. Canonical Code payload schemas and source-index mapping design have passed CI on PR #70.
+9. **Technology strategy:** language direction is accepted and recorded in [Technology Strategy](../architecture/technology-strategy.md): Go Core, Python AI/ML Runtime, multilingual extensions, modular monolith first. Next, benchmark physical storage/search/model providers and define measurable workload targets; do not rewrite existing contracts or create runtime scaffolding before the vertical-slice boundary is agreed.
 10. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
 
 ## 5. First vertical slice acceptance scenario

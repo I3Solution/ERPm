@@ -30,7 +30,7 @@ Không triển khai LLM prompt, model/tokenizer runtime, API/MCP adapter hoặc 
 - [x] Xác định trust/instruction-safety labels và generated-summary lineage.
 - [x] Xác định selection, deduplication, conflict, token budget và completeness semantics.
 - [x] Xác định lifecycle, authorization freshness, expiry, cache/retention và acceptance scenarios.
-- [ ] Review và chốt bảy default ở mục 14 của context-packet-contract.md.
+- [x] Review và chốt bảy default ở mục 14 của context-packet-contract.md ngày 2026-11-12.
 - [ ] Chuyển contract thành machine-readable schema, ContextProfile schema và adapter mappings.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
@@ -53,8 +53,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- Review bảy default trong mục 14.
-- Sau khi chốt, định nghĩa JSON/Protobuf schema cho ContextPacket và ContextProfile.
+- Định nghĩa JSON Schema/Protobuf (chọn sau trong technology/protocol ADR) cho ContextPacket và ContextProfile.
 - Định nghĩa adapter mapping cho Query API/MCP/IDE clients mà không mất trust/provenance metadata.
 - Thiết kế evaluation dataset cho evidence coverage, token efficiency, omission rate và prompt-injection containment.
 
@@ -63,4 +62,5 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - Tài liệu chính: .ai/architecture/context-packet-contract.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Đã tạo semantic draft; chưa có machine-readable schema hoặc runtime implementation.
+- User đã chấp thuận bảy semantic default Context Packet v1 ngày 2026-11-12.
+- Semantic contract đã được chốt; chưa có machine-readable schema, adapter mapping, evaluation fixture hoặc runtime implementation.

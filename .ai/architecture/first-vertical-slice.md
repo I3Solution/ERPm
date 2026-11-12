@@ -50,7 +50,7 @@ These are package/module ownership boundaries inside one Go application, not sep
 4. **Create run:** create the single durable IngestionRun with pinned IngestionProfile and component versions. Duplicate trigger/idempotency behavior follows the Ingestion Contract.
 5. **Extract:** invoke the backend Roslyn extractor against the immutable backend Source snapshot. Its output declares source schema version, repository identity and exact SHA. Mixed or mismatched revision output is rejected. Frontend extraction is a separate follow-up integration.
 6. **Stage:** retain raw JSONL output and source manifests in run-scoped staging. Staging is invisible to normal Retrieval.
-7. **Normalize:** map backend v1/v2 and frontend v3 records through Code Index Adapter Contract v1 into only the accepted canonical code payload types. Unsupported Angular/project/dependency rows are explicitly counted/reported, never silently discarded.
+7. **Normalize:** map backend v2 records through Code Index Adapter Contract v1 into the accepted canonical code payload types. Unsupported project/dependency rows are explicitly counted/reported, never silently discarded. Frontend v3 mapping remains a follow-up source-family integration.
 8. **Validate:** validate schema, trusted ownership, SourceRevision lineage, Evidence locators, payload identity, relationship-promotion conditions, count reconciliation and required completeness metrics.
 9. **Publish:** publish the entire SourceRevision atomically through one PublicationManifest and readiness transition. On failure, keep the last good revision active and leave staging non-queryable.
 10. **Retrieve:** perform exact structured lookup within one authorized Workspace/Project and return canonical records with Evidence and exact SourceRevision. No result may leak from a sibling Workspace/Project or another SHA.
@@ -115,7 +115,7 @@ Inspected at the root PR snapshot used for this design (root submodule gitlinks:
 
 ### Backend Roslyn extractor
 - Implementation: `tools/ERPm.CodeIndex/Indexing/BackendRoslynIndexer.cs`, currently exposed through the root .NET 10 executable `tools/ERPm.CodeIndex/Program.cs`.
-- The indexer is a .NET library class (`IndexAsync(repositoryPath, repositoryId, commitSha, cancellationToken))); it opens the single top-level solution using MSBuildWorkspace and returns records in memory.
+- The indexer is a .NET library class (`IndexAsync(repositoryPath, repositoryId, commitSha, cancellationToken)) it opens the single top-level solution using MSBuildWorkspace and returns records in memory.
 - The current CLI is not a generic adapter protocol. It accepts hard-coded `index repo erpm-be`, discovers the ERPm umbrella root, verifies recursive submodule status, and writes JSONL to the local `.ai/code-index/cache/<repo>/<sha>/<indexerVersion>/symbols.jsonl` path.
 - Dependencies include MSBuild Locator and Roslyn Workspaces; execution requires a compatible .NET 10 SDK/MSBuild environment.
 
@@ -128,11 +128,9 @@ Inspected at the root PR snapshot used for this design (root submodule gitlinks:
 ### Consequence for the platform adapter
 The current tooling is a developer-workspace indexer, not yet a deployable, generic platform Extractor contract. It has no stable external invocation protocol for the Go Core, and it assumes the ERPm umbrella checkout/cache layout. In addition, the frontend manifest may include nested Git submodules; the current TypeScript Program can emit observations for multiple repository owners. Canonical Ingestion v1 normalizes one SourceRevision per batch and defers cross-source derivation, so frontend submodule records must be split into separately registered SourceRevision ingestions rather than published as one combined batch.
 
-Do not call the current CLI directly from Go and claim it is a reusable adapter. The next implementation design must choose one of these explicit paths:
-1. introduce a thin .NET extractor-host/bridge that exposes a versioned, language-neutral request/result protocol while reusing the existing Roslyn and TypeScript analysis code; or
-2. refactor the current tool's orchestration boundary to accept an explicit immutable source snapshot, trusted repository/revision manifest and output artifact directory, then expose that boundary as a stable process contract.
+Do not call the current CLI directly from Go and claim it is a reusable adapter. For the first slice, the selected design is a thin .NET extractor-host command that accepts an explicit execution-workspace path, trusted SourceRevision binding and run-scoped output directory through a versioned request/result protocol. It reuses the existing Roslyn analysis class and source schema. It does not require a broad rewrite of the existing workspace-oriented CLI; the new host command must dispatch before the legacy umbrella manifest is loaded.
 
-In either case, preserve the existing analysis semantics and source schemas, keep the host out of the Go Core process, and make all ERPm-specific assumptions explicit configuration rather than hidden hard-coded identifiers. Choose only after the adapter contract and cost/compatibility review. This is a wrapper/integration change, not a rewrite of the extractors.
+Keep the host out of the Go Core process, preserve the existing analysis semantics and source schema, and make any remaining ERPm-specific assumptions explicit configuration rather than hidden hard-coded identifiers. This is a wrapper/integration change, not a rewrite of the extractor.
 
 ## 9. Git Source capture and immutable execution snapshot v1
 
@@ -179,12 +177,12 @@ The Go Core invokes the existing .NET Roslyn extractor as an isolated process. T
 ### 10.1 Invocation
 
 - One invocation processes exactly one registered SourceRevision.
-- The Go Orchestrator creates a unique run/stage output directory and mounts the captured source snapshot read-only.
+- The Go Orchestrator creates a unique run/stage output directory and a writable per-invocation execution workspace copied from the verified immutable snapshot. The immutable snapshot itself remains read-only and is never passed as a writable build directory.
 - The host receives one bounded JSON request document on stdin. The request contains:
   - protocol version and invocation ID;
   - registered Source ID and SourceRevision ID;
-  - repository identity, exact full commit SHA and captured tree/content hash;
-  - read-only snapshot root path inside the execution sandbox;
+  - repository identity, exact full commit SHA, root tree ID, capture-manifest ID and capture-manifest SHA-256;
+  - writable execution-workspace root path inside the execution sandbox (derived from the verified immutable snapshot);
   - output directory path inside the run-scoped writable staging mount;
   - extractor identity/version, requested source schema version and bounded configuration.
 - The host must not resolve Git branches, fetch from remote repositories, select Workspace/Project ownership, read platform secrets or write to canonical storage.
@@ -194,13 +192,13 @@ The Go Core invokes the existing .NET Roslyn extractor as an isolated process. T
 
 - The host writes an immutable records.jsonl and result-manifest.json into the assigned output directory.
 - JSONL contains only source-contract records (initially backend code-index schema v2); logs never appear in the records file.
-- The result manifest declares protocol version, invocation ID, Source/SourceRevision IDs, repository ID, commit SHA, extractor name/version, source schema version, output relative path, record count, byte length, SHA-256, diagnostic counts and completion outcome.
+- The result manifest declares protocol version, invocation ID, Source/SourceRevision IDs, repository ID, commit SHA, capture-manifest ID and digest, extractor name/version, source schema version, output relative path, record count, byte length, SHA-256, diagnostic counts and completion outcome.
 - Stdout is reserved for bounded human-readable progress only; stderr is reserved for diagnostics. The machine-readable result is the manifest and output artifact, not parsed console text.
 - Exit code zero means the manifest and artifact were fully written and closed. Any non-zero exit, missing manifest, hash mismatch, lineage mismatch or schema violation fails the stage. Partial output remains quarantined staging and is never publishable.
 
 ### 10.3 Core-side verification
 
-Go validates the result manifest against the invocation it issued, verifies output path containment, byte length and SHA-256, then streams each JSONL record through the declared source schema validator. It independently checks repository ID, exact SHA, allowed relative paths and supported source record kinds before the Canonical Adapter runs.
+Go validates the result manifest against the invocation it issued, including exact capture-manifest ID/digest echo, verifies output path containment, byte length and SHA-256, then streams each JSONL record through the declared source schema validator. It independently checks repository ID, exact SHA, allowed relative paths and supported source record kinds before the Canonical Adapter runs.
 
 The Go Core derives counts/hashes from the artifact and compares them with the manifest; it does not trust the extractor's reported counts as the sole evidence of completeness.
 
@@ -208,7 +206,7 @@ The Go Core derives counts/hashes from the artifact and compares them with the m
 
 - The initial host may be added as a dedicated command/entry point in the existing .NET code-index tool, provided the old local CLI behavior remains compatible.
 - Reuse BackendRoslynIndexer without changing its symbol/reference analysis semantics or source record schema.
-- Pin the .NET runtime/SDK, MSBuild/Roslyn dependencies and host version in the trusted extractor profile. The inspected ERPm-BE revision pins .NET SDK 10.0.403 with latestPatch roll-forward; the host execution image must satisfy this requirement or fail with an explicit prerequisite error.
+- Pin the .NET runtime/SDK, MSBuild/Roslyn dependencies and host version in the trusted extractor profile. The inspected ERPm-BE revision pins .NET SDK 10.0.403 with latestPatch roll-forward; preflight SDK selection from the execution-workspace working directory and fail with an explicit prerequisite error when unavailable.
 - The host is replaceable by another language implementation only if it passes the same request/result contract and conformance fixtures.
 - This protocol does not prescribe the future public plugin transport. A later SDK may wrap the same logical invocation/result contract over HTTP/gRPC or an asynchronous execution service.
 

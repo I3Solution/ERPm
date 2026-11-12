@@ -1,0 +1,49 @@
+{
+  "contract": {
+    "name": "ekp.validation-report",
+    "version": "1.0"
+  },
+  "reportId": "validation-report-001",
+  "runId": "run-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "inputNormalizationManifest": {
+    "manifestId": "normalization-manifest-001",
+    "contentHash": "sha256:normalization-manifest"
+  },
+  "outcome": "passed_with_warnings",
+  "publicationEligible": true,
+  "counts": {
+    "acceptedRecords": 80,
+    "rejectedRecords": 0,
+    "acceptedEvidence": 80,
+    "rejectedEvidence": 0,
+    "acceptedRelations": 0,
+    "rejectedRelations": 0
+  },
+  "completenessEvaluations": [
+    {
+      "metric": "supported_file_coverage",
+      "numerator": 95,
+      "denominator": 100,
+      "actualRatio": 0.95,
+      "minimumRatio": 0.95,
+      "passed": true
+    }
+  ],
+  "violations": [
+    {
+      "code": "OPTIONAL_OBSERVATIONS_OMITTED",
+      "severity": "warning",
+      "category": "completeness",
+      "affectedCount": 15,
+      "summary": "Optional source observations were omitted under the ingestion profile."
+    }
+  ],
+  "validatedAtUtc": "2026-11-12T04:05:30Z"
+}

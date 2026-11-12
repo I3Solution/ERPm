@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:normalization-manifest:1.0",
+  "title": "Enterprise Knowledge Platform NormalizationManifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "manifestId", "runId", "scope", "sourceId", "sourceRevisionId",
+    "inputExtractionManifest", "inputProcessingManifests", "normalizer",
+    "canonicalContractVersion", "payloadSchemaVersions", "knowledgeRecordArtifacts",
+    "evidenceArtifacts", "relationArtifacts", "counts", "completedAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "ekp.normalization-manifest" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "manifestId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId"],
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 1 },
+        "workspaceId": { "type": "string", "minLength": 1 },
+        "projectId": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "sourceId": { "type": "string", "minLength": 1 },
+    "sourceRevisionId": { "type": "string", "minLength": 1 },
+    "inputExtractionManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestId", "contentHash"],
+      "properties": {
+        "manifestId": { "type": "string", "minLength": 1 },
+        "contentHash": { "type": "string", "minLength": 1 }
+      }
+    },
+    "inputProcessingManifests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["manifestId", "contentHash", "processorOrdinal"],
+        "properties": {
+          "manifestId": { "type": "string", "minLength": 1 },
+          "contentHash": { "type": "string", "minLength": 1 },
+          "processorOrdinal": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "normalizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "version"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "canonicalContractVersion": { "type": "string", "minLength": 1 },
+    "payloadSchemaVersions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "knowledgeRecordArtifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifactId", "storageRef", "contentHash", "recordCount"],
+        "properties": {
+          "artifactId": { "type": "string", "minLength": 1 },
+          "storageRef": { "type": "string", "minLength": 1 },
+          "contentHash": { "type": "string", "minLength": 1 },
+          "recordCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "evidenceArtifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifactId", "storageRef", "contentHash", "evidenceCount"],
+        "properties": {
+          "artifactId": { "type": "string", "minLength": 1 },
+          "storageRef": { "type": "string", "minLength": 1 },
+          "contentHash": { "type": "string", "minLength": 1 },
+          "evidenceCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "relationArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifactId", "storageRef", "contentHash", "relationCount"],
+        "properties": {
+          "artifactId": { "type": "string", "minLength": 1 },
+          "storageRef": { "type": "string", "minLength": 1 },
+          "contentHash": { "type": "string", "minLength": 1 },
+          "relationCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceObservations", "knowledgeRecords", "evidence",
+        "relations", "unsupportedObservations", "omittedObservations"
+      ],
+      "properties": {
+        "sourceObservations": { "type": "integer", "minimum": 0 },
+        "knowledgeRecords": { "type": "integer", "minimum": 0 },
+        "evidence": { "type": "integer", "minimum": 0 },
+        "relations": { "type": "integer", "minimum": 0 },
+        "unsupportedObservations": { "type": "integer", "minimum": 0 },
+        "omittedObservations": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "payloadCounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["payloadType", "version", "count"],
+        "properties": {
+          "payloadType": {
+            "enum": [
+              "code.file", "code.symbol",
+              "code.reference_observation", "code.api_observation"
+            ]
+          },
+          "version": { "type": "string", "minLength": 1 },
+          "count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "completedAtUtc": { "type": "string", "format": "date-time" }
+  }
+}

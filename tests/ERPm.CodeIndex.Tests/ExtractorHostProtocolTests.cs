@@ -43,6 +43,15 @@ public sealed class ExtractorHostProtocolTests : IDisposable
     }
 
     [Fact]
+    public void Rejects_an_unsupported_backend_source_schema()
+    {
+        var request = CreateRequest() with { SourceSchemaVersion = 1 };
+
+        Assert.Throws<InvalidDataException>(
+            () => ExtractorHostProtocol.ValidateRequest(request));
+    }
+
+    [Fact]
     public void Rejects_a_short_commit_sha()
     {
         var request = CreateRequest() with { CommitSha = "abc123" };
@@ -151,7 +160,7 @@ public sealed class ExtractorHostProtocolTests : IDisposable
         OutputDirectory = _output,
         ExtractorId = "roslyn-backend",
         ExtractorVersion = "0.1.0",
-        SourceSchemaVersion = 1
+        SourceSchemaVersion = 2
     };
 
     public void Dispose()

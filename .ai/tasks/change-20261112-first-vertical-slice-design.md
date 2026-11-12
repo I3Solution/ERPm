@@ -29,6 +29,8 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Draft backend extractor-host process protocol v1: bounded JSON stdin request, immutable JSONL + result manifest artifacts, independent Go-side hash/schema/lineage verification.
 - [x] Inspect pinned ERPm-BE Git tree and SDK prerequisites: one root solution, no nested gitlinks, .NET SDK 10.0.403 pinned.
 - [x] Draft immutable Git capture and isolated writable build-workspace policy; captured snapshot remains read-only.
+- [x] Specify the minimum .NET host integration point: dispatch before WorkspaceManifestReader, reuse BackendRoslynIndexer, preserve legacy CLI behavior.
+- [x] Define host/capture conformance tests for protocol, hashes, path isolation, revision lineage, cancellation, snapshot immutability and retries.
 - [ ] Review/approve host protocol and validate .NET/MSBuild deployment feasibility with an executable feasibility probe.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
@@ -56,7 +58,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
 - Validate capture manifest/materialization parity, read-only snapshot behavior and MSBuild writable workspace with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
-- Chờ user review slice boundary and host protocol before creating Go runtime foundation.
+- Chờ user review slice boundary and host protocol; then run a focused .NET host + immutable snapshot feasibility spike before Go runtime foundation.
 
 ## 7. Evidence và cập nhật
 

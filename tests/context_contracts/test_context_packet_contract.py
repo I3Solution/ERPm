@@ -335,6 +335,22 @@ class IngestionContractSchemaTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             validate_schema(manifest, SCHEMAS / "publication-manifest-v1.schema.json")
 
+    def test_publication_manifest_rejects_blocked_validation_report(self):
+        manifest = load_json(EXAMPLES / "publication-manifest-valid-v1.json")
+        manifest["validationReport"]["outcome"] = "blocked"
+        with self.assertRaises(ValidationError):
+            validate_schema(manifest, SCHEMAS / "publication-manifest-v1.schema.json")
+
+    def test_publication_manifest_references_exact_validation_and_normalization(self):
+        publication = load_json(EXAMPLES / "publication-manifest-valid-v1.json")
+        normalization = load_json(EXAMPLES / "normalization-manifest-valid-v1.json")
+        validation = load_json(EXAMPLES / "validation-report-valid-v1.json")
+        validate_schema(publication, SCHEMAS / "publication-manifest-v1.schema.json")
+        self.assertEqual(
+            [],
+            validate_publication_manifest_semantics(publication, normalization, validation),
+        )
+
 
 
 def validate_code_logical_identity(
@@ -545,6 +561,51 @@ def validate_validation_report_semantics(report: dict, normalization: dict) -> l
             errors.append("blocked validation requires an error, fatal violation or failed completeness metric")
         if report["publicationEligible"]:
             errors.append("blocked validation cannot be publication eligible")
+
+    return errors
+
+
+def validate_publication_manifest_semantics(
+    publication: dict,
+    normalization: dict,
+    validation: dict,
+) -> list[str]:
+    errors: list[str] = []
+
+    for manifest in (normalization, validation):
+        if publication["runId"] != manifest["runId"]:
+            errors.append("PublicationManifest runId differs from validated source revision")
+        if publication["scope"] != manifest["scope"]:
+            errors.append("PublicationManifest Workspace scope differs from validated source revision")
+        if publication["sourceId"] != manifest["sourceId"]:
+            errors.append("PublicationManifest sourceId differs from validated source revision")
+        if publication["sourceRevisionId"] != manifest["sourceRevisionId"]:
+            errors.append("PublicationManifest SourceRevision differs from validated source revision")
+
+    normalization_ref = publication["normalizationManifest"]
+    if normalization_ref["manifestId"] != normalization["manifestId"]:
+        errors.append("PublicationManifest references a different NormalizationManifest")
+    if normalization_ref["contentHash"] != validation["inputNormalizationManifest"]["contentHash"]:
+        errors.append("PublicationManifest normalization hash differs from the validated input hash")
+
+    validation_ref = publication["validationReport"]
+    if validation_ref["reportId"] != validation["reportId"]:
+        errors.append("PublicationManifest references a different ValidationReport")
+    if validation_ref["outcome"] != validation["outcome"] or validation["outcome"] == "blocked":
+        errors.append("PublicationManifest does not reference an eligible ValidationReport")
+    if publication["stageOutputHashes"].get("normalization") != normalization_ref["contentHash"]:
+        errors.append("PublicationManifest stage hash does not match NormalizationManifest reference")
+    if publication["stageOutputHashes"].get("validation") != validation_ref["contentHash"]:
+        errors.append("PublicationManifest stage hash does not match ValidationReport reference")
+
+    counts = publication["counts"]
+    accepted = validation["counts"]
+    if counts["knowledgeRecords"] != accepted["acceptedRecords"]:
+        errors.append("Published KnowledgeRecord count differs from ValidationReport")
+    if counts["evidence"] != accepted["acceptedEvidence"]:
+        errors.append("Published Evidence count differs from ValidationReport")
+    if counts["relations"] != accepted["acceptedRelations"]:
+        errors.append("Published Relation count differs from ValidationReport")
 
     return errors
 

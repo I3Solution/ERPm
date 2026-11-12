@@ -108,7 +108,32 @@ The following must be established from source evidence before implementation:
 
 Do not resolve these by guessing. Record discoveries in the task and update the design before code.
 
-## 8. Explicit exclusions
+## 8. Extractor feasibility findings from the current repository
+
+Inspected at the root PR snapshot used for this design (root submodule gitlinks: ERPm-BE `235173fd193ae2fb60081fa4573434f5edd506f3`, ERPm-FE `62270988b42eece930c702d1272fe857d31bcbb9`):
+
+### Backend Roslyn extractor
+- Implementation: `tools/ERPm.CodeIndex/Indexing/BackendRoslynIndexer.cs`, currently exposed through the root .NET 10 executable `tools/ERPm.CodeIndex/Program.cs`.
+- The indexer is a .NET library class (`IndexAsync(repositoryPath, repositoryId, commitSha, cancellationToken))); it opens the single top-level solution using MSBuildWorkspace and returns records in memory.
+- The current CLI is not a generic adapter protocol. It accepts hard-coded `index repo erpm-be`, discovers the ERPm umbrella root, verifies recursive submodule status, and writes JSONL to the local `.ai/code-index/cache/<repo>/<sha>/<indexerVersion>/symbols.jsonl` path.
+- Dependencies include MSBuild Locator and Roslyn Workspaces; execution requires a compatible .NET 10 SDK/MSBuild environment.
+
+### Frontend TypeScript extractor
+- Implementation: `tools/frontend-code-indexer/index.mjs` and `indexer.mjs`; package requires Node >=22 and pins TypeScript 5.8.3.
+- The worker reads one JSON workspace manifest from stdin, emits one JSONL record per stdout line, writes diagnostics to stderr and exits non-zero on failure.
+- The current .NET `FrontendWorkerRunner` owns process invocation, validates schema-v3 output, checks repository/SHA/path and writes records into the same local cache tree.
+- The TypeScript indexer currently expects a repository entry named `erpm-fe` and uses that repository's `tsconfig.app.json` as its Program root; it can attribute records to nested repositories in the manifest.
+
+### Consequence for the platform adapter
+The current tooling is a developer-workspace indexer, not yet a deployable, generic platform Extractor contract. It has no stable external invocation protocol for the Go Core, and it assumes the ERPm umbrella checkout/cache layout.
+
+Do not call the current CLI directly from Go and claim it is a reusable adapter. The next implementation design must choose one of these explicit paths:
+1. introduce a thin .NET extractor-host/bridge that exposes a versioned, language-neutral request/result protocol while reusing the existing Roslyn and TypeScript analysis code; or
+2. refactor the current tool's orchestration boundary to accept an explicit immutable source snapshot, trusted repository/revision manifest and output artifact directory, then expose that boundary as a stable process contract.
+
+In either case, preserve the existing analysis semantics and source schemas, keep the host out of the Go Core process, and make all ERPm-specific assumptions explicit configuration rather than hidden hard-coded identifiers. Choose only after the adapter contract and cost/compatibility review. This is a wrapper/integration change, not a rewrite of the extractors.
+
+## 9. Explicit exclusions
 
 - No vector/embedding provider or full-text vendor selection.
 - No production Python AI/ML worker until a concrete AI/ML stage is selected.

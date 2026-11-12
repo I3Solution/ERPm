@@ -148,10 +148,11 @@ class ContextProfileSchemaTests(unittest.TestCase):
 
 def validate_retrieval_result_semantics(result: dict) -> list[str]:
     errors: list[str] = []
-    selected = {
-        (revision["sourceId"], revision["sourceRevisionId"])
+    selected_revisions = {
+        (revision["sourceId"], revision["sourceRevisionId"]): revision
         for revision in result["selectedRevisions"]
     }
+    selected = set(selected_revisions)
     if result["outcome"] == "empty" and result["results"]:
         errors.append("empty outcome cannot contain results")
     if result["outcome"] == "partial" and not result["results"]:
@@ -172,6 +173,12 @@ def validate_retrieval_result_semantics(result: dict) -> list[str]:
             errors.append(f"{report['kind']}: duplicate per-revision projection state")
         if set(state_keys) != selected:
             errors.append(f"{report['kind']}: projection states must cover every selected SourceRevision")
+        for projection_state in revision_states:
+            key = (projection_state["sourceId"], projection_state["sourceRevisionId"])
+            selected_revision = selected_revisions.get(key)
+            if projection_state["state"] == "available" and selected_revision is not None:
+                if projection_state["sourcePublicationManifestId"] != selected_revision["publicationManifestId"]:
+                    errors.append(f"{report['kind']}: projection references a different selected PublicationManifest")
 
         available_keys = {
             (item["sourceId"], item["sourceRevisionId"])
@@ -255,6 +262,16 @@ class RetrievalContractSchemaTests(unittest.TestCase):
     def test_valid_error_fixture(self):
         error = load_json(EXAMPLES / "retrieval-error-valid-v1.json")
         validate_schema(error, SCHEMAS / "retrieval-error-v1.schema.json")
+
+
+    def test_available_projection_must_reference_selected_publication_manifest(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        report = next(item for item in result["methodReports"] if item["kind"] == "vector")
+        report["revisionStates"][0]["sourcePublicationManifestId"] = "manifest-from-another-generation"
+        self.assertTrue(any(
+            "different selected PublicationManifest" in error
+            for error in validate_retrieval_result_semantics(result)
+        ))
 
     def test_projection_reports_cover_each_selected_revision(self):
         result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
@@ -1007,6 +1024,8 @@ def validate_projection_status_semantics(status: dict, manifest: dict) -> list[s
             errors.append("ready ProjectionManifest SourceRevision differs from desired revision")
         if reference["sourcePublicationManifestId"] != status["sourcePublication"]["manifestId"]:
             errors.append("ready ProjectionManifest source publication differs from desired publication")
+        if reference["sourcePublicationContentHash"] != status["sourcePublication"]["contentHash"]:
+            errors.append("ready ProjectionManifest source publication hash differs from desired publication")
         if reference["profileId"] != status["desiredProfile"]["profileId"]:
             errors.append("ready ProjectionManifest profile ID differs from desired profile")
         if reference["profileVersion"] != status["desiredProfile"]["version"]:
@@ -1109,6 +1128,15 @@ class ProjectionContractSchemaTests(unittest.TestCase):
         status["desiredProfile"]["version"] = "2.0"
         validate_schema(status, SCHEMAS / "projection-status-v1.schema.json")
         self.assertEqual([], validate_projection_status_semantics(status, manifest))
+ 
+    def test_ready_projection_status_rejects_publication_hash_mismatch(self):
+        status = load_json(EXAMPLES / "projection-status-valid-v1.json")
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        status["projectionManifest"]["sourcePublicationContentHash"] = "sha256:wrong-publication"
+        self.assertIn(
+            "ready ProjectionManifest source publication hash differs from desired publication",
+            validate_projection_status_semantics(status, manifest),
+        )
 
 
 if __name__ == "__main__":

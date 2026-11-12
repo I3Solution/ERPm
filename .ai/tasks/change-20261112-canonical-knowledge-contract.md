@@ -52,6 +52,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 ## 6. Việc còn lại
 
 - Thiết kế machine-readable schema/fixtures và adapter contract cho 4 code payload đầu tiên.
+- Đồng bộ contract với [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - Tiếp tục review các quyết định wire-level, ID/identity derivation và retention/deletion.
 - Kết nối contract với Connector/Extractor/Normalizer/Ingestion design; không migrate cache cũ hoặc thêm document/database extractors trước khi contract implementation được duyệt.
 

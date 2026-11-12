@@ -69,16 +69,18 @@ Deliverables:
   - Detailed Tenant/identity/ACL/source policy remains under review. See [Workspace Boundary](../architecture/workspace-boundary.md).
 - [x] Canonical Knowledge Record, Evidence, Relation and Source Revision machine-readable schemas, plus the four initial Code payload schemas and identity rules.
   - Core v1 decisions accepted on 2026-11-12. Payload schemas and the backend v1/v2 + frontend v3 adapter mapping contract are now documented and covered by CI tests; runtime adapter remains a Phase 2 deliverable. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
-- [ ] Connector vs extractor vs processor vs normalizer/validator/publisher machine-readable contracts.
-  - Responsibilities and the six core Ingestion v1 decisions were accepted on 2026-11-12; detailed component schemas and operational protocol remain open. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
+- [x] Define logical stage I/O contracts for Connector, Extractor, optional Processor, Normalizer, Validator and Publisher, including child attempt/checkpoint records.
+  - Proposed StageInvocation/StageAttempt and stage-specific manifest schemas, valid fixtures and CI semantic tests are now present. The detailed stage I/O/retry/cancellation semantics are a design draft pending user review; no runtime workers or protocol are implemented. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - [x] Define Control Plane, Artifact Store, Canonical Knowledge Store, Search Projection Store, staging and cache responsibilities.
   - Five logical storage defaults accepted on 2026-11-12: one relational deployment initially for Control Plane + Canonical Store with separate modules; policy-driven source/history retention; exact Git SHA/hash provenance with archive when replay/retention requires it; separate full-text/vector logical adapters; and a two-Workspace isolation benchmark scenario. See [Storage Boundary](../architecture/storage-boundary.md).
   - Physical vendor/topology, concrete retention/legal deletion rules and execution of the benchmark remain open.
-- [ ] Ingestion machine-readable lifecycle/state contracts and operational security details.
-  - Core decisions accepted: one IngestionRun aggregate; manual + webhook triggers; per-SourceRevision atomic canonical publication; async search/vector readiness; defined optional-vs-required failure policy. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
+- [x] Add machine-readable IngestionProfile, IngestionRun, StageInvocation/Attempt, stage output manifests and ValidationReport contracts.
+  - The six core Ingestion v1 decisions were accepted on 2026-11-12. Stage manifests and semantic CI tests now cover run/source/revision lineage, checkpoint integrity, optional processors, retry classification and publication eligibility.
+- [ ] Complete operational security and remaining ingestion details.
+  - Webhook authentication/replay protection, source-family completeness metric vocabulary, projection-specific readiness schemas and storage-specific large-revision commit protocol remain open. The proposed stage details await user review.
 - [x] Define Retrieval request/result and Context Packet semantic contracts.
   - Seven Retrieval v1 semantic defaults and seven Context Packet v1 semantic defaults were accepted on 2026-11-12. See [Retrieval Contract](../architecture/retrieval-contract.md) and [Context Packet Contract](../architecture/context-packet-contract.md).
-  - Machine-readable schemas, protocol mappings, acceptance fixtures and implementation remain open.
+  - Retrieval Request/Result/Error and Context Packet/Profile schemas, valid examples and CI semantic tests now exist. Protocol mappings, cursor signing and runtime implementation remain open.
 - [ ] Security/ACL and provenance requirements.
 - [ ] Technology decision records with benchmark/operational rationale.
 
@@ -204,13 +206,13 @@ Deliverables:
 Do not begin another indexer feature or create a PR for EF metadata yet. First complete Phase 0 in this order:
 
 1. **Workspace boundary:** core isolation principle accepted; finish detailed Tenant, identity, role inheritance, project restriction and source ACL semantics using [Workspace Boundary](../architecture/workspace-boundary.md).
-2. **Canonical Knowledge Contract:** core v1 decisions, shared envelope schemas, four Code payload schemas, payload identity rules and source-index adapter mapping design are now documented. Runtime adapter implementation belongs to Phase 2; see [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
+2. **Canonical Knowledge Contract:** core v1 decisions, shared envelope schemas, four Code payload schemas, payload identity rules and source-index adapter mapping design are now documented. CI verification is recorded on PR #70; runtime adapter implementation belongs to Phase 2. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
 3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
-4. **Connector and ingestion contracts:** review [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md), then finalize trigger, request/run identity, validation, publication and failure semantics.
+4. **Connector and ingestion contracts:** core Run/trigger/publication choices and proposed stage I/O, child attempt, checkpoint and retry schemas are documented in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md). Obtain review for proposed stage details; then finish webhook security, source-specific completeness metrics and large-revision commit semantics.
 5. **Storage boundary:** logical defaults are accepted in [Storage Boundary](../architecture/storage-boundary.md); build the two-Workspace benchmark and defer vendor/physical-topology decisions to technology ADRs.
 6. **Retrieval contract:** seven semantic defaults are accepted in [Retrieval Contract](../architecture/retrieval-contract.md); define machine-readable fields, errors, cursor semantics, protocol mapping and two-Workspace acceptance fixtures.
 7. **Context Packet:** semantic defaults are accepted in the [Context Packet Contract](../architecture/context-packet-contract.md); initial JSON Schema Draft 2020-12 files, valid examples and schema/semantic CI tests now exist for ContextPacket and ContextProfile. Adapter mappings and broader evaluation fixtures remain open.
-8. **Remaining contract schemas and adapters:** complete detailed Ingestion stage contracts and protocol mappings; implement and verify runtime adapters in Phase 2. Canonical Code payload schemas and source-index mapping design are complete, pending CI verification for this update.
+8. **Remaining contract schemas and adapters:** review the proposed Ingestion stage contracts, complete remaining projection/protocol/security details, and implement/verify runtime adapters in Phase 2. Canonical Code payload schemas and source-index mapping design have passed CI on PR #70.
 9. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
 10. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
 

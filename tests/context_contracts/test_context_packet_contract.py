@@ -159,6 +159,48 @@ def validate_retrieval_result_semantics(result: dict) -> list[str]:
     if result["outcome"] in {"complete", "partial", "empty"}:
         if any(report["required"] and not report["ran"] for report in result["methodReports"]):
             errors.append("successful outcome requires every required method to have run")
+
+    for report in result["methodReports"]:
+        if report["kind"] not in {"full_text", "vector"}:
+            continue
+        revision_states = report.get("revisionStates", [])
+        state_keys = [
+            (item["sourceId"], item["sourceRevisionId"])
+            for item in revision_states
+        ]
+        if len(state_keys) != len(set(state_keys)):
+            errors.append(f"{report['kind']}: duplicate per-revision projection state")
+        if set(state_keys) != selected:
+            errors.append(f"{report['kind']}: projection states must cover every selected SourceRevision")
+
+        available_keys = {
+            (item["sourceId"], item["sourceRevisionId"])
+            for item in revision_states
+            if item["state"] == "available"
+        }
+        coverage_keys = {
+            (item["sourceId"], item["sourceRevisionId"])
+            for item in report.get("coverage", [])
+        }
+        if coverage_keys != available_keys:
+            errors.append(f"{report['kind']}: coverage differs from ready projection revisions")
+        if report["ran"] != bool(available_keys):
+            errors.append(f"{report['kind']}: ran flag differs from per-revision projection readiness")
+
+        if len(available_keys) == len(selected):
+            if report["state"] != "available":
+                errors.append(f"{report['kind']}: all ready revisions require available method state")
+        elif available_keys:
+            if report["state"] != "partial":
+                errors.append(f"{report['kind']}: mixed readiness requires partial method state")
+        elif revision_states and len({item["state"] for item in revision_states}) == 1:
+            only_state = revision_states[0]["state"]
+            if report["state"] != only_state:
+                errors.append(f"{report['kind']}: aggregate state differs from per-revision status")
+
+        if report["required"] and available_keys != selected and result["outcome"] in {"complete", "partial", "empty"}:
+            errors.append(f"{report['kind']}: required projection is not ready for every selected SourceRevision")
+
     if result.get("pagination", {}).get("hasMore") and not result["pagination"].get("nextCursor"):
         errors.append("hasMore requires a continuation cursor")
     for item in result["results"]:
@@ -213,6 +255,60 @@ class RetrievalContractSchemaTests(unittest.TestCase):
     def test_valid_error_fixture(self):
         error = load_json(EXAMPLES / "retrieval-error-valid-v1.json")
         validate_schema(error, SCHEMAS / "retrieval-error-v1.schema.json")
+
+    def test_projection_reports_cover_each_selected_revision(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        report = next(item for item in result["methodReports"] if item["kind"] == "vector")
+        report["revisionStates"].append({
+            "sourceId": "source-b",
+            "sourceRevisionId": "revision-b",
+            "state": "pending",
+            "unavailableReason": "not_built"
+        })
+        result["selectedRevisions"].append({
+            "sourceId": "source-b",
+            "sourceRevisionId": "revision-b",
+            "revisionKey": "git:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "publicationManifestId": "manifest-b"
+        })
+        self.assertIn(
+            "vector: projection states must cover every selected SourceRevision",
+            validate_retrieval_result_semantics(result),
+        )
+
+    def test_required_projection_must_be_ready_for_every_selected_revision(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        report = next(item for item in result["methodReports"] if item["kind"] == "vector")
+        report["required"] = True
+        report["revisionStates"][0]["state"] = "stale"
+        report["revisionStates"][0].pop("projectionManifestId")
+        report["revisionStates"][0].pop("projectionVersion")
+        report["revisionStates"][0].pop("definitionFingerprint")
+        report["revisionStates"][0].pop("profileVersion")
+        report["revisionStates"][0]["unavailableReason"] = "profile_version_changed"
+        report["coverage"] = []
+        report["ran"] = False
+        report["state"] = "stale"
+        result["outcome"] = "complete"
+        self.assertTrue(any(
+            "required projection is not ready" in error
+            for error in validate_retrieval_result_semantics(result)
+        ))
+
+    def test_optional_stale_projection_yields_partial_when_structured_results_remain(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        report = next(item for item in result["methodReports"] if item["kind"] == "vector")
+        report["revisionStates"][0]["state"] = "stale"
+        report["revisionStates"][0].pop("projectionManifestId")
+        report["revisionStates"][0].pop("projectionVersion")
+        report["revisionStates"][0].pop("definitionFingerprint")
+        report["revisionStates"][0].pop("profileVersion")
+        report["revisionStates"][0]["unavailableReason"] = "profile_version_changed"
+        report["coverage"] = []
+        report["ran"] = False
+        report["state"] = "stale"
+        result["outcome"] = "partial"
+        self.assertEqual([], validate_retrieval_result_semantics(result))
 
 
 class CanonicalKnowledgeSchemaTests(unittest.TestCase):

@@ -54,7 +54,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 - Xác định wire-level fields, error mapping, pagination token encoding và protocol adapters.
 - Tạo machine-readable acceptance fixtures và test dataset hai Workspace trước khi triển khai retrieval runtime.
-- Thiết kế Context Packet dựa trên Retrieval Result đã ổn định.
+- Đối chiếu Retrieval Result với [Context Packet Contract](../architecture/context-packet-contract.md), bảo đảm item provenance, ACL và projection diagnostics không bị mất khi đóng gói.
 
 ## 7. Evidence và cập nhật
 

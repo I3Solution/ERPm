@@ -30,7 +30,9 @@ Không triển khai API, database query, search engine, ranking model hoặc Con
 - [x] Xác định retrieval methods, projection availability và partial-result semantics.
 - [x] Xác định result, Evidence, relation expansion, pagination, caching và diagnostics.
 - [x] Review và chốt bảy default semantic ở mục 14 của retrieval-contract.md ngày 2026-11-12.
-- [ ] Chuyển hợp đồng đã chốt thành machine-readable schema và protocol mapping.
+- [x] Tạo JSON Schema Draft 2020-12 cho Retrieval Request, Result và Error.
+- [x] Thêm valid fixtures và automated schema/semantic validation vào CI.
+- [ ] Hoàn thiện protocol mapping và two-Workspace integration fixtures.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -48,12 +50,13 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - Kiểm tra active/pinned selection chỉ đọc committed published revisions.
 - Kiểm tra projection unavailable không bị diễn giải thành Empty.
 - Kiểm tra Evidence, relation endpoints, pagination cursor và cache đều gắn scope/policy/revision.
-- Chưa có JSON Schema/OpenAPI/Protobuf hoặc automated integration test; đây là semantic draft.
+- JSON Schema Draft 2020-12 và valid fixtures đã được tạo; automated schema/semantic tests đã được thêm vào CI, đang chờ kết quả run.
+- Chưa có OpenAPI/Protobuf mapping hoặc two-Workspace integration test.
 
 ## 6. Việc còn lại
 
-- Xác định wire-level fields, error mapping, pagination token encoding và protocol adapters.
-- Tạo machine-readable acceptance fixtures và test dataset hai Workspace trước khi triển khai retrieval runtime.
+- Xác định cursor token encoding/signing, payload-specific filter catalog và ranking policy.
+- Hoàn thiện protocol adapters và two-Workspace integration fixtures trước khi triển khai retrieval runtime.
 - Đối chiếu Retrieval Result với [Context Packet Contract](../architecture/context-packet-contract.md), bảo đảm item provenance, ACL và projection diagnostics không bị mất khi đóng gói.
 
 ## 7. Evidence và cập nhật
@@ -62,4 +65,5 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - Tài liệu chính: .ai/architecture/retrieval-contract.md.
 - Ngày cập nhật cuối: 2026-11-12.
 - Bảy default semantic Retrieval v1 đã được user chấp thuận ngày 2026-11-12.
-- Đã tạo semantic draft; machine-readable schema, protocol mapping và runtime implementation còn mở.
+- Semantic draft, ba JSON Schema v1 và valid fixtures đã có; CI validation đã được thêm nhưng chưa có kết quả xác nhận.
+- Protocol mapping, two-Workspace integration fixtures và runtime implementation còn mở.

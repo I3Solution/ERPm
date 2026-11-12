@@ -10,15 +10,26 @@
   "runId": "run-001",
   "status": "published",
   "counts": {
-    "knowledgeRecords": 120,
-    "evidence": 140,
-    "relations": 30
+    "knowledgeRecords": 80,
+    "evidence": 80,
+    "relations": 0
   },
   "contentHash": "sha256:manifest",
   "stageOutputHashes": {
+    "normalization": "sha256:normalization-manifest",
+    "validation": "sha256:validation-report",
     "canonical": "sha256:canonical"
   },
   "previousActiveRevisionId": "revision-000",
   "activePointerGeneration": 2,
-  "publishedAtUtc": "2026-11-12T03:05:00Z"
+  "publishedAtUtc": "2026-11-12T03:05:00Z",
+  "normalizationManifest": {
+    "manifestId": "normalization-manifest-001",
+    "contentHash": "sha256:normalization-manifest"
+  },
+  "validationReport": {
+    "reportId": "validation-report-001",
+    "contentHash": "sha256:validation-report",
+    "outcome": "passed_with_warnings"
+  }
 }

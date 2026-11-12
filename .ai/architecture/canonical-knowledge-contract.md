@@ -1,6 +1,6 @@
 # Canonical Knowledge Contract — Proposed v1
 
-> **Status:** Draft for architecture review; Workspace isolation boundary accepted on 2026-11-12  
+> **Status:** Core v1 design decisions accepted by the user on 2026-11-12; implementation schema remains to be specified and tested  
 > **Date:** 2026-11-12  
 > **Scope:** Common envelope, typed payloads, evidence, relations, source revisions and versioning  
 > **Compatibility rule:** Existing code-index schemas v1/v2/v3 remain immutable
@@ -376,7 +376,24 @@ A future schema/adapter test suite must prove:
 11. ACL revocation prevents retrieval of stale search/vector candidates and cached Context Packets.
 12. Existing code-index v1/v2/v3 schemas and serializers remain unchanged.
 
-## 14. Decisions to review before implementation
+## 14. Accepted v1 design decisions
+
+The platform owner explicitly accepted these decisions on 2026-11-12:
+
+1. Keep the logical model split into `KnowledgeRecord`, `Evidence`, `KnowledgeRelation` and `SourceRevision`.
+2. `logicalKey` is required for domain entities with a stable conceptual identity. It is optional for chunks, transient observations or other items without a reliable cross-revision identity. Each payload type must declare its identity rule.
+3. The first code-ingestion payload scope is `code.file`, `code.symbol`, `code.reference_observation` and `code.api_observation`.
+4. V1 ingestion is single-source per normalized record/relation set. Cross-source derived records are deferred until single-source ingestion is stable. A future record may cite multiple sources only under a separately reviewed same-Workspace derivation contract.
+5. Historical extractor/payload results are not silently overwritten. Retention is policy-controlled; preserve lineage and enough original evidence to support audit/reprocessing. Exact retention duration and deletion obligations remain open.
+
+These are accepted architecture decisions. They do not approve physical DDL, API routes, machine-readable schema requiredness, payload details beyond the listed initial scope, or production implementation.
+
+## 15. Remaining decisions to review before implementation
+
+1. Exact wire-level required/optional envelope fields and ID encoding.
+2. The complete payload schemas for the four initial code types.
+3. How retention interacts with legal deletion, source revocation and artifact storage.
+4. Exact canonical identity/key derivation rules for each code payload type.
 
 1. Is the proposed envelope split into KnowledgeRecord, Evidence, KnowledgeRelation and SourceRevision accepted?
 2. Should logicalKey be mandatory for all record types, or optional for content chunks/observations without stable identity?

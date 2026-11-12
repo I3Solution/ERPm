@@ -254,7 +254,8 @@
               "succeeded_with_warnings",
               "failed",
               "skipped",
-              "retry_wait"
+              "retry_wait",
+              "canceled"
             ]
           },
           "startedAtUtc": {
@@ -278,8 +279,87 @@
             "items": {
               "type": "string"
             }
+          },
+          "skipReason": {
+            "enum": [
+              "not_configured",
+              "optional_stage_failure",
+              "policy"
+            ]
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "skipped"
+                }
+              },
+              "required": [
+                "state"
+              ]
+            },
+            "then": {
+              "required": [
+                "skipReason"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "skipReason": {
+                  "const": "not_configured"
+                }
+              },
+              "required": [
+                "skipReason"
+              ]
+            },
+            "then": {
+              "not": {
+                "required": [
+                  "stageAttemptId"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "skipReason": {
+                  "const": "optional_stage_failure"
+                }
+              },
+              "required": [
+                "skipReason"
+              ]
+            },
+            "then": {
+              "required": [
+                "stageAttemptId"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "state": {
+                  "const": "canceled"
+                }
+              },
+              "required": [
+                "state"
+              ]
+            },
+            "then": {
+              "required": [
+                "completedAtUtc"
+              ]
+            }
+          }
+        ]
       }
     },
     "createdAtUtc": {

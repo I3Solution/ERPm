@@ -2,7 +2,7 @@
 
 > **Loại:** change  
 > **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
-> **Trạng thái:** Doing — schemas, fixtures and semantic tests added; CI for latest projection commit pending  
+> **Trạng thái:** Doing — schemas, fixtures and semantic tests added; correcting one Retrieval coverage test exposed by CI Run #996  
 > **Progress aggregation:** v1  
 > **Liên quan:** .ai/architecture/ingestion-pipeline.md, .ai/architecture/retrieval-contract.md, .ai/architecture/storage-boundary.md, .ai/architecture/projection-lifecycle.md  
 > **Phạm vi:** Root repository — independent full-text/vector projection lifecycle
@@ -36,6 +36,7 @@ Không chọn search/vector vendor, embedding provider, queue, physical index la
 - [x] Tạo JSON Schema Draft 2020-12 cho Profile, Run, Manifest và Status.
 - [x] Thêm valid fixtures và semantic tests cho lineage, count reconciliation, fingerprint và readiness eligibility.
 - [ ] Chờ CI xác nhận và review chi tiết proposed contract với user.
+- [x] Sửa test coverage: test phải thêm selected SourceRevision nhưng cố ý không thêm projection state tương ứng; trước đó fixture đã thêm state nên test thực tế đang kiểm tra aggregate `partial`, không phải thiếu coverage.
 - [ ] Hoàn thiện numeric performance/quality/cost targets và operational reindex details sau benchmark.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.

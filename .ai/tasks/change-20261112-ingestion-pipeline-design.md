@@ -37,7 +37,9 @@ Chưa triển khai runtime worker, queue, database schema hoặc API.
 - [x] Chốt trigger v1 gồm manual + webhook; schedule để sau.
 - [x] Cho phép publish với warnings khi chỉ thiếu phần optional và đạt completeness policy.
 - [x] Chặn publish khi mandatory data/stage hoặc validity/integrity requirement thất bại; giữ revision published tốt trước đó.
-- [ ] Chốt child attempt/stage records, projection version/readiness, completeness metrics, webhook security và large-revision manifest protocol.
+- [x] Tạo JSON Schema Draft 2020-12 cho IngestionProfile, IngestionRun và PublicationManifest.
+- [x] Thêm valid fixtures và automated schema validation vào CI.
+- [ ] Chốt child attempt/stage detail, projection version/readiness, completeness metrics, webhook security và large-revision manifest protocol.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -55,12 +57,13 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - Đã định nghĩa source revision, provenance, retryable/permanent errors và publication visibility.
 - User đã chấp thuận sáu lựa chọn ingestion v1 ngày 2026-11-12: single IngestionRun aggregate, projection readiness độc lập, atomic publication theo SourceRevision, manual + webhook trigger, publish-with-warnings cho phần optional và block publication khi phần required lỗi.
 - Canonical publication được định nghĩa là structured-knowledge ready; full-text/vector projection chạy bất đồng bộ và có trạng thái riêng.
-- Chưa có implementation hoặc automated tests; tài liệu là proposal cho review.
+- Initial JSON Schema v1 và valid fixtures đã được thêm; automated schema validation dùng chung CI job, đang chờ kết quả.
+- Chưa có runtime implementation hoặc integration tests.
 - Không có claim về build/test runtime.
 
 ## 6. Việc còn lại
 
-- Chuẩn hóa contracts machine-readable cho stage inputs/outputs, IngestionRun và attempt/stage history.
+- Hoàn thiện stage input/output schemas và detailed attempt/stage event contracts.
 - Hoàn thiện remaining details cho projection lifecycle, completeness metrics, webhook authentication/replay protection và revision manifest protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
@@ -71,4 +74,4 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - CI: Chưa có kết luận PASS tổng thể cho PR tại lần cập nhật này.
 - Tài liệu chính: .ai/architecture/ingestion-pipeline.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Sáu quyết định Ingestion v1 đã được user chấp thuận; các operational details và implementation còn mở.
+- Sáu quyết định Ingestion v1 đã được user chấp thuận; initial profile/run/manifest schemas và fixtures đã có, CI chưa xác nhận ở lần cập nhật này. Operational details và implementation còn mở.

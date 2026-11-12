@@ -340,12 +340,22 @@ A benchmark must use anonymized or approved representative corpus and include at
 11. Rebuilding a projection does not modify KnowledgeRecord, Evidence or SourceRevision identity.
 12. Re-indexing with a new producer version preserves prior provenance and respects retention policy.
 
-## 16. Decisions to review
+## 16. Accepted storage decisions (2026-11-12)
 
-1. Should the first deployment use one relational database for both Control Plane and Canonical Knowledge Store, with separate schemas/modules, or separate physical stores from the start?
-2. Should original source snapshots be copied into Artifact Store, or should the first Git connector retain upstream references plus content hashes and archive only required evidence/artifacts?
-3. What retention/legal deletion requirements apply to source artifacts, canonical history, failed staging and audit events?
-4. Should v1 store full-text and vector projections in one search engine or keep them as separate logical adapters until benchmarks are available?
-5. Which two-workspace isolation and workload dataset should be used for the initial storage benchmark?
+The following are accepted logical defaults for the first platform implementation. They do not select specific vendors or require separate infrastructure for every logical store.
 
-These decisions are deliberately open. The architecture chooses ownership and consistency boundaries before choosing products.
+1. **Control Plane + Canonical Knowledge Store:** begin with one relational database deployment, while keeping separate logical modules, schemas and write/read ownership. Reconsider physical separation only when measured scale, availability, security or operational requirements justify it.
+2. **Git source snapshots:** always preserve the exact repository identity, commit SHA, tree/content hashes and capture manifest as revision provenance. Do not duplicate the entire repository on every ingestion by default. Keep an immutable Artifact Store archive when replay/retention policy requires it, when upstream availability cannot be relied on, or when a captured snapshot is required to reproduce extraction. Upstream commit references alone are not a substitute for an explicit retention/availability decision.
+3. **Retention and deletion:** use policy-driven retention across source artifacts, canonical history, staging, projections, caches, audit records, backups and replicas. Do not hardcode a universal duration in v1 contracts. Preserve source/processing history for the configured retention period; legal hold, hard-delete semantics and concrete durations must be settled for each deployment before production.
+4. **Full-text + vector:** keep full-text and vector as separate logical projection adapters with independent versions, readiness and rebuild lifecycle. They may share one physical search engine only if benchmark results prove required filtering/isolation, versioning, quality, latency and operational fit.
+5. **Initial benchmark:** use at least two isolated Workspaces with different effective ACLs and at least one Project-restricted scope. Include identical content hashes across Workspaces, a representative code corpus, failed ingestion, out-of-order SourceRevision publication, projection failure/rebuild, ACL revocation and stale-cache/search checks. Use approved or anonymized data. Measure isolation correctness, publication correctness, query quality/latency, ingestion throughput, rebuild cost and operational complexity.
+
+## 17. Remaining storage decisions
+
+The accepted defaults above settle the logical direction. The following remain open and must not be inferred as already implemented:
+
+- Select the relational database, Artifact Store/object storage and search technology through technology ADRs and benchmark evidence.
+- Define deployment-specific retention durations, legal hold, source revocation, backup expiry and hard-delete completion requirements.
+- Define which Git sources require archived snapshots versus upstream-backed replay, including retention exceptions.
+- Build the benchmark corpus and agree numeric quality, latency, throughput and cost thresholds.
+- Decide physical deployment topology and capacity sizing after representative workload measurements.

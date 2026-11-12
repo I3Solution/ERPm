@@ -1,0 +1,14 @@
+{
+  "contract": {
+    "name": "ekp.retrieval-error",
+    "version": "1.0"
+  },
+  "requestId": "request-test-002",
+  "outcome": "failed",
+  "error": {
+    "code": "REQUIRED_METHOD_UNAVAILABLE",
+    "category": "required_method_unavailable",
+    "message": "Required vector projection is not ready.",
+    "retryable": true
+  }
+}

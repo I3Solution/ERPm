@@ -11,10 +11,10 @@
     "projectId": "project-a"
   },
   "sourceId": "source-a",
-  "sourceRevisionId": "revision-a",
+  "sourceRevisionId": "revision-001",
   "sourcePublication": {
-    "manifestId": "publication-manifest-a",
-    "contentHash": "sha256:publication"
+    "manifestId": "manifest-001",
+    "contentHash": "sha256:manifest"
   },
   "projectionKind": "vector",
   "profile": {

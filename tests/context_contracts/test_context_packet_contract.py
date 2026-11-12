@@ -933,5 +933,183 @@ class IngestionStageContractSchemaTests(unittest.TestCase):
             validate_schema(run, SCHEMAS / "ingestion-run-v1.schema.json")
 
 
+
+def validate_projection_manifest_semantics(manifest: dict, profile: dict) -> list[str]:
+    errors: list[str] = []
+    counts = manifest["counts"]
+    policy = profile["buildPolicy"]
+
+    if manifest["projectionKind"] != profile["projectionKind"]:
+        errors.append("ProjectionManifest kind differs from ProjectionProfile")
+    if manifest["profile"]["profileId"] != profile["profileId"]:
+        errors.append("ProjectionManifest profile ID differs from ProjectionProfile")
+    if manifest["profile"]["version"] != profile["version"]:
+        errors.append("ProjectionManifest profile version differs from ProjectionProfile")
+    if manifest["definitionFingerprint"] != profile["definitionFingerprint"]:
+        errors.append("ProjectionManifest definition fingerprint differs from ProjectionProfile")
+
+    accounted = counts["indexedItems"] + counts["skippedItems"] + counts["failedItems"]
+    if accounted != counts["eligibleItems"]:
+        errors.append("indexed, skipped and failed item counts do not reconcile to eligible items")
+
+    artifact_count = sum(item["itemCount"] for item in manifest["outputArtifacts"])
+    if artifact_count != counts["indexedItems"]:
+        errors.append("projection artifact item counts differ from indexed item count")
+
+    if counts["eligibleItems"] > 0:
+        indexed_ratio = counts["indexedItems"] / counts["eligibleItems"]
+        if indexed_ratio < policy["minimumIndexedRatio"]:
+            errors.append("projection indexed ratio is below the profile minimum")
+    if counts["skippedItems"] > 0 and not policy["allowSkippedItems"]:
+        errors.append("ProjectionProfile does not permit skipped items")
+
+    return errors
+
+
+def validate_projection_run_lineage(run: dict, manifest: dict, publication: dict) -> list[str]:
+    errors: list[str] = []
+    if run["state"] != "succeeded":
+        errors.append("only a successful ProjectionRun can produce a ready manifest")
+    if run.get("projectionManifest", {}).get("manifestId") != manifest["manifestId"]:
+        errors.append("ProjectionRun references a different ProjectionManifest")
+    if run.get("projectionManifest", {}).get("contentHash") != manifest["contentHash"]:
+        errors.append("ProjectionRun projection manifest hash differs")
+    if run["scope"] != manifest["scope"] or run["scope"] != publication["scope"]:
+        errors.append("projection Workspace scope differs from source publication")
+    if run["sourceId"] != manifest["sourceId"] or run["sourceId"] != publication["sourceId"]:
+        errors.append("projection sourceId differs from source publication")
+    if run["sourceRevisionId"] != manifest["sourceRevisionId"] or run["sourceRevisionId"] != publication["sourceRevisionId"]:
+        errors.append("projection SourceRevision differs from source publication")
+    if run["sourcePublication"] != manifest["sourcePublication"]:
+        errors.append("ProjectionManifest source publication reference differs from ProjectionRun")
+    if manifest["sourcePublication"]["manifestId"] != publication["manifestId"]:
+        errors.append("ProjectionManifest references a different published canonical manifest")
+    if manifest["sourcePublication"]["contentHash"] != publication["contentHash"]:
+        errors.append("ProjectionManifest source publication hash differs from canonical publication")
+    if run["projectionKind"] != manifest["projectionKind"]:
+        errors.append("ProjectionManifest kind differs from ProjectionRun")
+    if run["profile"] != manifest["profile"]:
+        errors.append("ProjectionManifest profile differs from ProjectionRun")
+    if run["definitionFingerprint"] != manifest["definitionFingerprint"]:
+        errors.append("ProjectionManifest definition fingerprint differs from ProjectionRun")
+    return errors
+
+
+def validate_projection_status_semantics(status: dict, manifest: dict) -> list[str]:
+    errors: list[str] = []
+    if status["state"] == "ready":
+        if not status["eligibleForRetrieval"]:
+            errors.append("ready projection status must be eligible for retrieval")
+        reference = status["projectionManifest"]
+        if reference["manifestId"] != manifest["manifestId"] or reference["contentHash"] != manifest["contentHash"]:
+            errors.append("ready ProjectionStatus references a different ProjectionManifest")
+        if reference["sourceRevisionId"] != status["sourceRevisionId"]:
+            errors.append("ready ProjectionManifest SourceRevision differs from desired revision")
+        if reference["sourcePublicationManifestId"] != status["sourcePublication"]["manifestId"]:
+            errors.append("ready ProjectionManifest source publication differs from desired publication")
+        if reference["profileId"] != status["desiredProfile"]["profileId"]:
+            errors.append("ready ProjectionManifest profile ID differs from desired profile")
+        if reference["profileVersion"] != status["desiredProfile"]["version"]:
+            errors.append("ready ProjectionManifest profile version differs from desired profile")
+        if reference["definitionFingerprint"] != status["desiredProfile"]["definitionFingerprint"]:
+            errors.append("ready ProjectionManifest fingerprint differs from desired definition")
+    else:
+        if status["eligibleForRetrieval"]:
+            errors.append("non-ready projection status cannot be eligible for retrieval")
+        if status["state"] == "stale" and status["unavailableReason"] != "projection_revoked":
+            reference = status["projectionManifest"]
+            matches_desired = (
+                reference["sourceRevisionId"] == status["sourceRevisionId"]
+                and reference["sourcePublicationManifestId"] == status["sourcePublication"]["manifestId"]
+                and reference["profileId"] == status["desiredProfile"]["profileId"]
+                and reference["profileVersion"] == status["desiredProfile"]["version"]
+                and reference["definitionFingerprint"] == status["desiredProfile"]["definitionFingerprint"]
+            )
+            if matches_desired:
+                errors.append("stale projection status references a manifest that matches the desired definition")
+    return errors
+
+
+class ProjectionContractSchemaTests(unittest.TestCase):
+    def test_valid_projection_profile_fixture(self):
+        profile = load_json(EXAMPLES / "projection-profile-valid-v1.json")
+        validate_schema(profile, SCHEMAS / "projection-profile-v1.schema.json")
+
+    def test_valid_projection_run_fixture(self):
+        run = load_json(EXAMPLES / "projection-run-valid-v1.json")
+        validate_schema(run, SCHEMAS / "projection-run-v1.schema.json")
+
+    def test_failed_projection_run_cannot_expose_a_manifest(self):
+        run = load_json(EXAMPLES / "projection-run-valid-v1.json")
+        run["state"] = "failed"
+        run["diagnostics"] = [{
+            "code": "PROJECTION_BUILD_FAILED",
+            "classification": "permanent",
+            "retryable": False,
+            "summary": "The projection builder rejected an incompatible configuration."
+        }]
+        run["completedAtUtc"] = "2026-11-12T05:03:00Z"
+        with self.assertRaises(ValidationError):
+            validate_schema(run, SCHEMAS / "projection-run-v1.schema.json")
+
+    def test_valid_projection_manifest_and_counts(self):
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        profile = load_json(EXAMPLES / "projection-profile-valid-v1.json")
+        validate_schema(manifest, SCHEMAS / "projection-manifest-v1.schema.json")
+        self.assertEqual([], validate_projection_manifest_semantics(manifest, profile))
+
+    def test_projection_manifest_rejects_count_mismatch(self):
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        profile = load_json(EXAMPLES / "projection-profile-valid-v1.json")
+        manifest["counts"]["indexedItems"] = 79
+        self.assertIn(
+            "indexed, skipped and failed item counts do not reconcile to eligible items",
+            validate_projection_manifest_semantics(manifest, profile),
+        )
+
+    def test_projection_manifest_must_meet_profile_minimum_ratio(self):
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        profile = load_json(EXAMPLES / "projection-profile-valid-v1.json")
+        manifest["counts"]["indexedItems"] = 70
+        manifest["counts"]["skippedItems"] = 10
+        manifest["outputArtifacts"][0]["itemCount"] = 70
+        self.assertIn(
+            "projection indexed ratio is below the profile minimum",
+            validate_projection_manifest_semantics(manifest, profile),
+        )
+
+    def test_valid_projection_run_manifest_and_source_publication_lineage(self):
+        run = load_json(EXAMPLES / "projection-run-valid-v1.json")
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        publication = load_json(EXAMPLES / "publication-manifest-valid-v1.json")
+        self.assertEqual([], validate_projection_run_lineage(run, manifest, publication))
+
+    def test_projection_manifest_rejects_different_published_source_revision(self):
+        run = load_json(EXAMPLES / "projection-run-valid-v1.json")
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        publication = load_json(EXAMPLES / "publication-manifest-valid-v1.json")
+        manifest["sourceRevisionId"] = "revision-from-another-build"
+        self.assertTrue(any(
+            "SourceRevision differs from source publication" in error
+            for error in validate_projection_run_lineage(run, manifest, publication)
+        ))
+
+    def test_valid_ready_projection_status_matches_exact_manifest(self):
+        status = load_json(EXAMPLES / "projection-status-valid-v1.json")
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        validate_schema(status, SCHEMAS / "projection-status-v1.schema.json")
+        self.assertEqual([], validate_projection_status_semantics(status, manifest))
+
+    def test_stale_projection_is_never_eligible_for_retrieval(self):
+        status = load_json(EXAMPLES / "projection-status-valid-v1.json")
+        manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
+        status["state"] = "stale"
+        status["eligibleForRetrieval"] = False
+        status["unavailableReason"] = "profile_version_changed"
+        status["desiredProfile"]["version"] = "2.0"
+        validate_schema(status, SCHEMAS / "projection-status-v1.schema.json")
+        self.assertEqual([], validate_projection_status_semantics(status, manifest))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -134,7 +134,49 @@ Do not call the current CLI directly from Go and claim it is a reusable adapter.
 
 In either case, preserve the existing analysis semantics and source schemas, keep the host out of the Go Core process, and make all ERPm-specific assumptions explicit configuration rather than hidden hard-coded identifiers. Choose only after the adapter contract and cost/compatibility review. This is a wrapper/integration change, not a rewrite of the extractors.
 
-## 9. Explicit exclusions
+## 9. Proposed backend extractor-host process contract v1
+
+> **Status:** Proposed adapter protocol for the first source family; not yet a published extension SDK or approved runtime schema.
+
+The Go Core invokes the existing .NET Roslyn extractor as an isolated process. The process is a trusted, platform-managed component for this first pilot, not arbitrary customer code.
+
+### 9.1 Invocation
+
+- One invocation processes exactly one registered SourceRevision.
+- The Go Orchestrator creates a unique run/stage output directory and mounts the captured source snapshot read-only.
+- The host receives one bounded JSON request document on stdin. The request contains:
+  - protocol version and invocation ID;
+  - registered Source ID and SourceRevision ID;
+  - repository identity, exact full commit SHA and captured tree/content hash;
+  - read-only snapshot root path inside the execution sandbox;
+  - output directory path inside the run-scoped writable staging mount;
+  - extractor identity/version, requested source schema version and bounded configuration.
+- The host must not resolve Git branches, fetch from remote repositories, select Workspace/Project ownership, read platform secrets or write to canonical storage.
+- The host verifies request shape and that paths remain inside the assigned mounts. The trusted capture service remains authoritative for commit/tree provenance.
+
+### 9.2 Output
+
+- The host writes an immutable records.jsonl and result-manifest.json into the assigned output directory.
+- JSONL contains only source-contract records (initially backend code-index schema v2); logs never appear in the records file.
+- The result manifest declares protocol version, invocation ID, Source/SourceRevision IDs, repository ID, commit SHA, extractor name/version, source schema version, output relative path, record count, byte length, SHA-256, diagnostic counts and completion outcome.
+- Stdout is reserved for bounded human-readable progress only; stderr is reserved for diagnostics. The machine-readable result is the manifest and output artifact, not parsed console text.
+- Exit code zero means the manifest and artifact were fully written and closed. Any non-zero exit, missing manifest, hash mismatch, lineage mismatch or schema violation fails the stage. Partial output remains quarantined staging and is never publishable.
+
+### 9.3 Core-side verification
+
+Go validates the result manifest against the invocation it issued, verifies output path containment, byte length and SHA-256, then streams each JSONL record through the declared source schema validator. It independently checks repository ID, exact SHA, allowed relative paths and supported source record kinds before the Canonical Adapter runs.
+
+The Go Core derives counts/hashes from the artifact and compares them with the manifest; it does not trust the extractor's reported counts as the sole evidence of completeness.
+
+### 9.4 Compatibility and deployment
+
+- The initial host may be added as a dedicated command/entry point in the existing .NET code-index tool, provided the old local CLI behavior remains compatible.
+- Reuse BackendRoslynIndexer without changing its symbol/reference analysis semantics or source record schema.
+- Pin the .NET runtime/SDK, MSBuild/Roslyn dependencies and host version in the trusted extractor profile.
+- The host is replaceable by another language implementation only if it passes the same request/result contract and conformance fixtures.
+- This protocol does not prescribe the future public plugin transport. A later SDK may wrap the same logical invocation/result contract over HTTP/gRPC or an asynchronous execution service.
+
+
 
 - No vector/embedding provider or full-text vendor selection.
 - No production Python AI/ML worker until a concrete AI/ML stage is selected.

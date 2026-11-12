@@ -64,14 +64,16 @@ Verification evidence must remain distinct:
 
 Deliverables:
 - [ ] Platform context and bounded-context diagram.
-- [ ] Tenant/workspace/project/source hierarchy and isolation rules.
-  - Core decision accepted by user on 2026-11-12; detailed Tenant/ACL/identity choices remain open. See [Workspace Boundary](../architecture/workspace-boundary.md).
-  - Draft proposal: [Workspace Boundary](../architecture/workspace-boundary.md); pending review and approval.
-- [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision contracts.
-  - Draft available for review: [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
-- [ ] Connector vs extractor vs processor responsibilities.
+- [ ] Tenant/workspace/project/source hierarchy and detailed isolation rules.
+  - Core decision accepted by user on 2026-11-12: Knowledge Workspace is the primary isolation boundary; Project may only narrow access inside it.
+  - Detailed Tenant/identity/ACL/source policy remains under review. See [Workspace Boundary](../architecture/workspace-boundary.md).
+- [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision machine-readable schemas and detailed payloads.
+  - Core v1 decisions accepted on 2026-11-12: split record/evidence/relation/revision, logicalKey policy, first four code payloads, defer cross-source derivation, and preserve processing history. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
+- [ ] Connector vs extractor vs processor vs normalizer/validator/publisher responsibilities.
+  - Draft proposed in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); detailed decisions remain open.
 - [ ] Control plane, artifact store, structured store and search plane responsibilities.
-- [ ] Ingestion job lifecycle, retries, idempotency and freshness semantics.
+- [ ] Ingestion job/run lifecycle, retries, idempotency, publication atomicity and freshness semantics.
+  - Draft proposed in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); detailed decisions remain open.
 - [ ] Retrieval request/result and Context Packet contracts.
 - [ ] Security/ACL and provenance requirements.
 - [ ] Technology decision records with benchmark/operational rationale.
@@ -197,11 +199,11 @@ Deliverables:
 
 Do not begin another indexer feature or create a PR for EF metadata yet. First complete Phase 0 in this order:
 
-1. **Workspace boundary:** define Tenant, Workspace, Project, Source and authorization semantics. A draft is available in [Workspace Boundary](../architecture/workspace-boundary.md); review it before treating the model as accepted.
-2. **Canonical knowledge contract:** define common envelope plus typed payloads for code, documents and database knowledge.
-3. **Revision/provenance:** define Git commit, document version/content hash and extractor/schema version behavior.
-4. **Storage boundary:** decide control plane, artifact storage, structured store and search plane responsibilities.
-5. **Ingestion lifecycle:** define trigger, snapshot, job, idempotency, validation, publish and failure semantics.
+1. **Workspace boundary:** core isolation principle accepted; finish detailed Tenant, identity, role inheritance, project restriction and source ACL semantics using [Workspace Boundary](../architecture/workspace-boundary.md).
+2. **Canonical Knowledge Contract:** core v1 design decisions accepted; finalize wire-level envelope and the four initial code payload schemas using [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
+3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
+4. **Connector and ingestion contracts:** review [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md), then finalize trigger, request/run identity, validation, publication and failure semantics.
+5. **Storage boundary:** decide control plane, artifact storage, structured store and search plane responsibilities after the data/lifecycle contracts are stable.
 6. **Retrieval contract:** define query scope, filters, evidence result and relationship expansion.
 7. **Context Packet:** define the contract before implementing an LLM-facing context builder.
 8. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.

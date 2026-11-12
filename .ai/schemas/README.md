@@ -7,6 +7,7 @@ This directory contains machine-readable contract artifacts for the Enterprise K
 - `context-packet-v1.schema.json`: JSON Schema Draft 2020-12 for the immutable, task-scoped delivery packet.
 - `context-profile-v1.schema.json`: JSON Schema Draft 2020-12 for versioned selection, budget and lifecycle policy.
 - `retrieval-request-v1.schema.json`, `retrieval-result-v1.schema.json`, `retrieval-error-v1.schema.json`: machine-readable Retrieval request, successful result and failed outcome contracts.
+- `knowledge-record-v1.schema.json`, `evidence-v1.schema.json`, `knowledge-relation-v1.schema.json`, `source-revision-v1.schema.json`: initial Canonical Knowledge envelope and provenance schemas.
 - `examples/`: valid baseline examples used by automated tests.
 
 ## Validation

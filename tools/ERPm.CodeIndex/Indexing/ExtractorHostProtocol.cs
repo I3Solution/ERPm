@@ -63,10 +63,11 @@ public static class ExtractorHostProtocol
                 $"Execution workspace does not exist: '{workspaceRoot}'.");
         }
 
-        if (!Directory.EnumerateFiles(workspaceRoot, "*.sln", SearchOption.TopDirectoryOnly).Any())
+        var rootSolutions = Directory.GetFiles(workspaceRoot, "*.sln", SearchOption.TopDirectoryOnly);
+        if (rootSolutions.Length != 1)
         {
             throw new InvalidDataException(
-                "Execution workspace must contain a solution at its root.");
+                "Execution workspace must contain exactly one solution at its root.");
         }
 
         if (IsSameOrChildPath(outputDirectory, workspaceRoot))

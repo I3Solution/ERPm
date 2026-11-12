@@ -79,7 +79,7 @@ Owns:
 - SourceRevision identities, revision keys, hashes, capture state and pointers.
 - IngestionRun lifecycle, attempts/stage events, checkpoints, warnings and diagnostics metadata.
 - PublicationManifest, current/active SourceRevision pointer and canonical readiness state.
-- Per-projection state/version/freshness.
+- Versioned ProjectionProfiles, ProjectionRuns, ProjectionStatuses and the desired/ready manifest pointer per SourceRevision and projection kind.
 - Audit events and retention/deletion workflow metadata.
 
 Does not own:
@@ -167,18 +167,18 @@ Every projection must carry or be traceable to:
 - ACL/policy version or a reliable invalidation mechanism.
 - Projection state and generated timestamp.
 
-Search projection lifecycle is independent from canonical publication:
-- `pending`: canonical revision published; projection has not started.
-- `building`: projection generation/indexing in progress.
-- `ready`: projection is complete for the declared manifest and version.
-- `failed`: projection could not be built; canonical data remains available through other supported retrieval paths.
-- `stale`: a newer canonical revision or policy/version change means the projection is no longer current for the requested scope.
+Search projection lifecycle is independent from canonical publication and is defined in [Search Projection Lifecycle](projection-lifecycle.md):
+- `ProjectionProfile` pins projection kind, builder/configuration version, source payload selection and definition fingerprint.
+- `ProjectionRun` owns build/retry lifecycle separately from IngestionRun.
+- `ProjectionManifest` is immutable output tied to the exact canonical PublicationManifest.
+- `ProjectionStatus` is resolved for one SourceRevision + projection kind + desired profile definition.
+- Statuses are `pending`, `building`, `ready`, `failed` and `stale`; only `ready` is retrieval-eligible.
 
 Rules:
 1. A search/vector failure does not roll back a published canonical SourceRevision.
 2. Structured retrieval may use canonical records as soon as the SourceRevision is published.
 3. Full-text/vector retrieval may use only ready projections compatible with the requested SourceRevision, payload/projection version and ACL policy.
-4. A query response must disclose partial retrieval capability when a projection is pending/failed/stale; absence from an unavailable projection is not proof that no knowledge exists.
+4. A query response must disclose per-SourceRevision projection readiness; optional unavailable methods may yield Partial results while required unavailable methods fail with a capability-unavailable error. Absence from an unavailable projection is not proof that no knowledge exists.
 5. Candidate filters for Tenant/Workspace/Project and effective ACL must apply inside the search request or before any candidate content/count/snippet is exposed. Post-filtering already exposed candidates is insufficient.
 6. Projection rebuilds are idempotent and do not mutate canonical records.
 7. A projection can be deleted/rebuilt independently; canonical facts and source evidence remain intact.

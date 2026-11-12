@@ -71,8 +71,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- User review/approval cho proposed stage I/O, attempt, retry, cancellation và optional Processor semantics.
-- User review/approval cho stage I/O/attempt/retry/cancellation draft.
+- User review/approval cho stage I/O, attempt, retry, cancellation và optional Processor semantics (proposed design draft).
 - Hoàn thiện source-family completeness metrics, webhook authentication/replay protection và large-revision commit protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.

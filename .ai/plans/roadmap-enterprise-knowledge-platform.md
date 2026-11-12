@@ -77,7 +77,8 @@ Deliverables:
 - [ ] Ingestion machine-readable lifecycle/state contracts and operational security details.
   - Core decisions accepted: one IngestionRun aggregate; manual + webhook triggers; per-SourceRevision atomic canonical publication; async search/vector readiness; defined optional-vs-required failure policy. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - [ ] Retrieval request/result and Context Packet contracts.
-  - A first [Retrieval Contract](../architecture/retrieval-contract.md) draft is now part of Phase 0; request/result semantics and remaining decisions require review.
+  - Seven Retrieval v1 semantic defaults were accepted on 2026-11-12. The [Retrieval Contract](../architecture/retrieval-contract.md) still needs machine-readable schemas, protocol mapping and acceptance fixtures.
+  - A [Context Packet Contract](../architecture/context-packet-contract.md) draft now defines task-scoped, evidence-preserving and token-bounded agent context; its seven semantic defaults need review before schemas/adapters.
 - [ ] Security/ACL and provenance requirements.
 - [ ] Technology decision records with benchmark/operational rationale.
 
@@ -207,10 +208,11 @@ Do not begin another indexer feature or create a PR for EF metadata yet. First c
 3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
 4. **Connector and ingestion contracts:** review [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md), then finalize trigger, request/run identity, validation, publication and failure semantics.
 5. **Storage boundary:** logical defaults are accepted in [Storage Boundary](../architecture/storage-boundary.md); build the two-Workspace benchmark and defer vendor/physical-topology decisions to technology ADRs.
-6. **Retrieval contract:** review the draft [Retrieval Contract](../architecture/retrieval-contract.md), then finalize request scope, revision selection, filters, evidence-backed results, projection availability and verified relationship expansion.
-7. **Context Packet:** define the agent-facing packet after the retrieval result contract is stable; do not conflate retrieval results with prompt-ready context.
-8. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
-9. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
+6. **Retrieval contract:** seven semantic defaults are accepted in [Retrieval Contract](../architecture/retrieval-contract.md); define machine-readable fields, errors, cursor semantics, protocol mapping and two-Workspace acceptance fixtures.
+7. **Context Packet:** review the [Context Packet Contract](../architecture/context-packet-contract.md), agree packet scope/audience, task boundary, evidence/trust, token budget and expiry defaults; keep Retrieval Result distinct from prompt-ready context.
+8. **Contract schemas and adapters:** define machine-readable ContextPacket/ContextProfile schemas and map them consistently to Query API, MCP and agent clients without dropping provenance.
+9. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
+10. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
 
 ## 5. First vertical slice acceptance scenario
 

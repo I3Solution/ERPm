@@ -1,0 +1,24 @@
+{
+  "manifestId": "manifest-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "runId": "run-001",
+  "status": "published",
+  "counts": {
+    "knowledgeRecords": 120,
+    "evidence": 140,
+    "relations": 30
+  },
+  "contentHash": "sha256:manifest",
+  "stageOutputHashes": {
+    "canonical": "sha256:canonical"
+  },
+  "previousActiveRevisionId": "revision-000",
+  "activePointerGeneration": 2,
+  "publishedAtUtc": "2026-11-12T03:05:00Z"
+}

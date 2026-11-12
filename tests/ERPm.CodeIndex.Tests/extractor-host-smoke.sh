@@ -45,7 +45,7 @@ import sys
 request_path, execution, output, commit_sha, tree_id, capture_sha256 = sys.argv[1:]
 request = {
     "protocolVersion": 1,
-    "invocationId": "ci-erpmbе-extractor-smoke",
+    "invocationId": "ci-erpm-be-extractor-smoke",
     "sourceId": "ci-source-erpm-be",
     "sourceRevisionId": "ci-revision-" + commit_sha,
     "repositoryId": "erpm-be",
@@ -69,7 +69,6 @@ DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet run --no-build \
 python3 - "$output" "$commit_sha" "$snapshot_before" "$snapshot" <<'PY'
 import hashlib
 import json
-import os
 import pathlib
 import subprocess
 import sys

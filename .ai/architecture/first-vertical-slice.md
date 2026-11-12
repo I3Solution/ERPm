@@ -1,6 +1,6 @@
 # First Vertical Slice — Git Code Knowledge Ingestion
 
-> **Status:** Proposed implementation design — no runtime implementation authorized by this document alone
+> **Status:** Approved first-slice direction; initial .NET extractor-host implementation in progress (CI and immutable-snapshot feasibility verification pending)
 > **Date:** 2026-11-12
 > **Depends on:** Accepted Workspace boundary, Canonical Knowledge Contract v1, Ingestion v1 core decisions, Storage Boundary, Retrieval Contract, Projection Lifecycle, Technology Strategy
 > **Pilot:** ERPm Git source; all Core contracts remain product- and language-neutral
@@ -225,9 +225,15 @@ The current `Program.cs` resolves `WorkspaceManifestReader.Read()` before comman
 
 The preferred minimum change is a dedicated host command in the existing executable, not a second copy of Roslyn analysis code. A separate host project is justified only if dependency isolation or deployment testing demonstrates a concrete benefit.
 
+### 10.5.1 Initial implementation snapshot
+
+The first implementation now adds an `extractor-host` command to the existing executable and dispatches it before `WorkspaceManifestReader.Read()`. It accepts one protocol-v1 JSON request from stdin, validates the declared revision/capture identity and workspace/output boundary, reuses `BackendRoslynIndexer`, and writes `records.jsonl` plus `result-manifest.json` with echoed lineage, byte length, SHA-256 and record count. The legacy `workspace`, `index repo` and `find symbol` paths remain on their previous dispatch path. Protocol unit tests cover unsupported protocol versions, malformed commit/capture digests, missing solution, output nested in the execution workspace, artifact hash/count and manifest JSON round-trip.
+
+This is an initial trusted host prototype, not a complete process sandbox or proof of immutable capture. CI compilation/test and execution against the pinned ERPm-BE immutable snapshot are still required. Go must independently verify all returned data and enforce process-tree timeout/cancellation, resource limits, read-only snapshot mounts, writable execution workspace and network restrictions.
+
 ### 10.6 Host and capture conformance tests
 
-The first implementation must cover at least:
+The first implementation and subsequent Core conformance suite must cover at least:
 1. valid request produces JSONL plus a manifest whose independently recomputed count, byte length and SHA-256 match;
 2. unsupported protocol/schema version is rejected;
 3. Source ID, SourceRevision ID, repository ID, full SHA and capture-manifest digest are echoed exactly and validated by Core;

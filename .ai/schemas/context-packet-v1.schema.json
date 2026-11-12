@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.enterprise-knowledge-platform.invalid/context-packet/1.0",
+  "$id": "urn:ekp:context-packet:1.0",
   "title": "Enterprise Knowledge Platform Context Packet v1",
   "type": "object",
   "additionalProperties": false,
@@ -489,7 +489,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "kind",
             "recordId",
@@ -522,7 +521,8 @@
             }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "sourceExcerpt": {
       "allOf": [
@@ -531,7 +531,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "kind",
             "content",
@@ -555,7 +554,8 @@
             }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "codeExcerpt": {
       "allOf": [
@@ -564,7 +564,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "kind",
             "content",
@@ -608,7 +607,8 @@
             }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "verifiedRelation": {
       "allOf": [
@@ -617,7 +617,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "kind",
             "relationId",
@@ -655,7 +654,8 @@
             }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "generatedSummary": {
       "allOf": [
@@ -664,7 +664,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "kind",
             "content",
@@ -728,7 +727,8 @@
             }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     },
     "notice": {
       "allOf": [
@@ -737,7 +737,6 @@
         },
         {
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "kind",
             "code",
@@ -757,7 +756,8 @@
             }
           }
         }
-      ]
+      ],
+      "unevaluatedProperties": false
     }
   }
 }

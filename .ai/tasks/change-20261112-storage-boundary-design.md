@@ -2,7 +2,7 @@
 
 > **Loại:** change  
 > **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
-> **Trạng thái:** Completed — logical decisions accepted  
+> **Trạng thái:** Doing  
 > **Progress aggregation:** v1  
 > **Liên quan:** .ai/architecture/workspace-boundary.md, .ai/architecture/canonical-knowledge-contract.md, .ai/architecture/ingestion-pipeline.md  
 > **Phạm vi:** Root repository — logical storage architecture

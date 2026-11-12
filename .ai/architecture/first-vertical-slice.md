@@ -134,13 +134,49 @@ Do not call the current CLI directly from Go and claim it is a reusable adapter.
 
 In either case, preserve the existing analysis semantics and source schemas, keep the host out of the Go Core process, and make all ERPm-specific assumptions explicit configuration rather than hidden hard-coded identifiers. Choose only after the adapter contract and cost/compatibility review. This is a wrapper/integration change, not a rewrite of the extractors.
 
-## 9. Proposed backend extractor-host process contract v1
+## 9. Git Source capture and immutable execution snapshot v1
+
+> **Status:** Proposed first-slice policy, based on inspection of the pinned ERPm-BE revision.
+
+### 9.1 Source of truth
+
+- The registered Git Source identifies one repository; the trigger's branch/tag/commit selector is only a request to resolve a revision.
+- The Git Connector resolves the selector to a full commit SHA and records the commit object ID, root tree object ID, repository identity and capture timestamp.
+- The Connector must not use the user's current ERPm umbrella working directory as the platform source of truth. Dirty files, local branches and uncommitted changes are excluded.
+- The first pilot revision inspected is ERPm-BE commit `235173fd193ae2fb60081fa4573434f5edd506f3`. Its tree contains one root solution (`ERPm.sln`), no nested Git submodule entries, no `.gitattributes`, and no files larger than 50 MiB. This is evidence for this pinned revision only, not a universal property of future revisions.
+
+### 9.2 Capture procedure
+
+1. Fetch/resolve the exact commit from the registered remote using connector credentials.
+2. Verify the commit object and root tree; reject a selector that moves during resolution or cannot be fetched completely.
+3. Enumerate the Git tree recursively and create a capture manifest with each path, Git mode, blob object ID and size, plus commit/tree IDs and a manifest digest.
+4. Materialize the exact commit into a content-addressed immutable snapshot. Reject unresolved gitlinks in v1; each submodule must be registered as its own Source and ingested as its own SourceRevision.
+5. Verify the materialized file set and content against the captured tree manifest. Symlink targets and executable modes must be represented explicitly; reject unsafe paths escaping the snapshot root.
+6. Mark the snapshot immutable and mount it read-only for the extractor invocation.
+
+The implementation may use a detached checkout or an equivalent Git-object materializer, but it must prove the same tree/content invariants. Do not assume that a Git commit SHA alone proves that a mutable working directory still contains those bytes.
+
+### 9.3 Build workspace versus immutable snapshot
+
+Roslyn/MSBuild may require restore and may write intermediate files. Therefore the extractor must not write into the canonical immutable snapshot.
+
+- Keep the captured snapshot read-only.
+- Create a per-invocation writable execution workspace from that snapshot and verify its source-file manifest before running the extractor.
+- Put `obj`, NuGet package cache, temporary files and diagnostics in isolated writable locations. Never share writable build outputs across tenants or SourceRevisions.
+- Disable network egress by default during extraction; if package restore is required, perform it in a separately controlled dependency-preparation step using approved feeds and pinned dependencies, then run analysis without unrestricted network access.
+- After extraction, verify that the immutable source snapshot is unchanged. Build-generated files in the execution workspace are not source records and must not enter the capture manifest.
+
+### 9.4 First-slice rejection conditions
+
+Fail capture closed when the commit/tree cannot be verified, the repository identity differs, a gitlink is present but not separately registered, a path escapes the snapshot root, or the materialized source-file manifest differs from the Git tree. A failed capture must not create a publishable SourceRevision.
+
+## 10. Proposed backend extractor-host process contract v1
 
 > **Status:** Proposed adapter protocol for the first source family; not yet a published extension SDK or approved runtime schema.
 
 The Go Core invokes the existing .NET Roslyn extractor as an isolated process. The process is a trusted, platform-managed component for this first pilot, not arbitrary customer code.
 
-### 9.1 Invocation
+### 10.1 Invocation
 
 - One invocation processes exactly one registered SourceRevision.
 - The Go Orchestrator creates a unique run/stage output directory and mounts the captured source snapshot read-only.
@@ -154,7 +190,7 @@ The Go Core invokes the existing .NET Roslyn extractor as an isolated process. T
 - The host must not resolve Git branches, fetch from remote repositories, select Workspace/Project ownership, read platform secrets or write to canonical storage.
 - The host verifies request shape and that paths remain inside the assigned mounts. The trusted capture service remains authoritative for commit/tree provenance.
 
-### 9.2 Output
+### 10.2 Output
 
 - The host writes an immutable records.jsonl and result-manifest.json into the assigned output directory.
 - JSONL contains only source-contract records (initially backend code-index schema v2); logs never appear in the records file.
@@ -162,21 +198,23 @@ The Go Core invokes the existing .NET Roslyn extractor as an isolated process. T
 - Stdout is reserved for bounded human-readable progress only; stderr is reserved for diagnostics. The machine-readable result is the manifest and output artifact, not parsed console text.
 - Exit code zero means the manifest and artifact were fully written and closed. Any non-zero exit, missing manifest, hash mismatch, lineage mismatch or schema violation fails the stage. Partial output remains quarantined staging and is never publishable.
 
-### 9.3 Core-side verification
+### 10.3 Core-side verification
 
 Go validates the result manifest against the invocation it issued, verifies output path containment, byte length and SHA-256, then streams each JSONL record through the declared source schema validator. It independently checks repository ID, exact SHA, allowed relative paths and supported source record kinds before the Canonical Adapter runs.
 
 The Go Core derives counts/hashes from the artifact and compares them with the manifest; it does not trust the extractor's reported counts as the sole evidence of completeness.
 
-### 9.4 Compatibility and deployment
+### 10.4 Compatibility and deployment
 
 - The initial host may be added as a dedicated command/entry point in the existing .NET code-index tool, provided the old local CLI behavior remains compatible.
 - Reuse BackendRoslynIndexer without changing its symbol/reference analysis semantics or source record schema.
-- Pin the .NET runtime/SDK, MSBuild/Roslyn dependencies and host version in the trusted extractor profile.
+- Pin the .NET runtime/SDK, MSBuild/Roslyn dependencies and host version in the trusted extractor profile. The inspected ERPm-BE revision pins .NET SDK 10.0.403 with latestPatch roll-forward; the host execution image must satisfy this requirement or fail with an explicit prerequisite error.
 - The host is replaceable by another language implementation only if it passes the same request/result contract and conformance fixtures.
 - This protocol does not prescribe the future public plugin transport. A later SDK may wrap the same logical invocation/result contract over HTTP/gRPC or an asynchronous execution service.
 
 
+
+## 11. Explicit exclusions
 
 - No vector/embedding provider or full-text vendor selection.
 - No production Python AI/ML worker until a concrete AI/ML stage is selected.

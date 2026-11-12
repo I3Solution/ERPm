@@ -84,9 +84,6 @@ Platform
 
 The core isolation decision is accepted: Knowledge Workspace is the primary data boundary; Project can only narrow access within that Workspace. Detailed role, identity, upstream ACL and lifecycle decisions remain under review. See [Workspace Boundary](workspace-boundary.md).
 
-
-Detailed ownership, retrieval scope, role inheritance and source ACL proposals are documented in [Workspace Boundary](workspace-boundary.md). That document is pending review and is not yet an implementation contract.
-
 Mandatory rules:
 1. Every source and derived knowledge record belongs to an explicit workspace scope.
 2. Retrieval must apply workspace scope and authorization filters before returning content.
@@ -108,7 +105,7 @@ Knowledge is organized by domain, while sharing one platform contract:
 | Documentation | PDF, DOCX, Markdown, HTML | Sections, paragraphs, tables, citations |
 | Development history | Git commits, PRs, issues | Change history, decisions, implementation links |
 
-A connector discovers and retrieves source material. An extractor understands a source format or technology. A normalizer maps extracted facts into shared contracts. These responsibilities must not be fused into one ERPm-specific pipeline.
+A connector discovers and captures immutable source snapshots; an extractor emits typed source-grounded observations; optional processors transform observations while preserving lineage; a normalizer maps them into canonical records; a validator checks scope/evidence/revision invariants; a publisher makes a complete revision visible; and an orchestrator coordinates the lifecycle. See [Connector and Ingestion Pipeline](ingestion-pipeline.md) for the proposed responsibilities and contracts.
 
 ## 6. Canonical knowledge and evidence contract
 
@@ -143,18 +140,7 @@ A prior technology direction discussed for evaluation is PostgreSQL for control 
 
 ## 8. Ingestion lifecycle and freshness
 
-Expected lifecycle:
-
-1. Register a source inside a workspace.
-2. Discover source revisions or content changes.
-3. Trigger ingestion manually, by webhook or schedule.
-4. Fetch a deterministic source snapshot.
-5. Parse and extract source-specific knowledge.
-6. Normalize and validate records against versioned contracts.
-7. Write artifacts and records to central storage.
-8. Publish/update search and relationship indexes.
-9. Mark the source revision as ready only after required stages succeed.
-10. Expose freshness, errors and provenance to retrieval clients.
+The high-level lifecycle is discovery → immutable snapshot capture → extraction → optional processing → normalization → validation → staging → publication/readiness. Detailed run states, retry/checkpoint semantics, idempotency, freshness pointers and atomic visibility are proposed in [Connector and Ingestion Pipeline](ingestion-pipeline.md).
 
 For Git sources, index an exact commit SHA, not a moving branch name. Branches are pointers to revisions. A query must resolve to an explicit indexed revision or a documented default revision; records from different SHAs must never be silently mixed.
 

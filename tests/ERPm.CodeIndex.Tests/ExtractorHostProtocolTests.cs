@@ -92,6 +92,29 @@ public sealed class ExtractorHostProtocolTests : IDisposable
     }
 
     [Fact]
+    public void Rejects_multiple_root_solutions()
+    {
+        File.WriteAllText(Path.Combine(_workspace, "Another.sln"), "solution");
+
+        Assert.Throws<InvalidDataException>(
+            () => ExtractorHostProtocol.ValidateRequest(CreateRequest()));
+    }
+
+    [Fact]
+    public async Task Host_rejects_request_larger_than_protocol_limit()
+    {
+        var oversizedRequest = new MemoryStream(Encoding.UTF8.GetBytes(new string('x', 64 * 1024 + 1)));
+        using var standardOutput = new StringWriter();
+        using var standardError = new StringWriter();
+
+        var exitCode = await ExtractorHostCommand.RunAsync(
+            oversizedRequest, standardOutput, standardError);
+
+        Assert.Equal(1, exitCode);
+        Assert.Contains("exceeds the 65536-byte limit", standardError.ToString());
+    }
+
+    [Fact]
     public async Task Result_manifest_binds_exact_request_lineage_and_artifact_bytes()
     {
         Directory.CreateDirectory(_output);

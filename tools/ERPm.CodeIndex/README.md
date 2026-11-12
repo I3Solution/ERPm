@@ -58,7 +58,7 @@ Example request shape (paths are supplied by the trusted orchestrator):
   "outputDirectory": "/sandbox/output",
   "extractorId": "roslyn-backend",
   "extractorVersion": "0.1.0",
-  "sourceSchemaVersion": 1
+  "sourceSchemaVersion": 2
 }
 ```
 

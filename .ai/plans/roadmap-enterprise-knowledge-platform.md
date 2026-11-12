@@ -69,12 +69,12 @@ Deliverables:
   - Detailed Tenant/identity/ACL/source policy remains under review. See [Workspace Boundary](../architecture/workspace-boundary.md).
 - [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision machine-readable schemas and detailed payloads.
   - Core v1 decisions accepted on 2026-11-12: split record/evidence/relation/revision, logicalKey policy, first four code payloads, defer cross-source derivation, and preserve processing history. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
-- [ ] Connector vs extractor vs processor vs normalizer/validator/publisher responsibilities.
-  - Draft proposed in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); detailed decisions remain open.
+- [ ] Connector vs extractor vs processor vs normalizer/validator/publisher machine-readable contracts.
+  - Responsibilities and the six core Ingestion v1 decisions were accepted on 2026-11-12; detailed component schemas and operational protocol remain open. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - [ ] Control plane, artifact store, structured store and search plane responsibilities.
-  - Draft proposed in [Storage Boundary](../architecture/storage-boundary.md); vendor/consolidation decisions remain open.
-- [ ] Ingestion job/run lifecycle, retries, idempotency, publication atomicity and freshness semantics.
-  - Draft proposed in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); detailed decisions remain open.
+  - Logical storage boundary draft is available in [Storage Boundary](../architecture/storage-boundary.md); physical consolidation and vendor decisions remain open.
+- [ ] Ingestion machine-readable lifecycle/state contracts and operational security details.
+  - Core decisions accepted: one IngestionRun aggregate; manual + webhook triggers; per-SourceRevision atomic canonical publication; async search/vector readiness; defined optional-vs-required failure policy. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - [ ] Retrieval request/result and Context Packet contracts.
 - [ ] Security/ACL and provenance requirements.
 - [ ] Technology decision records with benchmark/operational rationale.

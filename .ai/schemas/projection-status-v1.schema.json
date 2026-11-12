@@ -299,6 +299,19 @@
         "properties": {
           "unavailableReason": {
             "const": "build_in_progress"
+          },
+          "latestProjectionRun": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "queued",
+                  "building"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
           }
         },
         "not": {
@@ -342,7 +355,10 @@
               "state": {
                 "const": "failed"
               }
-            }
+            },
+            "required": [
+              "state"
+            ]
           }
         }
       }

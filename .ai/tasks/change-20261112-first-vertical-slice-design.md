@@ -37,7 +37,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] CI build and protocol unit tests pass; host smoke test executes against a read-only Git-archive snapshot and separate writable execution copy, validates artifact hash/count/lineage and confirms snapshot content unchanged.
 - [x] Complete the full five-job CI run and review all jobs; Run #1110 passed 5/5.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
-- [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
+- [x] User approved the First Vertical Slice boundary and authorized the .NET Extractor Host + protocol tests; Go Core runtime remains a separate next implementation phase.
 - [ ] Implement the approved vertical slice incrementally in Go.
 
 ## 4. Cách làm
@@ -60,7 +60,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 
 - Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Proposed host protocol is documented in section 10; it preserves existing Roslyn analysis and schema while returning run-scoped immutable artifacts. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
-- Validate capture manifest/materialization parity, read-only snapshot behavior and MSBuild writable workspace with a focused feasibility spike.
+- The smoke verifies read-only snapshot content is unchanged while MSBuild operates on a separate writable execution copy. Full capture-manifest-to-materialized-tree parity (including modes/symlink edge cases) remains a follow-up capture-service conformance test.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
 - The user approved proceeding with the first-slice implementation. The first .NET host/protocol implementation is in place and CI Run #1110 passed 5/5. Its code-index job confirms build, 32 unit tests and immutable-snapshot smoke; Roslyn/MSBuild extracted 36,374 records from the pinned ERPm-BE revision. Remaining work is Core-side process/artifact hardening before the Go Core foundation.
 
@@ -71,5 +71,5 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - Ngày cập nhật cuối: 2026-11-12.
 - Implementation commit(s): host command/protocol, unit tests, immutable-snapshot smoke and documentation are on `loipham/phase0-workspace-boundary` / PR #70.
 - Verification: CI Run #1110 passed 5/5 jobs. Code-index build succeeded; 32/32 unit tests passed; immutable-snapshot smoke extracted 36,374 records and passed artifact/snapshot checks.
-- Latest docs-only follow-up CI: Run #1114 pending at the time of this update.
-- Đây là design proposal; chưa có runtime implementation hoặc runtime verification.
+- Latest follow-up CI for the additional exact-lineage smoke assertions: Run #1119 queued/in progress at the time of this update.
+- The managed .NET extractor-host prototype is implemented and CI-verified. No Go Core runtime, canonical ingestion/publication, Workspace authorization or structured Retrieval runtime has been implemented yet.

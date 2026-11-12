@@ -638,6 +638,12 @@ def validate_ingestion_manifest_lineage(
         errors.append("Extractor input does not reference the Connector capture manifest")
     if processing["inputManifest"]["manifestId"] != extraction["manifestId"]:
         errors.append("Processor input does not reference the Extraction manifest")
+    allowed_parent_ids = set(processing["inputManifest"]["artifactIds"])
+    for output in processing["outputArtifacts"]:
+        if not set(output["parentArtifactIds"]).issubset(allowed_parent_ids):
+            errors.append(f"{output['artifactId']}: Processor output references an unknown parent artifact")
+    if sum(item["itemCount"] for item in processing["outputArtifacts"]) != processing["outputItemCount"]:
+        errors.append("Processor output item count differs from artifact counts")
     if normalization["inputExtractionManifest"]["manifestId"] != extraction["manifestId"]:
         errors.append("Normalizer input does not reference the Extraction manifest")
     if not any(
@@ -787,6 +793,20 @@ class IngestionStageContractSchemaTests(unittest.TestCase):
             [],
             validate_ingestion_manifest_lineage(capture, extraction, processing, normalization, validation),
         )
+
+    def test_processor_outputs_must_reference_declared_parent_artifacts(self):
+        capture = load_json(EXAMPLES / "source-capture-manifest-valid-v1.json")
+        extraction = load_json(EXAMPLES / "extraction-manifest-valid-v1.json")
+        processing = load_json(EXAMPLES / "processing-manifest-valid-v1.json")
+        normalization = load_json(EXAMPLES / "normalization-manifest-valid-v1.json")
+        validation = load_json(EXAMPLES / "validation-report-valid-v1.json")
+        processing["outputArtifacts"][0]["parentArtifactIds"] = ["artifact-not-in-input"]
+        self.assertTrue(any(
+            "unknown parent artifact" in error
+            for error in validate_ingestion_manifest_lineage(
+                capture, extraction, processing, normalization, validation
+            )
+        ))
 
     def test_ingestion_run_stage_event_can_reference_durable_attempt(self):
         run = load_json(EXAMPLES / "ingestion-run-valid-v1.json")

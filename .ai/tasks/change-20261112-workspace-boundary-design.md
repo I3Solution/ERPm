@@ -56,8 +56,8 @@ Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope t
 ## 7. Evidence và cập nhật
 
 - Commit / PR: PR [#70](https://github.com/I3Solution/ERPm/pull/70) đang mở; branch head `8c303361c9a3fbdf98c449eeffd2e3fb99d96621`.
-- CI / workflow run và kết quả: Không áp dụng; chưa chạy CI.
+- CI / workflow run: [Run #1013](https://github.com/I3Solution/ERPm/actions/runs/43179810828) passed 5/5 jobs for latest PR head at that time; this document is architecture-only.
 - Tài liệu chính: .ai/architecture/workspace-boundary.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Đã draft thiết kế; việc review/approval vẫn còn mở.
+- Đã draft thiết kế; detailed Tenant/identity/ACL/source policy review remains open.
 - Bổ sung proposed v1 capability matrix: admin roles không tự động có quyền đọc knowledge; workspace/project reader và contributor tách biệt; restricted Project cần grant riêng; source ACL chỉ thu hẹp quyền; deny ưu tiên allow.

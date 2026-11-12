@@ -34,7 +34,8 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Define host/capture conformance tests for protocol, hashes, path isolation, revision lineage, cancellation, snapshot immutability and retries.
 - [x] Implement the first managed .NET extractor-host command and protocol-v1 request/result manifest while preserving the legacy CLI entry points.
 - [x] Add protocol tests for version/revision/digest validation, output-vs-workspace isolation, artifact byte/hash/count binding and result-manifest JSON round-trip.
-- [ ] Run CI build/tests and resolve any compile/runtime failures; then execute the host against an immutable ERPm-BE snapshot to validate MSBuild feasibility.
+- [x] CI build and protocol unit tests pass; host smoke test executes against a read-only Git-archive snapshot and separate writable execution copy, validates artifact hash/count/lineage and confirms snapshot content unchanged.
+- [ ] Complete the full five-job CI run and review any unrelated failures before closing this implementation increment.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
 - [ ] Implement the approved vertical slice incrementally in Go.
@@ -53,7 +54,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - Source inspection evidence: backend is a .NET 10 library invoked by a hard-coded ERPm CLI and writes local JSONL cache; frontend worker consumes a manifest on stdin and emits JSONL on stdout, but current runner performs validation/cache writing and frontend Program root is tied to erpm-fe.
 - Pinned ERPm-BE commit `235173fd193ae2fb60081fa4573434f5edd506f3` has root `ERPm.sln`, no nested gitlinks, no .gitattributes and pins .NET SDK 10.0.403 (`rollForward: latestPatch`).
 - `BackendRoslynIndexer` currently accumulates records in memory and stamps `GeneratedAtUtc`; output artifact hashes therefore bind one invocation and are not deterministic across retries. Canonical identity must exclude this timestamp.
-- Initial runtime prototype is now present: `extractor-host` dispatches before `WorkspaceManifestReader`, validates the protocol request, reuses `BackendRoslynIndexer`, and writes `records.jsonl` plus a lineage/hash/count result manifest. Protocol unit tests have been added; CI has not yet verified this commit, and the host has not yet been run against the pinned immutable ERPm-BE snapshot.
+- Initial runtime prototype is now present: `extractor-host` dispatches before `WorkspaceManifestReader`, validates the protocol request, reuses `BackendRoslynIndexer`, and writes `records.jsonl` plus a lineage/hash/count result manifest. Protocol unit tests have been added; The code-index CI job has verified the .NET build, all 32 code-index unit tests and the managed-host smoke test against the pinned immutable ERPm-BE snapshot. The smoke run successfully executed Roslyn/MSBuild and validated the artifact manifest and snapshot immutability. The complete five-job workflow is still finishing.
 
 ## 6. Việc còn lại
 
@@ -61,12 +62,13 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
 - Validate capture manifest/materialization parity, read-only snapshot behavior and MSBuild writable workspace with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
-- The user approved proceeding with the first-slice implementation. The first .NET host/protocol implementation and unit tests are in place; next verify CI, then run the host against the pinned immutable ERPm-BE snapshot and prove snapshot immutability/MSBuild deployment before beginning the Go Core foundation.
+- The user approved proceeding with the first-slice implementation. The first .NET host/protocol implementation is in place and its focused CI checks pass: build, 32 unit tests and immutable-snapshot smoke. The smoke also confirms that the backend Roslyn host can load the pinned solution under the ERPm-BE SDK. Wait for the complete workflow result, then review the remaining hardening gaps before beginning the Go Core foundation.
 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - CI baseline: [Run #1044](https://github.com/I3Solution/ERPm/actions/runs/43181828139), 5/5 jobs passed for commit `763d62ab26951708506a7823ccea51fc71e75967`; later snapshot-design commits are awaiting their own CI.
 - Ngày cập nhật cuối: 2026-11-12.
-- Implementation commit(s): host command/protocol, unit tests and README updates are on `loipham/phase0-workspace-boundary` / PR #70; CI verification pending.
+- Implementation commit(s): host command/protocol, unit tests, immutable-snapshot smoke and documentation are on `loipham/phase0-workspace-boundary` / PR #70.
+- Focused verification: CI Run #1110, code-index build + 32 unit tests + immutable-snapshot host smoke all passed; overall workflow completion pending.
 - Đây là design proposal; chưa có runtime implementation hoặc runtime verification.

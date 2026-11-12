@@ -32,7 +32,9 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Specify the minimum .NET host integration point: dispatch before WorkspaceManifestReader, reuse BackendRoslynIndexer, preserve legacy CLI behavior.
 - [x] Bind extractor result to the exact capture manifest ID/digest; host receives a writable execution copy, never the immutable snapshot mount.
 - [x] Define host/capture conformance tests for protocol, hashes, path isolation, revision lineage, cancellation, snapshot immutability and retries.
-- [ ] Review/approve host protocol and validate .NET/MSBuild deployment feasibility with an executable feasibility probe.
+- [x] Implement the first managed .NET extractor-host command and protocol-v1 request/result manifest while preserving the legacy CLI entry points.
+- [x] Add protocol tests for version/revision/digest validation, output-vs-workspace isolation, artifact byte/hash/count binding and result-manifest JSON round-trip.
+- [ ] Run CI build/tests and resolve any compile/runtime failures; then execute the host against an immutable ERPm-BE snapshot to validate MSBuild feasibility.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
 - [ ] Implement the approved vertical slice incrementally in Go.
@@ -51,7 +53,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - Source inspection evidence: backend is a .NET 10 library invoked by a hard-coded ERPm CLI and writes local JSONL cache; frontend worker consumes a manifest on stdin and emits JSONL on stdout, but current runner performs validation/cache writing and frontend Program root is tied to erpm-fe.
 - Pinned ERPm-BE commit `235173fd193ae2fb60081fa4573434f5edd506f3` has root `ERPm.sln`, no nested gitlinks, no .gitattributes and pins .NET SDK 10.0.403 (`rollForward: latestPatch`).
 - `BackendRoslynIndexer` currently accumulates records in memory and stamps `GeneratedAtUtc`; output artifact hashes therefore bind one invocation and are not deterministic across retries. Canonical identity must exclude this timestamp.
-- No runtime build/test was run; no runtime implementation exists.
+- Initial runtime prototype is now present: `extractor-host` dispatches before `WorkspaceManifestReader`, validates the protocol request, reuses `BackendRoslynIndexer`, and writes `records.jsonl` plus a lineage/hash/count result manifest. Protocol unit tests have been added; CI has not yet verified this commit, and the host has not yet been run against the pinned immutable ERPm-BE snapshot.
 
 ## 6. Việc còn lại
 
@@ -59,11 +61,12 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
 - Validate capture manifest/materialization parity, read-only snapshot behavior and MSBuild writable workspace with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
-- Chờ user review slice boundary and host protocol; then run a focused .NET host + immutable snapshot feasibility spike before Go runtime foundation.
+- The user approved proceeding with the first-slice implementation. The first .NET host/protocol implementation and unit tests are in place; next verify CI, then run the host against the pinned immutable ERPm-BE snapshot and prove snapshot immutability/MSBuild deployment before beginning the Go Core foundation.
 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - CI baseline: [Run #1044](https://github.com/I3Solution/ERPm/actions/runs/43181828139), 5/5 jobs passed for commit `763d62ab26951708506a7823ccea51fc71e75967`; later snapshot-design commits are awaiting their own CI.
 - Ngày cập nhật cuối: 2026-11-12.
+- Implementation commit(s): host command/protocol, unit tests and README updates are on `loipham/phase0-workspace-boundary` / PR #70; CI verification pending.
 - Đây là design proposal; chưa có runtime implementation hoặc runtime verification.

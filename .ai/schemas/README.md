@@ -7,7 +7,10 @@ This directory contains machine-readable contract artifacts for the Enterprise K
 - `context-packet-v1.schema.json`: JSON Schema Draft 2020-12 for the immutable, task-scoped delivery packet.
 - `context-profile-v1.schema.json`: JSON Schema Draft 2020-12 for versioned selection, budget and lifecycle policy.
 - `retrieval-request-v1.schema.json`, `retrieval-result-v1.schema.json`, `retrieval-error-v1.schema.json`: machine-readable Retrieval request, successful result and failed outcome contracts.
-- `knowledge-record-v1.schema.json`, `evidence-v1.schema.json`, `knowledge-relation-v1.schema.json`, `source-revision-v1.schema.json`: initial Canonical Knowledge envelope and provenance schemas.
+- `knowledge-record-v1.schema.json`, `evidence-v1.schema.json`, `knowledge-relation-v1.schema.json`, `source-revision-v1.schema.json`: Canonical Knowledge envelope and provenance schemas.
+- `payloads/code-*-v1.schema.json`: typed v1 payload schemas for `code.file`, `code.symbol`, `code.reference_observation` and `code.api_observation`.
+- `examples/code-*-payload-valid-v1.json`: valid examples for the four typed Code payloads.
+- [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md): mapping and identity rules from immutable source-index v1/v2/v3 records.
 - `ingestion-profile-v1.schema.json`, `ingestion-run-v1.schema.json`, `publication-manifest-v1.schema.json`: initial IngestionProfile, durable IngestionRun and SourceRevision publication manifest contracts.
 - `examples/`: valid baseline examples used by automated tests.
 
@@ -20,6 +23,6 @@ python -m pip install jsonschema==4.25.1
 python -m unittest discover -s tests/context_contracts -v
 ```
 
-JSON Schema checks shape and local constraints. The test suite also checks cross-field semantic invariants that JSON Schema cannot fully express, including revision/evidence membership, token budget arithmetic, completeness counters and generated-summary lineage.
+JSON Schema checks shape and local constraints. The test suite also checks cross-field semantic invariants that JSON Schema cannot fully express, including revision/evidence membership, token budget arithmetic, completeness counters, generated-summary lineage, typed Code payload validation and per-payload logicalKey rules.
 
 Passing these checks does not prove authorization at runtime, source hash correctness, actual tokenizer accounting or safe delivery. Those require platform implementation and integration tests.

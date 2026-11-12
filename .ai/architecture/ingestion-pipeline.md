@@ -478,10 +478,10 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 
 - Queue/broker, worker runtime and scheduling technology.
 - Exact webhook signature scheme and replay-window storage.
-- Detailed stage checkpoint payload and large-revision chunk manifest.
-- Completeness metric vocabulary and per-source thresholds beyond the profile contract.
+- Physical chunking format, artifact retention and large-revision staging manifest implementation.
+- Completeness metric vocabulary and per-source thresholds beyond the generic manifest counters.
 - Projection schema/version registry and reindex orchestration.
-- Physical transaction/compare-and-swap implementation.
+- Storage-specific transaction/compare-and-swap implementation.
 
 The schemas are logical contracts and do not authorize a runtime or deployment choice.
 

@@ -26,7 +26,8 @@
 - [x] Xác định trách nhiệm ngôn ngữ theo bounded capability và nguyên tắc không rewrite existing indexers.
 - [x] Đề xuất process-isolated extension model và language-neutral contract/conformance requirements.
 - [x] Đề xuất repository layout tương lai, không tạo placeholder runtime directories.
-- [ ] User review/approval ADR trước khi xem đây là technology lock.
+- [x] Platform owner accepted direction on 2026-11-12: Go Core, Python specialized AI/ML Runtime, multilingual extensions, modular monolith first.
+- [ ] Review ADR details and validate operational boundaries/benchmark before runtime implementation.
 - [ ] Thiết kế benchmark/vertical-slice acceptance targets sau khi boundary được duyệt.
 - [ ] Triển khai runtime foundation theo vertical slice đã được phê duyệt.
 
@@ -45,7 +46,7 @@
 
 ## 6. Việc còn lại
 
-- Chờ user review/approval ADR.
+- Accepted language direction is recorded; detailed benchmark and runtime/extension protocol validation remain.
 - Chốt numeric benchmark workload/targets và vertical slice boundary trước runtime.
 
 ## 7. Evidence và cập nhật
@@ -53,4 +54,4 @@
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - CI baseline: [Run #1013](https://github.com/I3Solution/ERPm/actions/runs/43179810828), 5/5 jobs success cho commit 91147cda903f1d48cb2cef235dc52b842e2e5aec.
 - Ngày cập nhật cuối: 2026-11-12.
-- ADR là proposal; chưa có user approval cho technology lock hoặc runtime implementation.
+- Accepted direction is recorded; benchmark results, physical technology choices and first runtime slice remain unimplemented and unverified.

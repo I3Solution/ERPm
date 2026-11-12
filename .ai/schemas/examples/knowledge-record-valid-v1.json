@@ -1,0 +1,47 @@
+{
+  "contract": {
+    "name": "ekp.knowledge-record",
+    "version": "1.0"
+  },
+  "recordId": "record-code-symbol-001",
+  "logicalKey": "workspace-a:source-a:code.symbol:ExampleService",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "classification": {
+    "domain": "code",
+    "recordType": "code.symbol"
+  },
+  "claim": {
+    "kind": "deterministic_extraction",
+    "verification": "verified"
+  },
+  "payload": {
+    "type": "code.symbol",
+    "version": "1.0",
+    "data": {
+      "name": "ExampleService",
+      "language": "csharp"
+    }
+  },
+  "evidenceIds": [
+    "evidence-001"
+  ],
+  "provenance": {
+    "ingestionRunId": "run-001",
+    "producer": {
+      "connector": "git",
+      "connectorVersion": "1.0",
+      "extractor": "roslyn",
+      "extractorVersion": "1.0",
+      "normalizer": "ekp-code-normalizer",
+      "normalizerVersion": "1.0"
+    },
+    "inputSourceRevisionIds": [
+      "revision-001"
+    ]
+  },
+  "createdAtUtc": "2026-11-12T03:00:00Z"
+}

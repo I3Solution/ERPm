@@ -7,7 +7,7 @@
   "required": [
     "contract", "manifestId", "runId", "scope", "sourceId", "sourceRevisionId",
     "inputExtractionManifest", "inputProcessingManifests", "normalizer",
-    "canonicalContractVersion", "payloadSchemaVersions", "knowledgeRecordArtifacts",
+    "canonicalContractVersion", "payloadSchemaVersions", "payloadCounts", "knowledgeRecordArtifacts",
     "evidenceArtifacts", "relationArtifacts", "counts", "completedAtUtc"
   ],
   "properties": {

@@ -214,6 +214,35 @@ The Go Core derives counts/hashes from the artifact and compares them with the m
 
 
 
+### 10.5 Fit to the current .NET tool
+
+The existing `BackendRoslynIndexer.IndexAsync(repositoryPath, repositoryId, commitSha, cancellationToken)` already accepts an explicit repository path and revision identity. The first host can therefore reuse the analysis implementation without changing symbol/reference extraction semantics.
+
+The current `Program.cs` resolves `WorkspaceManifestReader.Read()` before command dispatch, so a generic host mode cannot simply reuse the current startup path. The implementation must route the new host command before loading the ERPm umbrella manifest:
+- add a dedicated protocol command/mode to the existing tool executable (or a small host entry point referencing the same indexer assembly);
+- deserialize and validate the versioned request;
+- invoke `BackendRoslynIndexer` with the supplied verified execution-workspace path and trusted repository/revision values;
+- write JSONL and result manifest to the caller-owned staging directory;
+- leave existing `workspace`, `index repo` and `find symbol` behavior backward-compatible.
+
+The preferred minimum change is a dedicated host command in the existing executable, not a second copy of Roslyn analysis code. A separate host project is justified only if dependency isolation or deployment testing demonstrates a concrete benefit.
+
+### 10.6 Host and capture conformance tests
+
+The first implementation must cover at least:
+1. valid request produces JSONL plus a manifest whose independently recomputed count, byte length and SHA-256 match;
+2. unsupported protocol/schema version is rejected;
+3. Source ID, SourceRevision ID, repository ID, full SHA and capture-manifest digest are echoed exactly and validated by Core;
+4. output path traversal/symlink escape and source path outside assigned mounts are rejected;
+5. mixed-revision records, malformed JSONL and unsupported source schema are rejected before normalization;
+6. non-zero exit, missing manifest, truncated output and digest/count mismatch leave staging quarantined;
+7. cancellation/timeout kills the complete host process tree and leaves no publishable artifact;
+8. read-only captured snapshot remains unchanged while MSBuild/NuGet/temp writes stay inside the isolated execution workspace;
+9. legacy local CLI commands continue to pass existing tests;
+10. retries may produce different artifact hashes because GeneratedAtUtc changes; the attempt artifact hash is integrity evidence, while canonical identity and source revision remain stable.
+
+Before enabling any network access for dependency restore, prove whether `MSBuildWorkspace.OpenSolutionAsync` requires restore for this solution and define an allowlisted, pinned dependency preparation step. The extractor process itself must not have unrestricted outbound network access.
+
 ## 11. Explicit exclusions
 
 - No vector/embedding provider or full-text vendor selection.

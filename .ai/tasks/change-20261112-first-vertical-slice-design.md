@@ -30,6 +30,7 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Inspect pinned ERPm-BE Git tree and SDK prerequisites: one root solution, no nested gitlinks, .NET SDK 10.0.403 pinned.
 - [x] Draft immutable Git capture and isolated writable build-workspace policy; captured snapshot remains read-only.
 - [x] Specify the minimum .NET host integration point: dispatch before WorkspaceManifestReader, reuse BackendRoslynIndexer, preserve legacy CLI behavior.
+- [x] Bind extractor result to the exact capture manifest ID/digest; host receives a writable execution copy, never the immutable snapshot mount.
 - [x] Define host/capture conformance tests for protocol, hashes, path isolation, revision lineage, cancellation, snapshot immutability and retries.
 - [ ] Review/approve host protocol and validate .NET/MSBuild deployment feasibility with an executable feasibility probe.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.

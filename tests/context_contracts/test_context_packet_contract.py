@@ -223,6 +223,9 @@ class CanonicalKnowledgeSchemaTests(unittest.TestCase):
 
     def test_logical_key_is_optional_for_observations_without_stable_identity(self):
         record = load_json(EXAMPLES / "knowledge-record-valid-v1.json")
+        record["logicalKey"] = "source-scoped-stable-identity"
+        validate_schema(record, SCHEMAS / "knowledge-record-v1.schema.json")
+
         record.pop("logicalKey")
         validate_schema(record, SCHEMAS / "knowledge-record-v1.schema.json")
 

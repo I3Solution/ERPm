@@ -276,12 +276,6 @@ class RetrievalContractSchemaTests(unittest.TestCase):
     def test_projection_reports_cover_each_selected_revision(self):
         result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
         report = next(item for item in result["methodReports"] if item["kind"] == "vector")
-        report["revisionStates"].append({
-            "sourceId": "source-b",
-            "sourceRevisionId": "revision-b",
-            "state": "pending",
-            "unavailableReason": "not_built"
-        })
         result["selectedRevisions"].append({
             "sourceId": "source-b",
             "sourceRevisionId": "revision-b",

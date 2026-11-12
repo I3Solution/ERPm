@@ -342,22 +342,22 @@ Existing schemas remain immutable source-extractor contracts:
 - Backend v2: .ai/code-index/schema/index-record-v2.schema.json.
 - Frontend v3: .ai/code-index/schema/index-record-v3.schema.json.
 
-Initial adapter direction:
+Initial adapter direction (the detailed rules are maintained in the [Code Index Adapter Contract](code-index-adapter-contract.md)):
 
 | Existing source record | Canonical representation |
 |---|---|
-| v1/v2 definition | code.symbol with language-specific symbol payload and Evidence |
-| v1/v2 reference | code.reference_observation; create a KnowledgeRelation only when source and target records are resolved and evidence supports the predicate |
-| v1/v2 project / dependency | typed code project/dependency payload or resolved relation after endpoints are registered |
-| v3 file / module | code.file / code.module |
-| v3 definition | code.symbol |
-| v3 reference / relationship | code.reference_observation; promote only verified resolved edges |
-| v3 angular | typed Angular component/service/guard/route observation payloads |
-| v3 api | code.api_observation with HTTP method and URL classification preserved |
+| Backend v1/v2 definition | `code.symbol`; v1 has no `symbolKind`, so preserve `unknown` |
+| Backend v1/v2 reference | `code.reference_observation`; promote only after both canonical endpoints and Evidence are verified |
+| Backend v1/v2 project / dependency | No mapping in the initial four payload types; preserve and report as unsupported |
+| Frontend v3 file | `code.file` |
+| Frontend v3 definition | `code.symbol` |
+| Frontend v3 reference / relationship (including import rows with `symbolKind: module`) | `code.reference_observation`; unresolved imports remain observations |
+| Frontend v3 api | `code.api_observation` with HTTP method and URL classification preserved |
+| Frontend v3 angular | No mapping in the initial four payload types; preserve and report as unsupported |
 
-The adapter preserves the original raw source record or a lossless reference to it for audit and reprocessing. It must not manufacture line offsets, resolve a dynamic API path by guessing, or convert unknown/partial observations into verified.
+The adapter preserves the original raw source record or a lossless reference to it for audit and reprocessing. It must not manufacture line offsets, resolve a dynamic API path by guessing, or convert unknown/partial observations into verified. It must not fabricate a backend file record from a symbol/reference row or infer a `code.module` payload from an import occurrence.
 
-No migration of existing caches is required for the first platform slice. Source indexers can continue emitting v1/v2/v3 while central ingestion adapters normalize them into the canonical contract.
+No migration of existing caches is required for the first platform slice. Source indexers can continue emitting v1/v2/v3 while central ingestion adapters normalize supported records into the canonical contract and report unsupported-kind coverage explicitly.
 
 ## 13. Validation requirements
 

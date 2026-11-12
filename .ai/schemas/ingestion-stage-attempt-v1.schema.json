@@ -121,7 +121,7 @@
       }
     },
     "skipReason": {
-      "enum": ["not_configured", "optional_stage_failure", "policy"]
+      "enum": ["optional_stage_failure", "policy"]
     },
     "nextRetryAtUtc": { "type": "string", "format": "date-time" },
     "startedAtUtc": { "type": "string", "format": "date-time" },
@@ -142,6 +142,19 @@
     {
       "if": { "properties": { "state": { "const": "skipped" } }, "required": ["state"] },
       "then": { "required": ["skipReason", "completedAtUtc"] }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": { "const": "skipped" },
+          "skipReason": { "const": "optional_stage_failure" }
+        },
+        "required": ["state", "skipReason"]
+      },
+      "then": {
+        "required": ["diagnostics"],
+        "properties": { "diagnostics": { "minItems": 1 } }
+      }
     },
     {
       "if": { "properties": { "state": { "const": "failed" } }, "required": ["state"] },

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.enterprise-knowledge-platform.invalid/context-profile/1.0",
+  "$id": "urn:ekp:context-profile:1.0",
   "title": "Enterprise Knowledge Platform Context Profile v1",
   "type": "object",
   "additionalProperties": false,

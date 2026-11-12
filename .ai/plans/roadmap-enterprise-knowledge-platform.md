@@ -67,8 +67,8 @@ Deliverables:
 - [ ] Tenant/workspace/project/source hierarchy and detailed isolation rules.
   - Core decision accepted by user on 2026-11-12: Knowledge Workspace is the primary isolation boundary; Project may only narrow access inside it.
   - Detailed Tenant/identity/ACL/source policy remains under review. See [Workspace Boundary](../architecture/workspace-boundary.md).
-- [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision machine-readable schemas and detailed payloads.
-  - Core v1 decisions accepted on 2026-11-12: split record/evidence/relation/revision, logicalKey policy, first four code payloads, defer cross-source derivation, and preserve processing history. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
+- [x] Canonical Knowledge Record, Evidence, Relation and Source Revision machine-readable schemas, plus the four initial Code payload schemas and identity rules.
+  - Core v1 decisions accepted on 2026-11-12. Payload schemas and the backend v1/v2 + frontend v3 adapter mapping contract are now documented and covered by CI tests; runtime adapter remains a Phase 2 deliverable. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
 - [ ] Connector vs extractor vs processor vs normalizer/validator/publisher machine-readable contracts.
   - Responsibilities and the six core Ingestion v1 decisions were accepted on 2026-11-12; detailed component schemas and operational protocol remain open. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - [x] Define Control Plane, Artifact Store, Canonical Knowledge Store, Search Projection Store, staging and cache responsibilities.
@@ -204,13 +204,13 @@ Deliverables:
 Do not begin another indexer feature or create a PR for EF metadata yet. First complete Phase 0 in this order:
 
 1. **Workspace boundary:** core isolation principle accepted; finish detailed Tenant, identity, role inheritance, project restriction and source ACL semantics using [Workspace Boundary](../architecture/workspace-boundary.md).
-2. **Canonical Knowledge Contract:** core v1 design decisions accepted; finalize wire-level envelope and the four initial code payload schemas using [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
+2. **Canonical Knowledge Contract:** core v1 decisions, shared envelope schemas, four Code payload schemas, payload identity rules and source-index adapter mapping design are now documented. Runtime adapter implementation belongs to Phase 2; see [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
 3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
 4. **Connector and ingestion contracts:** review [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md), then finalize trigger, request/run identity, validation, publication and failure semantics.
 5. **Storage boundary:** logical defaults are accepted in [Storage Boundary](../architecture/storage-boundary.md); build the two-Workspace benchmark and defer vendor/physical-topology decisions to technology ADRs.
 6. **Retrieval contract:** seven semantic defaults are accepted in [Retrieval Contract](../architecture/retrieval-contract.md); define machine-readable fields, errors, cursor semantics, protocol mapping and two-Workspace acceptance fixtures.
 7. **Context Packet:** semantic defaults are accepted in the [Context Packet Contract](../architecture/context-packet-contract.md); initial JSON Schema Draft 2020-12 files, valid examples and schema/semantic CI tests now exist for ContextPacket and ContextProfile. Adapter mappings and broader evaluation fixtures remain open.
-8. **Contract schemas and adapters:** define the remaining machine-readable Canonical Knowledge, Ingestion and Retrieval schemas; align all contracts and map them consistently to Query API, MCP and agent clients without dropping provenance.
+8. **Remaining contract schemas and adapters:** complete detailed Ingestion stage contracts and protocol mappings; implement and verify runtime adapters in Phase 2. Canonical Code payload schemas and source-index mapping design are complete, pending CI verification for this update.
 9. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
 10. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
 

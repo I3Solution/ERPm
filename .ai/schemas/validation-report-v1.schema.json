@@ -65,7 +65,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["metric", "numerator", "denominator", "actualRatio", "passed"],
+        "required": ["metric", "numerator", "denominator", "actualRatio", "minimumRatio", "passed"],
         "properties": {
           "metric": { "type": "string", "minLength": 1 },
           "numerator": { "type": "integer", "minimum": 0 },

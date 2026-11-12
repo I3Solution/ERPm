@@ -26,11 +26,21 @@ git -C "$source_root" ls-tree -r -z "$commit_sha" > "$capture_manifest"
 capture_sha256="$(sha256sum "$capture_manifest" | awk '{print $1}')"
 
 snapshot_digest() {
-  find "$snapshot" -type f -print0 |
-    sort -z |
-    xargs -0 sha256sum |
-    sha256sum |
-    awk '{print $1}'
+  python3 - "$snapshot" <<'PY'
+import hashlib
+import json
+import pathlib
+import sys
+
+root = pathlib.Path(sys.argv[1])
+entries = []
+for path in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
+    if path.is_file() and not path.is_symlink():
+        entries.append((path.relative_to(root).as_posix(),
+                        hashlib.sha256(path.read_bytes()).hexdigest()))
+encoded = json.dumps(entries, separators=(",", ":"), ensure_ascii=False).encode()
+print(hashlib.sha256(encoded).hexdigest())
+PY
 }
 
 snapshot_before="$(snapshot_digest)"
@@ -68,13 +78,19 @@ DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet run --no-build \
   --project "$repo_root/tools/ERPm.CodeIndex" -- extractor-host < "$request_file"
 popd >/dev/null
 
-python3 - "$output" "$commit_sha" "$snapshot_before" "$snapshot" <<'PY'
+snapshot_after="$(snapshot_digest)"
+if [[ "$snapshot_before" != "$snapshot_after" ]]; then
+  echo "Immutable snapshot content changed during extraction." >&2
+  exit 1
+fi
+
+python3 - "$output" "$commit_sha" <<'PY'
 import hashlib
 import json
 import pathlib
 import sys
 
-output, commit_sha, snapshot_before, snapshot = sys.argv[1:]
+output, commit_sha = sys.argv[1:]
 output_path = pathlib.Path(output)
 manifest = json.loads((output_path / "result-manifest.json").read_text(encoding="utf-8"))
 artifact_path = output_path / manifest["artifactFile"]
@@ -93,15 +109,6 @@ assert all(not pathlib.PurePosixPath(record["path"]).is_absolute()
            and ".." not in pathlib.PurePosixPath(record["path"]).parts
            for record in records)
 
-def digest_snapshot(root):
-    entries = []
-    for path in sorted(pathlib.Path(root).rglob("*")):
-        if path.is_file() and not path.is_symlink():
-            entries.append((path.relative_to(root).as_posix(),
-                            hashlib.sha256(path.read_bytes()).hexdigest()))
-    encoded = json.dumps(entries, separators=(",", ":"), ensure_ascii=False).encode()
-    return hashlib.sha256(encoded).hexdigest()
 
-assert digest_snapshot(snapshot) == snapshot_before, "Immutable snapshot content changed during extraction."
 print(f"Extractor host smoke passed: {len(records)} records, sha256={manifest['artifactSha256']}")
 PY

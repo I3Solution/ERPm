@@ -26,7 +26,8 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Xác định end-to-end flow và acceptance scenarios về revision, publication, ACL và client evidence.
 - [x] Ghi nhận discovery gates cho extractor invocation, immutable capture, submodule mapping và storage commit.
 - [x] Inspect actual backend/frontend extractor entry points and record current invocation/runtime constraints.
-- [ ] Select and specify a reusable external adapter host/protocol without changing extractor analysis semantics.
+- [x] Draft backend extractor-host process protocol v1: bounded JSON stdin request, immutable JSONL + result manifest artifacts, independent Go-side hash/schema/lineage verification.
+- [ ] Review/approve host protocol and validate .NET/MSBuild deployment feasibility.
 - [ ] Design frontend multi-repository output partitioning into separate registered SourceRevision runs.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
 - [ ] Implement the approved vertical slice incrementally in Go.
@@ -47,11 +48,11 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 
 ## 6. Việc còn lại
 
-- Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
+- Source inspection completed: backend Roslyn can be reused through a thin .NET host; current CLI itself is hard-coded to ERPm workspace/submodule/cache. Proposed host protocol is documented in section 9; it preserves existing Roslyn analysis and schema while returning run-scoped immutable artifacts. Frontend worker consumes manifest/stdin and emits JSONL/stdout but can emit records for nested repositories.
 - First executable slice is narrowed to one backend SourceRevision. Frontend integration must partition nested-repository output into independent SourceRevision ingestions; cross-source batch publication remains deferred.
 - Validate immutable snapshot and submodule handling with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
-- Chờ user review slice boundary trước khi tạo Go runtime foundation.
+- Chờ user review slice boundary and host protocol before creating Go runtime foundation.
 
 ## 7. Evidence và cập nhật
 

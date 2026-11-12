@@ -23,6 +23,21 @@ public sealed class ExtractorHostProtocolTests : IDisposable
     }
 
     [Fact]
+    public void Serializes_backend_records_using_camel_case_schema_fields()
+    {
+        var record = new IndexRecord(
+            2, "0.2.0", "erpm-be", new string("a"[0], 40), "src/Example.cs",
+            "definition", "class", "symbol:example", "Example", "global::Example",
+            "C#", 1, 5, null, null, null, null, "verified", DateTimeOffset.UtcNow);
+
+        using var document = JsonDocument.Parse(ExtractorHostProtocol.SerializeRecord(record));
+
+        Assert.True(document.RootElement.TryGetProperty("schemaVersion", out _));
+        Assert.True(document.RootElement.TryGetProperty("repositoryId", out _));
+        Assert.False(document.RootElement.TryGetProperty("SchemaVersion", out _));
+    }
+
+    [Fact]
     public void Accepts_a_valid_v1_request_and_normalizes_paths()
     {
         var validated = ExtractorHostProtocol.ValidateRequest(CreateRequest());

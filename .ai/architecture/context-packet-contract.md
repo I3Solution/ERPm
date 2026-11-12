@@ -258,16 +258,16 @@ Rules:
 13. Adapters preserve item types, source locators, revision identities, trust classes and notices.
 14. A packet can be rebuilt without mutating canonical KnowledgeRecord, Evidence, KnowledgeRelation or SourceRevision.
 
-## 14. Decisions for review
+## 14. Accepted v1 decisions
 
-The following defaults are proposed for v1; they should be accepted before freezing a machine-readable schema:
+> **Status:** The seven semantic defaults below were accepted by the user on 2026-11-12.
 
-1. **Packet scope:** exactly one Workspace and one bound principal/audience per packet.
-2. **Task boundary:** one packet per task/invocation; do not treat it as long-lived conversation memory.
-3. **Source content:** include bounded source excerpts/typed payload projections with mandatory Evidence; generated summaries are optional and always derived/untrusted.
-4. **Budget:** hard token ceiling includes metadata and content; preserve provenance/trust metadata and drop low-priority content before truncating evidence.
-5. **Tokenizer:** use the target model tokenizer when known; otherwise use a recorded conservative estimator and mark the count estimated.
-6. **Expiry/revocation:** short configurable TTL, principal/audience binding and authorization revalidation before delivery; do not promise recall of already delivered external content.
+1. **Packet scope:** exactly one Workspace and one bound principal/audience per packet. Cross-Workspace context requires separate packets and explicit caller-side orchestration.
+2. **Task boundary:** one packet per task/invocation; it is not long-lived conversation memory.
+3. **Source content:** include bounded source excerpts and typed payload projections with mandatory Evidence. Generated summaries are optional, derived and untrusted, with complete input lineage.
+4. **Budget:** enforce a hard token ceiling over metadata and content. Preserve provenance/trust metadata; remove low-priority optional items before shortening excerpts. Never silently truncate mandatory evidence or security metadata.
+5. **Tokenizer:** use the target model tokenizer when known; otherwise use a versioned conservative estimator and explicitly mark the count as estimated.
+6. **Expiry/revocation:** use a short configurable TTL, bind the packet to its principal/audience and revalidate authorization before delivery. Do not promise recall of content already delivered to an external recipient.
 7. **Conflicts and gaps:** represent unavailable methods, omissions, truncation, conflicts and uncertainty explicitly; never disguise them as complete context.
 
-After these semantic decisions are accepted, define the machine-readable packet schema, ContextProfile schema and adapter mappings. Do not choose an LLM or implement prompt rendering from this draft alone.
+These decisions freeze the semantic defaults for v1. The machine-readable ContextPacket and ContextProfile schemas, protocol adapter mappings and evaluation fixtures remain follow-up work. Do not choose an LLM or implement prompt rendering from this document alone.

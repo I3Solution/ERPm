@@ -29,6 +29,6 @@ python -m pip install jsonschema==4.25.1
 python -m unittest discover -s tests/context_contracts -v
 ```
 
-JSON Schema checks shape and local constraints. The test suite also checks cross-field semantic invariants that JSON Schema cannot fully express, including revision/evidence membership, token budget arithmetic, completeness counters, generated-summary lineage, typed Code payload validation, per-payload logicalKey rules, stage/output discriminator matching, checkpoint integrity, retry classification, manifest lineage, count reconciliation, completeness evaluation, projection profile/build/manifest/status consistency, publication binding and per-SourceRevision full-text/vector readiness.
+JSON Schema checks shape and local constraints. The test suite also checks cross-field semantic invariants that JSON Schema cannot fully express, including revision/evidence membership, token budget arithmetic, completeness counters, generated-summary lineage, typed Code payload validation, per-payload logicalKey rules, stage/output discriminator matching, checkpoint integrity, retry classification, manifest lineage, count reconciliation, completeness evaluation, projection profile/build/manifest/status consistency, exact publication ID/hash binding, publication generation isolation and per-SourceRevision full-text/vector readiness.
 
 Passing these checks does not prove authorization at runtime, source hash correctness, actual tokenizer accounting or safe delivery. Those require platform implementation and integration tests.

@@ -26,7 +26,12 @@ Thiết kế phải hỗ trợ Workspace isolation, provenance, immutable source
 - [x] Rà soát code index v1/v2/v3 và các invariant provenance hiện có.
 - [x] Đề xuất common envelope, typed payload families và workspace scope.
 - [x] Đề xuất Evidence, KnowledgeRelation, SourceRevision, provenance và versioning semantics.
-- [ ] Review và chốt envelope split, logicalKey policy, payload v1 scope, cross-source derivation và retention.
+- [x] Chốt envelope split thành KnowledgeRecord / Evidence / KnowledgeRelation / SourceRevision.
+- [x] Chốt logicalKey bắt buộc cho entity có identity ổn định; optional cho chunk/observation không có identity ổn định.
+- [x] Chốt payload v1 ban đầu: code.file, code.symbol, code.reference_observation, code.api_observation.
+- [x] Hoãn cross-source derived records; v1 tập trung single-source ingestion.
+- [x] Chốt không ghi đè lịch sử extraction/payload; retention duration và deletion obligations vẫn cần thiết kế.
+- [ ] Chốt wire-level schema, payload details và identity derivation rules.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -46,9 +51,9 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- Review các quyết định trong mục 14 của canonical-knowledge-contract.md.
-- Sau khi chốt, tạo machine-readable schema/fixtures và adapter contract.
-- Thiết kế vertical slice ingestion bằng Code Source trước; không migrate cache cũ hoặc thêm document/database extractors trước khi contract được chấp thuận.
+- Thiết kế machine-readable schema/fixtures và adapter contract cho 4 code payload đầu tiên.
+- Tiếp tục review các quyết định wire-level, ID/identity derivation và retention/deletion.
+- Kết nối contract với Connector/Extractor/Normalizer/Ingestion design; không migrate cache cũ hoặc thêm document/database extractors trước khi contract implementation được duyệt.
 
 ## 7. Evidence và cập nhật
 
@@ -56,4 +61,4 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - CI / workflow run và kết quả: CI tổng thể của PR đang chạy tại lần cập nhật cuối; chưa có kết luận PASS.
 - Tài liệu chính: .ai/architecture/canonical-knowledge-contract.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Đã draft contract; approval và implementation còn mở.
+- User đã chấp thuận 5 quyết định v1 ngày 2026-11-12. Contract draft và pipeline design đang được chuẩn bị để review; implementation còn mở.

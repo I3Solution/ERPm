@@ -16,8 +16,14 @@ public static class ExtractorHostProtocol
         WriteIndented = true
     };
 
+    private static readonly JsonSerializerOptions RecordJsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = false
+    };
+
     public static string SerializeRecord(IndexRecord record) =>
-        JsonSerializer.Serialize(record, JsonOptions);
+        JsonSerializer.Serialize(record, RecordJsonOptions);
 
     public static ExtractorHostRequest ValidateRequest(ExtractorHostRequest? request)
     {

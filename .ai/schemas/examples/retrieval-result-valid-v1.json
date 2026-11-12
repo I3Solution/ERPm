@@ -55,7 +55,9 @@
           "projectionManifestId": "projection-manifest-fts-a",
           "profileVersion": "1.0",
           "definitionFingerprint": "sha256:fts-definition",
-          "projectionVersion": "fts-v1"
+          "projectionVersion": "fts-v1",
+          "profileId": "code-fulltext-default",
+          "sourcePublicationManifestId": "manifest-a"
         }
       ],
       "coverage": [
@@ -81,7 +83,9 @@
           "projectionManifestId": "projection-manifest-vector-a",
           "profileVersion": "1.0",
           "definitionFingerprint": "sha256:vector-definition",
-          "projectionVersion": "embedding-v1"
+          "projectionVersion": "embedding-v1",
+          "profileId": "code-vector-default",
+          "sourcePublicationManifestId": "manifest-a"
         }
       ],
       "coverage": [

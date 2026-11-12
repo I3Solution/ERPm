@@ -29,7 +29,7 @@ Không triển khai API, database query, search engine, ranking model hoặc Con
 - [x] Xác định active/pinned SourceRevision selection và quy tắc published-only.
 - [x] Xác định retrieval methods, projection availability và partial-result semantics.
 - [x] Xác định result, Evidence, relation expansion, pagination, caching và diagnostics.
-- [ ] Review và chốt các default ở mục 14 của retrieval-contract.md.
+- [x] Review và chốt bảy default semantic ở mục 14 của retrieval-contract.md ngày 2026-11-12.
 - [ ] Chuyển hợp đồng đã chốt thành machine-readable schema và protocol mapping.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
@@ -52,14 +52,14 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- Review các quyết định đề xuất trong mục 14.
-- Sau khi chốt, xác định wire-level fields, error mapping, pagination token encoding và protocol adapters.
+- Xác định wire-level fields, error mapping, pagination token encoding và protocol adapters.
+- Tạo machine-readable acceptance fixtures và test dataset hai Workspace trước khi triển khai retrieval runtime.
 - Thiết kế Context Packet dựa trên Retrieval Result đã ổn định.
-- Tạo acceptance test dataset trước khi triển khai retrieval runtime.
 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - Tài liệu chính: .ai/architecture/retrieval-contract.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Đã tạo semantic draft; chưa có machine-readable schema hoặc runtime implementation.
+- Bảy default semantic Retrieval v1 đã được user chấp thuận ngày 2026-11-12.
+- Đã tạo semantic draft; machine-readable schema, protocol mapping và runtime implementation còn mở.

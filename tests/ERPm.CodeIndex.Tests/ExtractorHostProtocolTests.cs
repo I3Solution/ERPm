@@ -129,7 +129,11 @@ public sealed class ExtractorHostProtocolTests : IDisposable
             json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         Assert.NotNull(roundTrip);
-        Assert.Equal(manifest, roundTrip);
+        Assert.Equal(manifest.InvocationId, roundTrip.InvocationId);
+        Assert.Equal(manifest.ArtifactSha256, roundTrip.ArtifactSha256);
+        Assert.Equal(manifest.RecordCount, roundTrip.RecordCount);
+        Assert.Equal(manifest.CaptureManifestSha256, roundTrip.CaptureManifestSha256);
+        Assert.True(roundTrip.Completed);
     }
 
     private ExtractorHostRequest CreateRequest() => new()

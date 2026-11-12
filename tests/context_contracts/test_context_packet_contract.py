@@ -301,5 +301,37 @@ class CanonicalCrossRecordInvariantTests(unittest.TestCase):
                       validate_canonical_record_semantics(record, []))
 
 
+class IngestionContractSchemaTests(unittest.TestCase):
+    def test_valid_ingestion_profile_fixture(self):
+        profile = load_json(EXAMPLES / "ingestion-profile-valid-v1.json")
+        validate_schema(profile, SCHEMAS / "ingestion-profile-v1.schema.json")
+
+    def test_scheduled_trigger_is_not_supported_in_v1(self):
+        profile = load_json(EXAMPLES / "ingestion-profile-valid-v1.json")
+        profile["triggers"].append("schedule")
+        with self.assertRaises(ValidationError):
+            validate_schema(profile, SCHEMAS / "ingestion-profile-v1.schema.json")
+
+    def test_valid_ingestion_run_fixture(self):
+        run = load_json(EXAMPLES / "ingestion-run-valid-v1.json")
+        validate_schema(run, SCHEMAS / "ingestion-run-v1.schema.json")
+
+    def test_ingestion_run_uses_one_durable_run_identity(self):
+        run = load_json(EXAMPLES / "ingestion-run-valid-v1.json")
+        self.assertTrue(run["runId"])
+        self.assertTrue(run["logicalRunKey"])
+        self.assertNotIn("ingestionRequestId", run)
+
+    def test_valid_publication_manifest_fixture(self):
+        manifest = load_json(EXAMPLES / "publication-manifest-valid-v1.json")
+        validate_schema(manifest, SCHEMAS / "publication-manifest-v1.schema.json")
+
+    def test_publication_manifest_rejects_non_published_state(self):
+        manifest = load_json(EXAMPLES / "publication-manifest-valid-v1.json")
+        manifest["status"] = "staging"
+        with self.assertRaises(ValidationError):
+            validate_schema(manifest, SCHEMAS / "publication-manifest-v1.schema.json")
+
+
 if __name__ == "__main__":
     unittest.main()

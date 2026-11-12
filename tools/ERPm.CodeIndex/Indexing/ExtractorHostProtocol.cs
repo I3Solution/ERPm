@@ -49,9 +49,10 @@ public static class ExtractorHostProtocol
             throw new InvalidDataException("captureManifestSha256 must be a 64-character SHA-256 digest.");
         }
 
-        if (request.SourceSchemaVersion < 1)
+        if (request.SourceSchemaVersion != BackendRoslynIndexer.SchemaVersion)
         {
-            throw new InvalidDataException("sourceSchemaVersion must be greater than zero.");
+            throw new InvalidDataException(
+                "Unsupported backend source schema version. Expected " + BackendRoslynIndexer.SchemaVersion + ".");
         }
 
         var workspaceRoot = Path.GetFullPath(request.ExecutionWorkspaceRoot);

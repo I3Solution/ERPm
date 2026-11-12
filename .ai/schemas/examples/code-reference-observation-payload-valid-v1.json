@@ -1,0 +1,16 @@
+{
+  "type": "code.reference_observation",
+  "version": "1.0",
+  "data": {
+    "sourceRecordKind": "relationship",
+    "name": "./app.component",
+    "qualifiedName": null,
+    "language": "typescript",
+    "targetSymbolKind": "module",
+    "sourceSymbolId": "file:erpm-fe:src/app/app.module.ts",
+    "sourceSymbolKind": null,
+    "targetSymbolId": null,
+    "relation": "imports",
+    "targetResolution": "unresolved"
+  }
+}

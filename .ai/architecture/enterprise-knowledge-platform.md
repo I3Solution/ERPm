@@ -188,7 +188,7 @@ A Context Packet should be machine-readable and include:
 - Token/size budget and truncation notes.
 - Unresolved questions or missing evidence.
 
-The packet must preserve enough information for an agent or developer to open and verify the original source. It must not present generated summaries as authoritative source facts.
+The packet must preserve enough information for an agent or developer to open and verify the original source. It must not present generated summaries as authoritative source facts. Every factual item must retain SourceRevision and Evidence lineage, and captured source/derived text must remain labeled as untrusted data rather than agent instructions. See [Context Packet Contract](context-packet-contract.md) for the v1 envelope, item kinds, trust labels, token budget, truncation, lifecycle and acceptance semantics.
 
 ## 11. Security, governance and operations
 

@@ -190,10 +190,10 @@ def validate_retrieval_result_semantics(result: dict) -> list[str]:
         if len(available_keys) == len(selected):
             if report["state"] != "available":
                 errors.append(f"{report['kind']}: all ready revisions require available method state")
-        elif available_keys:
+        elif len({item["state"] for item in revision_states}) > 1:
             if report["state"] != "partial":
-                errors.append(f"{report['kind']}: mixed readiness requires partial method state")
-        elif revision_states and len({item["state"] for item in revision_states}) == 1:
+                errors.append(f"{report['kind']}: heterogeneous readiness requires partial method state")
+        elif revision_states:
             only_state = revision_states[0]["state"]
             if report["state"] != only_state:
                 errors.append(f"{report['kind']}: aggregate state differs from per-revision status")

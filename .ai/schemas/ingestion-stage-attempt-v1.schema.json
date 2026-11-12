@@ -155,6 +155,15 @@
       "then": { "required": ["completedAtUtc"] }
     },
     {
+      "if": {
+        "properties": { "state": { "enum": ["started", "failed", "retry_wait", "skipped", "canceled"] } },
+        "required": ["state"]
+      },
+      "then": {
+        "not": { "anyOf": [{ "required": ["outputManifest"] }, { "required": ["checkpoint"] }] }
+      }
+    },
+    {
       "if": { "properties": { "stage": { "const": "connector.capture" } }, "required": ["stage"] },
       "then": {
         "properties": {

@@ -135,7 +135,7 @@ public sealed class ExtractorHostProtocolTests : IDisposable
         Directory.CreateDirectory(_output);
         var artifactPath = Path.Combine(_output, ExtractorHostProtocol.ArtifactFileName);
         var artifact = "{\"kind\":\"code.file\"}\n{\"kind\":\"code.symbol\"}\n";
-        await File.WriteAllTextAsync(artifactPath, artifact, Encoding.UTF8);
+        await File.WriteAllTextAsync(artifactPath, artifact, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
         var request = ExtractorHostProtocol.ValidateRequest(CreateRequest());
         var manifest = await ExtractorHostProtocol.CreateResultManifestAsync(

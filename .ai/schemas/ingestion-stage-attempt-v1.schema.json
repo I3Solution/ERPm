@@ -145,11 +145,62 @@
     },
     {
       "if": { "properties": { "state": { "const": "failed" } }, "required": ["state"] },
-      "then": { "required": ["diagnostics", "completedAtUtc"] }
+      "then": {
+        "required": ["diagnostics", "completedAtUtc"],
+        "properties": { "diagnostics": { "minItems": 1 } }
+      }
     },
     {
       "if": { "properties": { "state": { "const": "canceled" } }, "required": ["state"] },
       "then": { "required": ["completedAtUtc"] }
+    }
+    {
+      "if": { "properties": { "stage": { "const": "connector.capture" } }, "required": ["stage"] },
+      "then": {
+        "properties": {
+          "outputManifest": { "properties": { "contract": { "const": "ekp.source-capture-manifest/1.0" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "extractor.extract" } }, "required": ["stage"] },
+      "then": {
+        "properties": {
+          "outputManifest": { "properties": { "contract": { "const": "ekp.extraction-manifest/1.0" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "processor.process" } }, "required": ["stage"] },
+      "then": {
+        "properties": {
+          "outputManifest": { "properties": { "contract": { "const": "ekp.processing-manifest/1.0" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "normalizer.normalize" } }, "required": ["stage"] },
+      "then": {
+        "properties": {
+          "outputManifest": { "properties": { "contract": { "const": "ekp.normalization-manifest/1.0" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "validator.validate" } }, "required": ["stage"] },
+      "then": {
+        "properties": {
+          "outputManifest": { "properties": { "contract": { "const": "ekp.validation-report/1.0" } } }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "publisher.publish" } }, "required": ["stage"] },
+      "then": {
+        "properties": {
+          "outputManifest": { "properties": { "contract": { "const": "ekp.publication-manifest/1.0" } } }
+        }
+      }
     }
   ]
 }

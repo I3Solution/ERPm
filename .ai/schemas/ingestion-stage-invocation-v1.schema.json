@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:ingestion-stage-invocation:1.0",
+  "title": "Enterprise Knowledge Platform IngestionStageInvocation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "invocationId", "runId", "scope", "source", "sourceRevision",
+    "stage", "component", "profile", "attemptNumber", "inputArtifacts",
+    "inputFingerprint", "idempotencyKey", "outputContract",
+    "requestedAtUtc", "deadlineAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "ekp.ingestion-stage-invocation" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "invocationId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId"],
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 1 },
+        "workspaceId": { "type": "string", "minLength": 1 },
+        "projectId": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceId"],
+      "properties": {
+        "sourceId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "sourceRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceRevisionId", "revisionKind", "revisionKey"],
+      "properties": {
+        "sourceRevisionId": { "type": "string", "minLength": 1 },
+        "revisionKind": { "type": "string", "minLength": 1 },
+        "revisionKey": { "type": "string", "minLength": 1 },
+        "contentHash": { "type": "string", "minLength": 1 }
+      }
+    },
+    "stage": {
+      "enum": [
+        "connector.capture",
+        "extractor.extract",
+        "processor.process",
+        "normalizer.normalize",
+        "validator.validate",
+        "publisher.publish"
+      ]
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "version"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "ordinal": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profileId", "version"],
+      "properties": {
+        "profileId": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "attemptNumber": { "type": "integer", "minimum": 1 },
+    "inputArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifactId", "role", "storageRef", "mediaType", "contentHash", "byteLength"],
+        "properties": {
+          "artifactId": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 },
+          "storageRef": { "type": "string", "minLength": 1 },
+          "mediaType": { "type": "string", "minLength": 1 },
+          "contentHash": { "type": "string", "minLength": 1 },
+          "byteLength": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "inputFingerprint": { "type": "string", "minLength": 1 },
+    "idempotencyKey": { "type": "string", "minLength": 1 },
+    "outputContract": {
+      "enum": [
+        "ekp.source-capture-manifest/1.0",
+        "ekp.extraction-manifest/1.0",
+        "ekp.processing-manifest/1.0",
+        "ekp.normalization-manifest/1.0",
+        "ekp.validation-report/1.0",
+        "ekp.publication-manifest/1.0"
+      ]
+    },
+    "resumeFromCheckpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkpointId", "outputManifestId", "outputContentHash"],
+      "properties": {
+        "checkpointId": { "type": "string", "minLength": 1 },
+        "outputManifestId": { "type": "string", "minLength": 1 },
+        "outputContentHash": { "type": "string", "minLength": 1 }
+      }
+    },
+    "requestedAtUtc": { "type": "string", "format": "date-time" },
+    "deadlineAtUtc": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "stage": { "const": "connector.capture" } }, "required": ["stage"] },
+      "then": { "properties": { "outputContract": { "const": "ekp.source-capture-manifest/1.0" } } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "extractor.extract" } }, "required": ["stage"] },
+      "then": { "properties": { "outputContract": { "const": "ekp.extraction-manifest/1.0" } } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "processor.process" } }, "required": ["stage"] },
+      "then": { "properties": { "outputContract": { "const": "ekp.processing-manifest/1.0" } } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "normalizer.normalize" } }, "required": ["stage"] },
+      "then": { "properties": { "outputContract": { "const": "ekp.normalization-manifest/1.0" } } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "validator.validate" } }, "required": ["stage"] },
+      "then": { "properties": { "outputContract": { "const": "ekp.validation-report/1.0" } } }
+    },
+    {
+      "if": { "properties": { "stage": { "const": "publisher.publish" } }, "required": ["stage"] },
+      "then": { "properties": { "outputContract": { "const": "ekp.publication-manifest/1.0" } } }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "contract": {
+    "name": "ekp.ingestion-stage-invocation",
+    "version": "1.0"
+  },
+  "invocationId": "invocation-extract-001",
+  "runId": "run-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "source": {
+    "sourceId": "source-a"
+  },
+  "sourceRevision": {
+    "sourceRevisionId": "revision-001",
+    "revisionKind": "git_commit",
+    "revisionKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "contentHash": "sha256:source-snapshot"
+  },
+  "stage": "extractor.extract",
+  "component": {
+    "type": "erp-code-index-adapter",
+    "version": "1.0"
+  },
+  "profile": {
+    "profileId": "git-code-default",
+    "version": "1.0"
+  },
+  "attemptNumber": 1,
+  "inputArtifacts": [
+    {
+      "artifactId": "artifact-source-001",
+      "role": "captured_source_snapshot",
+      "storageRef": "artifact://source-a/revision-001/snapshot",
+      "mediaType": "application/vnd.ekp.source-snapshot",
+      "contentHash": "sha256:source-snapshot",
+      "byteLength": 1024
+    }
+  ],
+  "inputFingerprint": "sha256:extract-input-fingerprint",
+  "idempotencyKey": "sha256:extract-stage-key",
+  "outputContract": "ekp.extraction-manifest/1.0",
+  "requestedAtUtc": "2026-11-12T04:00:00Z",
+  "deadlineAtUtc": "2026-11-12T04:15:00Z"
+}

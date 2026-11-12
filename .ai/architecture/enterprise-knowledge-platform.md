@@ -136,7 +136,7 @@ Keep logical storage responsibilities separate even if the first deployment uses
 - **Search plane:** full-text and vector representations with workspace, revision and ACL filters.
 - **Relationship retrieval:** initially may use relational/structured edges; introduce a dedicated graph database only when measured query needs justify it.
 
-The detailed logical ownership, publication-consistency and retention boundaries are proposed in [Storage Boundary](storage-boundary.md). This is a logical separation only: v1 may consolidate Control Plane and Canonical Knowledge Store in one relational technology if benchmarks and isolation controls support it.
+The detailed logical ownership, publication-consistency and retention boundaries are defined in [Storage Boundary](storage-boundary.md). The accepted v1 default is one relational deployment for Control Plane + Canonical Knowledge Store with separate logical modules/schemas; full-text and vector remain separate logical adapters and may share a search engine only after benchmark validation. Git sources retain exact SHA/hash provenance, with immutable archive capture when replay or retention policy requires it.
 
 A prior technology direction discussed for evaluation is PostgreSQL for control metadata, OpenSearch for full-text/vector search, Haystack for retrieval pipelines, and Go for MCP services. Treat these as candidate/previously discussed choices, not final locked decisions. Validate operational fit, deployment constraints, connector needs and retrieval benchmarks before committing.
 
@@ -173,6 +173,8 @@ Use:
 - Reranking to prioritize evidence, not to invent missing relationships.
 
 Vector search is one retrieval method, not the knowledge model and not the only source of truth.
+
+The request/result semantics are being specified separately in [Retrieval Contract](retrieval-contract.md). Retrieval must preserve the Workspace isolation boundary, select only committed SourceRevision manifests, enforce effective Project/Source ACL before exposing candidates, and report when a search projection is unavailable rather than treating its absence as proof that no knowledge exists.
 
 ## 10. Context Packet contract
 

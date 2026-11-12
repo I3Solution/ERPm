@@ -84,13 +84,13 @@ if [[ "$snapshot_before" != "$snapshot_after" ]]; then
   exit 1
 fi
 
-python3 - "$output" "$commit_sha" <<'PY'
+python3 - "$output" "$commit_sha" "$tree_id" "$capture_sha256" <<'PY'
 import hashlib
 import json
 import pathlib
 import sys
 
-output, commit_sha = sys.argv[1:]
+output, commit_sha, tree_id, capture_sha256 = sys.argv[1:]
 output_path = pathlib.Path(output)
 manifest = json.loads((output_path / "result-manifest.json").read_text(encoding="utf-8"))
 artifact_path = output_path / manifest["artifactFile"]
@@ -98,7 +98,18 @@ artifact = artifact_path.read_bytes()
 records = [json.loads(line) for line in artifact.splitlines() if line]
 
 assert manifest["completed"] is True
+assert manifest["protocolVersion"] == 1
+assert manifest["sourceId"] == "ci-source-erpm-be"
+assert manifest["sourceRevisionId"] == "ci-revision-" + commit_sha
+assert manifest["repositoryId"] == "erpm-be"
 assert manifest["commitSha"] == commit_sha
+assert manifest["treeId"] == tree_id
+assert manifest["captureManifestId"] == "ci-git-tree-" + commit_sha
+assert manifest["captureManifestSha256"] == capture_sha256
+assert manifest["extractorId"] == "roslyn-backend"
+assert manifest["extractorVersion"] == "0.1.0"
+assert manifest["sourceSchemaVersion"] == 2
+assert manifest["artifactFile"] == "records.jsonl"
 assert manifest["recordCount"] == len(records) > 0
 assert manifest["artifactBytes"] == len(artifact)
 assert manifest["artifactSha256"] == hashlib.sha256(artifact).hexdigest()

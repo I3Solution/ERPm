@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime
 from pathlib import Path
 
-from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema import Draft202012Validator, FormatChecker, ValidationError
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMAS = ROOT / ".ai" / "schemas"
@@ -104,7 +104,7 @@ class ContextPacketSchemaTests(unittest.TestCase):
     def test_packet_rejects_missing_evidence(self):
         packet = load_json(EXAMPLES / "context-packet-valid-v1.json")
         packet["items"][0]["provenance"]["evidence"] = []
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValidationError):
             validate_schema(packet, SCHEMAS / "context-packet-v1.schema.json")
 
     def test_packet_rejects_unknown_item_kind(self):

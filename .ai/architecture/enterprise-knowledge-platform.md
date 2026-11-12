@@ -214,6 +214,10 @@ Already implemented in the ERPm umbrella repository:
 
 These are the first **Code Knowledge connector/extractor family** for the platform. They are not yet a centralized knowledge service.
 
+## 12.1 First implementation vertical slice
+
+The proposed first end-to-end implementation path is documented in [First Vertical Slice](first-vertical-slice.md). It uses ERPm only as a pilot Git source while keeping Core contracts platform-neutral: immutable revision capture → existing code extractors → canonical adapter → validation → whole-SourceRevision publication → Workspace-scoped structured retrieval. The first Core is a Go modular monolith; existing Roslyn/TypeScript extractors remain unchanged. Extractor invocation details must be discovered from source before selecting an adapter transport or creating runtime scaffolding.
+
 ## 13. Explicit non-goals for the first platform increment
 
 - Do not rewrite existing indexers merely to rename them as platform services.

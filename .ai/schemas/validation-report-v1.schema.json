@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:validation-report:1.0",
+  "title": "Enterprise Knowledge Platform ValidationReport v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "reportId", "runId", "scope", "sourceId", "sourceRevisionId",
+    "inputNormalizationManifest", "outcome", "publicationEligible",
+    "counts", "completenessEvaluations", "violations", "validatedAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "ekp.validation-report" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "reportId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId"],
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 1 },
+        "workspaceId": { "type": "string", "minLength": 1 },
+        "projectId": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "sourceId": { "type": "string", "minLength": 1 },
+    "sourceRevisionId": { "type": "string", "minLength": 1 },
+    "inputNormalizationManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestId", "contentHash"],
+      "properties": {
+        "manifestId": { "type": "string", "minLength": 1 },
+        "contentHash": { "type": "string", "minLength": 1 }
+      }
+    },
+    "outcome": { "enum": ["passed", "passed_with_warnings", "blocked"] },
+    "publicationEligible": { "type": "boolean" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acceptedRecords", "rejectedRecords", "acceptedEvidence",
+        "rejectedEvidence", "acceptedRelations", "rejectedRelations"
+      ],
+      "properties": {
+        "acceptedRecords": { "type": "integer", "minimum": 0 },
+        "rejectedRecords": { "type": "integer", "minimum": 0 },
+        "acceptedEvidence": { "type": "integer", "minimum": 0 },
+        "rejectedEvidence": { "type": "integer", "minimum": 0 },
+        "acceptedRelations": { "type": "integer", "minimum": 0 },
+        "rejectedRelations": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "completenessEvaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric", "numerator", "denominator", "actualRatio", "passed"],
+        "properties": {
+          "metric": { "type": "string", "minLength": 1 },
+          "numerator": { "type": "integer", "minimum": 0 },
+          "denominator": { "type": "integer", "minimum": 1 },
+          "actualRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+          "minimumRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+          "passed": { "type": "boolean" }
+        }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "category", "affectedCount", "summary"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "severity": { "enum": ["warning", "error", "fatal"] },
+          "category": {
+            "enum": [
+              "schema", "ownership", "revision", "provenance",
+              "identity", "relationship", "completeness", "integrity"
+            ]
+          },
+          "affectedCount": { "type": "integer", "minimum": 0 },
+          "itemReference": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "validatedAtUtc": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "outcome": { "const": "blocked" } }, "required": ["outcome"] },
+      "then": {
+        "properties": { "publicationEligible": { "const": false } }
+      },
+      "else": {
+        "properties": { "publicationEligible": { "const": true } }
+      }
+    }
+  ]
+}

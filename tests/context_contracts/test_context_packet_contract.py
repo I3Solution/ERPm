@@ -623,6 +623,8 @@ class IngestionStageContractSchemaTests(unittest.TestCase):
         attempt["state"] = "skipped"
         attempt["skipReason"] = "optional_stage_failure"
         attempt["completedAtUtc"] = "2026-11-12T04:04:00Z"
+        attempt.pop("outputManifest")
+        attempt.pop("checkpoint")
         with self.assertRaises(ValidationError):
             validate_schema(attempt, SCHEMAS / "ingestion-stage-attempt-v1.schema.json")
 

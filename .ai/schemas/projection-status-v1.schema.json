@@ -278,7 +278,10 @@
           "required": [
             "projectionManifest"
           ]
-        }
+        },
+        "required": [
+          "unavailableReason"
+        ]
       }
     },
     {
@@ -344,7 +347,8 @@
       },
       "then": {
         "required": [
-          "latestProjectionRun"
+          "latestProjectionRun",
+          "unavailableReason"
         ],
         "properties": {
           "unavailableReason": {
@@ -376,7 +380,8 @@
       },
       "then": {
         "required": [
-          "projectionManifest"
+          "projectionManifest",
+          "unavailableReason"
         ],
         "properties": {
           "unavailableReason": {

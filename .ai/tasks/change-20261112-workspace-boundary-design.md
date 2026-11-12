@@ -25,8 +25,10 @@ Thiết kế phải phân biệt rõ khái niệm Knowledge Workspace của nề
 - [x] Rà soát metadata hiện tại và phân biệt Agent Workspace Context với Knowledge Workspace.
 - [x] Đề xuất hierarchy, ownership và quan hệ Tenant → Workspace → Project → Source.
 - [x] Đề xuất identity, authorization inheritance, source ACL mode và isolation requirements.
+- [x] Bổ sung capability matrix tối thiểu cho role bundles, tách quyền quản trị, ingestion và content read; ghi rõ deny precedence, restricted Project và service-account scope.
 - [x] Chốt nguyên tắc chính: Knowledge Workspace là ranh giới cô lập dữ liệu; Project chỉ thu hẹp quyền bên trong Workspace.
 - [ ] Review và chốt các quyết định chi tiết còn mở về Tenant, quyền kế thừa, source ACL, identity và lifecycle.
+- [ ] Review proposed capability matrix; chưa coi role/action mapping là quyết định đã được user phê duyệt.
 
 Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -58,3 +60,4 @@ Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope t
 - Tài liệu chính: .ai/architecture/workspace-boundary.md.
 - Ngày cập nhật cuối: 2026-11-12.
 - Đã draft thiết kế; việc review/approval vẫn còn mở.
+- Bổ sung proposed v1 capability matrix: admin roles không tự động có quyền đọc knowledge; workspace/project reader và contributor tách biệt; restricted Project cần grant riêng; source ACL chỉ thu hẹp quyền; deny ưu tiên allow.

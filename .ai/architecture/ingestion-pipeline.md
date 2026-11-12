@@ -486,6 +486,74 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 The schemas are logical contracts and do not authorize a runtime or deployment choice.
 
 
+## 19. Proposed source-family completeness metric vocabulary
+
+> **Status:** Proposed vocabulary for review; no source-family thresholds or payload requirements are approved by this section.
+> **Purpose:** make partial extraction measurable without confusing output volume, source freshness, evidence quality or ingestion success.
+
+### 19.1 Metric record semantics
+
+A completeness metric is a named, versioned measurement over an explicitly defined population. Its stable name identifies the numerator and denominator meaning; the profile pins which metrics are required and the applicable threshold.
+
+Every evaluated metric must satisfy these rules:
+
+1. Numerator and denominator count the same unit and population. Do not divide extracted files by discovered symbols, or accepted records by source bytes.
+2. The denominator must be derived from a documented population source: an authoritative connector enumeration, a deterministic structural count, or an explicitly declared estimate.
+3. Required publication gates must use exact/authoritative or deterministic denominators. Estimated denominators may be diagnostic only unless a reviewed source-family policy explicitly permits them.
+4. Report unsupported, excluded, failed and intentionally skipped items separately. Unsupported content is not silently removed from the denominator.
+5. A zero-item source is not represented as a fabricated 100% ratio. It requires an explicit empty-source policy and a separate minimum-item/empty-allowed decision. A required metric with no evaluable denominator is indeterminate and cannot silently pass.
+6. Ratios are bounded to [0, 1], counts are non-negative integers, and the evaluated numerator cannot exceed its denominator unless the metric definition explicitly uses a different unit.
+7. Completeness is distinct from correctness/verification confidence. A 100% extraction ratio does not prove that extracted claims are correct.
+8. Metric definitions and denominator rules are versioned. Changing the population definition or numerator semantics requires a metric definition version change and profile review.
+
+### 19.2 Common metric families
+
+| Stable metric name | Numerator / denominator | Typical stage | Meaning |
+|---|---|---|---|
+| `capture.items` | captured eligible source items / enumerated eligible source items | Connector | Whether all expected source items were captured |
+| `capture.bytes` | captured bytes / expected bytes | Connector | Byte-level capture completeness when the source provides an authoritative expected size |
+| `extract.items_supported` | successfully extracted supported items / captured items eligible for this extractor | Extractor | Coverage of supported input items |
+| `extract.observations` | emitted observations / expected observations | Extractor | Use only when the source can provide a deterministic expected observation population |
+| `normalize.items` | source observations mapped to canonical records or explicitly classified observations / normalizable observations | Normalizer | Whether normalizable observations were accounted for |
+| `validate.records_accepted` | accepted canonical records / normalized candidate records | Validator | Acceptance ratio after schema and semantic validation |
+| `validate.evidence_coverage` | accepted records with at least one valid Evidence / accepted records requiring Evidence | Validator | Evidence attachment coverage |
+| `validate.relations_resolved` | resolved, evidence-backed relations / resolvable relation candidates | Validator | Relationship resolution coverage; normally diagnostic unless the source profile requires it |
+
+These names are a shared vocabulary, not a universal requirement that every source family emits every metric. A profile must select only metrics whose populations can be measured reliably.
+
+### 19.3 Source-family metric profiles
+
+| Source family | Candidate required metrics | Candidate diagnostic metrics | Denominator guidance |
+|---|---|---|---|
+| Git repository/code | `capture.items`, `extract.items_supported`, `validate.evidence_coverage` | unsupported file count, parse failures by language, symbol/reference counts | Use the captured tree/file manifest as the item population; distinguish excluded files by explicit policy from failed capture |
+| Document collection | `capture.items`, `extract.items_supported`, `validate.evidence_coverage` | pages/sections parsed, OCR use/failures, unsupported format count, empty document count | Use the connector's enumerated document/version manifest; page count is a separate unit from document count |
+| Database metadata | `capture.items`, `extract.items_supported`, `validate.evidence_coverage` | tables/views/columns/constraints parsed, unsupported object types, permission-denied objects | Use an authoritative schema catalog/export snapshot and report permission-filtered objects separately |
+| Git history / issue tracker | `capture.items` | commits/PRs/issues captured, comments/attachments omitted, rate-limit truncation | Use the exact bounded time/cursor/revision window and record pagination completion |
+| Business knowledge | Profile-specific; require explicit enumerated source scope and evidence coverage | documents/sections/terms/rules parsed, unresolved references | Do not claim completeness without a source-owned inventory or a declared bounded collection |
+
+A metric may be required for one source profile and diagnostic for another. The profile must also classify source item types as mandatory, optional, excluded-by-policy or unsupported. Mandatory items cannot be converted into optional warnings by an extractor response.
+
+### 19.4 Publication decision rules
+
+- A missing mandatory item, incomplete authoritative enumeration, capture inconsistency or failed required stage blocks publication regardless of aggregate ratio.
+- Optional omissions may produce `passed_with_warnings` only when every required metric passes, every omitted item is classified and reported, and the pinned profile allows that warning category.
+- An unsupported item can be optional only when the source profile explicitly classifies its type as optional/excluded; the extractor cannot self-declare mandatory data optional.
+- A high aggregate ratio must never compensate for a failed mandatory item class or a missing required stage.
+- Empty-source publication is allowed only when the profile explicitly allows empty revisions and the connector proves the source enumeration completed successfully with zero eligible items.
+- Source freshness, retrieval projection readiness and record verification confidence remain separate dimensions; they are not folded into completeness ratios.
+
+### 19.5 Current schema gap and follow-up
+
+The initial IngestionProfile v1 and ValidationReport v1 schemas carry required metric names, aggregate minimum coverage and numerator/denominator/ratio/pass values. They do not yet encode per-metric thresholds, denominator provenance/quality, item-class mandatory status or an explicit indeterminate/empty-population result.
+
+Before finalizing machine-readable source-family profiles, review whether v1 should add:
+- per-metric policy entries (required/optional, minimum ratio and optional minimum count);
+- denominator basis/quality and population description;
+- source item-class disposition (mandatory, optional, excluded-by-policy, unsupported);
+- explicit empty-source permission and an indeterminate evaluation state.
+
+Do not silently reinterpret existing v1 fields to carry these additional semantics. Any schema change must preserve current fixtures/consumers or use an explicit contract versioning decision.
+
 ## 18. Proposed Stage I/O, attempt, checkpoint and retry contracts v1
 
 > **Status:** Machine-readable design draft added on 2026-11-12; detailed stage semantics are proposed for review and are not yet marked user-approved.  

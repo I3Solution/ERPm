@@ -68,7 +68,7 @@ Source registration / webhook / schedule / manual trigger
                          v
                Retrieval / Search projections
 
-Search projection building may execute as a post-publication stage or as a required pre-publication stage according to source policy. A revision must not be marked query-ready until every stage declared mandatory by that source's ingestion profile is complete.
+Search projection building is a separate asynchronous lifecycle after canonical publication. A SourceRevision becomes knowledge-ready for structured retrieval when its canonical publication manifest is committed; full-text/vector availability is reported independently by each projection.
 
 ## 3. Component responsibility boundaries
 
@@ -262,8 +262,8 @@ Terminal state semantics:
 
 | State | Meaning |
 |---|---|
-| succeeded | All required stages completed; revision was published and is query-ready under the configured profile |
-| succeeded_with_warnings | Required stages completed and published; optional items/stages had explicitly permitted warnings, all reported |
+| succeeded | All required ingestion stages completed and canonical records/evidence/relations were published; structured retrieval is available. Search/vector projections have independent statuses. |
+| succeeded_with_warnings | Canonical publication completed; optional extraction items/stages had permitted warnings under the source profile. Search/vector projection status remains independent. |
 | failed | A required stage failed or validation/publication was rejected; no new revision becomes query-visible |
 | canceled | Explicit cancellation completed safely; no partial publication is query-visible |
 | superseded | A newer desired revision/pipeline run made this run obsolete before publication |
@@ -325,10 +325,10 @@ Recommended logical pattern:
 1. Store stage outputs in a run-scoped staging namespace.
 2. Validate counts, hashes, schema, ownership and mandatory evidence.
 3. Write canonical records/evidence/relations as a versioned batch.
-4. Build mandatory retrieval projections or mark them as a required follow-up stage.
-5. Commit a publication manifest for the complete revision.
-6. Transition the SourceRevision to ready and update its active pointer in one controlled transaction/compare-and-swap operation.
-7. Retrieval reads only published/ready revisions.
+4. Commit a canonical publication manifest for the complete SourceRevision.
+5. Transition the SourceRevision to published/knowledge-ready and update its active pointer in one controlled transaction/compare-and-swap operation.
+6. Retrieval may immediately use structured canonical queries against published records.
+7. Enqueue full-text/vector projection work asynchronously; each projection publishes its own manifest/readiness state when complete.
 
 If any required step fails before the ready transition:
 - Keep the last successful revision available according to policy.
@@ -343,9 +343,10 @@ Do not delete the previous valid revision merely because a new run was attempted
 Track separate concepts:
 - **Latest discovered revision:** newest upstream revision observed.
 - **Latest captured revision:** immutable snapshot successfully captured.
-- **Latest published revision:** newest fully query-ready revision.
+- **Latest published revision:** newest SourceRevision with a committed canonical publication manifest.
 - **Active/default revision:** revision selected by workspace/source policy for normal retrieval.
-- **Last successful run:** latest successful processing run and pipeline version set.
+- **Last successful run:** latest run whose canonical publication succeeded.
+- **Projection readiness:** separate per-projection state/version and the newest SourceRevision covered by that projection.
 
 The latest discovered revision may be newer than the active/published revision. Expose this lag to operators rather than pretending the knowledge is current.
 

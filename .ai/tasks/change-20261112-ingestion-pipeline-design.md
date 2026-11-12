@@ -31,7 +31,13 @@ Chưa triển khai runtime worker, queue, database schema hoặc API.
 - [x] Đề xuất boundary contracts giữa các stage.
 - [x] Đề xuất IngestionRun lifecycle, idempotency và concurrency/checkpoint semantics.
 - [x] Đề xuất validation, staging và atomic publication/freshness model.
-- [ ] Review và chốt các lựa chọn mở về request/run identity, search readiness, trigger, atomicity unit và partial extraction policy.
+- [x] Chốt một IngestionRun quản lý durable request, lifecycle và retry attempts; không tạo IngestionRequest riêng trong v1.
+- [x] Tách canonical publication/readiness khỏi trạng thái full-text/vector projection bất đồng bộ.
+- [x] Chốt atomic publication theo toàn bộ SourceRevision.
+- [x] Chốt trigger v1 gồm manual + webhook; schedule để sau.
+- [x] Cho phép publish với warnings khi chỉ thiếu phần optional và đạt completeness policy.
+- [x] Chặn publish khi mandatory data/stage hoặc validity/integrity requirement thất bại; giữ revision published tốt trước đó.
+- [ ] Chốt child attempt/stage records, projection version/readiness, completeness metrics, webhook security và large-revision manifest protocol.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -52,16 +58,15 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 ## 6. Việc còn lại
 
-- Review các quyết định trong mục 15 của ingestion-pipeline.md.
-- Sau khi chốt, chuẩn hóa contracts machine-readable cho stage inputs/outputs và state machine.
+- Chuẩn hóa contracts machine-readable cho stage inputs/outputs, IngestionRun và attempt/stage history.
+- Hoàn thiện webhook authentication/replay protection, completeness metrics và revision manifest protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
-- CI: Các check của PR đang queued/in progress tại lần cập nhật cuối; chưa có kết luận tổng thể.
+- CI: Chưa có kết luận PASS tổng thể cho PR tại lần cập nhật này.
 - Tài liệu chính: .ai/architecture/ingestion-pipeline.md.
-- PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - Ngày cập nhật cuối: 2026-11-12.
 - Đã draft kiến trúc ingestion; approval và implementation còn mở.

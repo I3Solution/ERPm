@@ -438,3 +438,42 @@ These decisions constrain the logical lifecycle but do not select a queue, datab
 5. Define large-revision staging and manifest commit protocol for the chosen storage technology.
 
 These details must be resolved before runtime implementation. No vendor, queue or physical database schema is selected by this document.
+
+
+## 16. Initial machine-readable schemas v1
+
+Initial JSON Schema Draft 2020-12 artifacts:
+
+- [IngestionProfile v1](../schemas/ingestion-profile-v1.schema.json)
+- [IngestionRun v1](../schemas/ingestion-run-v1.schema.json)
+- [PublicationManifest v1](../schemas/publication-manifest-v1.schema.json)
+
+These schemas encode the accepted v1 lifecycle choices: one durable IngestionRun identity, manual/webhook triggers only, profile-controlled component versions and completeness policy, retryable stage history, and publication manifest scoped to one complete SourceRevision. They do not define a separate IngestionRequest entity.
+
+### 16.1 Cross-field and lifecycle invariants
+
+The Orchestrator/Validator/Publisher must additionally enforce:
+
+1. Run scope and Source ownership are resolved from registered platform metadata; connector/extractor output cannot override Tenant/Workspace/Project.
+2. The SourceRevision resolved for a run belongs to the same Source and Workspace as the run.
+3. The run's IngestionProfile ID/version and every selected component version are immutable inputs to its logical idempotency key.
+4. A retry reuses only durable stage outputs whose input revision, content hash and producer versions match exactly.
+5. Permanent authorization, ownership, schema or provenance errors are not retried as transient failures.
+6. `succeeded` and `succeeded_with_warnings` require a committed PublicationManifest for the complete SourceRevision; structured retrieval becomes available only after that commit.
+7. A failed/canceled/superseded run cannot publish a partial manifest or advance the active Source pointer.
+8. Publication is atomic for the entire SourceRevision; chunked staging remains invisible until manifest/readiness commit.
+9. Full-text/vector projection jobs are asynchronous and have independent readiness; their failure does not roll back canonical publication.
+10. Optional omissions can produce warnings only when the profile permits them and explicit completeness thresholds pass.
+11. A newer desired revision cannot be overwritten by an older run completing later; active-pointer changes require a concurrency-safe generation/CAS check.
+12. Webhook authentication, signature validation and replay protection are enforced before creating/advancing a run; raw secrets never enter run records.
+
+### 16.2 Deliberately not frozen
+
+- Queue/broker, worker runtime and scheduling technology.
+- Exact webhook signature scheme and replay-window storage.
+- Detailed stage checkpoint payload and large-revision chunk manifest.
+- Completeness metric vocabulary and per-source thresholds beyond the profile contract.
+- Projection schema/version registry and reindex orchestration.
+- Physical transaction/compare-and-swap implementation.
+
+The schemas are logical contracts and do not authorize a runtime or deployment choice.

@@ -32,7 +32,8 @@ Không triển khai LLM prompt, model/tokenizer runtime, API/MCP adapter hoặc 
 - [x] Xác định lifecycle, authorization freshness, expiry, cache/retention và acceptance scenarios.
 - [x] Review và chốt bảy default ở mục 14 của context-packet-contract.md ngày 2026-11-12.
 - [x] Tạo JSON Schema Draft 2020-12 cho ContextPacket v1 và ContextProfile v1.
-- [ ] Định nghĩa adapter mappings và automated schema/semantic validation fixtures.
+- [ ] Định nghĩa adapter mappings.
+- [x] Thêm valid fixtures, JSON Schema validation và cross-field semantic tests vào CI; chờ CI xác nhận.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -50,12 +51,14 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - Kiểm tra source/summary trust labels và generated-summary lineage.
 - Kiểm tra budget có hard limit, omission/truncation rõ ràng và không cắt metadata bắt buộc.
 - Kiểm tra ACL revocation trước delivery và giới hạn không thể recall nội dung đã gửi ra ngoài.
-- Chưa có machine-readable schema hoặc automated test; đây là semantic draft.
+- JSON Schema Draft 2020-12 và valid fixtures đã có.
+- Automated tests kiểm tra schema shape và cross-field invariants; CI job đã được thêm, kết quả chạy đang chờ.
 
 ## 6. Việc còn lại
 
 - Hoàn thiện adapter mappings cho Query API/MCP/IDE clients.
-- Tạo automated schema validation và semantic fixtures; chọn JSON/Protobuf trong protocol ADR.
+- Hoàn thiện adapter mappings cho Query API/MCP/IDE clients.
+- Mở rộng evaluation dataset cho evidence coverage, token efficiency, omission rate và prompt-injection containment.
 - Định nghĩa adapter mapping cho Query API/MCP/IDE clients mà không mất trust/provenance metadata.
 - Thiết kế evaluation dataset cho evidence coverage, token efficiency, omission rate và prompt-injection containment.
 
@@ -65,4 +68,5 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - Tài liệu chính: .ai/architecture/context-packet-contract.md.
 - Ngày cập nhật cuối: 2026-11-12.
 - User đã chấp thuận bảy semantic default Context Packet v1 ngày 2026-11-12.
-- Semantic contract đã được chốt; chưa có machine-readable schema, adapter mapping, evaluation fixture hoặc runtime implementation.
+- Semantic contract và hai JSON Schema v1 đã được tạo; validation fixtures/CI job đã được thêm nhưng chưa có kết quả CI xác nhận.
+- Chưa có adapter mapping hoặc runtime implementation.

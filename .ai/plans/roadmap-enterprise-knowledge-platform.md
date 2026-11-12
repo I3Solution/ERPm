@@ -71,11 +71,13 @@ Deliverables:
   - Core v1 decisions accepted on 2026-11-12: split record/evidence/relation/revision, logicalKey policy, first four code payloads, defer cross-source derivation, and preserve processing history. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
 - [ ] Connector vs extractor vs processor vs normalizer/validator/publisher machine-readable contracts.
   - Responsibilities and the six core Ingestion v1 decisions were accepted on 2026-11-12; detailed component schemas and operational protocol remain open. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
-- [ ] Control plane, artifact store, structured store and search plane responsibilities.
-  - Logical storage boundary draft is available in [Storage Boundary](../architecture/storage-boundary.md); physical consolidation and vendor decisions remain open.
+- [x] Define Control Plane, Artifact Store, Canonical Knowledge Store, Search Projection Store, staging and cache responsibilities.
+  - Five logical storage defaults accepted on 2026-11-12: one relational deployment initially for Control Plane + Canonical Store with separate modules; policy-driven source/history retention; exact Git SHA/hash provenance with archive when replay/retention requires it; separate full-text/vector logical adapters; and a two-Workspace isolation benchmark scenario. See [Storage Boundary](../architecture/storage-boundary.md).
+  - Physical vendor/topology, concrete retention/legal deletion rules and execution of the benchmark remain open.
 - [ ] Ingestion machine-readable lifecycle/state contracts and operational security details.
   - Core decisions accepted: one IngestionRun aggregate; manual + webhook triggers; per-SourceRevision atomic canonical publication; async search/vector readiness; defined optional-vs-required failure policy. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
 - [ ] Retrieval request/result and Context Packet contracts.
+  - A first [Retrieval Contract](../architecture/retrieval-contract.md) draft is now part of Phase 0; request/result semantics and remaining decisions require review.
 - [ ] Security/ACL and provenance requirements.
 - [ ] Technology decision records with benchmark/operational rationale.
 
@@ -204,9 +206,9 @@ Do not begin another indexer feature or create a PR for EF metadata yet. First c
 2. **Canonical Knowledge Contract:** core v1 design decisions accepted; finalize wire-level envelope and the four initial code payload schemas using [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
 3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
 4. **Connector and ingestion contracts:** review [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md), then finalize trigger, request/run identity, validation, publication and failure semantics.
-5. **Storage boundary:** review [Storage Boundary](../architecture/storage-boundary.md); decide physical consolidation and technology only after the logical data/lifecycle contracts are stable.
-6. **Retrieval contract:** define query scope, filters, evidence result, projection availability semantics and relationship expansion.
-7. **Context Packet:** define the contract before implementing an LLM-facing context builder.
+5. **Storage boundary:** logical defaults are accepted in [Storage Boundary](../architecture/storage-boundary.md); build the two-Workspace benchmark and defer vendor/physical-topology decisions to technology ADRs.
+6. **Retrieval contract:** review the draft [Retrieval Contract](../architecture/retrieval-contract.md), then finalize request scope, revision selection, filters, evidence-backed results, projection availability and verified relationship expansion.
+7. **Context Packet:** define the agent-facing packet after the retrieval result contract is stable; do not conflate retrieval results with prompt-ready context.
 8. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
 9. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
 

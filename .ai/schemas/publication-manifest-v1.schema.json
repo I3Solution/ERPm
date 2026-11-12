@@ -11,9 +11,11 @@
     "sourceRevisionId",
     "runId",
     "status",
-    "counts",
     "contentHash",
-    "publishedAtUtc"
+    "publishedAtUtc",
+    "normalizationManifest",
+    "validationReport",
+    "counts"
   ],
   "properties": {
     "manifestId": {
@@ -105,6 +107,49 @@
     "publishedAtUtc": {
       "type": "string",
       "format": "date-time"
+    },
+    "normalizationManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifestId",
+        "contentHash"
+      ],
+      "properties": {
+        "manifestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "validationReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reportId",
+        "contentHash",
+        "outcome"
+      ],
+      "properties": {
+        "reportId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outcome": {
+          "enum": [
+            "passed",
+            "passed_with_warnings"
+          ]
+        }
+      }
     }
   }
 }

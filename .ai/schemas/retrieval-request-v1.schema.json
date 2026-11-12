@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:retrieval-request:1.0",
+  "title": "Enterprise Knowledge Platform Retrieval Request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "requestId",
+    "scope",
+    "query",
+    "revisionPolicy",
+    "methods",
+    "limits"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.retrieval-request"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "requestId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workspaceId"
+      ],
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sourceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "query": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/filter"
+          }
+        },
+        "intent": {
+          "enum": [
+            "automatic",
+            "exact_lookup",
+            "structured_search",
+            "full_text_search",
+            "vector_search",
+            "hybrid_search"
+          ]
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "text"
+          ]
+        },
+        {
+          "required": [
+            "filters"
+          ],
+          "properties": {
+            "filters": {
+              "minItems": 1
+            }
+          }
+        }
+      ]
+    },
+    "revisionPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "const": "active"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "revisions"
+          ],
+          "properties": {
+            "mode": {
+              "const": "pinned"
+            },
+            "revisions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/revisionRef"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "methods": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "required"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "structured",
+              "full_text",
+              "vector"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "options": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "relationExpansion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "maxDepth": {
+          "const": 1
+        },
+        "maxResults": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxCandidates",
+        "maxResults"
+      ],
+      "properties": {
+        "maxCandidates": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "maxResults": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "maxRelations": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "cursor": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "rankingPolicyRef": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "revisionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "sourceRevisionId"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRevisionId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "field",
+        "operator",
+        "value"
+      ],
+      "properties": {
+        "field": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operator": {
+          "enum": [
+            "eq",
+            "neq",
+            "in",
+            "not_in",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "contains",
+            "starts_with",
+            "exists"
+          ]
+        },
+        "value": {},
+        "payloadType": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

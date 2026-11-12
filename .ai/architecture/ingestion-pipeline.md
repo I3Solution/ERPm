@@ -486,6 +486,70 @@ The Orchestrator/Validator/Publisher must additionally enforce:
 The schemas are logical contracts and do not authorize a runtime or deployment choice.
 
 
+## 20. Proposed webhook authentication and replay protection
+
+> **Status:** Security baseline proposal for review; provider-specific signature formats and deployment controls remain open.
+> **Boundary:** A webhook is an untrusted notification that may request source discovery. It is not an authorization grant and is not the source of truth for ownership, profile selection or source revision.
+
+### 20.1 Trust and authorization sequence
+
+The ingress path must execute in this order:
+
+1. Resolve the webhook endpoint to a pre-registered webhook configuration and Source. Do not derive Tenant/Workspace/Project ownership from request body fields.
+2. Enforce transport, request-size and rate limits before expensive processing.
+3. Read the exact raw request body and required signature/timestamp/key-id headers.
+4. Verify the provider-specific signature over the exact bytes and signed metadata; use constant-time comparison and an active/previous key set during rotation.
+5. Enforce timestamp freshness within a configured replay window. Reject missing, malformed or out-of-window timestamps when the provider's scheme supports signed timestamps.
+6. Validate provider identity, event type allowlist and minimal payload schema. Treat every payload field as untrusted.
+7. Resolve the registered Source and authorize that source's webhook trigger policy, current state and effective Workspace policy.
+8. Atomically claim the delivery identity in a durable deduplication ledger. A duplicate delivery with the same body hash is acknowledged without creating another Run; reuse of the same delivery identity with a different body hash is rejected and audited as suspicious.
+9. Persist the accepted receipt and create or enqueue the single durable IngestionRun using the registered Source and pinned IngestionProfile. The connector, not the webhook body, resolves the immutable SourceRevision.
+10. Return an acknowledgement only after the receipt and run/enqueue intent are durably recorded. Processing then continues asynchronously.
+
+Authentication must complete before an event can create or advance an IngestionRun. A valid signature alone does not authorize a Source or Workspace action.
+
+### 20.2 Signature and secret handling
+
+- Use a provider-specific verifier adapter. A generic HMAC-SHA-256 over the exact raw body plus a signed timestamp is the preferred baseline where the provider supports it; do not assume all providers use the same header or canonicalization format.
+- Support key identifiers or equivalent rotation metadata where available. Keep a bounded overlap between active and previous secrets during rotation.
+- Store only secret references in webhook configuration. Resolve secret bytes through the platform secret manager at verification time.
+- Never log signature headers, secret material, access tokens or complete sensitive webhook bodies. Record safe provider/event identifiers, verification outcome and a sanitized diagnostic code.
+- Do not accept unsigned query-string secrets as the sole authentication mechanism.
+- Enforce TLS at the public ingress boundary; reject unsupported content types and oversized bodies before parsing.
+
+### 20.3 Replay and duplicate-delivery semantics
+
+A delivery identity is scoped by the registered webhook configuration/provider and must be stable for the provider's retry semantics (for example, a provider delivery ID). The durable deduplication record stores:
+
+- webhook configuration ID and registered Source ID;
+- provider delivery/event ID and event type;
+- signed timestamp or provider event creation time, when available;
+- raw body content hash (not necessarily the body itself);
+- verification/authorization result and receipt time;
+- associated IngestionRun ID when accepted.
+
+The deduplication claim must be atomic under concurrent duplicate deliveries. Retain the identity for at least the provider retry/replay horizon plus the configured security margin; exact duration is a deployment/security policy decision. If the provider supplies no stable delivery ID, use a documented provider-specific event identity/fingerprint and treat it as a weaker guarantee.
+
+A replayed or duplicate delivery must not create a second IngestionRun. A legitimate later event that points to the same SourceRevision may be deduplicated by the Run idempotency key after the provider delivery itself is authenticated and recorded.
+
+### 20.4 Payload and source-revision rules
+
+- The endpoint is bound to one registered Source or an explicitly allowlisted set of Sources; payload cannot choose another Tenant, Workspace, Project, Source, connector, secret reference or IngestionProfile.
+- Event type and changed-item hints may narrow discovery work but cannot assert that a revision is complete or publishable.
+- The Connector resolves the exact immutable SourceRevision and captures a consistent snapshot. A branch name, URL, mutable cursor or revision string from the webhook is only an input hint until the Connector validates it.
+- Webhook URLs, callback URLs and arbitrary fetch targets in payloads must never be fetched by the Orchestrator. Any upstream access occurs through the configured Connector with its own allowlist and egress policy.
+- Invalid, unauthorized, stale or conflicting events are rejected without creating an IngestionRun; safe audit metadata may be retained according to policy.
+
+### 20.5 Operational and acceptance requirements
+
+- Per-webhook and per-source rate limits, body-size limits, concurrency limits and bounded acknowledgement deadlines.
+- Metrics for signature failures, stale timestamps, duplicate deliveries, conflicting delivery IDs, authorization denials, queue/dispatch delay and accepted events.
+- Alert on repeated signature failures, delivery-ID/body-hash conflicts and abnormal event volume.
+- Test valid delivery, invalid signature, altered body, stale timestamp, unknown key ID, key rotation overlap, concurrent duplicate deliveries, same ID/different body, unauthorized Source, disabled Source, malformed payload and downstream enqueue failure.
+- If durable receipt succeeds but Run dispatch fails, a recoverable outbox/dispatch state must ensure the accepted event is eventually enqueued without creating duplicate Runs. The physical outbox/transaction mechanism is deferred to the storage ADR.
+
+A durable webhook receipt/deduplication ledger is an ingress-security record, not a separate first-class IngestionRequest. The accepted v1 aggregate remains one IngestionRun per logical ingestion work.
+
 ## 19. Proposed source-family completeness metric vocabulary
 
 > **Status:** Proposed vocabulary for review; no source-family thresholds or payload requirements are approved by this section.

@@ -5,6 +5,8 @@ namespace ERPm.CodeIndex.Indexing;
 
 public static class ExtractorHostCommand
 {
+    private const int MaximumRequestBytes = 64 * 1024;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -18,8 +20,8 @@ public static class ExtractorHostCommand
     {
         try
         {
-            var request = await JsonSerializer.DeserializeAsync<ExtractorHostRequest>(
-                input, JsonOptions, cancellationToken)
+            var requestBytes = await ReadBoundedRequestAsync(input, cancellationToken);
+            var request = JsonSerializer.Deserialize<ExtractorHostRequest>(requestBytes, JsonOptions)
                 ?? throw new InvalidDataException("Extractor request is empty.");
 
             request = ExtractorHostProtocol.ValidateRequest(request);
@@ -68,5 +70,32 @@ public static class ExtractorHostCommand
             await standardError.WriteLineAsync(exception.ToString());
             return 1;
         }
+    }
+
+    private static async Task<byte[]> ReadBoundedRequestAsync(
+        Stream input,
+        CancellationToken cancellationToken)
+    {
+        await using var buffer = new MemoryStream();
+        var chunk = new byte[8192];
+
+        while (true)
+        {
+            var read = await input.ReadAsync(chunk, cancellationToken);
+            if (read == 0)
+            {
+                break;
+            }
+
+            if (buffer.Length + read > MaximumRequestBytes)
+            {
+                throw new InvalidDataException(
+                    $"Extractor request exceeds the {MaximumRequestBytes}-byte limit.");
+            }
+
+            await buffer.WriteAsync(chunk.AsMemory(0, read), cancellationToken);
+        }
+
+        return buffer.ToArray();
     }
 }

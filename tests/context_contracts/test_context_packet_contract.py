@@ -1017,6 +1017,16 @@ def validate_projection_status_semantics(status: dict, manifest: dict) -> list[s
     if status["state"] == "ready":
         if not status["eligibleForRetrieval"]:
             errors.append("ready projection status must be eligible for retrieval")
+        if status["scope"] != manifest["scope"]:
+            errors.append("ready ProjectionManifest Workspace scope differs from status")
+        if status["sourceId"] != manifest["sourceId"]:
+            errors.append("ready ProjectionManifest sourceId differs from status")
+        if status["projectionKind"] != manifest["projectionKind"]:
+            errors.append("ready ProjectionManifest kind differs from status")
+        if status["sourceRevisionId"] != manifest["sourceRevisionId"]:
+            errors.append("ready ProjectionManifest SourceRevision differs from status")
+        if status["sourcePublication"] != manifest["sourcePublication"]:
+            errors.append("ready ProjectionManifest source publication differs from status")
         reference = status["projectionManifest"]
         if reference["manifestId"] != manifest["manifestId"] or reference["contentHash"] != manifest["contentHash"]:
             errors.append("ready ProjectionStatus references a different ProjectionManifest")

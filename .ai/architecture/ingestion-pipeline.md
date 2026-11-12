@@ -535,7 +535,7 @@ Every component receives an `IngestionStageInvocation` containing:
 
 The expected output contract is discriminator-bound to the stage; e.g. an extractor invocation cannot declare a Publisher manifest output. Component configuration is resolved from the trusted profile/secret broker. Secret values, tokens and credentials never appear in invocation, attempt, manifest or diagnostic payloads.
 
-Every attempt returns a stage-specific immutable manifest (or the existing PublicationManifest for Publisher) and an `IngestionStageAttempt` result. The attempt records the output manifest reference and content hash. Large content stays in artifacts; manifests carry bounded metadata and references rather than embedding source/document/code bodies.
+A successful attempt produces a stage-specific immutable manifest (or the existing PublicationManifest for Publisher) and records its reference/content hash in `IngestionStageAttempt`. Failed, retry-waiting, skipped or canceled attempts do not expose an output manifest/checkpoint; any partial artifacts remain uncommitted and invisible. Large content stays in artifacts; manifests carry bounded metadata and references rather than embedding source/document/code bodies.
 
 ### 18.3 Stage input/output contracts
 

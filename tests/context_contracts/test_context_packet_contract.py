@@ -1064,6 +1064,13 @@ class ProjectionContractSchemaTests(unittest.TestCase):
         profile = load_json(EXAMPLES / "projection-profile-valid-v1.json")
         validate_schema(profile, SCHEMAS / "projection-profile-v1.schema.json")
 
+    def test_full_text_projection_profile_uses_same_versioned_contract(self):
+        profile = load_json(EXAMPLES / "projection-profile-valid-v1.json")
+        profile["projectionKind"] = "full_text"
+        profile["builder"]["type"] = "full-text-projection-builder"
+        profile["configuration"]["configContract"] = "ekp.full-text-projection-config/1.0"
+        validate_schema(profile, SCHEMAS / "projection-profile-v1.schema.json")
+
     def test_valid_projection_run_fixture(self):
         run = load_json(EXAMPLES / "projection-run-valid-v1.json")
         validate_schema(run, SCHEMAS / "projection-run-v1.schema.json")
@@ -1128,6 +1135,23 @@ class ProjectionContractSchemaTests(unittest.TestCase):
         manifest = load_json(EXAMPLES / "projection-manifest-valid-v1.json")
         validate_schema(status, SCHEMAS / "projection-status-v1.schema.json")
         self.assertEqual([], validate_projection_status_semantics(status, manifest))
+
+    def test_building_projection_status_is_not_retrieval_eligible(self):
+        status = load_json(EXAMPLES / "projection-status-valid-v1.json")
+        status["state"] = "building"
+        status["eligibleForRetrieval"] = False
+        status["unavailableReason"] = "build_in_progress"
+        status["latestProjectionRun"]["state"] = "building"
+        validate_schema(status, SCHEMAS / "projection-status-v1.schema.json")
+
+    def test_pending_projection_status_has_no_ready_manifest(self):
+        status = load_json(EXAMPLES / "projection-status-valid-v1.json")
+        status["state"] = "pending"
+        status["eligibleForRetrieval"] = False
+        status["unavailableReason"] = "not_built"
+        status.pop("projectionManifest")
+        status.pop("latestProjectionRun")
+        validate_schema(status, SCHEMAS / "projection-status-v1.schema.json")
 
     def test_stale_projection_is_never_eligible_for_retrieval(self):
         status = load_json(EXAMPLES / "projection-status-valid-v1.json")

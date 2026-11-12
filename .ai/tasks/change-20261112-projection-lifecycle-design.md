@@ -2,7 +2,7 @@
 
 > **Loại:** change  
 > **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
-> **Trạng thái:** Doing — schemas, fixtures and semantic tests added; correcting one Retrieval coverage test exposed by CI Run #996  
+> **Trạng thái:** Doing — schemas, fixtures and semantic tests pass CI Run #1013; semantic review and operational targets remain  
 > **Progress aggregation:** v1  
 > **Liên quan:** .ai/architecture/ingestion-pipeline.md, .ai/architecture/retrieval-contract.md, .ai/architecture/storage-boundary.md, .ai/architecture/projection-lifecycle.md  
 > **Phạm vi:** Root repository — independent full-text/vector projection lifecycle
@@ -35,7 +35,8 @@ Không chọn search/vector vendor, embedding provider, queue, physical index la
 - [x] Định nghĩa required/optional projection behavior và cursor/cache projection version binding.
 - [x] Tạo JSON Schema Draft 2020-12 cho Profile, Run, Manifest và Status.
 - [x] Thêm valid fixtures và semantic tests cho lineage, count reconciliation, fingerprint và readiness eligibility.
-- [ ] Chờ CI xác nhận và review chi tiết proposed contract với user.
+- [x] CI xác nhận schemas, fixtures và semantic tests: Run #1013, 5/5 jobs success.
+- [ ] Review chi tiết proposed contract với user.
 - [x] Sửa test coverage: test phải thêm selected SourceRevision nhưng cố ý không thêm projection state tương ứng; trước đó fixture đã thêm state nên test thực tế đang kiểm tra aggregate `partial`, không phải thiếu coverage.
 - [ ] Hoàn thiện numeric performance/quality/cost targets và operational reindex details sau benchmark.
 
@@ -59,12 +60,12 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - Retrieval semantic tests kiểm tra per-revision status coverage, required projection failure và optional stale projection Partial behavior.
 - JSON documents và fixtures đã được kiểm tra parse qua GitHub source retrieval.
 - Semantic tests bind ProjectionManifest to exact PublicationManifest ID/hash and Retrieval's per-revision availability to selected publication IDs.
-- CI semantic/schema run cho commit mới đang chờ.
+- CI Run #1013 passed all five jobs for commit `91147cda903f1d48cb2cef235dc52b842e2e5aec`.
 - Chưa có runtime projection builder, physical index generation, performance/quality benchmark hoặc Workspace integration test.
 
 ## 6. Việc còn lại
 
-- Chờ và xử lý CI mới trên PR #70.
+- Review proposed semantics with platform owner; no runtime projection implementation yet.
 - Review status aggregation semantics khi nhiều selected revisions có readiness khác nhau.
 - Hoàn thiện integration test sau khi có platform runtime: R2 publish while R1 build lags, ACL revoke, profile/model upgrade, build crash before ready-pointer commit.
 - Chọn embedding/analyzer providers và physical index topology chỉ sau technology ADR/benchmark.
@@ -73,7 +74,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - Baseline Ingestion Stage CI: [Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888), 5/5 jobs success tại commit `52a75c94b9c4b49e295a18fe5f7939be7ae46e9c`.
-- Projection contract CI: pending cho commit mới; baseline Ingestion Stage CI [Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888) passed 5/5 jobs.
+- Projection contract CI: [Run #1013](https://github.com/I3Solution/ERPm/actions/runs/43179810828) passed 5/5 jobs.
 - Tài liệu chính: `.ai/architecture/projection-lifecycle.md`.
 - Retrieval integration: `.ai/architecture/retrieval-contract.md`.
 - Ngày cập nhật cuối: 2026-11-12.

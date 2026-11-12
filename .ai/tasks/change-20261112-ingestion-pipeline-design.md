@@ -62,5 +62,6 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - CI: Các check của PR đang queued/in progress tại lần cập nhật cuối; chưa có kết luận tổng thể.
 - Tài liệu chính: .ai/architecture/ingestion-pipeline.md.
+- PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
 - Ngày cập nhật cuối: 2026-11-12.
 - Đã draft kiến trúc ingestion; approval và implementation còn mở.

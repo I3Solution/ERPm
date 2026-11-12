@@ -795,6 +795,26 @@ class IngestionStageContractSchemaTests(unittest.TestCase):
         self.assertEqual(run["runId"], attempt["runId"])
         self.assertEqual(run["stageEvents"][0]["stageAttemptId"], attempt["attemptId"])
 
+    def test_unconfigured_optional_stage_is_skipped_without_child_attempt(self):
+        run = load_json(EXAMPLES / "ingestion-run-valid-v1.json")
+        event = run["stageEvents"][0]
+        event["stage"] = "processing"
+        event["state"] = "skipped"
+        event["skipReason"] = "not_configured"
+        event["completedAtUtc"] = "2026-11-12T03:05:00Z"
+        event.pop("stageAttemptId")
+        validate_schema(run, SCHEMAS / "ingestion-run-v1.schema.json")
+
+    def test_optional_stage_failure_skip_requires_child_attempt_reference(self):
+        run = load_json(EXAMPLES / "ingestion-run-valid-v1.json")
+        event = run["stageEvents"][0]
+        event["stage"] = "processing"
+        event["state"] = "skipped"
+        event["skipReason"] = "optional_stage_failure"
+        event["completedAtUtc"] = "2026-11-12T03:05:00Z"
+        with self.assertRaises(ValidationError):
+            validate_schema(run, SCHEMAS / "ingestion-run-v1.schema.json")
+
 
 if __name__ == "__main__":
     unittest.main()

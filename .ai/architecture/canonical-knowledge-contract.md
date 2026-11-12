@@ -402,3 +402,40 @@ These are accepted architecture decisions. They do not approve physical DDL, API
 5. What retention policy should apply to old extractor/payload versions after reprocessing?
 
 The contract is a proposal until these choices are reviewed. Physical database DDL, REST/MCP routes and a full domain schema registry are out of scope for this document.
+
+
+## 16. Initial machine-readable schemas v1
+
+Initial JSON Schema Draft 2020-12 artifacts:
+
+- [KnowledgeRecord v1](../schemas/knowledge-record-v1.schema.json)
+- [Evidence v1](../schemas/evidence-v1.schema.json)
+- [KnowledgeRelation v1](../schemas/knowledge-relation-v1.schema.json)
+- [SourceRevision v1](../schemas/source-revision-v1.schema.json)
+
+These schemas formalize the shared envelope and ownership/provenance structures for the first four accepted code payload types. The `payload.data` object remains typed by `payload.type` and `payload.version`; its detailed per-type fields are intentionally not frozen in this initial envelope schema.
+
+### 16.1 Cross-record invariants
+
+The platform validator must enforce relationships that a single-object JSON Schema cannot prove:
+
+1. `classification.recordType` equals `payload.type`; the payload type is supported by the declared domain and version.
+2. Tenant/Workspace scope is assigned from trusted Source registration and cannot be overridden by connector/extractor content.
+3. A non-null Project belongs to the same Tenant and Workspace.
+4. Every `evidenceIds` entry resolves to Evidence in the same Workspace and the same declared SourceRevision lineage.
+5. Evidence source/revision ownership resolves to the registered Source and captured immutable snapshot; locator and content hash must be verified against that snapshot.
+6. Each relation's source/target records and relation scope belong to the same Workspace; relation Evidence supports the predicate and the edge is verified.
+7. Unresolved or ambiguous references remain observation payloads and cannot be serialized as KnowledgeRelation.
+8. `logicalKey` requiredness and derivation are declared by each payload identity policy; do not infer a universal rule from display names or paths.
+9. Single-source v1 normalization ensures a record/relation batch is derived from one registered Source and one SourceRevision. Cross-source derived records remain deferred.
+10. Unsupported envelope or payload versions fail closed or require an explicit versioned adapter; historical records are never reinterpreted in place.
+
+### 16.2 Deliberately not frozen
+
+- Detailed fields and validation semantics for each code payload's `data`.
+- Per-payload logical identity derivation and uniqueness scope.
+- Final ID encoding, schema registry URI and compatibility tooling.
+- Retention/deletion implementation and legal-hold behavior.
+- Physical DDL and database vendor.
+
+The initial schemas do not alter or replace existing backend code-index v1/v2 or frontend code-index v3 source contracts.

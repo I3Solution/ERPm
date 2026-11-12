@@ -31,7 +31,8 @@
     "profileId": "code-vector-default",
     "profileVersion": "1.0",
     "definitionFingerprint": "sha256:vector-projection-definition",
-    "projectionVersion": "vector-v1"
+    "projectionVersion": "vector-v1",
+    "sourcePublicationContentHash": "sha256:manifest"
   },
   "latestProjectionRun": {
     "projectionRunId": "projection-run-001",

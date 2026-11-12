@@ -72,6 +72,7 @@ Deliverables:
 - [ ] Connector vs extractor vs processor vs normalizer/validator/publisher responsibilities.
   - Draft proposed in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); detailed decisions remain open.
 - [ ] Control plane, artifact store, structured store and search plane responsibilities.
+  - Draft proposed in [Storage Boundary](../architecture/storage-boundary.md); vendor/consolidation decisions remain open.
 - [ ] Ingestion job/run lifecycle, retries, idempotency, publication atomicity and freshness semantics.
   - Draft proposed in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); detailed decisions remain open.
 - [ ] Retrieval request/result and Context Packet contracts.
@@ -203,8 +204,8 @@ Do not begin another indexer feature or create a PR for EF metadata yet. First c
 2. **Canonical Knowledge Contract:** core v1 design decisions accepted; finalize wire-level envelope and the four initial code payload schemas using [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
 3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
 4. **Connector and ingestion contracts:** review [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md), then finalize trigger, request/run identity, validation, publication and failure semantics.
-5. **Storage boundary:** decide control plane, artifact storage, structured store and search plane responsibilities after the data/lifecycle contracts are stable.
-6. **Retrieval contract:** define query scope, filters, evidence result and relationship expansion.
+5. **Storage boundary:** review [Storage Boundary](../architecture/storage-boundary.md); decide physical consolidation and technology only after the logical data/lifecycle contracts are stable.
+6. **Retrieval contract:** define query scope, filters, evidence result, projection availability semantics and relationship expansion.
 7. **Context Packet:** define the contract before implementing an LLM-facing context builder.
 8. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
 9. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.

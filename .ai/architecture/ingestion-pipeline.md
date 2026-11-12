@@ -546,13 +546,13 @@ A successful attempt produces a stage-specific immutable manifest (or the existi
 | Processor.Process | ExtractionManifest or immediately preceding ProcessingManifest plus its artifacts | [ProcessingManifest](../schemas/processing-manifest-v1.schema.json) | Optional ordered transform; every output artifact declares parent artifact IDs; preserve source revision and parent lineage. |
 | Normalizer.Normalize | ExtractionManifest plus zero or more ordered ProcessingManifests selected by the orchestrator | [NormalizationManifest](../schemas/normalization-manifest-v1.schema.json) | Emit canonical KnowledgeRecord, Evidence and only already-resolved/evidence-backed KnowledgeRelation artifacts; report payload versions, counts, unsupported and omitted observations. |
 | Validator.Validate | NormalizationManifest, referenced canonical staging artifacts and trusted Source/Project/SourceRevision/ACL metadata | [ValidationReport](../schemas/validation-report-v1.schema.json) | Validate schemas, ownership, source revision, evidence, identity, relation endpoints, counts and profile completeness. Do not mutate normalized artifacts. |
-| Publisher.Publish | Publication-eligible ValidationReport and its exact NormalizationManifest/staging artifacts | [PublicationManifest](../schemas/publication-manifest-v1.schema.json) | Publish the complete SourceRevision atomically; update readiness/active pointer only through the concurrency-safe publication transition. |
+| Publisher.Publish | Publication-eligible ValidationReport and its exact NormalizationManifest/staging artifacts | [PublicationManifest](../schemas/publication-manifest-v1.schema.json) | Publish the complete SourceRevision atomically; the manifest records both input manifest IDs/hashes, eligible validation outcome and published counts. Update readiness/active pointer only through the concurrency-safe publication transition. |
 
 The Publisher is not permitted to accept a blocked ValidationReport or reconstruct missing normalized data. A `passed_with_warnings` report may publish only when every required metric passes and every warning is permitted by the pinned IngestionProfile. A run becomes `succeeded` or `succeeded_with_warnings` only after the PublicationManifest and ready-state transition commit.
 
 ### 18.4 Manifest lineage and artifact rules
 
-All stage manifests carry the same `runId`, Tenant/Workspace/Project scope, `sourceId` and `sourceRevisionId`. The SourceCaptureManifest carries the full resolved revision identity and capture content hash. Every downstream manifest must reference the prior stage manifest ID and content hash; its artifacts must remain tied to that same source revision.
+All stage manifests carry the same `runId`, Tenant/Workspace/Project scope, `sourceId` and `sourceRevisionId`. The SourceCaptureManifest carries the full resolved revision identity and capture content hash. Every downstream manifest must reference its input manifest IDs and content hashes; the PublicationManifest explicitly records the NormalizationManifest and ValidationReport references/hashes. All artifacts remain tied to that same source revision.
 
 Artifact references are immutable and include:
 
@@ -611,6 +611,7 @@ The CI schema/semantic tests now cover the following design invariants:
 8. Validation accepted + rejected counts reconcile to the NormalizationManifest; completeness pass flags reconcile to configured minimum ratios.
 9. A blocked ValidationReport is never publication-eligible. `passed_with_warnings` requires warnings only and passing required completeness metrics.
 10. Run stage summaries can reference child StageAttempt records without creating a separate IngestionRequest entity.
+11. A published PublicationManifest references the exact NormalizationManifest and an eligible ValidationReport; published record/evidence/relation counts equal the Validator's accepted counts.
 
 These tests validate contract behavior; runtime authorization, storage durability, hash verification, atomic publication and cancellation races still require integration tests in a later implementation phase.
 

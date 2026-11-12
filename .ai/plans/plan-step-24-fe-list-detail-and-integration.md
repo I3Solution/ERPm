@@ -72,4 +72,8 @@ Cập nhật bảng này khi có card hoàn thành (mã, trạng thái, SHA).
 | :--- | :--- | :--- |
 | BE-INT.1 | Todo | https://trello.com/c/PLSefcdu |
 | FE-INT.1 | Todo | https://trello.com/c/yVyoUVZI |
-| LD.1 - LD.5 | Todo | card đang raise |
+| LD.1 | Done | Khung list-page/detail-page, skeleton, list-query-state (PR #23) |
+| LD.2 | Done | WMS Catalog Items list + detail page (PR #23, pointer 1cbf6eb) |
+| LD.3 | Doing | HRM Employees list/detail |
+| LD.4 | Doing | Spike modal vs page |
+| LD.5 | Done | SD Light Lists & Server Paging (SD `0cd05e4`, FE `518bf90`) |

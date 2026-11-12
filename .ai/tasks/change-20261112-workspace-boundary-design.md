@@ -47,7 +47,8 @@ Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope t
 ## 6. Việc còn lại
 
 - Nhận review cho các quyết định trong .ai/architecture/workspace-boundary.md.
-- Sau khi chốt boundary, tạo task tiếp theo cho Canonical Knowledge Contract.
+- Core boundary đã được chốt; chi tiết ACL/identity và source access vẫn cần hoàn thiện.
+- Canonical Knowledge Contract và Ingestion Pipeline đã có task records riêng trong PR #70.
 - Không triển khai schema/runtime trước khi các ranh giới và quy tắc ACL được chấp thuận.
 
 ## 7. Evidence và cập nhật

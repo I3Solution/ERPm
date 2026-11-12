@@ -262,16 +262,27 @@ Membership, ACL, Source policy or Workspace lifecycle changes must invalidate or
 11. Pagination cursor cannot be reused with a different Workspace, principal, policy version or SourceRevision set.
 12. Every result can be traced to an authorized SourceRevision and source-native Evidence locator.
 
-## 14. Decisions for review
+## 14. Accepted Retrieval v1 decisions (2026-11-12)
 
-The following defaults are proposed for v1; review these before freezing a machine-readable schema:
+The following seven semantic defaults were accepted by the user on 2026-11-12. They are the contract baseline for subsequent machine-readable schemas and protocol adapters.
 
-1. **Scope:** exactly one Workspace per request; Project/Source filters are narrowing selectors intersected with server-resolved grants.
-2. **Revision selection:** active published revision by default; explicit pinned revisions for historical/debug queries; no implicit historical fallback.
-3. **Methods:** structured/exact retrieval is baseline; full-text/vector are opt-in or hybrid methods whose readiness is reported per source/revision.
-4. **Required methods:** methods are optional unless explicitly marked required; unavailable optional methods yield Partial, required unavailable methods fail with a capability-unavailable error.
-5. **Relations:** one-hop verified/resolved expansion by default, with strict result limits and Evidence/ACL checks on both endpoints.
-6. **Results:** every record must carry exact SourceRevision identity and at least one authorized Evidence reference; method scores remain separate from final ranking.
-7. **Pagination and caching:** opaque cursor and cache entries bind to effective principal/scope, policy, revision manifests and projection/ranking versions.
+1. **Scope:** exactly one Workspace per request. Project/Source filters only narrow the caller's effective grants and are intersected with server-resolved authorization.
+2. **Revision selection:** active published revision is the default. Historical/debug queries must pin exact published SourceRevision IDs; there is no silent historical fallback.
+3. **Methods:** structured/exact retrieval is the baseline. Full-text/vector are optional or explicitly requested hybrid methods whose readiness is reported per source/revision.
+4. **Required methods:** methods are optional unless explicitly marked required. An unavailable optional method yields a Partial response when usable results remain; an unavailable required method yields a capability-unavailable failure, never a false Empty.
+5. **Relations:** one-hop verified/resolved expansion is the default, with result limits and independent Evidence/ACL checks on both endpoints.
+6. **Results:** every KnowledgeRecord result carries its exact SourceRevision and at least one authorized Evidence reference. Method-specific scores remain distinguishable from final ranking.
+7. **Pagination and caching:** opaque cursors and cached candidates/results are bound to effective principal/scope, authorization-policy version, revision manifests and relevant projection/ranking versions.
 
-After these semantic choices are accepted, define JSON/Protobuf schemas and protocol adapters. Do not implement an API or select a search engine from this draft alone.
+## 15. Remaining contract work
+
+The accepted semantics do not yet define wire-level schemas or authorize runtime implementation. The following remain open:
+
+- Required JSON/Protobuf fields, ID encoding, enum compatibility and error payload shape.
+- Query text and typed-filter schema for the four initial code payloads and later domain payloads.
+- Opaque cursor format, signing/encryption, expiry and invalidation behavior.
+- Ranking policy schema, deterministic tie-breakers, score normalization and evaluation thresholds.
+- Retrieval API and MCP protocol mapping, including authentication propagation and rate/resource limits.
+- Machine-readable acceptance fixtures and integration tests against two isolated Workspaces.
+
+After these are specified, define protocol adapters. Do not implement an API or select a search engine from this semantic contract alone.

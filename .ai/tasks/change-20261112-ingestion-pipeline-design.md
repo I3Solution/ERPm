@@ -53,12 +53,15 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 
 - Đã kiểm tra pipeline tách khỏi nguồn dữ liệu và không cho Connector/Extractor override scope.
 - Đã định nghĩa source revision, provenance, retryable/permanent errors và publication visibility.
+- User đã chấp thuận sáu lựa chọn ingestion v1 ngày 2026-11-12: single IngestionRun aggregate, projection readiness độc lập, atomic publication theo SourceRevision, manual + webhook trigger, publish-with-warnings cho phần optional và block publication khi phần required lỗi.
+- Canonical publication được định nghĩa là structured-knowledge ready; full-text/vector projection chạy bất đồng bộ và có trạng thái riêng.
 - Chưa có implementation hoặc automated tests; tài liệu là proposal cho review.
 - Không có claim về build/test runtime.
 
 ## 6. Việc còn lại
 
 - Chuẩn hóa contracts machine-readable cho stage inputs/outputs, IngestionRun và attempt/stage history.
+- Hoàn thiện remaining details cho projection lifecycle, completeness metrics, webhook security và manifest protocol.
 - Hoàn thiện webhook authentication/replay protection, completeness metrics và revision manifest protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.

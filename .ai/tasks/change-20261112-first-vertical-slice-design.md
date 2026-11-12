@@ -24,7 +24,8 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 - [x] Xác định mục tiêu, phạm vi và logical Go module ownership cho first vertical slice.
 - [x] Xác định end-to-end flow và acceptance scenarios về revision, publication, ACL và client evidence.
 - [x] Ghi nhận discovery gates cho extractor invocation, immutable capture, submodule mapping và storage commit.
-- [ ] Inspect actual backend/frontend extractor entry points and define evidence-backed invocation adapter contract.
+- [x] Inspect actual backend/frontend extractor entry points and record current invocation/runtime constraints.
+- [ ] Select and specify a reusable external adapter host/protocol without changing extractor analysis semantics.
 - [ ] User review/approval design boundary and acceptance criteria before runtime scaffolding.
 - [ ] Implement the approved vertical slice incrementally in Go.
 
@@ -39,11 +40,13 @@ Thiết kế luồng end-to-end đầu tiên cho Enterprise Knowledge Platform: 
 
 - Đối chiếu flow với Canonical Knowledge, Code Index Adapter, Ingestion, Storage, Retrieval, Projection và Workspace contracts.
 - Acceptance scenarios bao gồm tối thiểu hai Workspaces, exact SHA, failed stage, retry, out-of-order revision, ACL revoke và equivalent evidence.
-- Chưa chạy runtime build/test vì chưa có runtime implementation.
+- Source inspection evidence: backend is a .NET 10 library invoked by a hard-coded ERPm CLI and writes local JSONL cache; frontend worker consumes a manifest on stdin and emits JSONL on stdout, but current runner performs validation/cache writing and frontend Program root is tied to erpm-fe.
+- No runtime build/test was run; no runtime implementation exists.
 
 ## 6. Việc còn lại
 
-- Inspect source extractor invocation và snapshot behavior trước khi code.
+- Source inspection completed for current CLI/worker boundaries; design an external adapter protocol/bridge that removes ERPm hard-coded workspace/cache assumptions before runtime.
+- Validate immutable snapshot and submodule handling with a focused feasibility spike.
 - Chốt physical storage/transaction và identity integration qua ADR/benchmark.
 - Chờ user review slice boundary trước khi tạo Go runtime foundation.
 

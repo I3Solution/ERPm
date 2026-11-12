@@ -156,9 +156,9 @@ def validate_retrieval_result_semantics(result: dict) -> list[str]:
         errors.append("empty outcome cannot contain results")
     if result["outcome"] == "partial" and not result["results"]:
         errors.append("partial outcome requires at least one usable result")
-    if result["outcome"] == "complete":
+    if result["outcome"] in {"complete", "partial", "empty"}:
         if any(report["required"] and not report["ran"] for report in result["methodReports"]):
-            errors.append("complete outcome requires every required method to have run")
+            errors.append("successful outcome requires every required method to have run")
     if result.get("pagination", {}).get("hasMore") and not result["pagination"].get("nextCursor"):
         errors.append("hasMore requires a continuation cursor")
     for item in result["results"]:
@@ -202,6 +202,12 @@ class RetrievalContractSchemaTests(unittest.TestCase):
         result["outcome"] = "partial"
         result["results"] = []
         self.assertIn("partial outcome requires at least one usable result",
+                      validate_retrieval_result_semantics(result))
+
+    def test_successful_result_rejects_unrun_required_method(self):
+        result = load_json(EXAMPLES / "retrieval-result-valid-v1.json")
+        result["methodReports"][0]["ran"] = False
+        self.assertIn("successful outcome requires every required method to have run",
                       validate_retrieval_result_semantics(result))
 
     def test_valid_error_fixture(self):

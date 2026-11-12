@@ -9,7 +9,7 @@
 
 Prove one end-to-end path through the reusable platform:
 
-**Registered Git Source → exact immutable capture → existing code extractor(s) → canonical adapter → validation → whole-SourceRevision publication → structured retrieval with evidence and Workspace authorization.**
+**One registered Git Source (initially ERPm-BE) → exact immutable capture → Roslyn extractor adapter → canonical adapter → validation → whole-SourceRevision publication → structured retrieval with evidence and Workspace authorization.**
 
 The slice must prove that the platform is reusable beyond ERPm. ERPm is only the first fixture/workspace used to exercise the contracts.
 
@@ -19,6 +19,7 @@ Non-goals: vector search, reranking, production Agent orchestration, autonomous 
 
 - Implement the first Core slice in Go as one modular monolith, following the accepted Technology Strategy.
 - Keep current backend Roslyn and frontend TypeScript/Angular indexers unchanged. Their schemas/serializers remain source contracts.
+- Narrow the first executable slice to one SourceRevision from the backend repository. Add the frontend extractor as a follow-up source-family integration, not as part of the first publication batch.
 - Invoke the existing extractors through a bounded adapter boundary. Before choosing subprocess, HTTP/gRPC worker or another transport, inspect their actual CLI inputs/outputs, runtime dependencies, snapshot behavior and error/exit semantics. Do not invent a transport or rewrite the extractors to fit Go.
 - Use Python only if the slice demonstrates a concrete AI/ML requirement. The initial deterministic code extraction path does not require a Python runtime.
 - Do not create public SDK packages until an independent extension consumer exists. The first extractor adapter is an internal conformance implementation of the future extension contract.
@@ -32,7 +33,7 @@ Non-goals: vector search, reranking, production Agent orchestration, autonomous 
 | identity | Resolve principal and authorize source ingestion and retrieval actions |
 | connector/git | Resolve a requested Git selector to exact commit SHA; capture/verify immutable source snapshot |
 | ingestion | Create one IngestionRun; coordinate stage attempts, checkpoints, retry and cancellation state |
-| extractoradapter | Invoke existing backend/frontend extractors and validate their declared source schema/version |
+| extractoradapter | Invoke the backend Roslyn extractor for the first slice and validate its declared source schema/version |
 | normalization | Apply Code Index Adapter Contract v1 and trusted Source/SourceRevision binding |
 | validation | Validate canonical schemas, lineage, evidence, scope, counts and required completeness policy |
 | publication | Commit one PublicationManifest for the complete SourceRevision and advance the ready pointer |
@@ -47,7 +48,7 @@ These are package/module ownership boundaries inside one Go application, not sep
 2. **Authorize trigger:** caller requests ingestion for the registered Source. Resolve scope from stored registration; reject caller-supplied ownership overrides.
 3. **Resolve immutable revision:** Git Connector resolves branch/tag/commit selector to a full commit SHA and captures a consistent tree manifest. Record repository identity, commit SHA, tree/content hashes and capture provenance.
 4. **Create run:** create the single durable IngestionRun with pinned IngestionProfile and component versions. Duplicate trigger/idempotency behavior follows the Ingestion Contract.
-5. **Extract:** invoke the existing backend and frontend extractor adapters against the same immutable snapshot. Each output declares source schema version, repository identity and exact SHA. Mixed or mismatched revision output is rejected.
+5. **Extract:** invoke the backend Roslyn extractor against the immutable backend Source snapshot. Its output declares source schema version, repository identity and exact SHA. Mixed or mismatched revision output is rejected. Frontend extraction is a separate follow-up integration.
 6. **Stage:** retain raw JSONL output and source manifests in run-scoped staging. Staging is invisible to normal Retrieval.
 7. **Normalize:** map backend v1/v2 and frontend v3 records through Code Index Adapter Contract v1 into only the accepted canonical code payload types. Unsupported Angular/project/dependency rows are explicitly counted/reported, never silently discarded.
 8. **Validate:** validate schema, trusted ownership, SourceRevision lineage, Evidence locators, payload identity, relationship-promotion conditions, count reconciliation and required completeness metrics.
@@ -85,7 +86,7 @@ Full-text/vector ProjectionRun starts only after canonical publication and remai
 
 ## 6. Implementation sequence after design approval
 
-1. **Extractor feasibility spike:** inspect exact existing Roslyn and TypeScript worker invocation contracts, output paths, runtime prerequisites, snapshot behavior, exit codes, cancellation and deterministic behavior. Record a supported adapter invocation contract.
+1. **Extractor feasibility spike:** backend Roslyn invocation and output behavior have been inspected. Specify a generic external adapter request/result protocol and a thin .NET host that reuses the existing Roslyn library without changing analysis semantics. Inspect/refactor the frontend TypeScript worker separately when onboarding that source family.
 2. **Go foundation:** create one Go module, config/logging/tracing/test conventions and minimal application composition. Do not pre-create all logical packages; introduce only those required by the slice.
 3. **Control-plane and Git capture path:** implement source registration fixtures, trusted scope resolution and exact snapshot capture.
 4. **Extractor adapters and normalization:** wrap existing extractors without modifying their source contracts; implement canonical adapter and explicit omission accounting.
@@ -99,7 +100,7 @@ Full-text/vector ProjectionRun starts only after canonical publication and remai
 The following must be established from source evidence before implementation:
 - exact backend/frontend extractor entry points, arguments, output schema negotiation and exit/error behavior;
 - whether each extractor can consume an immutable captured worktree without mutating it;
-- how submodules/gitlinks and multiple repositories are represented in one registered Source versus multiple Sources;
+- how submodules/gitlinks and multiple repositories are registered as separate Sources; do not combine their records into one SourceRevision batch in v1;
 - whether both extractors can run in a reproducible isolated environment and how tool versions are pinned;
 - artifact store implementation and publication transaction/CAS mechanism;
 - identity provider and service-to-service workload identity;
@@ -125,7 +126,7 @@ Inspected at the root PR snapshot used for this design (root submodule gitlinks:
 - The TypeScript indexer currently expects a repository entry named `erpm-fe` and uses that repository's `tsconfig.app.json` as its Program root; it can attribute records to nested repositories in the manifest.
 
 ### Consequence for the platform adapter
-The current tooling is a developer-workspace indexer, not yet a deployable, generic platform Extractor contract. It has no stable external invocation protocol for the Go Core, and it assumes the ERPm umbrella checkout/cache layout.
+The current tooling is a developer-workspace indexer, not yet a deployable, generic platform Extractor contract. It has no stable external invocation protocol for the Go Core, and it assumes the ERPm umbrella checkout/cache layout. In addition, the frontend manifest may include nested Git submodules; the current TypeScript Program can emit observations for multiple repository owners. Canonical Ingestion v1 normalizes one SourceRevision per batch and defers cross-source derivation, so frontend submodule records must be split into separately registered SourceRevision ingestions rather than published as one combined batch.
 
 Do not call the current CLI directly from Go and claim it is a reusable adapter. The next implementation design must choose one of these explicit paths:
 1. introduce a thin .NET extractor-host/bridge that exposes a versioned, language-neutral request/result protocol while reusing the existing Roslyn and TypeScript analysis code; or

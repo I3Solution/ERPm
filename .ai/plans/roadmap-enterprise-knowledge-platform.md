@@ -65,8 +65,10 @@ Verification evidence must remain distinct:
 Deliverables:
 - [ ] Platform context and bounded-context diagram.
 - [ ] Tenant/workspace/project/source hierarchy and isolation rules.
+  - Core decision accepted by user on 2026-11-12; detailed Tenant/ACL/identity choices remain open. See [Workspace Boundary](../architecture/workspace-boundary.md).
   - Draft proposal: [Workspace Boundary](../architecture/workspace-boundary.md); pending review and approval.
 - [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision contracts.
+  - Draft available for review: [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md).
 - [ ] Connector vs extractor vs processor responsibilities.
 - [ ] Control plane, artifact store, structured store and search plane responsibilities.
 - [ ] Ingestion job lifecycle, retries, idempotency and freshness semantics.

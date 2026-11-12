@@ -30,7 +30,10 @@ public sealed class ExtractorHostProtocolTests : IDisposable
             "definition", "class", "symbol:example", "Example", "global::Example",
             "C#", 1, 5, null, null, null, null, "verified", DateTimeOffset.UtcNow);
 
-        using var document = JsonDocument.Parse(ExtractorHostProtocol.SerializeRecord(record));
+        var serialized = ExtractorHostProtocol.SerializeRecord(record);
+        Assert.DoesNotContain("\\n", serialized);
+        Assert.DoesNotContain("\\r", serialized);
+        using var document = JsonDocument.Parse(serialized);
 
         Assert.True(document.RootElement.TryGetProperty("schemaVersion", out _));
         Assert.True(document.RootElement.TryGetProperty("repositoryId", out _));

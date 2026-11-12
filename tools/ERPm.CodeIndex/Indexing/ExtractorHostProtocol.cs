@@ -16,6 +16,9 @@ public static class ExtractorHostProtocol
         WriteIndented = true
     };
 
+    public static string SerializeRecord(IndexRecord record) =>
+        JsonSerializer.Serialize(record, JsonOptions);
+
     public static ExtractorHostRequest ValidateRequest(ExtractorHostRequest? request)
     {
         ArgumentNullException.ThrowIfNull(request);

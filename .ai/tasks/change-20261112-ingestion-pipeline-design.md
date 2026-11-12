@@ -2,7 +2,7 @@
 
 > **Loại:** change  
 > **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
-> **Trạng thái:** Doing — stage I/O schemas and proposed attempt/retry contract added; latest CI pending  
+> **Trạng thái:** Doing — stage I/O contracts added; CI Run #926 passed; projection lifecycle moved to a separate task  
 > **Progress aggregation:** v1  
 > **Liên quan:** .ai/architecture/workspace-boundary.md, .ai/architecture/canonical-knowledge-contract.md, .ai/architecture/enterprise-knowledge-platform.md  
 > **Phạm vi:** Root repository — kiến trúc ingestion platform
@@ -44,7 +44,8 @@ Chưa triển khai runtime worker, queue, database schema hoặc API.
 - [x] Định nghĩa input/output mapping cho sáu component stages, checkpoint fingerprint, retry classification, optional Processor, cancellation và supersession.
 - [x] Thêm CI schema/semantic tests cho stage contract, manifest lineage, aggregate counts, completeness ratios và retry/checkpoint invariants.
 - [ ] User review/approval cho các chi tiết stage I/O, attempt và retry/cancellation semantics.
-- [ ] Chốt projection version/readiness, source-specific completeness vocabulary, webhook security và large-revision manifest protocol.
+- [x] Hoàn thành projection profile/run/manifest/status schemas và Retrieval readiness theo từng SourceRevision ở task [Projection Lifecycle](change-20261112-projection-lifecycle-design.md).
+- [ ] Chốt source-specific completeness vocabulary, webhook security và large-revision manifest protocol.
 
 Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
 
@@ -63,7 +64,7 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 - User đã chấp thuận sáu lựa chọn ingestion v1 ngày 2026-11-12: single IngestionRun aggregate, projection readiness độc lập, atomic publication theo SourceRevision, manual + webhook trigger, publish-with-warnings cho phần optional và block publication khi phần required lỗi.
 - Canonical publication được định nghĩa là structured-knowledge ready; full-text/vector projection chạy bất đồng bộ và có trạng thái riêng.
 - Initial Profile/Run/Publication schemas đã có và CI Run #853 trước bước mở rộng này đã xanh toàn bộ.
-- StageInvocation/StageAttempt và năm stage output manifests cùng valid fixtures/semantic tests đã được thêm; CI cho commit mới đang chờ.
+- StageInvocation/StageAttempt và năm stage output manifests cùng valid fixtures/semantic tests đã được thêm; [CI Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888) xác nhận cả 5 jobs success cho commit `52a75c94b9c4b49e295a18fe5f7939be7ae46e9c`.
 - Stage I/O/attempt/retry/cancellation details hiện là proposed v1 draft, chưa ghi nhận là user-approved.
 - Chưa có runtime implementation hoặc integration tests.
 - Không có claim về build/test runtime.
@@ -71,15 +72,16 @@ Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope 
 ## 6. Việc còn lại
 
 - User review/approval cho proposed stage I/O, attempt, retry, cancellation và optional Processor semantics.
-- Hoàn thiện remaining details cho projection lifecycle, source-family completeness metrics, webhook authentication/replay protection và large-revision commit protocol.
+- User review/approval cho stage I/O/attempt/retry/cancellation draft.
+- Hoàn thiện source-family completeness metrics, webhook authentication/replay protection và large-revision commit protocol.
 - Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
 - Đo retrieval/index projection requirements trước khi chọn search/vector technology.
 
 ## 7. Evidence và cập nhật
 
 - PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
-- CI trước bước stage-contract expansion: [Run #853](https://github.com/I3Solution/ERPm/actions/runs/43154774480) — toàn bộ 5 jobs success.
-- CI cho stage-contract expansion: đang chờ workflow của commit mới.
+- CI cho stage-contract expansion: [Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888) — toàn bộ 5 jobs success cho commit `52a75c94b9c4b49e295a18fe5f7939be7ae46e9c`.
+- Projection schemas/readiness đang được triển khai trong task riêng; CI của phần đó đang chờ.
 - Tài liệu chính: .ai/architecture/ingestion-pipeline.md.
 - Ngày cập nhật cuối: 2026-11-12.
-- Sáu quyết định Ingestion v1 đã được user chấp thuận. Proposed stage I/O/attempt/retry contracts, schemas, fixtures và semantic tests đã được thêm; cần CI xác nhận và user review trước runtime implementation.
+- Sáu quyết định Ingestion v1 đã được user chấp thuận. Stage I/O/attempt/retry contracts, schemas, fixtures và semantic tests đã pass CI Run #926. Chi tiết stage semantics vẫn là proposed draft cần user review trước runtime implementation.

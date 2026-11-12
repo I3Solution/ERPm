@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:ingestion-stage-attempt:1.0",
+  "title": "Enterprise Knowledge Platform IngestionStageAttempt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "attemptId", "invocationId", "runId", "scope", "sourceId",
+    "sourceRevisionId", "stage", "attemptNumber", "component", "state",
+    "inputFingerprint", "inputArtifactIds", "startedAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "ekp.ingestion-stage-attempt" },
+        "version": { "const": "1.0" }
+      }
+    },
+    "attemptId": { "type": "string", "minLength": 1 },
+    "invocationId": { "type": "string", "minLength": 1 },
+    "runId": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tenantId", "workspaceId"],
+      "properties": {
+        "tenantId": { "type": "string", "minLength": 1 },
+        "workspaceId": { "type": "string", "minLength": 1 },
+        "projectId": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "sourceId": { "type": "string", "minLength": 1 },
+    "sourceRevisionId": { "type": "string", "minLength": 1 },
+    "stage": {
+      "enum": [
+        "connector.capture",
+        "extractor.extract",
+        "processor.process",
+        "normalizer.normalize",
+        "validator.validate",
+        "publisher.publish"
+      ]
+    },
+    "attemptNumber": { "type": "integer", "minimum": 1 },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "version"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "ordinal": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "state": {
+      "enum": [
+        "started",
+        "succeeded",
+        "succeeded_with_warnings",
+        "failed",
+        "retry_wait",
+        "skipped",
+        "canceled"
+      ]
+    },
+    "inputFingerprint": { "type": "string", "minLength": 1 },
+    "inputArtifactIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "outputManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestId", "storageRef", "contentHash", "contract"],
+      "properties": {
+        "manifestId": { "type": "string", "minLength": 1 },
+        "storageRef": { "type": "string", "minLength": 1 },
+        "contentHash": { "type": "string", "minLength": 1 },
+        "contract": { "type": "string", "minLength": 1 }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkpointId", "inputFingerprint", "outputManifestId", "outputContentHash", "committedAtUtc"],
+      "properties": {
+        "checkpointId": { "type": "string", "minLength": 1 },
+        "inputFingerprint": { "type": "string", "minLength": 1 },
+        "outputManifestId": { "type": "string", "minLength": 1 },
+        "outputContentHash": { "type": "string", "minLength": 1 },
+        "committedAtUtc": { "type": "string", "format": "date-time" }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "category", "classification", "retryable", "summary"],
+        "properties": {
+          "code": { "type": "string", "minLength": 1 },
+          "severity": { "enum": ["info", "warning", "error", "fatal"] },
+          "category": {
+            "enum": [
+              "network", "rate_limit", "upstream", "authentication",
+              "authorization", "ownership", "revision", "schema",
+              "provenance", "completeness", "integrity", "storage",
+              "timeout", "cancellation", "internal"
+            ]
+          },
+          "classification": { "enum": ["transient", "permanent", "not_applicable"] },
+          "retryable": { "type": "boolean" },
+          "retryAfterSeconds": { "type": "integer", "minimum": 0 },
+          "summary": { "type": "string", "minLength": 1 },
+          "upstreamReference": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "skipReason": {
+      "enum": ["not_configured", "optional_stage_failure", "policy"]
+    },
+    "nextRetryAtUtc": { "type": "string", "format": "date-time" },
+    "startedAtUtc": { "type": "string", "format": "date-time" },
+    "completedAtUtc": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "state": { "enum": ["succeeded", "succeeded_with_warnings"] } },
+        "required": ["state"]
+      },
+      "then": { "required": ["outputManifest", "checkpoint", "completedAtUtc"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "retry_wait" } }, "required": ["state"] },
+      "then": { "required": ["nextRetryAtUtc", "diagnostics"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "skipped" } }, "required": ["state"] },
+      "then": { "required": ["skipReason", "completedAtUtc"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "failed" } }, "required": ["state"] },
+      "then": { "required": ["diagnostics", "completedAtUtc"] }
+    },
+    {
+      "if": { "properties": { "state": { "const": "canceled" } }, "required": ["state"] },
+      "then": { "required": ["completedAtUtc"] }
+    }
+  ]
+}

@@ -84,6 +84,8 @@ Platform
 
 The exact Tenant/Workspace/Project hierarchy is a design baseline and must be validated against the intended deployment model before implementation.
 
+Detailed ownership, retrieval scope, role inheritance and source ACL proposals are documented in [Workspace Boundary](workspace-boundary.md). That document is pending review and is not yet an implementation contract.
+
 Mandatory rules:
 1. Every source and derived knowledge record belongs to an explicit workspace scope.
 2. Retrieval must apply workspace scope and authorization filters before returning content.

@@ -50,7 +50,7 @@ Giữ nguyên các feature đã hoàn tất; chỉ bổ sung feature khi scope t
 
 ## 7. Evidence và cập nhật
 
-- Commit / PR đã merge: Chưa có.
+- Commit / PR: PR [#70](https://github.com/I3Solution/ERPm/pull/70) đang mở; branch head `8c303361c9a3fbdf98c449eeffd2e3fb99d96621`.
 - CI / workflow run và kết quả: Không áp dụng; chưa chạy CI.
 - Tài liệu chính: .ai/architecture/workspace-boundary.md.
 - Ngày cập nhật cuối: 2026-11-12.

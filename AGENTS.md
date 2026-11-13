@@ -48,18 +48,6 @@ Bạn đang làm việc trong workspace ERPm, gồm umbrella repository và các
 - Các thay đổi typo/format thuần túy hoặc thao tác máy móc không làm thay đổi hành vi/nội dung có thể miễn task record. Nếu không chắc, tạo record.
 - Trạng thái task dùng đúng: `Todo`, `Doing`, `Blocked`, `Done`. Chỉ đánh dấu `Done` khi phần việc thực tế hoàn tất, có verification evidence và tất cả feature checklist có theo dõi đã được đánh dấu hoàn thành. Không ghi PASS nếu chưa chạy kiểm tra.
 
-### Quy tắc bắt buộc đối với `.ai/status.md`
-
-- `.ai/status.md` là **generated output**, không phải task record và không phải nơi nhập dữ liệu.
-- **CẤM Agent/Developer tạo, sửa, xóa, format, commit hoặc push thay đổi thủ công vào `.ai/status.md`**. Quy tắc này áp dụng cả khi task có nội dung liên quan đến tiến độ/status.
-- Chỉ workflow GitHub Actions được ủy quyền mới có quyền sinh/cập nhật file này sau khi PR được merge vào `master`.
-- Khi cần thay đổi nội dung báo cáo, hãy cập nhật task record hoặc generator/template nguồn; không chỉnh trực tiếp output.
-- Mỗi lần PR merge vào `master`, workflow phải đọc lại toàn bộ task records đủ điều kiện trên **latest `master`** và generate lại toàn bộ `.ai/status.md`. Không cộng dồn patch của PR, không dựa trên nội dung status cũ.
-- Một task đi qua nhiều PR phải giữ nguyên filename/record. Báo cáo phản ánh snapshot mới nhất của record sau mỗi lần merge.
-- Task records lịch sử không có marker aggregation của template mới được bỏ qua; không migration, backfill hoặc validate hồi tố.
-- Không thêm PR validator hoặc yêu cầu Developer chạy generator local. Việc tổng hợp và ghi file là trách nhiệm của GitHub Actions.
-- Nếu generator phát hiện task record mới có marker nhưng sai contract, workflow phải fail an toàn và giữ nguyên status report hiện tại; không âm thầm bỏ qua record lỗi rồi xuất báo cáo thiếu dữ liệu.
-
 ## 6. Context packet trước khi code
 
 Với task vượt quá một file hoặc liên quan nhiều repo, trước khi triển khai phải tóm tắt:

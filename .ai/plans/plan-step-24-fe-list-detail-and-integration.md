@@ -72,4 +72,7 @@ Cập nhật bảng này khi có card hoàn thành (mã, trạng thái, SHA).
 | :--- | :--- | :--- |
 | BE-INT.1 | Todo | https://trello.com/c/PLSefcdu |
 | FE-INT.1 | Todo | https://trello.com/c/yVyoUVZI |
-| LD.1 - LD.5 | Todo | card đang raise |
+| LD.1, LD.2 | Done (merge) | FE #22, #23, WMS #4, BE #35, #36 |
+| LD.3 | Review | FE #31 f02584c, HRM #11 8e20ffb; chờ Tester |
+| LD.4 | Done | bảng rà soát trong [step-24-list-detail-ld.md](../steps/step-24-list-detail-ld.md): không có màn xếp loại page |
+| LD.5 | Todo | Dev 1 |

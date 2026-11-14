@@ -22,14 +22,14 @@ repositories:
     path: ERPm-BE
     repository: I3Solution/ERPm-BE
     role: backend
-    pinned_revision: d5cb0771a32e0407cc714e20a45ec751ea800f4a
+    pinned_revision: 44307c462719b43606dcf05a038bf189a4369e78
     baseline_revision: 38763b0b67b96d5998dda76cd71e7015b458b5f4
     status: verified
   - id: erpm-fe
     path: ERPm-FE
     repository: I3Solution/ERPm-FE
     role: frontend
-    pinned_revision: dbeaf66687454452886201bb669df1e25478d893
+    pinned_revision: 267efd47044d194692e9a910b95adcdc4b631a24
     baseline_revision: 427ac894cdcf22a3f83ad11c8ac87d817cbec126
     status: verified
 notes:

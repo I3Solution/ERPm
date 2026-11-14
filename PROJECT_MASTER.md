@@ -36,7 +36,7 @@ Xây dựng một hệ thống phần mềm **Quản trị Bán hàng - Tồn kh
 | **Database** | **PostgreSQL 16+** | Hỗ trợ JSONB linh hoạt, ACID chuẩn xác cho tài chính, miễn phí, hỗ trợ mở rộng partitioning sau này. |
 | **ORM & Data Access** | **EF Core 10 + Dapper** | EF Core cho nghiệp vụ Command/Transaction; Dapper cho Query báo cáo & Dashboard tốc độ cao. |
 | **Frontend Framework** | **Angular 20 (Standalone Components)** | Cấu trúc module rõ ràng, Dependency Injection, Signals phản ứng nhanh, Type-safe tuyệt đối. |
-| **Hybrid UI Framework** | **Ionic Framework 8 + Capacitor** | Bộ UI tối ưu đồng thời cho Mobile & Desktop Web, tích hợp Camera quét mã vạch native, Single Codebase build Android/iOS. Ngoại lệ (2026-11-14): bảng/danh sách dùng Angular Material + CDK (`mat-table`, `matSort`, paginator) theo §4.2. |
+| **Hybrid UI Framework** | **Ionic Framework 8 + Capacitor** | Bộ UI tối ưu đồng thời cho Mobile & Desktop Web, tích hợp Camera quét mã vạch native, Single Codebase build Android/iOS. Ngoại lệ (2026-11-14): bảng `app-data-table` bọc Angular Material + CDK theo §4.2. |
 | **Kiến trúc Mã nguồn** | **Clean Architecture (Domain-Driven)** | Tách biệt hoàn toàn Domain Logic, Application Layer, Infrastructure và Presentation. |
 
 ---
@@ -198,7 +198,7 @@ client/
 1. **Responsive Adaptive Component:**
    - Trên **Mobile (< 768px)**: Sử dụng Ionic UI (Bottom Tabs, Floating Action Button, IonList Card, Slide Gestures, Camera Barcode Scanner).
    - Trên **Desktop (>= 768px)**: Sử dụng Side Navigation Menu, Split Pane, Data Table đa cột, Phím tắt (F2 tìm kiếm, F9 thanh toán, ESC đóng).
-   - **Ngoại lệ Angular Material (chốt 2026-11-14):** `@angular/material` + `@angular/cdk` (cùng bản 20.x) CHỈ nằm trong component dùng chung `erpm-list` (erpm-list bọc Material): lõi bảng PC = `mat-table`/`matSort`/`mat-paginator`; vỏ + mobile = Ionic (ion-searchbar, thẻ ion-card/ion-item, ion-button 44px); theme bằng token ERPm (sáng/tối). Các màn chỉ dùng `<erpm-list>`, không gắn Material trực tiếp. Form nhập liệu vẫn bắt buộc `<app-form-control>`/`<app-input-control>`; Ionic giữ vai trò khung hybrid/mobile; không dùng Material cho form, dialog hay điều hướng nếu chưa có quyết định mới.
+   - **Ngoại lệ Angular Material (chốt 2026-11-14):** `@angular/material` + `@angular/cdk` (cùng bản 20.x) CHỈ nằm trong component bảng dùng chung `app-data-table` (app-data-table bọc Material, sửa tại chỗ, không có bảng thứ hai): lõi bảng PC = `mat-table`/`matSort`; vỏ + mobile = Ionic (thẻ `ion-card`, nút 44px); theme bằng token ERPm (sáng/tối). Các màn chỉ dùng `<app-data-table>`, không gắn Material trực tiếp. Form nhập liệu vẫn bắt buộc `<app-form-control>`/`<app-input-control>`; không dùng Material cho form, dialog hay điều hướng nếu chưa có quyết định mới.
 2. **Quét mã vạch (Barcode / QR):**
    - Trên Mobile: Dùng `@capacitor-community/barcode-scanner` hoặc Camera native.
    - Trên Desktop: Hỗ trợ đầu đọc mã vạch USB (lắng nghe sự kiện phím nhanh `keyup` buffer).

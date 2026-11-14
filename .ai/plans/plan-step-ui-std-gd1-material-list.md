@@ -1,6 +1,6 @@
 # Plan: UI-STD GĐ1 — component list dùng chung trên Angular Material
 
-> **Trạng thái:** Chờ quyết định (xung đột kiến trúc, mục 2). Chưa cài thư viện, chưa sửa mã.
+> **Trạng thái:** Đã chốt 2026-11-14: sửa tại chỗ `app-data-table` (bọc Material, vỏ Ionic); không có component mới.
 > **Yêu cầu:** Thiện qua BA 1 (2026-11-14): giao diện list lộn xộn (bảng dài ngắn không đều, sort tệ); áp Angular Material + CDK, theme ERPm, sáng/tối, PC + mobile.
 > **Căn cứ:** FE #46 (docs/ui-std/gd0-inventory.md, gd0-measurements.md): 47 màn, chỉ 5 màn dùng list-page, 11 màn `<table>` tay; dòng bảng 50–97px; nút trong dòng 26–36px.
 
@@ -17,7 +17,7 @@ Phương án nhẹ hơn để so: nâng data-table hiện có (cột cố địn
 
 ## 3. Các bước (sau khi duyệt)
 1. Cài @angular/material + @angular/cdk 20.x; theme ERPm map từ token hiện có (variables.scss), sáng/tối theo cơ chế theme hiện tại.
-2. Component dùng chung `app-data-list` (mat-table + matSort + paginator): cột Hành động cố định, bề rộng đều, sort đẩy lên server khi màn dùng phân trang server (nối createListQueryState như FE #49), mobile <768px chuyển thẻ, nút ≥44px, dùng token cỡ chữ/khoảng cách chung (không đặt riêng, theo UI-STD).
+2. Component dùng chung `app-data-table` (mat-table + matSort + paginator): cột Hành động cố định, bề rộng đều, sort đẩy lên server khi màn dùng phân trang server (nối createListQueryState như FE #49), mobile <768px chuyển thẻ, nút ≥44px, dùng token cỡ chữ/khoảng cách chung (không đặt riêng, theo UI-STD).
 3. Thay data-table từng bước: 4 màn trước; data-table cũ giữ cho các màn còn lại.
 4. Kiểm: build, spec, ảnh trước/sau PC 1366 và mobile 390 (sáng/tối), Tester 1.
 

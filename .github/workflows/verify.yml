@@ -1,5 +1,9 @@
 name: Verify ERPm
-on: [push, pull_request]
+on:
+  # Run once per change: PRs get the pull_request run; only master needs a push run (feature-branch pushes would run twice).
+  push:
+    branches: [master]
+  pull_request:
 permissions:
   contents: read
 jobs:

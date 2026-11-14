@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:knowledge-record:1.0",
+  "title": "Enterprise Knowledge Platform KnowledgeRecord v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "recordId",
+    "scope",
+    "classification",
+    "claim",
+    "payload",
+    "evidenceIds",
+    "provenance",
+    "createdAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.knowledge-record"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "recordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "logicalKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "recordType"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordType": {
+          "enum": [
+            "code.file",
+            "code.symbol",
+            "code.reference_observation",
+            "code.api_observation"
+          ]
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "verification"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "source_observation",
+            "deterministic_extraction",
+            "human_assertion",
+            "model_inference"
+          ]
+        },
+        "verification": {
+          "enum": [
+            "verified",
+            "partial",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "version",
+        "data"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "code.file",
+            "code.symbol",
+            "code.reference_observation",
+            "code.api_observation"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    "evidenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ingestionRunId",
+        "producer"
+      ],
+      "properties": {
+        "ingestionRunId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "connector": {
+              "type": "string"
+            },
+            "connectorVersion": {
+              "type": "string"
+            },
+            "extractor": {
+              "type": "string"
+            },
+            "extractorVersion": {
+              "type": "string"
+            },
+            "normalizer": {
+              "type": "string"
+            },
+            "normalizerVersion": {
+              "type": "string"
+            }
+          }
+        },
+        "inputSourceRevisionIds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "accessPolicyRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

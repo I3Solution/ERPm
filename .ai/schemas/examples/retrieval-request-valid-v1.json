@@ -1,0 +1,54 @@
+{
+  "contract": {
+    "name": "ekp.retrieval-request",
+    "version": "1.0"
+  },
+  "requestId": "request-test-001",
+  "scope": {
+    "workspaceId": "workspace-a",
+    "projectIds": [
+      "project-a"
+    ],
+    "sourceIds": [
+      "source-a"
+    ]
+  },
+  "query": {
+    "text": "ExampleService",
+    "intent": "hybrid_search",
+    "filters": [
+      {
+        "field": "payloadType",
+        "operator": "eq",
+        "value": "code.symbol"
+      }
+    ]
+  },
+  "revisionPolicy": {
+    "mode": "active"
+  },
+  "methods": [
+    {
+      "kind": "structured",
+      "required": true
+    },
+    {
+      "kind": "full_text",
+      "required": false
+    },
+    {
+      "kind": "vector",
+      "required": false
+    }
+  ],
+  "relationExpansion": {
+    "enabled": true,
+    "maxDepth": 1,
+    "maxResults": 20
+  },
+  "limits": {
+    "maxCandidates": 100,
+    "maxResults": 20,
+    "maxRelations": 20
+  }
+}

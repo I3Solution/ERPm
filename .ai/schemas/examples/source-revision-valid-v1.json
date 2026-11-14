@@ -1,0 +1,14 @@
+{
+  "sourceRevisionId": "revision-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "revisionKind": "git_commit",
+  "revisionKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "contentHash": "sha256:abc123",
+  "artifactRef": "artifact://source-a/revision-001",
+  "capturedAtUtc": "2026-11-12T03:00:00Z"
+}

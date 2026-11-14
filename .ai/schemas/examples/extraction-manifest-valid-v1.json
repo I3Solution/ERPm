@@ -1,0 +1,52 @@
+{
+  "contract": {
+    "name": "ekp.extraction-manifest",
+    "version": "1.0"
+  },
+  "manifestId": "extraction-manifest-001",
+  "runId": "run-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "inputCaptureManifest": {
+    "manifestId": "capture-manifest-001",
+    "contentHash": "sha256:capture-manifest"
+  },
+  "extractor": {
+    "type": "erp-code-index-adapter",
+    "version": "1.0",
+    "outputContract": "erp.code-index/3"
+  },
+  "observationArtifacts": [
+    {
+      "artifactId": "artifact-observations-001",
+      "storageRef": "artifact://runs/run-001/observations.jsonl",
+      "mediaType": "application/x-ndjson",
+      "contentHash": "sha256:observations",
+      "byteLength": 4096,
+      "observationCount": 100
+    }
+  ],
+  "observationCount": 100,
+  "unsupportedCount": 5,
+  "coverage": [
+    {
+      "metric": "supported_file_coverage",
+      "numerator": 95,
+      "denominator": 100,
+      "ratio": 0.95
+    },
+    {
+      "metric": "evidence_locator_coverage",
+      "numerator": 100,
+      "denominator": 100,
+      "ratio": 1.0
+    }
+  ],
+  "omissionReportRef": "artifact://runs/run-001/omissions.json",
+  "completedAtUtc": "2026-11-12T04:03:00Z"
+}

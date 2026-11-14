@@ -1,0 +1,35 @@
+{
+  "contract": {
+    "name": "ekp.projection-profile",
+    "version": "1.0"
+  },
+  "profileId": "code-vector-default",
+  "version": "1.0",
+  "projectionKind": "vector",
+  "builder": {
+    "type": "embedding-projection-builder",
+    "version": "1.0",
+    "outputContract": "ekp.projection-manifest/1.0"
+  },
+  "sourceSelection": {
+    "canonicalContractVersion": "1.0",
+    "payloadTypes": [
+      { "type": "code.file", "versions": ["1.0"] },
+      { "type": "code.symbol", "versions": ["1.0"] },
+      { "type": "code.reference_observation", "versions": ["1.0"] },
+      { "type": "code.api_observation", "versions": ["1.0"] }
+    ]
+  },
+  "configuration": {
+    "configRef": "config://projection/vector/code-default/1.0",
+    "configFingerprint": "sha256:vector-config",
+    "configContract": "ekp.vector-projection-config/1.0"
+  },
+  "buildPolicy": {
+    "maxAttempts": 3,
+    "minimumIndexedRatio": 0.95,
+    "allowSkippedItems": true,
+    "rebuildMode": "full"
+  },
+  "definitionFingerprint": "sha256:vector-projection-definition"
+}

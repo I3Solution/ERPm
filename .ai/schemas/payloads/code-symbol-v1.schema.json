@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:payload:code.symbol:1.0",
+  "title": "Enterprise Knowledge Platform code.symbol payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "version", "data"],
+  "properties": {
+    "type": { "const": "code.symbol" },
+    "version": { "const": "1.0" },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "qualifiedName",
+        "language",
+        "symbolKind",
+        "sourceSymbolId",
+        "identity"
+      ],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "qualifiedName": { "type": ["string", "null"] },
+        "language": { "type": "string", "minLength": 1 },
+        "symbolKind": {
+          "enum": [
+            "namespace", "type", "method", "field", "property", "event",
+            "parameter", "local", "typeParameter", "other", "class",
+            "interface", "enum", "function", "constructor", "variable",
+            "unknown"
+          ]
+        },
+        "sourceSymbolId": { "type": "string", "minLength": 1 },
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stability", "strategy"],
+          "properties": {
+            "stability": { "enum": ["stable", "revision_local"] },
+            "strategy": {
+              "enum": ["compiler_semantic_key", "source_locator"]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": { "stability": { "const": "stable" } },
+                "required": ["stability"]
+              },
+              "then": {
+                "properties": { "strategy": { "const": "compiler_semantic_key" } }
+              },
+              "else": {
+                "properties": { "strategy": { "const": "source_locator" } }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

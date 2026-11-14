@@ -64,14 +64,31 @@ Verification evidence must remain distinct:
 
 Deliverables:
 - [ ] Platform context and bounded-context diagram.
-- [ ] Tenant/workspace/project/source hierarchy and isolation rules.
-- [ ] Canonical Knowledge Record, Evidence, Relation and Source Revision contracts.
-- [ ] Connector vs extractor vs processor responsibilities.
-- [ ] Control plane, artifact store, structured store and search plane responsibilities.
-- [ ] Ingestion job lifecycle, retries, idempotency and freshness semantics.
-- [ ] Retrieval request/result and Context Packet contracts.
+- [ ] Tenant/workspace/project/source hierarchy and detailed isolation rules.
+  - Core decision accepted by user on 2026-11-12: Knowledge Workspace is the primary isolation boundary; Project may only narrow access inside it.
+  - Detailed Tenant/identity/ACL/source policy remains under review. See [Workspace Boundary](../architecture/workspace-boundary.md).
+- [x] Canonical Knowledge Record, Evidence, Relation and Source Revision machine-readable schemas, plus the four initial Code payload schemas and identity rules.
+  - Core v1 decisions accepted on 2026-11-12. Payload schemas and the backend v1/v2 + frontend v3 adapter mapping contract are now documented and covered by CI tests; runtime adapter remains a Phase 2 deliverable. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
+- [x] Define logical stage I/O contracts for Connector, Extractor, optional Processor, Normalizer, Validator and Publisher, including child attempt/checkpoint records.
+  - Proposed StageInvocation/StageAttempt and stage-specific manifest schemas, valid fixtures and CI semantic tests are now present. The detailed stage I/O/retry/cancellation semantics are a design draft pending user review; no runtime workers or protocol are implemented. See [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md).
+- [x] Define Control Plane, Artifact Store, Canonical Knowledge Store, Search Projection Store, staging and cache responsibilities.
+  - Five logical storage defaults accepted on 2026-11-12: one relational deployment initially for Control Plane + Canonical Store with separate modules; policy-driven source/history retention; exact Git SHA/hash provenance with archive when replay/retention requires it; separate full-text/vector logical adapters; and a two-Workspace isolation benchmark scenario. See [Storage Boundary](../architecture/storage-boundary.md).
+  - Physical vendor/topology, concrete retention/legal deletion rules and execution of the benchmark remain open.
+- [x] Add machine-readable IngestionProfile, IngestionRun, StageInvocation/Attempt, stage output manifests and ValidationReport contracts.
+  - The six core Ingestion v1 decisions were accepted on 2026-11-12. Stage manifests and semantic CI tests cover run/source/revision lineage, checkpoint integrity, optional processors, retry classification and publication eligibility; [CI Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888) passed all five jobs for commit `52a75c94b9c4b49e295a18fe5f7939be7ae46e9c`.
+- [x] Define full-text/vector ProjectionProfile, ProjectionRun, ProjectionManifest and per-SourceRevision ProjectionStatus, with Retrieval readiness/coverage semantics.
+  - Schemas, fixtures and semantic tests are added in [Search Projection Lifecycle](../architecture/projection-lifecycle.md) and [Retrieval Contract](../architecture/retrieval-contract.md). Runtime projection builders and index stores remain Phase 2/3 implementation work; CI for the new projection contracts is pending.
+- [ ] Complete operational security and remaining ingestion details.
+  - Proposed source-family completeness vocabulary and empty-source/publication rules are drafted in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md) section 19; per-source thresholds and metric schema evolution remain open.
+  - Provider-neutral webhook authentication/replay/deduplication requirements are drafted in section 20; provider-specific verifier details remain open.
+  - Large-SourceRevision staging, chunk reconciliation and whole-revision publication barrier are drafted in section 21; physical storage/transaction mapping remains open.
+  - Proposed StageInvocation/Attempt, retry/cancellation and optional Processor details still require user review.
+- [x] Define Retrieval request/result and Context Packet semantic contracts.
+  - Seven Retrieval v1 semantic defaults and seven Context Packet v1 semantic defaults were accepted on 2026-11-12. See [Retrieval Contract](../architecture/retrieval-contract.md) and [Context Packet Contract](../architecture/context-packet-contract.md).
+  - Retrieval Request/Result/Error and Context Packet/Profile schemas, valid examples and CI semantic tests now exist. Protocol mappings, cursor signing and runtime implementation remain open.
 - [ ] Security/ACL and provenance requirements.
-- [ ] Technology decision records with benchmark/operational rationale.
+- [x] Record accepted Core/AI-ML/extension language direction in [Technology Strategy](../architecture/technology-strategy.md): Go Core, Python AI/ML Runtime, multilingual extensions, modular monolith first.
+- [ ] Complete technology benchmark/operational rationale for database, artifact, search/vector providers and runtime workload targets.
 
 **Exit criteria:** contracts are reviewable, versioned and testable; the first vertical slice can be implemented without ERPm-specific assumptions in the core.
 
@@ -194,15 +211,16 @@ Deliverables:
 
 Do not begin another indexer feature or create a PR for EF metadata yet. First complete Phase 0 in this order:
 
-1. **Workspace boundary:** define Tenant, Workspace, Project, Source and authorization semantics.
-2. **Canonical knowledge contract:** define common envelope plus typed payloads for code, documents and database knowledge.
-3. **Revision/provenance:** define Git commit, document version/content hash and extractor/schema version behavior.
-4. **Storage boundary:** decide control plane, artifact storage, structured store and search plane responsibilities.
-5. **Ingestion lifecycle:** define trigger, snapshot, job, idempotency, validation, publish and failure semantics.
-6. **Retrieval contract:** define query scope, filters, evidence result and relationship expansion.
-7. **Context Packet:** define the contract before implementing an LLM-facing context builder.
-8. **Technology ADRs:** validate candidate technologies against the contracts and a small benchmark.
-9. **First vertical slice design:** centralize the existing ERPm code index without changing its source-analysis semantics.
+1. **Workspace boundary:** core isolation principle accepted; a proposed role/action matrix is now drafted. Review Tenant deployment assumptions, role inheritance, restricted Project behavior, workspace-shared source access, upstream ACL and identity model using [Workspace Boundary](../architecture/workspace-boundary.md).
+2. **Canonical Knowledge Contract:** core v1 decisions, shared envelope schemas, four Code payload schemas, payload identity rules and source-index adapter mapping design are now documented. CI verification is recorded on PR #70; runtime adapter implementation belongs to Phase 2. See [Canonical Knowledge Contract](../architecture/canonical-knowledge-contract.md) and [Code Index Adapter Contract](../architecture/code-index-adapter-contract.md).
+3. **Revision/provenance:** align SourceRevision, evidence locators and producer/payload versions with the exact immutable snapshot model.
+4. **Connector and ingestion contracts:** core Run/trigger/publication choices and proposed stage I/O, child attempt, checkpoint and retry schemas are documented in [Connector and Ingestion Pipeline](../architecture/ingestion-pipeline.md); stage-contract CI Run #926 passed. Source-family completeness vocabulary, webhook security and large-revision staging/commit protocols are now drafted in sections 19–21; obtain review before finalizing their machine-readable fields and physical mappings.
+5. **Storage boundary:** logical defaults are accepted in [Storage Boundary](../architecture/storage-boundary.md); build the two-Workspace benchmark and defer vendor/physical-topology decisions to technology ADRs.
+6. **Retrieval contract:** seven semantic defaults are accepted in [Retrieval Contract](../architecture/retrieval-contract.md); define machine-readable fields, errors, cursor semantics, protocol mapping and two-Workspace acceptance fixtures.
+7. **Context Packet:** semantic defaults are accepted in the [Context Packet Contract](../architecture/context-packet-contract.md); initial JSON Schema Draft 2020-12 files, valid examples and schema/semantic CI tests now exist for ContextPacket and ContextProfile. Adapter mappings and broader evaluation fixtures remain open.
+8. **Remaining contract schemas and adapters:** ProjectionProfile/Run/Manifest/Status and per-revision Retrieval readiness schemas are documented in [Search Projection Lifecycle](../architecture/projection-lifecycle.md); [CI Run #1013](https://github.com/I3Solution/ERPm/actions/runs/43179810828) passed all five jobs. Complete remaining security/protocol details and implement/verify runtime adapters and projection builders in Phase 2/3. Canonical Code payload schemas and source-index mapping design have passed CI on PR #70.
+9. **Technology strategy:** language direction is accepted and recorded in [Technology Strategy](../architecture/technology-strategy.md): Go Core, Python AI/ML Runtime, multilingual extensions, modular monolith first. Next, benchmark physical storage/search/model providers and define measurable workload targets; do not rewrite existing contracts or create runtime scaffolding before the vertical-slice boundary is agreed.
+10. **First vertical slice design:** proposed end-to-end Git code ingestion design is documented in [First Vertical Slice](../architecture/first-vertical-slice.md). The pinned ERPm-BE revision has a single root solution and no nested gitlinks; its SDK is pinned to 10.0.403. The design now requires immutable Git-tree capture plus a separate writable build workspace, with per-invocation artifact integrity hashes (not deterministic output fingerprints). First executable increment is intentionally one backend SourceRevision through a reusable .NET Roslyn extractor host and Go Core; frontend/submodule records will be separate SourceRevision ingestions because v1 does not publish cross-source batches. Backend CLI assumptions have been inspected; define the external adapter request/result protocol and verify immutable snapshot handling before runtime scaffold.
 
 ## 5. First vertical slice acceptance scenario
 
@@ -219,6 +237,8 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 
 ## 6. Cross-cutting capability — Automated task progress report
 
+**Execution status (2026-11-12): PAUSED.** The workflow `.github/workflows/aggregate-task-status.yml` was removed from `master` in PR #69. The generator, tests and design documents remain for possible future work; no automatic aggregation is currently active.
+
 **Goal:** keep task-level ownership independent while maintaining one continuously refreshed project status report without requiring any Developer to edit a shared file.
 
 - [x] Keep the existing Markdown task-record naming convention.
@@ -227,14 +247,14 @@ Use ERPm as the pilot, but keep the contracts project-neutral:
 - [x] Add the aggregation marker and feature/milestone checklist to the task template.
 - [x] Implement a deterministic generator that reads eligible task records and rebuilds `.ai/status.md` from scratch.
 - [x] Add parser/unit tests for valid, malformed, legacy, multi-feature and repeated-update task records; CI verified successfully in [run #631](https://github.com/I3Solution/ERPm/actions/runs/42993219834).
-- [x] Add a GitHub Actions workflow triggered when a PR is merged into `master` (bootstrap run still pending after merge).
+- [x] Implement the GitHub Actions workflow definition; intentionally disabled/removed in PR #69 pending a future redesign.
 - [x] Respect mandatory PR-only changes to `master`: publish the generated report through a dedicated automation branch and a bot PR; never push directly to `master`.
 - [x] Serialize aggregation runs, always read latest `master`, and use a force-with-lease update only on the workflow-owned automation branch.
 - [x] Grant only the aggregation job `contents: write` and `pull-requests: write`; generated status PRs remain subject to normal review/check rules.
 - [x] Support an approved `STATUS_AGGREGATION_TOKEN` so required PR CI workflows can run; the default `GITHUB_TOKEN` fallback does not trigger normal PR workflows.
 - [ ] Verify multiple sequential PRs updating the same task, concurrent merges, unchanged output, malformed records and recovery.
 
-**Operating contract:**
+**Target operating contract if the feature is resumed after redesign:**
 
 1. Task Markdown files are the only manually maintained progress source.
 2. `.ai/status.md` is generated output. Agents and Developers are prohibited from manually creating, editing, deleting, formatting, committing or pushing it.

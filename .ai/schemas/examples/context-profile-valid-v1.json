@@ -1,0 +1,36 @@
+{
+  "contract": {
+    "name": "ekp.context-profile",
+    "version": "1.0"
+  },
+  "profileId": "profile-code",
+  "version": "1.0",
+  "description": "Code investigation context.",
+  "allowedItemKinds": [
+    "structured_fact",
+    "source_excerpt",
+    "code_excerpt",
+    "verified_relation",
+    "notice"
+  ],
+  "allowedDomains": [
+    "code"
+  ],
+  "selection": {
+    "policyVersion": "1.0",
+    "deduplicate": true,
+    "maxItems": 20,
+    "maxExcerptCharacters": 12000,
+    "allowGeneratedSummaries": false
+  },
+  "budget": {
+    "maxTokens": 1000,
+    "reservedTokens": 100,
+    "tokenizerFallback": "conservative_estimator"
+  },
+  "lifecycle": {
+    "ttlSeconds": 900,
+    "revalidateAuthorizationBeforeDelivery": true
+  },
+  "redactionPolicyRef": "redaction-default-v1"
+}

@@ -1,0 +1,61 @@
+{
+  "contract": {
+    "name": "ekp.ingestion-profile",
+    "version": "1.0"
+  },
+  "profileId": "git-code-default",
+  "version": "1.0",
+  "connector": {
+    "type": "git",
+    "versionRange": "^1.0",
+    "configRef": "secretref:git-source-a"
+  },
+  "extractor": {
+    "type": "erp-code-index-adapter",
+    "versionRange": "^1.0",
+    "outputContract": "erp.code-index/3"
+  },
+  "processors": [],
+  "normalizer": {
+    "type": "ekp-code-normalizer",
+    "versionRange": "^1.0",
+    "canonicalContractVersion": "1.0"
+  },
+  "capture": {
+    "revisionStrategy": "git_commit",
+    "consistentSnapshotRequired": true
+  },
+  "completeness": {
+    "requiredMetrics": [
+      "supported_file_coverage",
+      "evidence_locator_coverage"
+    ],
+    "minimumCoverageRatio": 0.95,
+    "allowOptionalWarnings": true
+  },
+  "triggers": [
+    "manual",
+    "webhook"
+  ],
+  "retry": {
+    "maxAttempts": 3,
+    "initialBackoffSeconds": 5,
+    "maxBackoffSeconds": 120,
+    "retryableCategories": [
+      "network_transient",
+      "rate_limited",
+      "upstream_unavailable"
+    ]
+  },
+  "timeouts": {
+    "runTimeoutSeconds": 3600,
+    "stageTimeoutSeconds": 900
+  },
+  "sourceAclRef": "acl:source-a",
+  "retentionPolicyRef": "retention:default",
+  "publication": {
+    "atomicityUnit": "source_revision",
+    "preserveLastGoodRevision": true,
+    "searchProjectionsAsync": true
+  }
+}

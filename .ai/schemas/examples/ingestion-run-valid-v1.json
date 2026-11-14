@@ -1,0 +1,58 @@
+{
+  "contract": {
+    "name": "ekp.ingestion-run",
+    "version": "1.0"
+  },
+  "runId": "run-001",
+  "logicalRunKey": "sha256:logical-run-key",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevision": {
+    "sourceRevisionId": "revision-001",
+    "revisionKind": "git_commit",
+    "revisionKey": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "contentHash": "sha256:source"
+  },
+  "ingestionProfile": {
+    "profileId": "git-code-default",
+    "version": "1.0"
+  },
+  "trigger": {
+    "kind": "manual",
+    "requestedAtUtc": "2026-11-12T03:00:00Z",
+    "requestedByPrincipalId": "principal-a",
+    "idempotencyKey": "request-001"
+  },
+  "state": "succeeded",
+  "pipelineVersions": {
+    "connector": "git/1.0",
+    "extractor": "erp-code-index-adapter/1.0",
+    "processors": [],
+    "normalizer": "ekp-code-normalizer/1.0",
+    "canonicalContractVersion": "1.0",
+    "payloadSchemaVersions": [
+      "code.file/1.0",
+      "code.symbol/1.0"
+    ],
+    "profileVersion": "1.0"
+  },
+  "attemptCount": 1,
+  "retryCount": 0,
+  "stageEvents": [
+    {
+      "stage": "extracting",
+      "state": "succeeded",
+      "startedAtUtc": "2026-11-12T03:01:00Z",
+      "completedAtUtc": "2026-11-12T03:02:00Z",
+      "attempt": 1,
+      "stageAttemptId": "attempt-extract-001"
+    }
+  ],
+  "createdAtUtc": "2026-11-12T03:00:00Z",
+  "updatedAtUtc": "2026-11-12T03:05:00Z",
+  "completedAtUtc": "2026-11-12T03:05:00Z"
+}

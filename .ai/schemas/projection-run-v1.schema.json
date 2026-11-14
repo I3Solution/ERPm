@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:projection-run:1.0",
+  "title": "Enterprise Knowledge Platform ProjectionRun v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "projectionRunId",
+    "idempotencyKey",
+    "scope",
+    "sourceId",
+    "sourceRevisionId",
+    "sourcePublication",
+    "projectionKind",
+    "profile",
+    "builder",
+    "definitionFingerprint",
+    "state",
+    "attemptCount",
+    "createdAtUtc",
+    "updatedAtUtc"
+  ],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.projection-run"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "projectionRunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRevisionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourcePublication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifestId",
+        "contentHash"
+      ],
+      "properties": {
+        "manifestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "projectionKind": {
+      "enum": [
+        "full_text",
+        "vector"
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileId",
+        "version"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "builder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "version"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "definitionFingerprint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "enum": [
+        "queued",
+        "building",
+        "succeeded",
+        "failed",
+        "canceled",
+        "superseded"
+      ]
+    },
+    "attemptCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retryCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "classification",
+          "retryable",
+          "summary"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "classification": {
+            "enum": [
+              "transient",
+              "permanent"
+            ]
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "upstreamReference": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "projectionManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifestId",
+        "contentHash"
+      ],
+      "properties": {
+        "manifestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "createdAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "startedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "succeeded"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "projectionManifest",
+          "startedAtUtc",
+          "completedAtUtc"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "const": "failed"
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "diagnostics",
+          "completedAtUtc"
+        ],
+        "properties": {
+          "diagnostics": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "canceled",
+              "superseded"
+            ]
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "required": [
+          "completedAtUtc"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": [
+              "queued",
+              "building",
+              "failed",
+              "canceled",
+              "superseded"
+            ]
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "then": {
+        "not": {
+          "required": [
+            "projectionManifest"
+          ]
+        }
+      }
+    }
+  ]
+}

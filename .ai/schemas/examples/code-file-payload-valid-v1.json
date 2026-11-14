@@ -1,0 +1,9 @@
+{
+  "type": "code.file",
+  "version": "1.0",
+  "data": {
+    "path": "src/app/app.component.ts",
+    "language": "typescript",
+    "sourceSymbolId": "file:erpm-fe:src/app/app.component.ts"
+  }
+}

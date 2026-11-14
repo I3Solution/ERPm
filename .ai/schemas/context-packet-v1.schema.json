@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:context-packet:1.0",
+  "title": "Enterprise Knowledge Platform Context Packet v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "packetId",
+    "contentHash",
+    "lifecycle",
+    "scope",
+    "audience",
+    "task",
+    "retrievalProvenance",
+    "policy",
+    "budget",
+    "completeness",
+    "items"
+  ],
+  "properties": {
+    "contract": {
+      "$ref": "#/$defs/contract"
+    },
+    "packetId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "createdAtUtc",
+        "expiresAtUtc"
+      ],
+      "properties": {
+        "state": {
+          "const": "ready"
+        },
+        "createdAtUtc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAtUtc": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sourceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "principalId",
+        "consumer"
+      ],
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "consumer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audienceRef": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "taskType"
+      ],
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taskType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goalRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goalText": {
+          "type": "string",
+          "maxLength": 12000
+        }
+      }
+    },
+    "retrievalProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requestId",
+        "resultId",
+        "contractVersion",
+        "selectedRevisions"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resultId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contractVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selectedRevisions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceRevisionRef"
+          }
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contextProfileId",
+        "contextProfileVersion",
+        "authorizationPolicyFingerprint",
+        "selectionPolicyVersion"
+      ],
+      "properties": {
+        "contextProfileId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contextProfileVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authorizationPolicyFingerprint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selectionPolicyVersion": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "budget": {
+      "$ref": "#/$defs/budget"
+    },
+    "completeness": {
+      "$ref": "#/$defs/completeness"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/structuredFact"
+          },
+          {
+            "$ref": "#/$defs/sourceExcerpt"
+          },
+          {
+            "$ref": "#/$defs/codeExcerpt"
+          },
+          {
+            "$ref": "#/$defs/verifiedRelation"
+          },
+          {
+            "$ref": "#/$defs/generatedSummary"
+          },
+          {
+            "$ref": "#/$defs/notice"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "const": "ekp.context-packet"
+        },
+        "version": {
+          "const": "1.0"
+        }
+      }
+    },
+    "sourceRevisionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceId",
+        "sourceRevisionId",
+        "revisionKey",
+        "publicationManifestId"
+      ],
+      "properties": {
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revisionKey": {
+          "type": "string",
+          "minLength": 1
+        },
+        "publicationManifestId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxTokens",
+        "usedTokens",
+        "reservedTokens",
+        "tokenizer"
+      ],
+      "properties": {
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "usedTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reservedTokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tokenizer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version",
+            "countMode"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "countMode": {
+              "enum": [
+                "exact",
+                "estimated"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "completeness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "includedItemCount",
+        "omittedItemCount",
+        "truncatedItemCount",
+        "notices"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "complete",
+            "partial"
+          ]
+        },
+        "includedItemCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "omittedItemCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncatedItemCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notices": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "trust": {
+      "enum": [
+        "platform_metadata",
+        "source_content_untrusted",
+        "derived_content_untrusted"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "knowledgeRecordId",
+        "evidence",
+        "claimKind",
+        "verification"
+      ],
+      "properties": {
+        "knowledgeRecordId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidenceRef"
+          }
+        },
+        "claimKind": {
+          "enum": [
+            "source_observation",
+            "deterministic_extraction",
+            "human_assertion",
+            "model_inference"
+          ]
+        },
+        "verification": {
+          "enum": [
+            "verified",
+            "partial",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "sourceId",
+        "sourceRevisionId",
+        "locator"
+      ],
+      "properties": {
+        "evidenceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRevisionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contentHash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "object",
+          "minProperties": 1
+        }
+      }
+    },
+    "baseItem": {
+      "type": "object",
+      "required": [
+        "itemId",
+        "kind",
+        "priority",
+        "selectionReason",
+        "trust"
+      ],
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selectionReason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trust": {
+          "$ref": "#/$defs/trust"
+        },
+        "truncation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "isTruncated",
+            "retainedRange"
+          ],
+          "properties": {
+            "isTruncated": {
+              "type": "boolean"
+            },
+            "retainedRange": {
+              "type": "string",
+              "minLength": 1
+            },
+            "omittedRange": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "structuredFact": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseItem"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "recordId",
+            "payloadType",
+            "payloadVersion",
+            "data",
+            "provenance"
+          ],
+          "properties": {
+            "kind": {
+              "const": "structured_fact"
+            },
+            "recordId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "payloadType": {
+              "type": "string",
+              "minLength": 1
+            },
+            "payloadVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "data": {
+              "type": "object"
+            },
+            "provenance": {
+              "$ref": "#/$defs/provenance"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "sourceExcerpt": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseItem"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "content",
+            "contentHash",
+            "provenance"
+          ],
+          "properties": {
+            "kind": {
+              "const": "source_excerpt"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contentHash": {
+              "type": "string",
+              "minLength": 1
+            },
+            "provenance": {
+              "$ref": "#/$defs/provenance"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "codeExcerpt": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseItem"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "content",
+            "repositoryId",
+            "commitSha",
+            "path",
+            "startLine",
+            "endLine",
+            "provenance"
+          ],
+          "properties": {
+            "kind": {
+              "const": "code_excerpt"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            },
+            "repositoryId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "commitSha": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40,64}$"
+            },
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "startLine": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "endLine": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "provenance": {
+              "$ref": "#/$defs/provenance"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "verifiedRelation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseItem"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "relationId",
+            "sourceRecordId",
+            "predicate",
+            "targetRecordId",
+            "evidence"
+          ],
+          "properties": {
+            "kind": {
+              "const": "verified_relation"
+            },
+            "relationId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceRecordId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "predicate": {
+              "type": "string",
+              "minLength": 1
+            },
+            "targetRecordId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evidenceRef"
+              }
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "generatedSummary": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseItem"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "content",
+            "inputItemIds",
+            "inputEvidenceIds",
+            "producer",
+            "templatePolicyVersion",
+            "generatedAtUtc"
+          ],
+          "properties": {
+            "kind": {
+              "const": "generated_summary"
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1
+            },
+            "inputItemIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "inputEvidenceIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "producer": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "templatePolicyVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "generatedAtUtc": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "notice": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/baseItem"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "code",
+            "message"
+          ],
+          "properties": {
+            "kind": {
+              "const": "notice"
+            },
+            "code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}

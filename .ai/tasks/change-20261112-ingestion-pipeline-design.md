@@ -1,0 +1,93 @@
+# [change] Thiết kế Connector / Extractor / Normalizer và Ingestion Lifecycle
+
+> **Loại:** change  
+> **Ngày tạo:** 2026-11-12 · **Người làm:** AI Agent (ChatGPT) · **Người yêu cầu:** User  
+> **Trạng thái:** Doing — stage I/O contracts added; CI Run #926 passed; projection lifecycle moved to a separate task  
+> **Progress aggregation:** v1  
+> **Liên quan:** .ai/architecture/workspace-boundary.md, .ai/architecture/canonical-knowledge-contract.md, .ai/architecture/enterprise-knowledge-platform.md  
+> **Phạm vi:** Root repository — kiến trúc ingestion platform
+
+## 1. Mô tả
+
+Thiết kế ranh giới trách nhiệm và contract logic cho Connector, Extractor, Processor, Normalizer, Validator, Publisher và Orchestrator; đồng thời định nghĩa ingestion lifecycle, revision semantics, idempotency, concurrency, checkpoint, atomic publication, freshness và failure behavior.
+
+Chưa triển khai runtime worker, queue, database schema hoặc API.
+
+## 2. Phân tích
+
+- Connector chỉ giao tiếp/capture source; không được tự gán Tenant/Workspace/Project hoặc ghi canonical store.
+- Extractor hiểu format/technology và tạo source-grounded observations.
+- Processor là stage tùy chọn cho transformation có lineage.
+- Normalizer chuyển source-specific observations sang Canonical Knowledge Contract.
+- Validator kiểm tra scope, revision, evidence, relation và completeness.
+- Publisher làm revision hiển thị theo readiness transition; không để record-level partial visibility.
+- Orchestrator điều phối job, retry, checkpoint, audit và concurrency.
+- SourceRevision bất biến; Git selector phải resolve về exact commit SHA.
+- V1 ưu tiên một SourceRevision trên mỗi normalized batch, cross-source derivation để sau.
+
+## 3. Features / Milestones
+
+- [x] Định nghĩa trách nhiệm Connector, Extractor, optional Processor, Normalizer, Validator, Publisher và Orchestrator.
+- [x] Đề xuất boundary contracts giữa các stage.
+- [x] Đề xuất IngestionRun lifecycle, idempotency và concurrency/checkpoint semantics.
+- [x] Đề xuất validation, staging và atomic publication/freshness model.
+- [x] Chốt một IngestionRun quản lý durable request, lifecycle và retry attempts; không tạo IngestionRequest riêng trong v1.
+- [x] Tách canonical publication/readiness khỏi trạng thái full-text/vector projection bất đồng bộ.
+- [x] Chốt atomic publication theo toàn bộ SourceRevision.
+- [x] Chốt trigger v1 gồm manual + webhook; schedule để sau.
+- [x] Cho phép publish với warnings khi chỉ thiếu phần optional và đạt completeness policy.
+- [x] Chặn publish khi mandatory data/stage hoặc validity/integrity requirement thất bại; giữ revision published tốt trước đó.
+- [x] Tạo JSON Schema Draft 2020-12 cho IngestionProfile, IngestionRun và PublicationManifest.
+- [x] Thêm valid fixtures và automated schema validation vào CI.
+- [x] Định nghĩa proposed StageInvocation và child StageAttempt contracts; liên kết attempt về IngestionRun.
+- [x] Tạo JSON Schema và valid fixtures cho SourceCaptureManifest, ExtractionManifest, ProcessingManifest, NormalizationManifest và ValidationReport.
+- [x] Định nghĩa input/output mapping cho sáu component stages, checkpoint fingerprint, retry classification, optional Processor, cancellation và supersession.
+- [x] Thêm CI schema/semantic tests cho stage contract, manifest lineage, aggregate counts, completeness ratios và retry/checkpoint invariants.
+- [ ] User review/approval cho các chi tiết stage I/O, attempt và retry/cancellation semantics.
+- [x] Hoàn thành projection profile/run/manifest/status schemas và Retrieval readiness theo từng SourceRevision ở task [Projection Lifecycle](change-20261112-projection-lifecycle-design.md).
+- [x] Draft source-family completeness metric vocabulary, numerator/denominator semantics, empty-source handling and publication gates in section 19; thresholds and schema evolution remain for review.
+- [x] Draft webhook signature verification, source-bound authorization, durable replay/deduplication, secret rotation and dispatch recovery requirements in section 20.
+- [ ] Review/approve provider-neutral webhook security baseline and choose provider-specific signature adapters.
+- [x] Draft storage-independent large-SourceRevision staging, chunk-manifest reconciliation, publication barrier, retry/recovery and orphan-cleanup protocol in section 21.
+- [ ] Review/approve logical staging/commit protocol and validate its physical mapping in the Storage/Technology ADR.
+- [ ] Review/approve source-family completeness vocabulary and decide whether metric schema v1 needs per-metric thresholds and denominator provenance.
+
+Giữ nguyên các feature đã hoàn thành; chỉ bổ sung feature khi scope thực sự mở rộng.
+
+## 4. Cách làm
+
+- Đọc Workspace Boundary và Canonical Knowledge Contract đã được user review ở mức nguyên tắc.
+- Tạo .ai/architecture/ingestion-pipeline.md.
+- Gắn task record riêng theo quy ước.
+- Chưa tạo code runtime hoặc lựa chọn công nghệ cụ thể.
+- Không sửa .ai/status.md.
+
+## 5. Kiểm tra
+
+- Đã kiểm tra pipeline tách khỏi nguồn dữ liệu và không cho Connector/Extractor override scope.
+- Đã định nghĩa source revision, provenance, retryable/permanent errors và publication visibility.
+- User đã chấp thuận sáu lựa chọn ingestion v1 ngày 2026-11-12: single IngestionRun aggregate, projection readiness độc lập, atomic publication theo SourceRevision, manual + webhook trigger, publish-with-warnings cho phần optional và block publication khi phần required lỗi.
+- Canonical publication được định nghĩa là structured-knowledge ready; full-text/vector projection chạy bất đồng bộ và có trạng thái riêng.
+- Initial Profile/Run/Publication schemas đã có và CI Run #853 trước bước mở rộng này đã xanh toàn bộ.
+- StageInvocation/StageAttempt và năm stage output manifests cùng valid fixtures/semantic tests đã được thêm; [CI Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888) xác nhận cả 5 jobs success cho commit `52a75c94b9c4b49e295a18fe5f7939be7ae46e9c`.
+- Stage I/O/attempt/retry/cancellation details hiện là proposed v1 draft, chưa ghi nhận là user-approved.
+- Chưa có runtime implementation hoặc integration tests.
+- Không có claim về build/test runtime.
+
+## 6. Việc còn lại
+
+- User review/approval cho stage I/O, attempt, retry, cancellation và optional Processor semantics (proposed design draft).
+- Source-family completeness metric vocabulary is drafted in section 19. Per-source thresholds, denominator provenance and schema evolution remain open.
+- Webhook authentication/replay protection baseline is drafted in section 20; provider-specific verifier formats and operational retention remain open.
+- Large-revision staging/commit protocol is drafted in section 21; physical transaction/outbox/CAS and artifact-store mapping remain for Storage/Technology ADR.
+- Thiết kế vertical slice Git Connector → existing Code Extractor adapter → Normalizer → Validator → Publisher.
+- Đo retrieval/index projection requirements trước khi chọn search/vector technology.
+
+## 7. Evidence và cập nhật
+
+- PR: [#70](https://github.com/I3Solution/ERPm/pull/70), đang mở.
+- CI cho stage-contract expansion: [Run #926](https://github.com/I3Solution/ERPm/actions/runs/43156485888) — toàn bộ 5 jobs success cho commit `52a75c94b9c4b49e295a18fe5f7939be7ae46e9c`.
+- Projection schemas/readiness đang được triển khai trong task riêng; CI của phần đó đang chờ.
+- Tài liệu chính: .ai/architecture/ingestion-pipeline.md.
+- Ngày cập nhật cuối: 2026-11-12.
+- Sáu quyết định Ingestion v1 đã được user chấp thuận. Stage I/O/attempt/retry contracts, schemas, fixtures và semantic tests đã pass CI Run #926. Chi tiết stage semantics vẫn là proposed draft cần user review trước runtime implementation.

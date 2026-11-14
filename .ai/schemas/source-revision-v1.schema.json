@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:source-revision:1.0",
+  "title": "Enterprise Knowledge Platform SourceRevision v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "sourceRevisionId",
+    "scope",
+    "sourceId",
+    "revisionKind",
+    "revisionKey",
+    "contentHash",
+    "capturedAtUtc"
+  ],
+  "properties": {
+    "sourceRevisionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revisionKind": {
+      "enum": [
+        "git_commit",
+        "document_version",
+        "content_snapshot",
+        "database_schema_snapshot",
+        "issue_snapshot",
+        "other"
+      ]
+    },
+    "revisionKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "contentHash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifactRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capturedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourceObservedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "contract": {
+    "name": "ekp.projection-run",
+    "version": "1.0"
+  },
+  "projectionRunId": "projection-run-001",
+  "idempotencyKey": "sha256:projection-build-key",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "sourcePublication": {
+    "manifestId": "manifest-001",
+    "contentHash": "sha256:manifest"
+  },
+  "projectionKind": "vector",
+  "profile": {
+    "profileId": "code-vector-default",
+    "version": "1.0"
+  },
+  "builder": {
+    "type": "embedding-projection-builder",
+    "version": "1.0"
+  },
+  "definitionFingerprint": "sha256:vector-projection-definition",
+  "state": "succeeded",
+  "attemptCount": 1,
+  "retryCount": 0,
+  "projectionManifest": {
+    "manifestId": "projection-manifest-001",
+    "contentHash": "sha256:projection-manifest"
+  },
+  "createdAtUtc": "2026-11-12T05:00:00Z",
+  "updatedAtUtc": "2026-11-12T05:03:00Z",
+  "startedAtUtc": "2026-11-12T05:00:10Z",
+  "completedAtUtc": "2026-11-12T05:03:00Z"
+}

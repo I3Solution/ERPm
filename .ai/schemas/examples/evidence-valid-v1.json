@@ -1,0 +1,21 @@
+{
+  "evidenceId": "evidence-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "locator": {
+    "kind": "code_span",
+    "path": "src/ExampleService.cs",
+    "startLine": 1,
+    "endLine": 20
+  },
+  "contentHash": "sha256:abc123",
+  "capture": {
+    "method": "compiler_symbol",
+    "producerVersion": "1.0"
+  }
+}

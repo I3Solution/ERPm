@@ -1,0 +1,49 @@
+{
+  "contract": {
+    "name": "ekp.projection-manifest",
+    "version": "1.0"
+  },
+  "manifestId": "projection-manifest-001",
+  "projectionRunId": "projection-run-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "sourcePublication": {
+    "manifestId": "manifest-001",
+    "contentHash": "sha256:manifest"
+  },
+  "projectionKind": "vector",
+  "profile": {
+    "profileId": "code-vector-default",
+    "version": "1.0"
+  },
+  "builder": {
+    "type": "embedding-projection-builder",
+    "version": "1.0"
+  },
+  "definitionFingerprint": "sha256:vector-projection-definition",
+  "projectionVersion": "vector-v1",
+  "state": "ready",
+  "counts": {
+    "sourceRecords": 100,
+    "eligibleItems": 80,
+    "indexedItems": 80,
+    "skippedItems": 0,
+    "failedItems": 0
+  },
+  "outputArtifacts": [
+    {
+      "artifactId": "projection-segment-001",
+      "storageRef": "projection://workspace-a/source-a/revision-a/vector/segment-001",
+      "contentHash": "sha256:projection-segment",
+      "byteLength": 8192,
+      "itemCount": 80
+    }
+  ],
+  "contentHash": "sha256:projection-manifest",
+  "publishedAtUtc": "2026-11-12T05:03:00Z"
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ekp:knowledge-relation:1.0",
+  "title": "Enterprise Knowledge Platform KnowledgeRelation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "relationId",
+    "scope",
+    "sourceRecordId",
+    "predicate",
+    "targetRecordId",
+    "assertion",
+    "evidenceIds",
+    "producerVersion"
+  ],
+  "properties": {
+    "relationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tenantId",
+        "workspaceId"
+      ],
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workspaceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "projectId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "sourceRecordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "predicate": {
+      "type": "string",
+      "minLength": 1
+    },
+    "targetRecordId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "verification"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "source_observation",
+            "deterministic_extraction",
+            "human_assertion",
+            "model_inference"
+          ]
+        },
+        "verification": {
+          "const": "verified"
+        }
+      }
+    },
+    "evidenceIds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "producerVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "supersedesRelationId": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

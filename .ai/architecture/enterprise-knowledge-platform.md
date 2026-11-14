@@ -82,7 +82,7 @@ Platform
         └── Access policies
 ```
 
-The exact Tenant/Workspace/Project hierarchy is a design baseline and must be validated against the intended deployment model before implementation.
+The core isolation decision is accepted: Knowledge Workspace is the primary data boundary; Project can only narrow access within that Workspace. Detailed role, identity, upstream ACL and lifecycle decisions remain under review. See [Workspace Boundary](workspace-boundary.md).
 
 Mandatory rules:
 1. Every source and derived knowledge record belongs to an explicit workspace scope.
@@ -105,7 +105,7 @@ Knowledge is organized by domain, while sharing one platform contract:
 | Documentation | PDF, DOCX, Markdown, HTML | Sections, paragraphs, tables, citations |
 | Development history | Git commits, PRs, issues | Change history, decisions, implementation links |
 
-A connector discovers and retrieves source material. An extractor understands a source format or technology. A normalizer maps extracted facts into shared contracts. These responsibilities must not be fused into one ERPm-specific pipeline.
+A connector discovers and captures immutable source snapshots; an extractor emits typed source-grounded observations; optional processors transform observations while preserving lineage; a normalizer maps them into canonical records; a validator checks scope/evidence/revision invariants; a publisher makes a complete revision visible; and an orchestrator coordinates the lifecycle. See [Connector and Ingestion Pipeline](ingestion-pipeline.md) for the proposed responsibilities and contracts.
 
 ## 6. Canonical knowledge and evidence contract
 
@@ -124,6 +124,8 @@ The common envelope should support, at minimum:
 
 The contract must distinguish source facts from inferred/enriched facts. Name similarity alone is not proof of a relationship. Existing index schemas v1/v2/v3 remain historical, versioned contracts; do not silently reinterpret them as the future platform-wide contract.
 
+The proposed common envelope, Evidence, KnowledgeRelation, SourceRevision and typed payload model is specified separately in [Canonical Knowledge Contract](canonical-knowledge-contract.md). That document is a draft pending review; it does not yet authorize database/API implementation.
+
 ## 7. Central storage responsibilities
 
 Keep logical storage responsibilities separate even if the first deployment uses a small number of technologies:
@@ -134,22 +136,15 @@ Keep logical storage responsibilities separate even if the first deployment uses
 - **Search plane:** full-text and vector representations with workspace, revision and ACL filters.
 - **Relationship retrieval:** initially may use relational/structured edges; introduce a dedicated graph database only when measured query needs justify it.
 
-A prior technology direction discussed for evaluation is PostgreSQL for control metadata, OpenSearch for full-text/vector search, Haystack for retrieval pipelines, and Go for MCP services. Treat these as candidate/previously discussed choices, not final locked decisions. Validate operational fit, deployment constraints, connector needs and retrieval benchmarks before committing.
+The detailed logical ownership, publication-consistency and retention boundaries are defined in [Storage Boundary](storage-boundary.md). The accepted v1 default is one relational deployment for Control Plane + Canonical Knowledge Store with separate logical modules/schemas; full-text and vector remain separate logical adapters and may share a search engine only after benchmark validation. Git sources retain exact SHA/hash provenance, with immutable archive capture when replay or retention policy requires it.
+
+The accepted implementation-language direction is Go for the Core Platform, Python for the specialized AI/ML Runtime, and language-neutral versioned contracts/API/MCP for multilingual extensions. Start with a Go modular monolith; do not create one service per logical module. Existing Roslyn and TypeScript indexers remain source-specific extractors behind adapters. See [Technology Strategy](technology-strategy.md) for language boundaries, future repository layout and validation gates. Database, artifact, search/vector vendors and physical deployment topology remain open for benchmark/ADR; do not treat earlier PostgreSQL/OpenSearch/Haystack discussions as selected technologies.
 
 ## 8. Ingestion lifecycle and freshness
 
-Expected lifecycle:
+The high-level lifecycle is discovery → immutable snapshot capture → extraction → optional processing → normalization → validation → staging → publication/readiness. Detailed run states, retry/checkpoint semantics, idempotency, freshness pointers and atomic visibility are proposed in [Connector and Ingestion Pipeline](ingestion-pipeline.md).
 
-1. Register a source inside a workspace.
-2. Discover source revisions or content changes.
-3. Trigger ingestion manually, by webhook or schedule.
-4. Fetch a deterministic source snapshot.
-5. Parse and extract source-specific knowledge.
-6. Normalize and validate records against versioned contracts.
-7. Write artifacts and records to central storage.
-8. Publish/update search and relationship indexes.
-9. Mark the source revision as ready only after required stages succeed.
-10. Expose freshness, errors and provenance to retrieval clients.
+Canonical publication is atomic per complete SourceRevision. Full-text/vector projections have separate asynchronous readiness; their failure does not roll back canonical structured knowledge. See [Storage Boundary](storage-boundary.md).
 
 For Git sources, index an exact commit SHA, not a moving branch name. Branches are pointers to revisions. A query must resolve to an explicit indexed revision or a documented default revision; records from different SHAs must never be silently mixed.
 
@@ -179,6 +174,8 @@ Use:
 
 Vector search is one retrieval method, not the knowledge model and not the only source of truth.
 
+The request/result semantics are being specified separately in [Retrieval Contract](retrieval-contract.md). Retrieval must preserve the Workspace isolation boundary, select only committed SourceRevision manifests, enforce effective Project/Source ACL before exposing candidates, and report when a search projection is unavailable rather than treating its absence as proof that no knowledge exists.
+
 ## 10. Context Packet contract
 
 A Context Packet should be machine-readable and include:
@@ -191,7 +188,7 @@ A Context Packet should be machine-readable and include:
 - Token/size budget and truncation notes.
 - Unresolved questions or missing evidence.
 
-The packet must preserve enough information for an agent or developer to open and verify the original source. It must not present generated summaries as authoritative source facts.
+The packet must preserve enough information for an agent or developer to open and verify the original source. It must not present generated summaries as authoritative source facts. Every factual item must retain SourceRevision and Evidence lineage, and captured source/derived text must remain labeled as untrusted data rather than agent instructions. See [Context Packet Contract](context-packet-contract.md) for the v1 envelope, item kinds, trust labels, token budget, truncation, lifecycle and acceptance semantics. The seven Context Packet v1 semantic defaults were accepted on 2026-11-12; machine-readable schemas, adapter mappings and evaluation fixtures remain to be defined.
 
 ## 11. Security, governance and operations
 
@@ -216,6 +213,10 @@ Already implemented in the ERPm umbrella repository:
 - Provenance and SHA-isolation safeguards.
 
 These are the first **Code Knowledge connector/extractor family** for the platform. They are not yet a centralized knowledge service.
+
+## 12.1 First implementation vertical slice
+
+The proposed first end-to-end implementation path is documented in [First Vertical Slice](first-vertical-slice.md). It uses ERPm only as a pilot Git source while keeping Core contracts platform-neutral: immutable revision capture → existing code extractors → canonical adapter → validation → whole-SourceRevision publication → Workspace-scoped structured retrieval. The first Core is a Go modular monolith; existing Roslyn/TypeScript extractors remain unchanged. Extractor invocation details must be discovered from source before selecting an adapter transport or creating runtime scaffolding.
 
 ## 13. Explicit non-goals for the first platform increment
 

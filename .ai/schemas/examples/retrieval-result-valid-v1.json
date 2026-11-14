@@ -1,0 +1,165 @@
+{
+  "contract": {
+    "name": "ekp.retrieval-result",
+    "version": "1.0"
+  },
+  "requestId": "request-test-001",
+  "resultId": "result-test-001",
+  "outcome": "complete",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectIds": [
+      "project-a"
+    ],
+    "sourceIds": [
+      "source-a"
+    ],
+    "policyFingerprint": "acl-policy-v1"
+  },
+  "revisionPolicy": "active",
+  "selectedRevisions": [
+    {
+      "sourceId": "source-a",
+      "sourceRevisionId": "revision-a",
+      "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "publicationManifestId": "manifest-a"
+    }
+  ],
+  "methodReports": [
+    {
+      "kind": "structured",
+      "state": "available",
+      "required": true,
+      "ran": true,
+      "coverage": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "publicationManifestId": "manifest-a"
+        }
+      ]
+    },
+    {
+      "kind": "full_text",
+      "state": "available",
+      "required": false,
+      "ran": true,
+      "projectionVersion": "fts-v1",
+      "revisionStates": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "state": "available",
+          "projectionManifestId": "projection-manifest-fts-a",
+          "profileVersion": "1.0",
+          "definitionFingerprint": "sha256:fts-definition",
+          "projectionVersion": "fts-v1",
+          "profileId": "code-fulltext-default",
+          "sourcePublicationManifestId": "manifest-a"
+        }
+      ],
+      "coverage": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "publicationManifestId": "manifest-a"
+        }
+      ]
+    },
+    {
+      "kind": "vector",
+      "state": "available",
+      "required": false,
+      "ran": true,
+      "projectionVersion": "embedding-v1",
+      "revisionStates": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "state": "available",
+          "projectionManifestId": "projection-manifest-vector-a",
+          "profileVersion": "1.0",
+          "definitionFingerprint": "sha256:vector-definition",
+          "projectionVersion": "embedding-v1",
+          "profileId": "code-vector-default",
+          "sourcePublicationManifestId": "manifest-a"
+        }
+      ],
+      "coverage": [
+        {
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "publicationManifestId": "manifest-a"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "recordId": "record-a",
+      "recordKind": "entity",
+      "payloadType": "code.symbol",
+      "payloadVersion": "1",
+      "logicalKey": "ERPm.ExampleService",
+      "payload": {
+        "name": "ExampleService",
+        "symbolKind": "class"
+      },
+      "scope": {
+        "tenantId": "tenant-a",
+        "workspaceId": "workspace-a",
+        "projectId": "project-a"
+      },
+      "source": {
+        "sourceId": "source-a",
+        "sourceRevisionId": "revision-a",
+        "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "publicationManifestId": "manifest-a"
+      },
+      "claim": {
+        "kind": "deterministic_extraction",
+        "verification": "verified"
+      },
+      "evidence": [
+        {
+          "evidenceId": "evidence-a",
+          "sourceId": "source-a",
+          "sourceRevisionId": "revision-a",
+          "locator": {
+            "path": "src/ExampleService.cs",
+            "startLine": 1,
+            "endLine": 10
+          },
+          "contentHash": "sha256:abc",
+          "excerpt": "class ExampleService"
+        }
+      ],
+      "retrievalProvenance": {
+        "methods": [
+          {
+            "kind": "structured",
+            "rank": 1
+          },
+          {
+            "kind": "full_text",
+            "score": 0.91,
+            "rank": 1
+          }
+        ],
+        "relationExpanded": false
+      }
+    }
+  ],
+  "ranking": {
+    "policyVersion": "rank-v1",
+    "tieBreaker": "recordId-ascending"
+  },
+  "pagination": {
+    "hasMore": false
+  },
+  "diagnostics": []
+}

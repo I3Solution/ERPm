@@ -1,0 +1,67 @@
+{
+  "contract": {
+    "name": "ekp.normalization-manifest",
+    "version": "1.0"
+  },
+  "manifestId": "normalization-manifest-001",
+  "runId": "run-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "inputExtractionManifest": {
+    "manifestId": "extraction-manifest-001",
+    "contentHash": "sha256:extraction-manifest"
+  },
+  "inputProcessingManifests": [
+    {
+      "manifestId": "processing-manifest-001",
+      "contentHash": "sha256:processing-manifest",
+      "processorOrdinal": 0
+    }
+  ],
+  "normalizer": {
+    "type": "ekp-code-normalizer",
+    "version": "1.0"
+  },
+  "canonicalContractVersion": "1.0",
+  "payloadSchemaVersions": [
+    "code.file/1.0",
+    "code.symbol/1.0",
+    "code.reference_observation/1.0"
+  ],
+  "knowledgeRecordArtifacts": [
+    {
+      "artifactId": "artifact-records-001",
+      "storageRef": "artifact://runs/run-001/knowledge-records.jsonl",
+      "contentHash": "sha256:records",
+      "recordCount": 80
+    }
+  ],
+  "evidenceArtifacts": [
+    {
+      "artifactId": "artifact-evidence-001",
+      "storageRef": "artifact://runs/run-001/evidence.jsonl",
+      "contentHash": "sha256:evidence",
+      "evidenceCount": 80
+    }
+  ],
+  "relationArtifacts": [],
+  "counts": {
+    "sourceObservations": 100,
+    "knowledgeRecords": 80,
+    "evidence": 80,
+    "relations": 0,
+    "unsupportedObservations": 5,
+    "omittedObservations": 15
+  },
+  "payloadCounts": [
+    { "payloadType": "code.file", "version": "1.0", "count": 10 },
+    { "payloadType": "code.symbol", "version": "1.0", "count": 60 },
+    { "payloadType": "code.reference_observation", "version": "1.0", "count": 10 }
+  ],
+  "completedAtUtc": "2026-11-12T04:05:00Z"
+}

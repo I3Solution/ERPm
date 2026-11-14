@@ -1,0 +1,41 @@
+{
+  "contract": {
+    "name": "ekp.ingestion-stage-attempt",
+    "version": "1.0"
+  },
+  "attemptId": "attempt-extract-001",
+  "invocationId": "invocation-extract-001",
+  "runId": "run-001",
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectId": "project-a"
+  },
+  "sourceId": "source-a",
+  "sourceRevisionId": "revision-001",
+  "stage": "extractor.extract",
+  "attemptNumber": 1,
+  "component": {
+    "type": "erp-code-index-adapter",
+    "version": "1.0"
+  },
+  "state": "succeeded",
+  "inputFingerprint": "sha256:extract-input-fingerprint",
+  "inputArtifactIds": ["artifact-source-001"],
+  "outputManifest": {
+    "manifestId": "extraction-manifest-001",
+    "storageRef": "artifact://runs/run-001/extraction-manifest",
+    "contentHash": "sha256:extraction-manifest",
+    "contract": "ekp.extraction-manifest/1.0"
+  },
+  "checkpoint": {
+    "checkpointId": "checkpoint-extract-001",
+    "inputFingerprint": "sha256:extract-input-fingerprint",
+    "outputManifestId": "extraction-manifest-001",
+    "outputContentHash": "sha256:extraction-manifest",
+    "committedAtUtc": "2026-11-12T04:03:00Z"
+  },
+  "diagnostics": [],
+  "startedAtUtc": "2026-11-12T04:01:00Z",
+  "completedAtUtc": "2026-11-12T04:03:00Z"
+}

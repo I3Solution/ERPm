@@ -1,0 +1,97 @@
+{
+  "contract": {
+    "name": "ekp.context-packet",
+    "version": "1.0"
+  },
+  "packetId": "packet-test-001",
+  "contentHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "lifecycle": {
+    "state": "ready",
+    "createdAtUtc": "2026-11-12T03:00:00Z",
+    "expiresAtUtc": "2026-11-12T03:15:00Z"
+  },
+  "scope": {
+    "tenantId": "tenant-a",
+    "workspaceId": "workspace-a",
+    "projectIds": [
+      "project-a"
+    ],
+    "sourceIds": [
+      "source-a"
+    ]
+  },
+  "audience": {
+    "principalId": "principal-a",
+    "consumer": "test-agent"
+  },
+  "task": {
+    "taskId": "task-001",
+    "taskType": "code-investigation",
+    "goalText": "Find the implementation."
+  },
+  "retrievalProvenance": {
+    "requestId": "request-001",
+    "resultId": "result-001",
+    "contractVersion": "1.0",
+    "selectedRevisions": [
+      {
+        "sourceId": "source-a",
+        "sourceRevisionId": "revision-a",
+        "revisionKey": "git:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "publicationManifestId": "manifest-a"
+      }
+    ]
+  },
+  "policy": {
+    "contextProfileId": "profile-code",
+    "contextProfileVersion": "1.0",
+    "authorizationPolicyFingerprint": "acl-sha256:test",
+    "selectionPolicyVersion": "1.0"
+  },
+  "budget": {
+    "maxTokens": 1000,
+    "usedTokens": 250,
+    "reservedTokens": 100,
+    "tokenizer": {
+      "name": "test-estimator",
+      "version": "1.0",
+      "countMode": "estimated"
+    }
+  },
+  "completeness": {
+    "state": "complete",
+    "includedItemCount": 1,
+    "omittedItemCount": 0,
+    "truncatedItemCount": 0,
+    "notices": []
+  },
+  "items": [
+    {
+      "itemId": "item-001",
+      "kind": "source_excerpt",
+      "priority": 100,
+      "selectionReason": "Directly relevant source evidence.",
+      "trust": "source_content_untrusted",
+      "content": "public sealed class Example {}",
+      "contentHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "provenance": {
+        "knowledgeRecordId": "record-a",
+        "claimKind": "deterministic_extraction",
+        "verification": "verified",
+        "evidence": [
+          {
+            "evidenceId": "evidence-a",
+            "sourceId": "source-a",
+            "sourceRevisionId": "revision-a",
+            "contentHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "locator": {
+              "path": "src/Example.cs",
+              "startLine": 1,
+              "endLine": 1
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

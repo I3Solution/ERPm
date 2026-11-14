@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-11-10"
+updated_at: "2026-11-14"
 workspace:
   name: ERPm
   type: umbrella
@@ -22,7 +22,7 @@ repositories:
     path: ERPm-BE
     repository: I3Solution/ERPm-BE
     role: backend
-    pinned_revision: 56385da65226f72c3b66f9c839e2fc430ce85210
+    pinned_revision: 8a9abd62f43988ab3f700d0bb741a668d9050571
     baseline_revision: 38763b0b67b96d5998dda76cd71e7015b458b5f4
     status: verified
   - id: erpm-fe

@@ -2,7 +2,7 @@
 
 ## Baseline triển khai đã xác minh — Step 19 (2026-10-29)
 
-- Backend .NET 10.0.403 / EF Core 10.0.14; PostgreSQL 18 local, workflow CI nhắm PostgreSQL 16. Frontend Angular 17.3 và Ionic 8. Capacitor, offline và Dapper reporting chưa được nghiệm thu.
+- Backend .NET 10.0.403 / EF Core 10.0.14; PostgreSQL 18 local, workflow CI nhắm PostgreSQL 16. Frontend Angular 20.3 và Ionic 8 (bảng dữ liệu dùng Angular Material + CDK, xem §4.2). Capacitor, offline và Dapper reporting chưa được nghiệm thu.
 - FE có 10 submodule: ACC, SD, PUR, WMS, CRM, HRM, MFG, SCM, PM, dashboard. Luồng đang hoạt động chủ yếu ở SD/WMS/CRM/dashboard; module còn lại là khung hoặc backlog.
 - Danh mục hàng hóa nằm ở WMS, POS ở SD, đối tác ở CRM. Login/core/layout ở repo FE. Không tạo đường dẫn catalog/inventory/sales/partners theo sơ đồ cũ.
 - Nguồn schema chuẩn là EF migrations/snapshot; SQL trong database/ chỉ để tham chiếu, không dùng để reset hay triển khai trực tiếp. Nâng cấp UUID cũ bảo toàn ExternalId và các bảng legacy; DB tạo thủ công bằng script cũ cần quy trình adoption riêng.
@@ -36,7 +36,7 @@ Xây dựng một hệ thống phần mềm **Quản trị Bán hàng - Tồn kh
 | **Database** | **PostgreSQL 16+** | Hỗ trợ JSONB linh hoạt, ACID chuẩn xác cho tài chính, miễn phí, hỗ trợ mở rộng partitioning sau này. |
 | **ORM & Data Access** | **EF Core 10 + Dapper** | EF Core cho nghiệp vụ Command/Transaction; Dapper cho Query báo cáo & Dashboard tốc độ cao. |
 | **Frontend Framework** | **Angular 20 (Standalone Components)** | Cấu trúc module rõ ràng, Dependency Injection, Signals phản ứng nhanh, Type-safe tuyệt đối. |
-| **Hybrid UI Framework** | **Ionic Framework 8 + Capacitor** | Bộ UI tối ưu đồng thời cho Mobile & Desktop Web, tích hợp Camera quét mã vạch native, Single Codebase build Android/iOS. |
+| **Hybrid UI Framework** | **Ionic Framework 8 + Capacitor** | Bộ UI tối ưu đồng thời cho Mobile & Desktop Web, tích hợp Camera quét mã vạch native, Single Codebase build Android/iOS. Ngoại lệ (2026-11-14): bảng/danh sách dùng Angular Material + CDK (`mat-table`, `matSort`, paginator) theo §4.2. |
 | **Kiến trúc Mã nguồn** | **Clean Architecture (Domain-Driven)** | Tách biệt hoàn toàn Domain Logic, Application Layer, Infrastructure và Presentation. |
 
 ---
@@ -198,6 +198,7 @@ client/
 1. **Responsive Adaptive Component:**
    - Trên **Mobile (< 768px)**: Sử dụng Ionic UI (Bottom Tabs, Floating Action Button, IonList Card, Slide Gestures, Camera Barcode Scanner).
    - Trên **Desktop (>= 768px)**: Sử dụng Side Navigation Menu, Split Pane, Data Table đa cột, Phím tắt (F2 tìm kiếm, F9 thanh toán, ESC đóng).
+   - **Ngoại lệ Angular Material (chốt 2026-11-14):** `@angular/material` + `@angular/cdk` (cùng bản 20.x) CHỈ nằm trong component dùng chung `erpm-list` (erpm-list bọc Material): lõi bảng PC = `mat-table`/`matSort`/`mat-paginator`; vỏ + mobile = Ionic (ion-searchbar, thẻ ion-card/ion-item, ion-button 44px); theme bằng token ERPm (sáng/tối). Các màn chỉ dùng `<erpm-list>`, không gắn Material trực tiếp. Form nhập liệu vẫn bắt buộc `<app-form-control>`/`<app-input-control>`; Ionic giữ vai trò khung hybrid/mobile; không dùng Material cho form, dialog hay điều hướng nếu chưa có quyết định mới.
 2. **Quét mã vạch (Barcode / QR):**
    - Trên Mobile: Dùng `@capacitor-community/barcode-scanner` hoặc Camera native.
    - Trên Desktop: Hỗ trợ đầu đọc mã vạch USB (lắng nghe sự kiện phím nhanh `keyup` buffer).

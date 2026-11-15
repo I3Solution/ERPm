@@ -53,6 +53,54 @@ jobs:
         env:
           CHROME_BIN: /usr/bin/google-chrome
 
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci_verification_only
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      # tests/e2e creates and drops its own throwaway database on this server (see tests/e2e/support/env.ts).
+      ERPM_E2E_PG_PORT: '5432'
+      ERPM_E2E_PG_USER: postgres
+      ERPM_E2E_PG_PASSWORD: ci_verification_only
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            ERPm-FE/package-lock.json
+            tests/e2e/package-lock.json
+      - run: dotnet build ERPm-BE/src/ERPm.API/ERPm.API.csproj
+      - run: npm ci
+        working-directory: ERPm-FE
+      - run: npm ci
+        working-directory: tests/e2e
+      - run: npx playwright install --with-deps chromium
+        working-directory: tests/e2e
+      - run: npx playwright test
+        working-directory: tests/e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-report
+          path: |
+            tests/e2e/playwright-report
+            tests/e2e/test-results
+          retention-days: 7
+
   code-index:
     runs-on: ubuntu-latest
     steps:

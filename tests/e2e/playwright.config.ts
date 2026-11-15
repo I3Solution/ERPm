@@ -32,6 +32,14 @@ export default defineConfig({
         BootstrapAdmin__UserName: 'admin',
         BootstrapAdmin__Password: ADMIN_PASSWORD
       }
+    },
+    {
+      // Angular dev server proxying /api to the API above; slow first compile, hence the long timeout.
+      command: `npx ng serve --host 127.0.0.1 --port 4200 --proxy-config "${path.join(__dirname, 'proxy.json')}"`,
+      cwd: path.join(root, 'ERPm-FE'),
+      url: WEB_URL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 300_000
     }
   ]
 });

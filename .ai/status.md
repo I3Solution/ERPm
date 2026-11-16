@@ -1,5 +1,3 @@
-> **LEGACY / FROZEN:** This file is a historical snapshot only. Do not update it, use it as live task status, or regenerate it. Current progress belongs in each task record under `.ai/tasks/`.
-
 # ERPm / Enterprise Knowledge Platform — Current Status
 
 > Updated: 2026-11-11  

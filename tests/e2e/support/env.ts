@@ -17,10 +17,12 @@ export const PG = {
   host: process.env.ERPM_E2E_PG_HOST ?? 'localhost',
   port: Number(process.env.ERPM_E2E_PG_PORT ?? 5433),
   user: process.env.ERPM_E2E_PG_USER ?? 'erpm_user',
-  password: process.env.ERPM_E2E_PG_PASSWORD ?? 'erpm_password123'
+  password: process.env.ERPM_E2E_PG_PASSWORD ?? 'erpm_password123',
+  sslMode: process.env.ERPM_E2E_PG_SSLMODE
 };
 export const DB_NAME = stable('ERPM_E2E_DB', () => 'erpm_e2e_' + randomBytes(4).toString('hex'));
-export const CONNECTION = `Host=${PG.host};Port=${PG.port};Database=${DB_NAME};Username=${PG.user};Password=${PG.password}`;
+export const CONNECTION = process.env.ERPM_E2E_CONNECTION
+  ?? `Host=${PG.host};Port=${PG.port};Database=${DB_NAME};Username=${PG.user};Password=${PG.password}${PG.sslMode ? `;SSL Mode=${PG.sslMode}` : ''}`;
 
 /** Passwords exist only for this run; nothing here is a real credential. */
 export const ADMIN_PASSWORD = stable('ERPM_E2E_ADMIN_PW', () => 'Aa1-' + randomBytes(12).toString('hex'));

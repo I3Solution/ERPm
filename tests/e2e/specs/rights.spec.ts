@@ -8,7 +8,7 @@ const nav = (page: import('@playwright/test').Page, label: string) => page.getBy
 test('admin sees the administration menu and can open the organization tree', async ({ page }) => {
   await signIn(page, 'admin', ADMIN_PASSWORD);
   await expect(nav(page, 'Cơ cấu tổ chức')).toBeVisible();
-  await expect(nav(page, 'Tài khoản')).toBeVisible();
+  await expect(page.locator('a.nav-item[href="/users"]')).toBeVisible();
   await page.goto('/org');
   await expect(page.getByRole('treeitem').filter({ hasText: 'COMPANY_A' })).toBeVisible();
 });

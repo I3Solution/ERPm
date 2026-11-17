@@ -3,7 +3,14 @@ import { DB_NAME, PG } from './support/env';
 
 /** Drops the throwaway database once the API has stopped using it (best effort: CI discards the server anyway). */
 export default async function globalTeardown(): Promise<void> {
-  const client = new Client({ ...PG, database: 'postgres' });
+  const client = new Client({
+    host: PG.host,
+    port: PG.port,
+    user: PG.user,
+    password: PG.password,
+    database: 'postgres',
+    ssl: PG.sslMode ? { rejectUnauthorized: false } : undefined
+  });
   try {
     await client.connect();
     await client.query(`DROP DATABASE IF EXISTS "${DB_NAME}" WITH (FORCE)`);

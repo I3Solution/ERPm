@@ -2,6 +2,7 @@
 // (multilingual-e5-small via transformers.js, no data leaves the box), cosine search in memory.
 // Vectors are cached in .cache/vectors.json keyed by chunk hash, so only changed chunks are re-embedded.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { relative } from 'node:path';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,7 +22,7 @@ export function chunkMarkdown(source, text) {
     const head = (sec.match(/^##\s+(.*)$/m) || [, ''])[1];
     for (let i = 0; i < sec.length; i += MAX) {
       const body = sec.slice(i, i + MAX).trim();
-      if (body.length > 40) out.push({ source, title, section: head, text: body });
+      if (body.length > 40 && !/^(Xem thêm|Mục lục|See also|Related)/i.test(head)) out.push({ source, title, section: head, text: body });
     }
   }
   return out;
@@ -32,6 +33,11 @@ function collect() {
   const td = join(root, '.ai', 'tasks');
   for (const f of readdirSync(td)) if (f.endsWith('.md') && !f.startsWith('_')) files.push(['.ai/tasks/' + f, join(td, f)]);
   for (const f of ['AGENTS.md', 'PROJECT_MASTER.md']) if (existsSync(join(root, f))) files.push([f, join(root, f)]);
+  // Extra markdown trees: RAG_EXTRA_DIRS="label=path;label2=path2", default = sibling HRM wiki when present.
+  const hrm = join(root, '..', 'hrm-wiki_20261029', 'docs', 'wiki');
+  const extra = process.env.RAG_EXTRA_DIRS ? process.env.RAG_EXTRA_DIRS.split(';').map(x => x.split('=')) : existsSync(hrm) ? [['hrm-wiki', hrm]] : [];
+  const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.md') && !['index.md', 'log.md'].includes(e.name) ?[join(d, e.name)] : []);
+  for (const [label, dir] of extra) for (const p of walk(dir)) files.push([label + '/' + relative(dir, p).replaceAll('\\', '/'), p]);
   return files.flatMap(([src, p]) => chunkMarkdown(src, readFileSync(p, 'utf8').replace(/\r\n/g, '\n')));
 }
 
@@ -67,11 +73,11 @@ export async function build() {
 
 export const status = () => ({ ready, building: !!building, chunks: chunks.length });
 
-export async function ask(q, k = 6) {
+export async function ask(q, k = 6, src = '') {
   if (!ready) throw new Error('index not ready');
   const [qv] = await embed(['query: ' + q]);
   // vectors are normalized, so dot product == cosine
-  return vecs.map((v, i) => ({ i, s: v.reduce((a, x, d) => a + x * qv[d], 0) }))
+  return vecs.map((v, i) => ({ i, s: chunks[i].source.startsWith(src) ? v.reduce((a, x, d) => a + x * qv[d], 0) : -1 }))
     .sort((a, b) => b.s - a.s).slice(0, k)
     .map(({ i, s }) => ({ score: +s.toFixed(3), ...chunks[i] }));
 }

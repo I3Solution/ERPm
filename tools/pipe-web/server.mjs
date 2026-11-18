@@ -88,7 +88,7 @@ createServer((req, res) => {
   if (u.pathname === '/api/ask') {
     const q = (u.searchParams.get('q') || '').trim();
     if (!q) return json(res, []);
-    return ask(q).then(r => json(res, r), e => json(res, { error: e.message, ...status() }, 503));
+    return ask(q, 6, u.searchParams.get('src') || '').then(r => json(res, r), e => json(res, { error: e.message, ...status() }, 503));
   }
   if (u.pathname === '/api/rag-status') return json(res, status());
   if (u.pathname === '/api/lessons') return json(res, db.prepare("select file,title,lesson from task where lesson<>'' and lower(lesson) not like 'none%' order by file desc").all());

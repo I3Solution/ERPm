@@ -19,7 +19,7 @@ Web local chỉ đọc cho cơ chế /pipe. Nguồn dữ liệu là `.ai/tasks/*
 - [x] F4 Tìm từ khóa FTS5 (mã định danh như BE#87 không vỡ cú pháp) + tab Bài học (P-LESSON)
 - [x] F5 Tester độc lập kiểm trình duyệt (1366/390, sáng/tối)
 - [ ] F6 (sau) Lọc metadata trong ô tìm, đo số vòng Dev⇄Tester, thời gian chờ cổng
-- [x] F7 RAG cục bộ (nguồn thêm: HRM wiki ../hrm-wiki_20261029/docs/wiki hoặc env RAG_EXTRA_DIRS; lọc `?src=hrm-wiki`; chất lượng HRM mới ở mức trung bình, đã nâng e5-base + trộn FTS5 bằng RRF): `rag.mjs` (model multilingual-e5-small qua transformers.js, cache vector `.cache/vectors.json`), API `/api/ask`, gõ `? câu hỏi` trên web. Chỉ truy xuất, chưa sinh câu trả lời
+- [x] F7 RAG cục bộ (nguồn thêm: HRM wiki ../hrm-wiki_20261029/docs/wiki hoặc env RAG_EXTRA_DIRS; lọc `?src=hrm-wiki`; chất lượng HRM mới ở mức trung bình, đã nâng e5-base + trộn FTS5 bằng RRF; thêm docs/raw, bỏ trang catalog/index/log, bỏ mermaid + frontmatter khỏi vector, đưa đường dẫn file vào vector; 5548 đoạn; 5 câu nghiệp vụ HRM tiếng Việt đều trúng trang đúng ở top 1-3 khi gọi qua fetch — lưu ý curl trên Git Bash Windows làm hỏng tham số tiếng Việt, đừng dùng để đánh giá): `rag.mjs` (model multilingual-e5-small qua transformers.js, cache vector `.cache/vectors.json`), API `/api/ask`, gõ `? câu hỏi` trên web. Chỉ truy xuất, chưa sinh câu trả lời
 - [x] F8 Xuất vault Obsidian (`export-obsidian.mjs`) + graphify AST trên vault + skill `~/.claude/skills/pipe-mindmap`
 - [ ] F9 (sau) Điều khiển agent từ web (`claude -p`), bước LLM tóm tắt câu trả lời RAG, graphify ngữ nghĩa (`/graphify --update`)
 

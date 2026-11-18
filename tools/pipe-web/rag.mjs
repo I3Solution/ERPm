@@ -19,12 +19,15 @@ let extractor, chunks = [], vecs = [], ready = false, building = null;
 
 export function chunkMarkdown(source, text) {
   const out = [];
-  const title = (text.match(/^#\s+(.*)$/m) || [, source])[1];
+  // Frontmatter title beats H1; YAML lists and mermaid diagrams embed as noise that matches every query.
+  const fm = (text.match(/^---\n([\s\S]*?)\n---\n/) || [, ''])[1];
+  text = text.slice(fm ? fm.length + 8 : 0).replace(/```mermaid[\s\S]*?```/g, '');
+  const title = ((fm.match(/^title:\s*"?(.*?)"?\s*$/m) || text.match(/^#\s+(.*)$/m) || [, source])[1]);
   for (const sec of text.split(/\n(?=## )/)) {
     const head = (sec.match(/^##\s+(.*)$/m) || [, ''])[1];
     for (let i = 0; i < sec.length; i += MAX) {
       const body = sec.slice(i, i + MAX).trim();
-      if (body.length > 40 && !/^(Xem thêm|Mục lục|See also|Related)/i.test(head)) out.push({ source, title, section: head, text: body });
+      if (body.length > 40 && !/^(Xem thêm|Mục lục|Liên kết|See also|Related|Links?)\b/i.test(head)) out.push({ source, title, section: head, text: body });
     }
   }
   return out;
@@ -36,12 +39,19 @@ function collect() {
   for (const f of readdirSync(td)) if (f.endsWith('.md') && !f.startsWith('_')) files.push(['.ai/tasks/' + f, join(td, f)]);
   for (const f of ['AGENTS.md', 'PROJECT_MASTER.md']) if (existsSync(join(root, f))) files.push([f, join(root, f)]);
   // Extra markdown trees: RAG_EXTRA_DIRS="label=path;label2=path2", default = sibling HRM wiki when present.
-  const hrm = join(root, '..', 'hrm-wiki_20261029', 'docs', 'wiki');
-  const extra = process.env.RAG_EXTRA_DIRS ? process.env.RAG_EXTRA_DIRS.split(';').map(x => x.split('=')) : existsSync(hrm) ? [['hrm-wiki', hrm]] : [];
-  const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(join(d, e.name)) : e.name.endsWith('.md') && !['index.md', 'log.md'].includes(e.name) ?[join(d, e.name)] : []);
+  const hrmDocs = join(root, '..', 'hrm-wiki_20261029', 'docs');
+  const extra = process.env.RAG_EXTRA_DIRS ? process.env.RAG_EXTRA_DIRS.split(';').map(x => x.split('='))
+    : existsSync(hrmDocs) ? [['hrm-wiki', join(hrmDocs, 'wiki')], ['hrm-raw', join(hrmDocs, 'raw')]] : [];
+  // Skip hub pages, UI-control catalogs (they match every query) and raw drafts/inbox/schema/assets.
+  const skipFile = n => !n.endsWith('.md') || ['index.md', 'log.md'].includes(n) || /catalog/i.test(n);
+  const skipDir = n => n.startsWith('_') || n === 'assets';
+  const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? (skipDir(e.name) ? [] : walk(join(d, e.name))) : skipFile(e.name) ? [] : [join(d, e.name)]);
   for (const [label, dir] of extra) for (const p of walk(dir)) files.push([label + '/' + relative(dir, p).replaceAll('\\', '/'), p]);
   return files.flatMap(([src, p]) => chunkMarkdown(src, readFileSync(p, 'utf8').replace(/\r\n/g, '\n')));
 }
+
+// Path words (e.g. register-leave-day) carry the topic when the prose uses other terms.
+const doc = c => 'passage: ' + c.source + ' | ' + c.title + ' | ' + c.section + '\n' + c.text;
 
 const embed = async (texts) => {
   const t = await extractor(texts, { pooling: 'mean', normalize: true });
@@ -68,7 +78,7 @@ export async function build() {
     fts = new DatabaseSync(':memory:');
     fts.exec("create virtual table c using fts5(t, tokenize='unicode61 remove_diacritics 2')");
     const ins = fts.prepare('insert into c(rowid, t) values (?, ?)');
-    chunks.forEach((c, i) => ins.run(i, c.title + ' ' + c.section + ' ' + c.text));
+    chunks.forEach((c, i) => ins.run(i, c.source.replace(/[\/_.-]/g, ' ') + ' ' + c.title + ' ' + c.section + ' ' + c.text));
     mkdirSync(dirname(cacheFile), { recursive: true });
     writeFileSync(cacheFile, JSON.stringify(Object.fromEntries(keys.map((k, i) => [k, vecs[i]]))));
     ready = true;

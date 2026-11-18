@@ -3,16 +3,18 @@
 // Vectors are cached in .cache/vectors.json keyed by chunk hash, so only changed chunks are re-embedded.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { relative } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..');
-const cacheFile = join(here, '.cache', 'vectors.json');
-const MODEL = 'Xenova/multilingual-e5-small';
+const MODEL = process.env.RAG_MODEL || 'Xenova/multilingual-e5-base';
+const cacheFile = join(here, '.cache', 'vectors-' + MODEL.split('/').pop() + '.json');
 const MAX = 1200; // chars per chunk; shortcut: char-based split, upgrade to token-based if answers get cut mid-sentence
 
+let fts; // in-memory FTS5 over the same chunks, rowid = chunk index
 let extractor, chunks = [], vecs = [], ready = false, building = null;
 
 export function chunkMarkdown(source, text) {
@@ -63,6 +65,10 @@ export async function build() {
       idx.forEach((j, n) => { cache[keys[j]] = v[n]; });
     }
     vecs = keys.map(k => cache[k]);
+    fts = new DatabaseSync(':memory:');
+    fts.exec("create virtual table c using fts5(t, tokenize='unicode61 remove_diacritics 2')");
+    const ins = fts.prepare('insert into c(rowid, t) values (?, ?)');
+    chunks.forEach((c, i) => ins.run(i, c.title + ' ' + c.section + ' ' + c.text));
     mkdirSync(dirname(cacheFile), { recursive: true });
     writeFileSync(cacheFile, JSON.stringify(Object.fromEntries(keys.map((k, i) => [k, vecs[i]]))));
     ready = true;
@@ -76,8 +82,14 @@ export const status = () => ({ ready, building: !!building, chunks: chunks.lengt
 export async function ask(q, k = 6, src = '') {
   if (!ready) throw new Error('index not ready');
   const [qv] = await embed(['query: ' + q]);
+  const ok = i => chunks[i].source.startsWith(src);
   // vectors are normalized, so dot product == cosine
-  return vecs.map((v, i) => ({ i, s: chunks[i].source.startsWith(src) ? v.reduce((a, x, d) => a + x * qv[d], 0) : -1 }))
-    .sort((a, b) => b.s - a.s).slice(0, k)
-    .map(({ i, s }) => ({ score: +s.toFixed(3), ...chunks[i] }));
+  const dense = vecs.map((v, i) => [i, ok(i) ? v.reduce((a, x, d) => a + x * qv[d], 0) : -1]).sort((a, b) => b[1] - a[1]).slice(0, 50).map(x => x[0]);
+  const toks = [...new Set(q.split(/[^\p{L}\p{N}]+/u).filter(t => t.length > 1))].map(t => '"' + t + '"');
+  const sparse = toks.length ? fts.prepare('select rowid i from c where c match ? order by rank limit 200').all(toks.join(' OR ')).map(r => r.i).filter(ok).slice(0, 50) : [];
+  // Reciprocal rank fusion: robust to the two scores living on different scales.
+  const rrf = new Map();
+  for (const list of [dense, sparse]) list.forEach((i, r) => rrf.set(i, (rrf.get(i) || 0) + 1 / (60 + r)));
+  return [...rrf].sort((a, b) => b[1] - a[1]).slice(0, k)
+    .map(([i, s]) => ({ score: +(s * 100).toFixed(2), dense: dense.indexOf(i) + 1 || null, sparse: sparse.indexOf(i) + 1 || null, ...chunks[i] }));
 }

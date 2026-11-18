@@ -119,3 +119,6 @@ $RECYCLE.BIN/
 
 ## ERPm local generated code intelligence cache
 .ai/code-index/cache/
+
+## pipe-web local cache (vectors, Obsidian vault)
+tools/pipe-web/.cache/

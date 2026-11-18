@@ -6,6 +6,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, basename } from 'node:path';
 
+import { build, ask, status } from './rag.mjs';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const tasksDir = join(here, '..', '..', '.ai', 'tasks');
 const port = Number(process.argv[2] || 4500);
@@ -56,6 +58,7 @@ function load() {
   }
 }
 load();
+build().then(r => console.log('rag ready', r), e => console.error('rag build failed:', e.message)); // background, server stays usable
 
 const json = (res, o, code = 200) => { res.writeHead(code, { 'content-type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(o)); };
 const cols = 'file,title,type,status,stage,round,gate,prsha,env,metrics,tokens_k,minutes,features_done,features_total';
@@ -63,7 +66,7 @@ const cols = 'file,title,type,status,stage,round,gate,prsha,env,metrics,tokens_k
 createServer((req, res) => {
   const u = new URL(req.url, 'http://x');
   if (u.pathname === '/') { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); return res.end(readFileSync(join(here, 'index.html'))); }
-  if (u.pathname === '/api/reindex') { load(); return json(res, { ok: true }); }
+  if (u.pathname === '/api/reindex') { load(); build().catch(e => console.error('rag build:', e.message)); return json(res, { ok: true }); }
   if (u.pathname === '/api/tasks') {
     const where = [], args = [];
     for (const k of ['status', 'type', 'stage']) if (u.searchParams.get(k)) { where.push(`${k}=?`); args.push(u.searchParams.get(k)); }
@@ -82,6 +85,12 @@ createServer((req, res) => {
       from fts f join task t on t.file=f.file where fts match ? order by rank limit 30`).all(toks.join(' '));
     return json(res, rows);
   }
+  if (u.pathname === '/api/ask') {
+    const q = (u.searchParams.get('q') || '').trim();
+    if (!q) return json(res, []);
+    return ask(q, 6, u.searchParams.get('src') || '').then(r => json(res, r), e => json(res, { error: e.message, ...status() }, 503));
+  }
+  if (u.pathname === '/api/rag-status') return json(res, status());
   if (u.pathname === '/api/lessons') return json(res, db.prepare("select file,title,lesson from task where lesson<>'' and lower(lesson) not like 'none%' order by file desc").all());
   if (u.pathname === '/api/stats') {
     return json(res, {

@@ -19,13 +19,17 @@ Web local chỉ đọc cho cơ chế /pipe. Nguồn dữ liệu là `.ai/tasks/*
 - [x] F4 Tìm từ khóa FTS5 (mã định danh như BE#87 không vỡ cú pháp) + tab Bài học (P-LESSON)
 - [x] F5 Tester độc lập kiểm trình duyệt (1366/390, sáng/tối)
 - [ ] F6 (sau) Lọc metadata trong ô tìm, đo số vòng Dev⇄Tester, thời gian chờ cổng
-- [ ] F7 (sau) Điều khiển agent từ web (`claude -p`), vector nếu tìm từ khóa trượt
+- [x] F7 RAG cục bộ (nguồn thêm: HRM wiki ../hrm-wiki_20261029/docs/wiki hoặc env RAG_EXTRA_DIRS; lọc `?src=hrm-wiki`; chất lượng HRM mới ở mức trung bình, đã nâng e5-base + trộn FTS5 bằng RRF; thêm docs/raw, bỏ trang catalog/index/log, bỏ mermaid + frontmatter khỏi vector, đưa đường dẫn file vào vector; 5548 đoạn; 5 câu nghiệp vụ HRM tiếng Việt đều trúng trang đúng ở top 1-3 khi gọi qua fetch — lưu ý curl trên Git Bash Windows làm hỏng tham số tiếng Việt, đừng dùng để đánh giá): `rag.mjs` (model multilingual-e5-small qua transformers.js, cache vector `.cache/vectors.json`), API `/api/ask`, gõ `? câu hỏi` trên web. Chỉ truy xuất, chưa sinh câu trả lời
+- [x] F8 Xuất vault Obsidian (`export-obsidian.mjs`) + graphify AST trên vault + skill `~/.claude/skills/pipe-mindmap`
+- [ ] F9 (sau) Điều khiển agent từ web (`claude -p`), bước LLM tóm tắt câu trả lời RAG, graphify ngữ nghĩa (`/graphify --update`)
 
 ## P-PO
 Thiện chốt: Node + SQLite, MVP chỉ xem và tìm, từ khóa + metadata, chưa vector (2026-11-18). Tham chiếu: D:\Tian\wiki\notes\RAG trong AI Agent.html (kho nhỏ, nhiều mã định danh nên từ khóa trúng hơn vector).
 
 ## P-DEV
 Một file `tools/pipe-web/server.mjs` + `index.html`. API: /api/tasks, /api/task, /api/search, /api/lessons, /api/stats, /api/reindex. Metrics chỉ cộng ô có số, "?" tính 0, không bịa. Tự kiểm: 59 ticket đọc được, tìm "BE#87" ra kết quả, 3 bài học. Chưa có tester.
+
+**F7/F8 (2026-11-18):** thêm `rag.mjs`, `export-obsidian.mjs`; `npm i @huggingface/transformers@3` trong `tools/pipe-web` (node_modules, `.cache/` đã ignore). Tự kiểm: 429 đoạn; 2 câu hỏi tiếng Việt trả đúng nguồn top 3; vault 60 ticket/12 hub/67 wikilink; graphify update 470 node. Chưa có tester; chưa mở thử trong Obsidian. Dựng index lần đầu ~66s.
 
 ## P-TEST
 - Tester độc lập, 90d7b73, 2026-11-18: PASS 1-8 (Playwright 1366/390 x sáng/tối: không tràn ngang, 0 lỗi console, màu chữ/nền tương phản).

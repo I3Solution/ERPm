@@ -61,3 +61,5 @@ Thống nhất vị trí tìm kiếm, bộ lọc, thao tác chính và menu trê
 - Build, kiểm thử ChromeHeadless và kiểm tra giao diện đều đã chạy trên worktree nêu trên.
 - Trello Review gồm [Quy tắc FE](https://trello.com/c/UD6daXQC), [header và toolbar](https://trello.com/c/RVtYYvyR), [chọn dòng](https://trello.com/c/8rty58cP), [menu module](https://trello.com/c/FmTl1I9P) và [cây tài khoản](https://trello.com/c/FANHfJaF).
 - PR phụ thuộc gồm [BE #89](https://github.com/I3Solution/ERPm-BE/pull/89), [ACC #7](https://github.com/I3Solution/ERPm-FE-ACC/pull/7), [SD #24](https://github.com/I3Solution/ERPm-FE-SD/pull/24), [WMS #7](https://github.com/I3Solution/ERPm-FE-WMS/pull/7) và [FE #95](https://github.com/I3Solution/ERPm-FE/pull/95).
+- PR tích hợp [ERPm #97](https://github.com/I3Solution/ERPm/pull/97) pin FE `c03ff29c6f369e64f743b8a886bf17b774efe59e` và BE `479fc01c42c6827f28441bfeb7a96b05bcef5c6d`. Checkout chính đã đồng bộ hai gitlink cùng ACC, SD và WMS của FE.
+- [GitHub Actions FE](https://github.com/I3Solution/ERPm-FE/actions/runs/44368709609) đã qua verify.

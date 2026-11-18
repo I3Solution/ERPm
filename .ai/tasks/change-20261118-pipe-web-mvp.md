@@ -38,3 +38,11 @@ Một file `tools/pipe-web/server.mjs` + `index.html`. API: /api/tasks, /api/tas
 - Số liệu 67k token / 77 phút = TEST 67k + 12p + ~25p + ~40p (phút "~" xấp xỉ vẫn được cộng; nếu chỉ tính ô số chính xác thì 12p). Ghi chú nhỏ.
 - Bảo mật: ../../AGENTS.md, %2e%2e%5c, C:/..., _TEMPLATE.md đều 404; bind 127.0.0.1:4500; HTML trong ticket hiển thị dạng chữ, không thực thi. Nạp lại thấy/mất file tạm; đã xóa.
 - Không kiểm: tìm kiếm với từ khóa FTS lạ như "AND" (trả README, hợp lệ), hiển thị thực tế trên trình duyệt khác Chromium, thiết bị thật, hiệu năng nhiều ticket.
+- Tester độc lập (Claude, theo yêu cầu erpm-8d), 2d90062, 2026-11-18: **F7 PASS, F8 PASS (chưa mở Obsidian)**. Index 5548 đoạn.
+  - F7 UI (Playwright 1366/390 x sáng/tối): `? đăng ký nghỉ phép` 6 thẻ có điểm/nguồn/mục/đoạn, top = hrm-raw/.../register-leave-day/workflow.md; không tràn ngang, 0 lỗi console. Tìm cũ BE#87 vẫn 2 kết quả. `? <img onerror>` 0 thẻ img, 0 alert.
+  - 4 câu thêm, top nguồn: nghỉ việc → create-stop-working/business-rules + hr--termination (trúng); nghỉ phép năm → register-leave-day pitfalls/decision-table/workflow (trúng); phân quyền theo QTCT → backend-create-queryable, create-queryable, report-dynamic-store, backend-store-data-permission (trúng phần phân quyền dữ liệu, không có trang QTCT riêng ở top 3); commit message → commit-pr-conventions (trúng).
+  - API: /api/rag-status {ready,chunks:5548}; src=hrm chỉ hrm-raw/hrm-wiki; q rỗng, khoảng trắng, thiếu q → [].
+  - F8: export 2 lần cùng thư mục → 60 ticket/12 hub cả hai lần; 72 file, 257 wikilink, 0 link gãy; ticket có frontmatter (title/tags/status), 12 hub không frontmatter; graph.json có màu done/doing/blocked/todo. Chưa mở Obsidian (kiểm file .md).
+  - Ghi chú nhỏ (không FAIL): index.html dòng 30 chèn `x.score/x.source/x.section` không escape (chỉ `x.text` được thay `<`); nguồn là file md nội bộ nên rủi ro thấp, nên escape cho đồng bộ.
+  - Không kiểm: Obsidian GUI, trình duyệt khác Chromium, độ đúng của điểm số ngoài 5 câu trên.
+- Sau QA (erpm-8d, 2026-11-18): đã escape score/source/section ở index.html theo ghi chú tester (chưa commit).

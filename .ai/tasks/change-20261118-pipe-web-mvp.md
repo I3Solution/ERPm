@@ -17,7 +17,7 @@ Web local chỉ đọc cho cơ chế /pipe. Nguồn dữ liệu là `.ai/tasks/*
 - [x] F2 Bảng theo stage (BA/TA/DESIGN/DEV/TEST/REPORT)
 - [x] F3 Số liệu: ticket qua /pipe, tổng token và phút đã ghi, đếm theo trạng thái
 - [x] F4 Tìm từ khóa FTS5 (mã định danh như BE#87 không vỡ cú pháp) + tab Bài học (P-LESSON)
-- [ ] F5 Tester độc lập kiểm trình duyệt (1366/390, sáng/tối)
+- [x] F5 Tester độc lập kiểm trình duyệt (1366/390, sáng/tối)
 - [ ] F6 (sau) Lọc metadata trong ô tìm, đo số vòng Dev⇄Tester, thời gian chờ cổng
 - [ ] F7 (sau) Điều khiển agent từ web (`claude -p`), vector nếu tìm từ khóa trượt
 
@@ -26,3 +26,11 @@ Thiện chốt: Node + SQLite, MVP chỉ xem và tìm, từ khóa + metadata, ch
 
 ## P-DEV
 Một file `tools/pipe-web/server.mjs` + `index.html`. API: /api/tasks, /api/task, /api/search, /api/lessons, /api/stats, /api/reindex. Metrics chỉ cộng ô có số, "?" tính 0, không bịa. Tự kiểm: 59 ticket đọc được, tìm "BE#87" ra kết quả, 3 bài học. Chưa có tester.
+
+## P-TEST
+- Tester độc lập, 90d7b73, 2026-11-18: PASS 1-8 (Playwright 1366/390 x sáng/tối: không tràn ngang, 0 lỗi console, màu chữ/nền tương phản).
+- Ticket: thẻ tổng quan + 61 thẻ; chi tiết khớp byte với file. Stage: 1 DEV + 4 REPORT khớp dòng Pipeline. Bài học: 3 ticket (đúng, loại "none").
+- Tìm: BE#87 (2), treasury (4), overflow (2); a"b, *, (, rỗng, NEAR( đều 200 không 500; ô trống về danh sách.
+- Số liệu 67k token / 77 phút = TEST 67k + 12p + ~25p + ~40p (phút "~" xấp xỉ vẫn được cộng; nếu chỉ tính ô số chính xác thì 12p). Ghi chú nhỏ.
+- Bảo mật: ../../AGENTS.md, %2e%2e%5c, C:/..., _TEMPLATE.md đều 404; bind 127.0.0.1:4500; HTML trong ticket hiển thị dạng chữ, không thực thi. Nạp lại thấy/mất file tạm; đã xóa.
+- Không kiểm: tìm kiếm với từ khóa FTS lạ như "AND" (trả README, hợp lệ), hiển thị thực tế trên trình duyệt khác Chromium, thiết bị thật, hiệu năng nhiều ticket.

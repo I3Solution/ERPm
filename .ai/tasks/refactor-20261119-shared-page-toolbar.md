@@ -49,6 +49,7 @@ Thống nhất vị trí tìm kiếm, bộ lọc, thao tác chính và menu trê
 - Chrome kiểm tra bản build với API mẫu. SD Orders tại 1440 px và 390 px không tràn toolbar, giữ nhãn nút tạo và gửi truy vấn tìm kiếm. WMS Item Detail ở 390 px giao diện tối hiển thị nút quay lại, xóa và lưu. Ảnh cục bộ tại `tmp/toolbar-orders-desktop.png`, `tmp/toolbar-orders-mobile.png` và `tmp/toolbar-item-detail-mobile-dark.png`.
 - Bản cập nhật kiểm tra lại build production, UI-STD và ChromeHeadless 297/297. Hai dictionary dùng cùng git blob `cf54b0df1cc99f702ceaa1f8aa6fa466674e19a4`. Bundle khởi tạo 959,39 kB, vẫn phát cảnh báo ngân sách 500 kB và hai cảnh báo template đã nêu.
 - Chrome với dữ liệu mẫu ở 1440 px và 390 px đã kiểm tra đổi VI/EN, sáng/tối, đăng xuất, bàn phím đóng menu và phục hồi focus, chuông hiển thị trong viewport, lọc menu theo quyền, chọn dòng/chọn cả trang/bỏ chọn, xóa chọn khi tìm kiếm, cây ACC nở/thu và tìm tài khoản cấp sâu. Ảnh cục bộ tại `tmp/erp-ui-*.png`.
+- `tests/e2e/specs/rights.spec.ts` mở các nhóm điều hướng theo giao diện mới, kiểm tra nhóm theo quyền và nhánh tự mở khi vào route trực tiếp.
 
 ## 6. Việc còn lại
 

@@ -75,7 +75,7 @@
 
 ## 7. Evidence và cập nhật
 - Commit đã push (nhánh `loipham/s27-5-pricelist-permissions`):
-  - `ERPm-BE`: `aa604e9971739e16a572eb775d8756e21c174663`
+  - `ERPm-BE`: `702e104ffe6525e41573292fa745ff50aa5e2b20` (đã sửa `ERPm.Verification`: `ExecuteSqlInterpolatedAsync`, `PUT /api/v1/sys/roles/users/{id}`, tái dùng phiên đăng nhập `pl_actor`)
   - `ERPm-FE-SD`: `fffdc4af83e0df597da945177fd8f74541c870db`
   - `ERPm-FE`: `13fc5f4ff96be106360bcb5f4517dc5c44a7cfcf`
 - CI / workflow run và kết quả: Chờ mở PR để chạy `verify.yml` (PostgreSQL 16)

@@ -1,11 +1,11 @@
 version: 1
-updated_at: "2026-11-14"
+updated_at: "2026-11-19"
 workspace:
   name: ERPm
   type: umbrella
   repository: I3Solution/ERPm
   integration_branch: master
-  audited_root_commit: a87ffcb2638075f7496b48bc615bd6c516d95db1
+  audited_root_commit: fd992845106f7e80afe1417b13f91dc38ce9bd49
   phase1_branch: loipham/step-context-phase1
   phase1_branch_head_commit: cf87df111ba7b9606151b01aff10361462c0a0e9
   phase1_merge_commit: 6c3204172ade56ac6b575f38d34dc38f8b85d049
@@ -16,23 +16,23 @@ repositories:
     repository: I3Solution/ERPm
     role: umbrella_and_integration
     branch: master
-    pinned_revision: a87ffcb2638075f7496b48bc615bd6c516d95db1
+    pinned_revision: fd992845106f7e80afe1417b13f91dc38ce9bd49
     status: verified
   - id: erpm-be
     path: ERPm-BE
     repository: I3Solution/ERPm-BE
     role: backend
-    pinned_revision: 44307c462719b43606dcf05a038bf189a4369e78
+    pinned_revision: 479fc01c42c6827f28441bfeb7a96b05bcef5c6d
     baseline_revision: 38763b0b67b96d5998dda76cd71e7015b458b5f4
     status: verified
   - id: erpm-fe
     path: ERPm-FE
     repository: I3Solution/ERPm-FE
     role: frontend
-    pinned_revision: 267efd47044d194692e9a910b95adcdc4b631a24
+    pinned_revision: c03ff29c6f369e64f743b8a886bf17b774efe59e
     baseline_revision: 427ac894cdcf22a3f83ad11c8ac87d817cbec126
     status: verified
 notes:
-  - "Root baseline and Phase 1 merge commit are recorded separately; child pinned revisions match the root gitlinks at Phase 1."
+  - "Phase 1 references are historical. Child pinned revisions match the Git tree at audited_root_commit."
   - "Update this file whenever workspace topology or a submodule pointer changes."
   - "Nested FE module submodules are not expanded here; use ERPm-FE gitlinks at its pinned revision."

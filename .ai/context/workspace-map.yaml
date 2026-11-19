@@ -29,7 +29,7 @@ repositories:
     path: ERPm-FE
     repository: I3Solution/ERPm-FE
     role: frontend
-    pinned_revision: c03ff29c6f369e64f743b8a886bf17b774efe59e
+    pinned_revision: 98bf18fa7c793ca091f750167c854a26de3a05cc
     baseline_revision: 427ac894cdcf22a3f83ad11c8ac87d817cbec126
     status: verified
 notes:

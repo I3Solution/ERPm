@@ -53,6 +53,27 @@ Xem P-TA.
 - FE: `src/assets/i18n/system.json` copy từ BE, gitlink SD.
 - Kiểm tra: xem §5.
 
+## P-TEST
+- 2026-11-20, tester độc lập: **QA PASS** BE#93@37633e1, SD#28@dd3cc87, FE#100@bdc5620, root#102@d06ffd4.
+- Môi trường: API build riêng :5293 + FE `ng serve` :4293 → DB Docker `erpm_bulk` (:5433). User QA (mật khẩu Erpm@Local2026): `qa_appr` (chỉ duyệt), `qa_rej` (chỉ từ chối), `qa_none` (chỉ xem), `qa_self` (duyệt + từ chối, phạm vi SELF).
+- API, 33/33 PASS (sau khi sửa câu SQL của script test, không phải lỗi sản phẩm):
+  - Lô lẫn (2 đơn chờ duyệt, 1 Draft, 1 Confirmed, id 999999): kết quả từng đơn đúng; đơn thành công được ghi, đơn khác giữ nguyên.
+  - Giữ tồn đúng một lần (+8). Duyệt lại thì báo `invalid_status`, tồn không đổi.
+  - Từ chối: đơn về Draft, không giữ tồn, mỗi đơn đúng 1 dòng lịch sử `REJECT_CREDIT` kèm lý do.
+  - Trả 400: 101 id, trùng id, lý do trống, danh sách rỗng, lý do >500 ký tự (100 id thì được). Trả 403: qa_rej gọi duyệt, qa_appr gọi từ chối, qa_none gọi cả hai.
+  - SELF: đơn của mình thì xong, đơn người khác báo `error.order.not_found`.
+  - Duyệt hàng loạt chạy song song với từ chối đơn lẻ trên cùng đơn: 6/6 lần chỉ một bên thắng (4 lần duyệt thắng, 2 lần từ chối thắng; bên thua nhận 409 hoặc `invalid_status`). Tồn kho khớp với bên thắng.
+  - Thông báo: mỗi đơn xử lý xong có 1 bộ `SD_ORDER_CREDIT_APPROVED`/`REJECTED`; đơn lỗi không có.
+- UI (Playwright), 15/15 PASS:
+  - 1366 (qa_appr): nút mờ khi chưa chọn, ẩn nút từ chối. Chọn 3 đơn (1 Confirmed) → hiện "2/3" + "SO0000000003: …"; bỏ chọn; tải lại.
+  - qa_none: không có menu "⋯".
+  - 390 (qa_rej): lý do trống không gửi được; ra 2/2; bỏ chọn.
+  - Không có lỗi JS trên trang.
+- `ERPm.Verification`: 664/664 PASS (gồm 4 check bulk + 1 check HTTP 403). `ng test orders.component.spec`: 7/7.
+- `SalesAnalyticsComponent rejects an inverted date range` cũng FAIL trên base S27.4 (FE 4d37b65 / SD 0eb3e47), nên lỗi đã có từ trước, không do PR này. Test phụ thuộc ngày: fromDate = 2026-11-20 = hôm nay.
+- CI: BE#93, FE#100, root#102 xanh; SD#28 không có check. Ghi chú nhỏ, không chặn: hộp lý do tone danger có tiêu đề "Lỗi" (do DialogService dùng chung).
+- Bằng chứng: `C:\Users\222th\AppData\Local\Temp\claude\bd7a213182cf99bf\a723dcff-3b2a-44c9-b72b-ce9219e3f8a9\scratchpad\` (be_cases.txt, ui1.txt, ui2.txt, ui\*.png, verify.log).
+
 ## 4. Cách làm
 - DB test: `CREATE DATABASE erpm_bulk TEMPLATE erpm_uistd` trên Docker :5433, API `-- --migrate`.
 

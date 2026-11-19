@@ -95,3 +95,15 @@ Nút trên chi tiết SO hiện theo trạng thái; thiếu quyền thì nút b�
 - PR mở: ERPm-BE#92, ERPm-FE-SD#27, ERPm-FE#99 (chưa merge, chờ Thiện)
 - CI / workflow run và kết quả: chưa
 - Ngày cập nhật cuối: 2026-11-19
+
+## P-TEST
+Tester (retest), 2026-11-20. BE @d91101a (worktree `_wt-d2-s27-4-be`), API :5292, DB `erpm_s274r` (TEMPLATE erpm_uistd, trước S27.4).
+- Kết quả: BE#92 **PASS**; ERPm#101 đã gỡ chặn (lần trước FAIL chỉ do BE).
+- Trước migration: SALES_STAFF (id 7, company_id NULL), statement OwnOrders có 5 action: view/create/edit, crm:partner:view, wms:item:view.
+- `--migrate` lần 1: chạy 3 migration, gồm `20261119130655_GrantSalesStaffConfirmCancel` → 7 action, thêm `sd:order:confirm` + `sd:order:cancel` đúng 1 lần, DataScope SELF/Resources/Effect giữ nguyên, 1 statement.
+- `--migrate` lần 2: không chạy migration nào; chạy tay lại SQL của migration (UPDATE 1) → vẫn 7 action, không trùng.
+- API: user QA274R (Role None + IAM SALES_STAFF) → /auth/me có confirm/cancel; tạo đơn của mình → confirm 200 (Confirmed), cancel 200 (Cancelled, nhả giữ tồn về 0); đơn của admin → confirm 404, cancel 404.
+- Ghi chú: DB mẫu không có tồn, nên confirm lần đầu trả 409 `insufficient_available_stock` (đã qua bước kiểm quyền, không phải 403); đã thêm tay StockBalance item 1 / kho 1 rồi chạy lại.
+- BE Verification (PG :5433): VERIFIED 656 checks, 0 FAIL.
+- CI `gh pr checks 92`: verify pass ×2 (cả hai trên headSha d91101a).
+- Evidence: scratchpad `qa274r.py`, `verif274r.log`.

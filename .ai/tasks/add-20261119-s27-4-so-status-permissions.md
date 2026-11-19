@@ -89,7 +89,7 @@ Nút trên chi tiết SO hiện theo trạng thái; thiếu quyền thì nút b�
 
 ## 6. Việc còn lại
 - Tester 2 kiểm theo vai trò (tạo/xác nhận/duyệt/hủy/chỉ xem/ngoài scope), desktop + mobile.
-- Ghi chú: ERPm-FE#97 (S27.5) merge vào `main`, không phải `master`; FE#99 đặt base `main`.
+- ERPm-FE tích hợp vào `main` (Thiện chốt 2026-11-19); FE#99 base `main`.
 
 ## 7. Evidence và cập nhật
 - PR mở: ERPm-BE#92, ERPm-FE-SD#27, ERPm-FE#99 (chưa merge, chờ Thiện)

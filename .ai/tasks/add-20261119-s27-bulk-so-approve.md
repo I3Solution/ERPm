@@ -1,7 +1,7 @@
 # [add] SD UI-STD: duyệt hoặc từ chối công nợ nhiều đơn bán hàng
 
 > **Pipeline:** stage=TEST · round=BA/TA:1, DEV/TEST:1 · gate=none
-> **PR/SHA:** BE#93 @c00f81f · FE-SD#28 @dd3cc87 · FE#100 @bdc5620
+> **PR/SHA:** BE#93 @37633e1 · FE-SD#28 @dd3cc87 · FE#100 @bdc5620
 > **Env:** erpm_bulk (Docker PG :5433, tạo từ template erpm_uistd) · API http://localhost:5275 · FE http://localhost:4275
 > **Metrics:** BA=?/? · TA=?/? · DESIGN=?/? · DEV=?/? · TEST=? · REPORT=?
 
@@ -66,5 +66,6 @@ Xem P-TA.
 
 ## 7. Evidence và cập nhật
 - PR: ERPm-BE#93, ERPm-FE-SD#28, ERPm-FE#100 (stacked trên S27.4 BE#92/FE-SD#27/FE#99/ERPm#101)
-- Ngày cập nhật cuối: 2026-11-19
+- BE đã nhận commit S27.4 d91101a (migration 20261119130655, chỉ dữ liệu); không có migration riêng. Verification chạy lại: VERIFIED 664 checks; erpm_bulk đã migrate tới 20261119130655.
+- Ngày cập nhật cuối: 2026-11-20
 - Đã triển khai + tự kiểm; chưa qua TEST độc lập.

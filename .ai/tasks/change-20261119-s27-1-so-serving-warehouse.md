@@ -54,3 +54,15 @@
 - Commit / PR đã merge: chưa có.
 - CI / workflow run và kết quả: chưa có.
 - Ngày cập nhật cuối: 2026-11-19
+
+## P-TEST
+- Tester 1 ERPm, 2026-11-20, retest sau fix. SHA: BE 0e97e6f, FE b7d92d8 (SD cb993c4, WMS 8b3e3c7). Môi trường: API :5291 (build riêng), FE :4291, DB local `erpm_qa271` (:5433). Kết quả: **PASS**.
+- Lỗi cũ đã sửa: `GET /sales/orders/{id}` trả `warehouseName="Kho B HCM"` cho SO chi nhánh 3 kho 4 (SO mới 24, 25 và SO cũ 21).
+- Chi tiết SO hiện "Kho xuất hàng: Kho B HCM", không còn "Kho mặc định của chi nhánh" (1366 + 390, không tràn ngang, không lỗi JS).
+- Dialog Xuất hóa đơn: ô "Kho xuất hàng" điền sẵn Kho B HCM và bị khóa (1366 + 390).
+- Xuất HĐ từ UI: HĐ 5, 6 có warehouse_id=4/branch 3; PXK 5, 6 ở kho 4/branch 4; tồn kho 4 giảm 1 mỗi đơn, kho A (3) không đổi. SO -> Completed.
+- `cmp` system_dictionary.json (BE) vs src/assets/i18n/system.json (FE): giống hệt.
+- BE verification: VERIFIED 657 checks, 0 FAIL. CI BE#91 @0e97e6f: verify 2/2 pass.
+- Ảnh: scratchpad a723dcff…/qa271b/shots/detail-1366.png, detail-390.png, invoice-dialog-1366.png, invoice-dialog-390.png, invoiced-1366.png.
+- Đã comment QA PASS trên BE#91, FE-SD#26, FE-WMS#8, FE#98.
+- Ghi chú phụ (ngoài phạm vi, còn nguyên): dialog xác nhận Hủy đơn có tiêu đề "Lỗi".

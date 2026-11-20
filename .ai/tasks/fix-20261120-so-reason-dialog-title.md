@@ -56,3 +56,13 @@
 ## P-DEV
 - Nhánh `thien/so-reason-dialog-title` ở SD, FE, root. Build OK, ng test 315/315.
 - Tester: mở đơn ở trạng thái chờ duyệt nợ → Từ chối duyệt nợ; danh sách chọn nhiều đơn → Từ chối; đơn Draft/Confirmed → Hủy đơn; kiểm tiêu đề vi/en.
+
+## P-TEST
+- Kết quả: **QA PASS** @SD 25a0cf9 / FE d7c0779 / root d68fe2d (Tester độc lập, 2026-11-20). Env FE :4296, API :5296, DB erpm_d2s274.
+- Playwright 1366 (vi) + 390 (en), script `tests/e2e/_qa104.mjs`, `_qa104r.mjs`: tiêu đề đúng cho Phê duyệt bảo lãnh/Approve Credit, Từ chối duyệt nợ/Reject Credit, Hủy đơn/Cancel Order, Duyệt công nợ đơn đã chọn, Từ chối duyệt nợ đơn đã chọn (+ bản en).
+- Lý do bỏ trống → báo lỗi, dialog giữ nguyên (10/10). Hành động chạy: approve → Confirmed/Overridden, reject → Draft, cancel → Cancelled, bulk theo đúng đơn chọn.
+- ACC voucher-detail "Hủy/Đảo phiếu"/"Reverse voucher" vẫn đúng tiêu đề (1366, 390).
+- `order-detail-drawer` (2/7 lời gọi) không được template nào dùng → chỉ kiểm qua diff, không có đường UI.
+- `npx ng test --watch=false`: 315/315 SUCCESS. Spec SalesAnalytics chạy với Date giả lập 2026-11-05, 11-20, 12-31 23:30, 2027-01-01 00:30, 2030-06-15: 5/5 PASS mỗi lần.
+- CI: root#104 5/5 pass, FE#101 verify pass, SD#29 không có check.
+- Ghi chú môi trường: approve lần đầu lỗi `error.sd.insufficient_available_stock` do kho trống (không phải lỗi PR); đã nhập tồn đầu kỳ rồi kiểm lại.

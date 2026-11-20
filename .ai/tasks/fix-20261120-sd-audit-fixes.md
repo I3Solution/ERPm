@@ -63,3 +63,13 @@ Xem P-TA.
 - Commit / PR: BE#94 @d9bfe29 (I3Solution/ERPm-BE#94), root PR này
 - CI: chờ
 - Ngày cập nhật cuối: 2026-11-20
+
+## P-TEST
+- Tester độc lập 2026-11-20, BE#94 @d9bfe29, root #105 @4822f21; API :5297, DB `erpm_audit` (Docker :5433). Evidence local: `.ai/work/qa-be94/` (script + log + ảnh).
+- F1 PASS 14/14: nợ 100k + phiếu thu 100k chưa phân bổ → đơn 100k Confirmed (Warning); hủy phiếu → PendingApproval; ứng trước như nhau; phân bổ 60k → chỉ 40k còn lại được trừ (đơn 110k Pending, 100k Confirmed); trả hàng ReduceDebt trừ đúng 1 lần.
+- F2 PASS 5/5: POS TaxRate 10, net 1.000.000: TaxAmount 1 → 400 `error.validation.request`; 0 và 100.000 → OK, bút toán Có 3331 100.000, cân. POS qua UI (FE :4297) ghi hóa đơn 200.
+- F3 PASS: 45 và 113 thao tác song song (confirm, hóa đơn từ đơn, POS, hủy hóa đơn, nhập kho) cùng khách/mặt hàng/kho: 0 lỗi 5xx, Postgres log 0 `deadlock|40P01` (log API không truy cập được); tồn kho/giữ hàng khớp kỳ vọng; DebtBalance = Σ RemainingDebt; thông báo tồn thấp = số hóa đơn (20/20, 50/50).
+- F4 PASS 9/9: đơn VAT 8%+10% + CK dòng + CK đầu phiếu → hóa đơn tổng 295.200 = đơn, VAT dòng lưu đúng (15.200/10.000), bút toán cân Có 3331 25.200; trả nửa dòng 8% refund 97.600, công nợ 295.200→197.600, tồn +1, bút toán trả cân. UI 1366/390: chi tiết đơn + hộp thoại trả hàng hiện dòng hóa đơn, 0 lỗi JS/5xx, không tràn ngang.
+- ERPm.Verification (bản archive HEAD): VERIFIED 689 checks, 0 FAIL; đã DROP `erpm_verify_d3112840…`.
+- CI: BE#94 verify xanh. Root #105 frontend đỏ do spec SalesAnalytics phụ thuộc ngày ở SD 7f3e631 (không thuộc PR; sửa ở SD 25a0cf9, nhánh thien/so-reason-dialog-title) → cần sync master sau khi fix đó merge.
+- Kết luận: BE#94 QA PASS; root #105 QA FAIL chỉ vì CI ngoài phạm vi.

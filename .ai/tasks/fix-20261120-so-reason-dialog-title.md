@@ -1,7 +1,7 @@
 # [fix] SD: tiêu đề hộp nhập lý do hủy đơn / duyệt nợ hiện "Lỗi"; spec analytics phụ thuộc ngày
 
 > **Pipeline:** stage=TEST · round=BA/TA:1, DEV/TEST:1 · gate=none
-> **PR/SHA:** FE-SD#29 @25a0cf9 · FE#101 @d7c0779 · root (PR này)
+> **PR/SHA:** FE-SD#29 @25a0cf9 · FE#101 @d7c0779 · root#104
 > **Env:** erpm_d2s274 (Docker PG :5433) · API http://localhost:5296 (ERPm-BE master build, BE không đổi) · FE http://localhost:4296 · admin / Erpm@Local2026
 > **Metrics:** BA=?/? · TA=?/? · DESIGN=?/? · DEV=?/? · TEST=? · REPORT=?
 
@@ -9,7 +9,7 @@
 > **Ngày tạo:** 2026-11-20 · **Người làm:** Thiện (AI) · **Người yêu cầu:** Thiện
 > **Trạng thái:** Doing
 > **Progress aggregation:** v1
-> **Liên quan:** FE-SD#29, FE#101, root PR
+> **Liên quan:** FE-SD#29, FE#101, root#104
 > **Phạm vi:** ERPm-FE / module SD (orders, sales-analytics spec)
 
 ## 1. Mô tả

@@ -37,3 +37,18 @@ Ngày 2026-11-19 (UTC+07). Phạm vi lượt này là khảo sát source, lập 
 - Chạy `PricingEngine` từ source pin trong console .NET 10 tạm. Chọn SP mẫu giá 10.000 đ, bậc 100 giảm 1%. Chuỗi 99/100/101/99 cho tiền giảm 0/10.000/10.100/0 đ. Đây là kiểm tra engine độc lập. Hồi quy tích hợp trên màn SO sau khi nối API thuộc S27.2.
 - Giả định cần người chủ trì xác nhận là “10.000 đ tại 100 sản phẩm” có thể là kết quả của tỷ lệ hoặc mức giảm cố định. Đã ghi cả hai trường hợp vào kế hoạch và card.
 - Thay đổi của lượt điều phối nằm trong tài liệu và Trello. Kiểm thử toàn luồng nghiệp vụ được giao cùng từng card.
+
+## 2026-11-21 · Branch Settings
+
+- Đã fetch master và tạo `phuc/s27-branch-settings` tại `60d4c7715c4c163869ee292af572c095b6d6069f`. Đồng bộ BE `371856a9b0772c492a049c656e702c2166f4395e`, FE `35d34305ab75e6e0184901a9e20c92cc895fc7d5`, SD `d270b678333518d2dbedc710f5d295572ea2d323` và WMS `8b3e3c756ce3104ea2f9339678837d2a61a99c25` theo gitlink. Đối chiếu source lúc 01:25–01:29 UTC+07.
+- Nghiệp vụ chốt theo từng key. Branch có thể tự cấu hình hoặc kế thừa theo cha gần nhất trong công ty, sau đó dùng mặc định. Các giá trị scalar có danh mục định kiểu và UI chung. Nhóm dữ liệu có quan hệ như kho phục vụ SO dùng bảng nghiệp vụ hiện có, bổ sung chế độ kế thừa.
+- API contract quy định đăng ký key, trả nguồn và hiệu lực, xem ảnh hưởng, ghi đè/reset qua `If-Match`, lịch sử và giao thức chuyển tiếp của WMS. Thay đổi làm ảnh hưởng SO đang giữ tồn sẽ bị chặn. [Kế hoạch Branch Settings](../plans/plan-step-27-branch-settings.md) · [API contract](../../docs/BRANCH_SETTINGS_API_CONTRACT.md)
+
+| Mốc | Người phụ trách | Trạng thái khi bàn giao | Card |
+| --- | --- | --- | --- |
+| S27.6 · DB, resolver và API SYS | Võ Quốc Thiện | Todo | [S27.6](https://trello.com/c/OBXh4Sg8) |
+| S27.7 · Giao diện quản trị theo schema | Phạm Hữu Lợi | Todo | [S27.7](https://trello.com/c/mKVADVLW) |
+| S27.8 · Tích hợp kho phục vụ SO | Võ Quốc Thiện | Todo, sau phần SYS | [S27.8](https://trello.com/c/otwGGI11) |
+| S27.9 · QA tích hợp | Phúc | Backlog, sau S27.6–S27.8 | [S27.9](https://trello.com/c/LEibiBiE) |
+
+Đã đọc lại các card trên Trello để xác minh người phụ trách, cột và bốn mục nghiệm thu mỗi card. Lượt này bàn giao tài liệu và phân công. Kiểm chứng runtime thuộc từng card. [Task record](../tasks/change-20261121-s27-branch-settings-planning.md)

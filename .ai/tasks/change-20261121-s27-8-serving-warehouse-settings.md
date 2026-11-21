@@ -27,7 +27,7 @@ Chi tiết ở `P-BA` và `P-TA`.
 - [x] F5 BE: đăng ký định nghĩa key module + `editorKey`, tab Kho của SYS đọc giá trị hiệu lực qua WMS (sau S27.6).
 - [x] F6 FE: component editor `wms.so_warehouse_policy` độc lập, dùng ngay trong modal "Kho phục vụ" ở trang Tồn kho; gắn vào shell S27.7 theo `editorKey` khi shell có.
 - [x] F7 Dictionary VI/EN BE/FE trùng byte cho key mới; verification BE + FE spec PASS.
-- [ ] F8 Tester PASS (kế thừa/ghi đè, xuất/hủy với kho đã chốt, IAM, desktop/mobile).
+- [x] F8 Tester PASS (kế thừa/ghi đè, xuất/hủy với kho đã chốt, IAM, desktop/mobile).
 
 ## 4. Cách làm
 - Xem `P-DESIGN`, `P-DEV`.
@@ -129,3 +129,14 @@ Chi tiết ở `P-BA` và `P-TA`.
 - Kiểm: BE build 0 lỗi, model sạch, Verification 769 PASS (DB verify đã DROP); FE build OK, UI-STD OK, ng test 328/328. Smoke HTTP trên env tester: GET includePolicy 200 + ETag, PUT thiếu If-Match 428, If-Match cũ 412, preview 200, SYS GET key module 200.
 - Ngoài phạm vi / chưa làm: lịch sử chưa có màn FE riêng (shell S27.7), warning SO nháp có kho bị loại (ngoài phạm vi BA).
 
+
+## P-TEST
+- **Kết quả: PASS** @ BE a67c9df · WMS 87fc49c · FE 0a0b8c5 · root 9bf3ab1 (2026-11-21, tester độc lập).
+- Migration trên DB kiểu S27.1 (`erpm_s278q` = `erpm_uistd` + migrate tới 20261120013934, chèn dòng S27.1, rồi `--migrate`): GET cũ 5/5 chi nhánh giống snapshot S27.1; Q1 chi nhánh con không có dòng → `own_warehouses`; Q2 mặc định bị tắt → mặc định chuyển sang kho hoạt động (dòng kho tắt bị soft-delete, đúng comment SQL); Q4 role có `sys:branch:edit` được thêm `sys:branch-setting:edit` (statement Deny không đổi).
+- API (21+8+15+5 check): kế thừa A→HN→Điểm bán, `own_warehouses` ở HN, về kế thừa, Công ty B độc lập, policy ở Group không truyền sang công ty; 428/412/thiếu lý do 400; ≥2 mặc định / danh sách rỗng 400; adapter PUT cũ (mảng / `[]`); history; SYS PUT key module → 409 `module_managed`.
+- SO: chọn sẵn kho mặc định; kho ngoài danh sách → `warehouse_not_serving`; gỡ kho đang giữ → preview blocker + 409, đổi mặc định được lưu; Q3 xuất hóa đơn/hủy SO đã giữ sau khi đổi policy chạy đúng kho đã giữ; Q2 runtime `invalid` chặn SO mới, admin vẫn sửa được.
+- IAM: ngoài scope 404 (GET mới + cũ), thiếu `setting:view` → includePolicy 404, thiếu `setting:edit` → 403 cả PUT cũ/mới, ảnh hưởng đơn vị con ngoài scope → 403 (preview không lộ dữ liệu), tên nguồn cấp trên ẩn khi không xem được.
+- Đồng thời: 12 confirm đua PUT gỡ kho cả hai chiều → một bên thắng, 0 lỗi 5xx, 0 deadlock/40P01, không có reservation ở kho ngoài danh sách.
+- UI (`tests/e2e/_qa278.mjs`, ảnh `_qa278_*.png`) 1366/390 × sáng/tối: lưu danh sách, hiện nguồn kế thừa, 412 giữ lý do + mặc định đã chọn và có nút "Tải lại cấu hình", form SO chọn sẵn kho mặc định và chỉ liệt kê kho hiệu lực.
+- BE Verification `VERIFIED 769 checks` (DB verify đã DROP); FE `ng test` 328/328; dictionary BE = FE (md5 0400a0db…); CI xanh BE/FE/root (WMS không có CI).
+- Ghi nhận nhỏ (không chặn): kho khác công ty/không hoạt động trong PUT trả 409 `warehouse_not_serving` thay vì 400 `invalid_value` của contract; editor liệt kê cả kho ngoài công ty (vd MAIN của Group) mà server sẽ từ chối.

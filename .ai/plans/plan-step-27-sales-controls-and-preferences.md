@@ -71,3 +71,7 @@ Nghiệm thu tách đủ quyền sửa, gửi duyệt, duyệt/từ chối, kíc
 - FE build, UI-STD, Angular spec và Chrome desktop/mobile; BE verification trên PostgreSQL tạm. Thêm E2E cho luồng SO nháp → tính giá → xác nhận/duyệt → giữ tồn → xuất hoặc hủy, và vòng đời phiên bản bảng giá.
 - Cập nhật dictionary VI/EN cùng lúc ở FE/BE, audit theo domain, kiểm tra quyền ở API lẫn UI. Thông báo chuyển trạng thái thực hiện theo [hướng dẫn tích hợp thông báo](../../docs/NOTIFICATION_INTEGRATION_GUIDE.md).
 - Theo dõi phân công và bằng chứng ở [step log](../steps/step-27-sales-controls-and-preferences.md).
+
+## S27.6–S27.9 · Branch Settings theo từng key
+
+Bổ sung cấu hình kế thừa theo cây chi nhánh, form quản trị theo định nghĩa và tích hợp nhóm kho phục vụ SO. [Kế hoạch Branch Settings](plan-step-27-branch-settings.md) · [API contract](../../docs/BRANCH_SETTINGS_API_CONTRACT.md)

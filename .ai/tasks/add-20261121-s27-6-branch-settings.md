@@ -68,3 +68,14 @@ n/a (BE-only; FE chỉ đồng bộ dictionary).
 - Commit / PR: xem dòng PR/SHA.
 - Ngày cập nhật cuối: 2026-11-21
 - Đã xác minh: build, pending-model, Verification. Chưa xác minh: tester độc lập.
+
+## P-TEST
+
+- QA độc lập 2026-11-21 trên BE#98 @1845613, FE#105 @b303ed5, ERPm#109 @801539f; API local :5306, DB `erpm_s276` (Docker :5433).
+- API theo contract: 125/125 check PASS (định nghĩa 201/409/400, resolver local → cha gần nhất → mặc định, giữ `false`/`0`, bỏ qua đơn vị inactive, không vượt công ty, 6 kiểu giá trị + 20 giá trị sai → 400, reset kế thừa, ETag 428/412/ETag mới, preview đúng tập con và không ghi, lịch sử old/new/who/when, không ghi khi giá trị không đổi, 5 vòng × 8 PUT đồng thời cùng ETag → đúng 1 thắng, quyền view/edit/manage_definition và scope 404/403).
+- Verification từ bản archive HEAD: VERIFIED 725 checks, 0 FAIL; đã DROP DB verify.
+- Build bản BE merge `origin/master`: 0 lỗi. `gh pr checks`: BE#98 pass, FE#105 pass, ERPm#109 không có check (đang conflict).
+- Dictionary: hai head chưa merge lệch nhau (BE#98 thiếu 3 key của BE#97); sau khi merge master vào bản sao BE#98 và FE#105 thì `cmp` giống hệt.
+- Lệch contract (không chặn): `errors` của 400 chỉ chứa mã lỗi, không có tên trường; `changedBy` là user id (`"1"`); 409 `module_managed` chưa thử qua API vì chưa có key module (Verification có kiểm).
+- Root FAIL: gitlink ERPm-BE conflict với master (ec8c972), ERPm-FE chưa trỏ FE#105 → `cmp` dictionary ở root sẽ lỗi. Cần pin lại cả hai về commit đã merge của repo con.
+- Kết luận: BE#98 PASS, FE#105 PASS, ERPm#109 FAIL (chỉ gitlink).

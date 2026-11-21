@@ -1,13 +1,13 @@
 # [change] S27.8 Dùng Branch Settings cho kho phục vụ SO
 
-> **Pipeline:** stage=DESIGN · round=BA/TA:1, DEV/TEST:0 · gate=PO-scope
-> **PR/SHA:** chưa có (root nhánh `thien/s27-8-serving-warehouse-settings`)
-> **Env:** none
-> **Metrics:** BA=? · TA=? · DESIGN=? · DEV=? · TEST=? · REPORT=?
+> **Pipeline:** stage=TEST · round=BA/TA:1, DEV/TEST:1 · gate=none
+> **PR/SHA:** BE I3Solution/ERPm-BE#99 @a67c9df · WMS I3Solution/ERPm-FE-WMS#9 @87fc49c · FE I3Solution/ERPm-FE#106 @0a0b8c5 · root (PR này)
+> **Env:** API http://localhost:5308 (DB Docker `erpm_s278` = template `erpm_uistd` + migrate), FE http://localhost:4308 (proxy → 5308), đăng nhập `admin`
+> **Metrics:** BA=? · TA=? · DESIGN=?/5p · DEV=?/120p · TEST=? · REPORT=?
 
 > **Loại:** change
 > **Ngày tạo:** 2026-11-21 · **Người làm:** Võ Quốc Thiện (AI BA/TA) · **Người yêu cầu:** Phúc (giao qua Trello)
-> **Trạng thái:** Todo
+> **Trạng thái:** Doing
 > **Progress aggregation:** v1
 > **Liên quan:** Trello https://trello.com/c/otwGGI11 · [plan Branch Settings](../plans/plan-step-27-branch-settings.md) · [API contract](../../docs/BRANCH_SETTINGS_API_CONTRACT.md) §4 · [planning](change-20261121-s27-branch-settings-planning.md) · [S27.1](change-20261119-s27-1-so-serving-warehouse.md) · phụ thuộc S27.6 (BE nền, `thien/s27-6-branch-settings`) và S27.7 (FE shell, Lợi, Todo)
 > **Phạm vi:** ERPm-BE WMS/SD (ServingWarehouses, StockService, StockController, OrderStockReservations, SalesOrderService, SalesPostingService, migration), ERPm-FE WMS (editor kho phục vụ), SD (form SO, chỉ thông báo lỗi), dictionary VI/EN
@@ -20,29 +20,29 @@
 Chi tiết ở `P-BA` và `P-TA`.
 
 ## 3. Features / Milestones
-- [ ] F1 BE: bảng `tbl_WMS_BranchWarehousePolicy` + migration backfill từ dữ liệu S27.1, không đổi kho hiệu lực của chi nhánh nào; Down an toàn.
-- [ ] F2 BE: resolver kế thừa (local → cha gần nhất trong cùng công ty → fallback `own_warehouses`), trả nguồn và trạng thái `invalid`; mọi caller SO/WMS dùng resolver này.
-- [ ] F3 BE: API WMS mới (`includePolicy`, `preview`, PUT có mode + `If-Match` + lý do) và adapter cho GET/PUT cũ; cùng quyền, scope IAM, lịch sử.
-- [ ] F4 BE: guard gỡ kho đang giữ tồn (preview + kiểm lại trong giao dịch, khóa thống nhất), chặn ghi ảnh hưởng đơn vị ngoài scope; SO đã chốt giữ kho khi xuất hóa đơn/hủy.
-- [ ] F5 BE: đăng ký định nghĩa key module + `editorKey`, tab Kho của SYS đọc giá trị hiệu lực qua WMS (sau S27.6).
-- [ ] F6 FE: component editor `wms.so_warehouse_policy` độc lập, dùng ngay trong modal "Kho phục vụ" ở trang Tồn kho; gắn vào shell S27.7 theo `editorKey` khi shell có.
-- [ ] F7 Dictionary VI/EN BE/FE trùng byte cho key mới; verification BE + FE spec PASS.
+- [x] F1 BE: bảng `tbl_WMS_BranchWarehousePolicy` + migration backfill từ dữ liệu S27.1, không đổi kho hiệu lực của chi nhánh nào; Down an toàn.
+- [x] F2 BE: resolver kế thừa (local → cha gần nhất trong cùng công ty → fallback `own_warehouses`), trả nguồn và trạng thái `invalid`; mọi caller SO/WMS dùng resolver này.
+- [x] F3 BE: API WMS mới (`includePolicy`, `preview`, PUT có mode + `If-Match` + lý do) và adapter cho GET/PUT cũ; cùng quyền, scope IAM, lịch sử.
+- [x] F4 BE: guard gỡ kho đang giữ tồn (preview + kiểm lại trong giao dịch, khóa thống nhất), chặn ghi ảnh hưởng đơn vị ngoài scope; SO đã chốt giữ kho khi xuất hóa đơn/hủy.
+- [x] F5 BE: đăng ký định nghĩa key module + `editorKey`, tab Kho của SYS đọc giá trị hiệu lực qua WMS (sau S27.6).
+- [x] F6 FE: component editor `wms.so_warehouse_policy` độc lập, dùng ngay trong modal "Kho phục vụ" ở trang Tồn kho; gắn vào shell S27.7 theo `editorKey` khi shell có.
+- [x] F7 Dictionary VI/EN BE/FE trùng byte cho key mới; verification BE + FE spec PASS.
 - [ ] F8 Tester PASS (kế thừa/ghi đè, xuất/hủy với kho đã chốt, IAM, desktop/mobile).
 
 ## 4. Cách làm
-- Chưa triển khai. Xem `P-TA` cho thứ tự.
+- Xem `P-DESIGN`, `P-DEV`.
 
 ## 5. Kiểm tra
-- Chưa chạy. Danh sách test ở `P-TA`.
+- BE build 0 lỗi; `has-pending-model-changes` sạch; Verification `VERIFIED 769 checks` (36 check S27.8 + 1 check cấp quyền Q4). FE `ng build` OK, `check-ui-std` OK, `ng test` 328 SUCCESS. Chưa chạy TEST (F8).
 
 ## 6. Việc còn lại
-- Chờ chủ card chốt câu hỏi mở trong `P-BA` (gate PO-scope), chờ S27.6 merge cho F3 (phần lịch sử/ETag/quyền), F5; chờ shell S27.7 cho phần gắn editor vào trang Cấu hình chi nhánh.
+- F8 tester. Shell S27.7 (Lợi): map `editorKey: 'wms.so_warehouse_policy'` → `ServingWarehousePolicyEditorComponent` (1 dòng registry), đổi nút "Kho phục vụ" ở Tồn kho thành link sang shell; lịch sử xem qua API SYS `.../settings/wms.so_warehouse_policy/history`.
 
 ## 7. Evidence và cập nhật
-- Commit / PR đã merge: chưa có.
+- Commit / PR: BE#99, WMS#9, FE#106, root PR (chưa merge).
 - CI / workflow run và kết quả: chưa có.
 - Ngày cập nhật cuối: 2026-11-21
-- Chỉ mới phân tích; chưa có code.
+- DEV xong, chờ TEST.
 
 ## P-BA
 **Quy tắc nghiệp vụ**
@@ -110,3 +110,22 @@ Chi tiết ở `P-BA` và `P-TA`.
 - BE `tests/ERPm.Verification/Program.cs` (cạnh khối S27.1 dòng 1172-1193): backfill giữ snapshot; kế thừa A→HN→Điểm bán theo từng mode; Công ty B độc lập; về kế thừa; `own_warehouses` ở cha dùng kho của đơn vị lập SO; invalid khi kho mặc định bị vô hiệu; adapter GET/PUT mảng/PUT `[]`; 428/412/thiếu lý do; gỡ kho có reservation → 409 + preview blocker; đổi mặc định được; ngoài scope → 403 (cả API cũ); ghi đồng thời với Confirm (2 DbContext) một bên thắng; hóa đơn/hủy SO đã chốt sau khi đổi cấu hình; lịch sử có dòng sau mỗi lần lưu.
 - FE spec: editor (tải SettingView, đổi mode, đúng một mặc định, gửi `If-Match` + lý do, 412 giữ form, 409 hiện blocker), `stock.service.spec`, cập nhật `order-detail.component.spec.ts` (lỗi warehouse_not_serving), inventory modal dùng editor. `ng build`, `ng test`, dictionary `cmp`.
 - E2E/tester: kế thừa/ghi đè, xuất/hủy với kho đã chốt, IAM, 1366 + 390.
+
+## P-DESIGN
+- Editor standalone `app-serving-warehouse-policy-editor` (WMS), host tạm modal "Kho phục vụ" ở Tồn kho: ô chọn đơn vị giữ nguyên, thân modal = editor, footer chỉ nút Hủy (nút Lưu/Xem ảnh hưởng nằm trong editor để shell S27.7 dùng lại).
+- Khối "Đang áp dụng": nguồn (Tự cấu hình / Kế thừa từ X / Kế thừa từ đơn vị cấp trên khi không được xem / Mặc định: kho của chính đơn vị) + danh sách kho, kho mặc định in đậm; trạng thái lỗi viền + nền `--erpm-danger-*`.
+- `app-form-control` select cho cách chọn kho (Kế thừa / Danh sách chỉ định / Kho của đơn vị lập đơn bán), bảng tick kho + radio mặc định chỉ hiện khi chọn danh sách; textarea lý do bắt buộc.
+- Xem ảnh hưởng: đơn vị đổi kho (trước → sau) + blocker "N đơn bán" màu lỗi; 412 → thông báo + nút "Tải lại cấu hình", giữ dữ liệu đang nhập. Không tự đặt cỡ chữ/chiều cao (UI-STD OK); bố cục flex-wrap cho 390.
+- i18n mới: `inventory.serving_policy_*` (18 key), `error.branch_setting.active_reservations`, `error.branch_setting.reason_required`; VI/EN BE = FE trùng byte.
+
+## P-DEV
+- BE (ERPm-BE#99, nhánh `thien/s27-8-serving-warehouse-settings`, đã merge master có S27.6): entity `BranchWarehousePolicy` + migration `20261121070924_AddBranchWarehousePolicy` (sau `20261121062222_AddBranchSettings`): backfill Q1/Q2 (SQL `AddBranchWarehousePolicy.BackfillSql`, chạy lại được), đăng ký định nghĩa module (`group=warehouse`, `value_type=object`, editorKey), cấp `sys:branch-setting:edit` cho statement Allow có `sys:branch:edit` ở role + inline user (Q4). Down: xóa bảng + định nghĩa; dòng S27.1 giữ.
+- Resolver `ServingWarehouses` (giữ chữ ký `ForBranchAsync/RequireAsync/ResolveAsync`): local → tổ tiên hoạt động cùng công ty → kho của chính đơn vị; danh sách lỗi → rỗng/`warehouse_not_serving` (Q2). `OrderStockReservations.ReserveAsync` lấy shared lock `serving:company:{id}` trước khóa stock; ghi policy lấy exclusive cùng key.
+- `StockService`: GET cũ (scope 404, invalid 409), `includePolicy` → `SettingViewDto` dùng chung + header ETag; preview/PUT có mode cần lý do + If-Match (428/412) → `SettingImpactDto`; PUT cũ = adapter (mảng có dòng = fixed_list, rỗng = own_warehouses), cùng quyền/scope/guard/lịch sử, không If-Match. Quyền: `sys:branch:edit` (attribute) AND `sys:branch-setting:edit` qua `ICurrentUser.CanAt` trên đơn vị đích và mọi đơn vị bị đổi (403); đọc policy cần `sys:branch-setting:view` (404); tên nguồn chỉ khi xem được. Guard: reservation Active ở kho bị mất → 409 `active_reservations`; đổi mặc định trong cùng danh sách được lưu. Lịch sử ghi `tbl_SYS_BranchSettingHistory` (revision tăng qua cả "kế thừa").
+- Q3: `SalesOrderInvoicing` báo `warehouseHeld` khi SO đang Reserved ở đúng kho → bỏ kiểm cấu hình, chỉ kiểm cùng công ty.
+- `ServingWarehousePolicyProvider : IBranchSettingModuleProvider` → SYS liệt kê key; API scalar ghi key này vẫn 409 `module_managed`.
+- Đơn vị gốc Group (cài đặt một công ty) vẫn ghi được qua API (giữ hành vi S27.1), dù contract nói Company/Branch.
+- FE: WMS#9 (`serving-warehouse-policy-editor/*`, `stock.service.ts`, modal Tồn kho) + FE#106 (con trỏ WMS, `system.json`). SD không đổi: banner lỗi toàn cục đã hiện `error.sd.warehouse_not_serving` từ BE.
+- Kiểm: BE build 0 lỗi, model sạch, Verification 769 PASS (DB verify đã DROP); FE build OK, UI-STD OK, ng test 328/328. Smoke HTTP trên env tester: GET includePolicy 200 + ETag, PUT thiếu If-Match 428, If-Match cũ 412, preview 200, SYS GET key module 200.
+- Ngoài phạm vi / chưa làm: lịch sử chưa có màn FE riêng (shell S27.7), warning SO nháp có kho bị loại (ngoài phạm vi BA).
+
